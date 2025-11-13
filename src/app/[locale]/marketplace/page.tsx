@@ -12,8 +12,10 @@ export default function MarketplacePage() {
   const [selectedPricing, setSelectedPricing] = useState("All");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const categoryRef = useRef<HTMLDivElement>(null);
   const pricingRef = useRef<HTMLDivElement>(null);
+  const PLUGINS_PER_PAGE = 12;
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -62,12 +64,24 @@ export default function MarketplacePage() {
     });
   }, [searchQuery, selectedCategory, selectedPricing]);
 
+  // Pagination
+  const totalPages = Math.ceil(filteredPlugins.length / PLUGINS_PER_PAGE);
+  const paginatedPlugins = useMemo(() => {
+    const startIndex = (currentPage - 1) * PLUGINS_PER_PAGE;
+    return filteredPlugins.slice(startIndex, startIndex + PLUGINS_PER_PAGE);
+  }, [filteredPlugins, currentPage]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, selectedPricing]);
+
   return (
     <main className="min-h-screen bg-[#0a0a0a]">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
+      <section className="relative pt-40 pb-32 overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0 z-0">
           <StarField density="medium" showComets={true} cometCount={3} />
@@ -75,18 +89,40 @@ export default function MarketplacePage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+          <div className="text-center mb-16">
+            <h1 className="text-5xl md:text-7xl font-bold mb-8">
               <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient-x">
                 KubeStellar Galaxy
               </span>
               <br />
               <span className="text-white">Marketplace</span>
             </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8">
               Extend your KubeStellar deployment with powerful plugins and
               tools. From free community projects to enterprise solutions.
             </p>
+            
+            {/* Stats */}
+            <div className="flex flex-wrap justify-center gap-8 mt-12">
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent mb-2">
+                  {plugins.length}+
+                </div>
+                <div className="text-gray-400 text-sm md:text-base">Plugins Available</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                  {plugins.filter(p => p.pricing.type === 'free').length}
+                </div>
+                <div className="text-gray-400 text-sm md:text-base">Free Plugins</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent mb-2">
+                  {Math.floor(plugins.reduce((sum, p) => sum + p.downloads, 0) / 100000)}K+
+                </div>
+                <div className="text-gray-400 text-sm md:text-base">Total Downloads</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -478,8 +514,8 @@ export default function MarketplacePage() {
           </div>
 
           {/* Plugin Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPlugins.map((plugin) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {paginatedPlugins.map((plugin) => (
               <div
                 key={plugin.id}
                 className="group bg-gray-800/30 backdrop-blur-sm border border-gray-700/50 rounded-xl overflow-hidden hover:border-purple-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1"
@@ -575,6 +611,43 @@ export default function MarketplacePage() {
               </div>
             ))}
           </div>
+
+          {/* Pagination */}
+          {filteredPlugins.length > 0 && totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-12">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 transition-all duration-300"
+              >
+                Previous
+              </button>
+              
+              <div className="flex gap-2">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-4 py-2 rounded-lg transition-all duration-300 ${
+                      currentPage === page
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                        : 'bg-gray-800/50 border border-gray-700/50 text-gray-300 hover:bg-gray-700/50'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 transition-all duration-300"
+              >
+                Next
+              </button>
+            </div>
+          )}
 
           {/* No Results */}
           {filteredPlugins.length === 0 && (

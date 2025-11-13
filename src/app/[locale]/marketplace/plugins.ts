@@ -919,4 +919,170 @@ Essential for regulated industries. One-time purchase, lifetime value.`,
     website: "https://compliancestar.io",
     tags: ["compliance", "governance", "auditing", "reporting", "premium"],
   },
+  {
+    id: "21",
+    name: "Service Mesh Bridge",
+    slug: "service-mesh-bridge",
+    tagline: "Connect and manage multiple service meshes",
+    description:
+      "Unified management for Istio, Linkerd, and Consul service meshes across your KubeStellar clusters. Centralized observability and control.",
+    longDescription: `Service Mesh Bridge provides a unified control plane for managing multiple service mesh implementations across your distributed clusters. Whether you're running Istio, Linkerd, Consul, or a mix of different meshes, Service Mesh Bridge gives you a single pane of glass for configuration, monitoring, and troubleshooting.
+
+Cross-mesh service discovery enables services in different meshes to communicate seamlessly. Advanced traffic management features allow you to implement sophisticated routing, load balancing, and failover strategies across mesh boundaries.
+
+Free forever, built by mesh enthusiasts for mesh enthusiasts.`,
+    icon: "🕸️",
+    category: "Networking",
+    pricing: {
+      type: "free",
+    },
+    author: "KubeStellar Community",
+    downloads: 9876,
+    rating: 4.7,
+    version: "1.2.4",
+    features: [
+      "Multi-mesh management",
+      "Cross-mesh service discovery",
+      "Unified observability dashboard",
+      "Traffic mirroring and shadowing",
+      "Centralized policy management",
+      "Mesh migration tools",
+      "Performance metrics aggregation",
+      "Integration with popular meshes",
+    ],
+    requirements: [
+      "KubeStellar v0.20.0 or higher",
+      "Service mesh installed (Istio/Linkerd/Consul)",
+    ],
+    compatibility: ["Linux", "macOS"],
+    screenshots: [],
+    documentation: "https://docs.kubestellar.io/plugins/service-mesh-bridge",
+    github: "https://github.com/kubestellar/service-mesh-bridge",
+    tags: ["service-mesh", "networking", "istio", "linkerd", "free"],
+  },
+  {
+    id: "22",
+    name: "Edge Monitor Pro",
+    slug: "edge-monitor-pro",
+    tagline: "Specialized monitoring for edge computing deployments",
+    description:
+      "Monitor edge devices and clusters with limited connectivity. Offline-first design, bandwidth-efficient metrics collection, and intelligent data aggregation.",
+    longDescription: `Edge Monitor Pro is built from the ground up for the unique challenges of edge computing. Handle intermittent connectivity, bandwidth constraints, and resource-limited devices with ease. Smart data aggregation ensures you get the insights you need without overwhelming your edge infrastructure.
+
+Local data retention keeps critical metrics available even when connectivity is lost. When connection is restored, intelligent sync ensures central visibility without flooding your network. Edge-specific alerts handle scenarios like prolonged disconnection or unusual power consumption.
+
+Purpose-built for IoT, retail, manufacturing, and remote deployments.`,
+    icon: "📡",
+    category: "Observability",
+    pricing: {
+      type: "monthly",
+      amount: 119,
+    },
+    author: "EdgeTech Solutions",
+    downloads: 6234,
+    rating: 4.8,
+    version: "2.4.0",
+    features: [
+      "Offline-first architecture",
+      "Bandwidth-efficient metrics",
+      "Local data retention",
+      "Intelligent sync when online",
+      "Edge-specific alerts",
+      "Device health monitoring",
+      "Power consumption tracking",
+      "Mobile app for remote access",
+    ],
+    requirements: [
+      "KubeStellar v0.21.0 or higher",
+      "Edge clusters with limited resources",
+    ],
+    compatibility: ["Linux", "ARM"],
+    screenshots: [],
+    documentation: "https://docs.edgetechsolutions.io",
+    website: "https://edgetechsolutions.io",
+    tags: ["edge", "monitoring", "iot", "observability", "premium"],
+  },
+  {
+    id: "23",
+    name: "Multi-Tenancy Manager",
+    slug: "multi-tenancy-manager",
+    tagline: "Enterprise-grade multi-tenancy for KubeStellar",
+    description:
+      "Implement secure multi-tenancy with isolated namespaces, RBAC templates, resource quotas, and tenant-specific policies across your cluster fleet.",
+    longDescription: `Multi-Tenancy Manager transforms your KubeStellar deployment into a secure, multi-tenant platform. Onboard new tenants in seconds with pre-configured isolation, security policies, and resource limits. Each tenant gets their own isolated environment while you maintain centralized control and visibility.
+
+Hierarchical namespace support enables complex organizational structures. Per-tenant billing and showback reports make it easy to track and allocate costs. Advanced RBAC templates ensure security best practices are enforced automatically.
+
+Perfect for SaaS platforms, shared services, and organizations with multiple teams.`,
+    icon: "🏢",
+    category: "Governance",
+    pricing: {
+      type: "one-time",
+      amount: 599,
+    },
+    author: "TenantStar Enterprise",
+    downloads: 3892,
+    rating: 4.9,
+    version: "3.0.1",
+    features: [
+      "Automated tenant onboarding",
+      "Hierarchical namespaces",
+      "RBAC template library",
+      "Resource quota management",
+      "Network isolation policies",
+      "Per-tenant billing reports",
+      "Tenant self-service portal",
+      "Audit logging per tenant",
+    ],
+    requirements: [
+      "KubeStellar v0.21.0 or higher",
+      "Kubernetes 1.25+",
+    ],
+    compatibility: ["Linux", "macOS", "Windows"],
+    screenshots: [],
+    documentation: "https://docs.tenantstar.io",
+    website: "https://tenantstar.io",
+    tags: ["multi-tenancy", "governance", "rbac", "enterprise", "premium"],
+  },
+  {
+    id: "24",
+    name: "Chaos Engineering Toolkit",
+    slug: "chaos-engineering-toolkit",
+    tagline: "Test resilience with controlled chaos experiments",
+    description:
+      "Free chaos engineering toolkit for KubeStellar. Inject failures, test failover mechanisms, and validate resilience across your distributed infrastructure.",
+    longDescription: `Chaos Engineering Toolkit brings the power of chaos engineering to KubeStellar deployments. Test your system's resilience by injecting controlled failures, simulating network issues, and validating failover mechanisms. Learn how your system behaves under stress before real failures occur.
+
+Pre-built experiment templates cover common scenarios like pod failures, network latency, resource exhaustion, and cluster partitions. Safety mechanisms ensure experiments can be aborted and rolled back if needed. Detailed reports show exactly how your system responded.
+
+Free and open source, inspired by Chaos Mesh and powered by the community.`,
+    icon: "🌪️",
+    category: "Development Tools",
+    pricing: {
+      type: "free",
+    },
+    author: "KubeStellar Community",
+    downloads: 7654,
+    rating: 4.6,
+    version: "1.6.0",
+    features: [
+      "Pod failure injection",
+      "Network chaos (latency, packet loss)",
+      "Resource stress testing",
+      "Time chaos experiments",
+      "Scheduled experiments",
+      "Safety mechanisms and rollback",
+      "Experiment templates library",
+      "Integration with CI/CD",
+    ],
+    requirements: [
+      "KubeStellar v0.20.0 or higher",
+      "Kubernetes 1.24+",
+    ],
+    compatibility: ["Linux", "macOS"],
+    screenshots: [],
+    documentation: "https://docs.kubestellar.io/plugins/chaos-toolkit",
+    github: "https://github.com/kubestellar/chaos-toolkit",
+    tags: ["chaos-engineering", "testing", "resilience", "sre", "free"],
+  },
 ];

@@ -1611,7 +1611,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 }
 
 .animate-slide-partners {
-  animation: slide-partners 30s linear infinite;
+  animation: slide-partners 60s linear infinite;
   will-change: transform;
 }
 
