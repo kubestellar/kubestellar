@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Navbar, Footer } from "@/components";
@@ -12,10 +12,9 @@ export default function PluginDetailPage() {
   const t = useTranslations("marketplace");
   const plugins = usePlugins();
   const params = useParams();
-  const router = useRouter();
   const slug = params.slug as string;
 
-  const plugin = plugins.find((p) => p.slug === slug);
+  const plugin = plugins.find(p => p.slug === slug);
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [installedSuccess, setInstalledSuccess] = useState(false);
@@ -129,7 +128,10 @@ export default function PluginDetailPage() {
                       <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full">
                         {plugin.category}
                       </span>
-                      <span className="text-gray-400">{t("plugin.version")}{plugin.version}</span>
+                      <span className="text-gray-400">
+                        {t("plugin.version")}
+                        {plugin.version}
+                      </span>
                       <span className="text-gray-400">
                         {t("plugin.by")} {plugin.author}
                       </span>
@@ -166,7 +168,10 @@ export default function PluginDetailPage() {
                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                       />
                     </svg>
-                    <span>{plugin.downloads.toLocaleString()} {t("plugin.downloads")}</span>
+                    <span>
+                      {plugin.downloads.toLocaleString()}{" "}
+                      {t("plugin.downloads")}
+                    </span>
                   </div>
                 </div>
 
@@ -337,7 +342,9 @@ export default function PluginDetailPage() {
               </div>
 
               <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-white mb-4">{t("plugin.maintainers")}</h3>
+                <h3 className="text-xl font-bold text-white mb-4">
+                  {t("plugin.maintainers")}
+                </h3>
                 <ul className="space-y-2">
                   <li className="text-gray-300 text-sm flex items-start gap-2">
                     <span className="text-purple-400 mt-1">•</span>
@@ -372,7 +379,9 @@ export default function PluginDetailPage() {
 
               {/* Tags */}
               <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-white mb-4">{t("plugin.tags")}</h3>
+                <h3 className="text-xl font-bold text-white mb-4">
+                  {t("plugin.tags")}
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {plugin.tags.map((tag, index) => (
                     <span
@@ -387,7 +396,9 @@ export default function PluginDetailPage() {
 
               {/* Links */}
               <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-white mb-4">{t("plugin.links")}</h3>
+                <h3 className="text-xl font-bold text-white mb-4">
+                  {t("plugin.links")}
+                </h3>
                 <div className="space-y-3">
                   <a
                     href={plugin.documentation}
@@ -492,16 +503,26 @@ export default function PluginDetailPage() {
                 {/* Payment Details */}
                 <div className="bg-gray-900/50 rounded-xl p-4 mb-6 border border-gray-700/50">
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-gray-400">{t("payment.details.plugin")}</span>
-                    <span className="text-white font-semibold">{plugin.name}</span>
+                    <span className="text-gray-400">
+                      {t("payment.details.plugin")}
+                    </span>
+                    <span className="text-white font-semibold">
+                      {plugin.name}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-gray-400">{t("payment.details.licenseType")}</span>
-                    <span className="text-white capitalize">{plugin.pricing.type}</span>
+                    <span className="text-gray-400">
+                      {t("payment.details.licenseType")}
+                    </span>
+                    <span className="text-white capitalize">
+                      {plugin.pricing.type}
+                    </span>
                   </div>
                   <div className="border-t border-gray-700/50 my-3"></div>
                   <div className="flex justify-between items-center">
-                    <span className="text-white font-semibold">{t("payment.details.total")}</span>
+                    <span className="text-white font-semibold">
+                      {t("payment.details.total")}
+                    </span>
                     <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                       ${plugin.pricing.amount}
                     </span>
@@ -511,7 +532,9 @@ export default function PluginDetailPage() {
                 {/* Mock Payment Form */}
                 <div className="space-y-4 mb-6">
                   <div>
-                    <label className="block text-sm text-gray-400 mb-2">{t("payment.form.cardNumber")}</label>
+                    <label className="block text-sm text-gray-400 mb-2">
+                      {t("payment.form.cardNumber")}
+                    </label>
                     <input
                       type="text"
                       placeholder={t("payment.form.cardPlaceholder")}
@@ -521,7 +544,9 @@ export default function PluginDetailPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-gray-400 mb-2">{t("payment.form.expiry")}</label>
+                      <label className="block text-sm text-gray-400 mb-2">
+                        {t("payment.form.expiry")}
+                      </label>
                       <input
                         type="text"
                         placeholder={t("payment.form.expiryPlaceholder")}
@@ -530,7 +555,9 @@ export default function PluginDetailPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-400 mb-2">{t("payment.form.cvv")}</label>
+                      <label className="block text-sm text-gray-400 mb-2">
+                        {t("payment.form.cvv")}
+                      </label>
                       <input
                         type="text"
                         placeholder={t("payment.form.cvvPlaceholder")}

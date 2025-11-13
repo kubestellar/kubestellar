@@ -43,17 +43,17 @@ export default function MarketplacePage() {
 
   // Extract unique categories
   const categories = useMemo(() => {
-    const cats = new Set(plugins.map((p) => p.category));
+    const cats = new Set(plugins.map(p => p.category));
     return ["All", ...Array.from(cats)];
   }, []);
 
   // Filter plugins
   const filteredPlugins = useMemo(() => {
-    return plugins.filter((plugin) => {
+    return plugins.filter(plugin => {
       const matchesSearch =
         plugin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         plugin.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        plugin.tags.some((tag) =>
+        plugin.tags.some(tag =>
           tag.toLowerCase().includes(searchQuery.toLowerCase())
         );
 
@@ -104,26 +104,35 @@ export default function MarketplacePage() {
               Extend your KubeStellar deployment with powerful plugins and
               tools. From free community projects to enterprise solutions.
             </p>
-            
+
             {/* Stats */}
             <div className="flex flex-wrap justify-center gap-8 mt-12">
               <div className="text-center">
                 <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent mb-2">
                   {plugins.length}+
                 </div>
-                <div className="text-gray-400 text-sm md:text-base">Plugins Available</div>
+                <div className="text-gray-400 text-sm md:text-base">
+                  Plugins Available
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
-                  {plugins.filter(p => p.pricing.type === 'free').length}
+                  {plugins.filter(p => p.pricing.type === "free").length}
                 </div>
-                <div className="text-gray-400 text-sm md:text-base">Free Plugins</div>
+                <div className="text-gray-400 text-sm md:text-base">
+                  Free Plugins
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent mb-2">
-                  {Math.floor(plugins.reduce((sum, p) => sum + p.downloads, 0) / 100000)}K+
+                  {Math.floor(
+                    plugins.reduce((sum, p) => sum + p.downloads, 0) / 100000
+                  )}
+                  K+
                 </div>
-                <div className="text-gray-400 text-sm md:text-base">Total Downloads</div>
+                <div className="text-gray-400 text-sm md:text-base">
+                  Total Downloads
+                </div>
               </div>
             </div>
           </div>
@@ -154,19 +163,28 @@ export default function MarketplacePage() {
             <div className="flex gap-6 animate-slide-partners">
               {/* Get top 6 plugins by downloads and triple them for seamless loop */}
               {[
-                ...plugins.slice().sort((a, b) => b.downloads - a.downloads).slice(0, 6),
-                ...plugins.slice().sort((a, b) => b.downloads - a.downloads).slice(0, 6),
-                ...plugins.slice().sort((a, b) => b.downloads - a.downloads).slice(0, 6),
+                ...plugins
+                  .slice()
+                  .sort((a, b) => b.downloads - a.downloads)
+                  .slice(0, 6),
+                ...plugins
+                  .slice()
+                  .sort((a, b) => b.downloads - a.downloads)
+                  .slice(0, 6),
+                ...plugins
+                  .slice()
+                  .sort((a, b) => b.downloads - a.downloads)
+                  .slice(0, 6),
               ].map((plugin, index) => (
                 <div
                   key={`${plugin.id}-${index}`}
                   className="flex-shrink-0 w-[400px] group/card"
-                  onMouseEnter={(e) => {
+                  onMouseEnter={e => {
                     e.currentTarget
                       .closest(".animate-slide-partners")
                       ?.classList.add("pause-animation");
                   }}
-                  onMouseLeave={(e) => {
+                  onMouseLeave={e => {
                     e.currentTarget
                       .closest(".animate-slide-partners")
                       ?.classList.remove("pause-animation");
@@ -276,7 +294,7 @@ export default function MarketplacePage() {
               .slice()
               .sort((a, b) => b.downloads - a.downloads)
               .slice(0, 6)
-              .map((plugin) => (
+              .map(plugin => (
                 <Link
                   key={plugin.id}
                   href={`/marketplace/${plugin.slug}`}
@@ -366,9 +384,7 @@ export default function MarketplacePage() {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
               {t("browse.title")}
             </h2>
-            <p className="text-gray-400">
-              {t("browse.subtitle")}
-            </p>
+            <p className="text-gray-400">{t("browse.subtitle")}</p>
           </div>
 
           {/* Search and Filters */}
@@ -380,7 +396,7 @@ export default function MarketplacePage() {
                   type="text"
                   placeholder={t("browse.searchPlaceholder")}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={e => setSearchQuery(e.target.value)}
                   className="w-full px-6 py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm"
                 />
                 <svg
@@ -426,7 +442,7 @@ export default function MarketplacePage() {
                 </button>
                 {isCategoryOpen && (
                   <div className="absolute z-50 mt-2 w-full md:w-64 bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl py-2 ring-1 ring-gray-700/50 max-h-96 overflow-y-auto scrollbar-hide">
-                    {categories.map((cat) => (
+                    {categories.map(cat => (
                       <button
                         key={cat}
                         onClick={() => {
@@ -459,10 +475,10 @@ export default function MarketplacePage() {
                     {selectedPricing === "All"
                       ? t("browse.pricingFilter.all")
                       : selectedPricing === "free"
-                      ? t("browse.pricingFilter.free")
-                      : selectedPricing === "monthly"
-                      ? t("browse.pricingFilter.monthly")
-                      : t("browse.pricingFilter.oneTime")}
+                        ? t("browse.pricingFilter.free")
+                        : selectedPricing === "monthly"
+                          ? t("browse.pricingFilter.monthly")
+                          : t("browse.pricingFilter.oneTime")}
                   </span>
                   <svg
                     className={`w-5 h-5 transition-transform duration-200 ${
@@ -487,7 +503,7 @@ export default function MarketplacePage() {
                       { value: "free", label: "Free" },
                       { value: "monthly", label: "Monthly" },
                       { value: "one-time", label: "One-time" },
-                    ].map((option) => (
+                    ].map(option => (
                       <button
                         key={option.value}
                         onClick={() => {
@@ -512,13 +528,14 @@ export default function MarketplacePage() {
           {/* Results Count */}
           <div className="mb-6">
             <p className="text-gray-400">
-              {t("browse.showing")} {filteredPlugins.length} {t("browse.of")} {plugins.length} {t("browse.plugins")}
+              {t("browse.showing")} {filteredPlugins.length} {t("browse.of")}{" "}
+              {plugins.length} {t("browse.plugins")}
             </p>
           </div>
 
           {/* Plugin Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {paginatedPlugins.map((plugin) => (
+            {paginatedPlugins.map(plugin => (
               <div
                 key={plugin.id}
                 className="group bg-gray-800/30 backdrop-blur-sm border border-gray-700/50 rounded-xl overflow-hidden hover:border-purple-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1"
@@ -625,25 +642,29 @@ export default function MarketplacePage() {
               >
                 {t("browse.pagination.previous")}
               </button>
-              
+
               <div className="flex gap-2">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-4 py-2 rounded-lg transition-all duration-300 ${
-                      currentPage === page
-                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                        : 'bg-gray-800/50 border border-gray-700/50 text-gray-300 hover:bg-gray-700/50'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  page => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-4 py-2 rounded-lg transition-all duration-300 ${
+                        currentPage === page
+                          ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+                          : "bg-gray-800/50 border border-gray-700/50 text-gray-300 hover:bg-gray-700/50"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
               </div>
 
               <button
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                onClick={() =>
+                  setCurrentPage(prev => Math.min(totalPages, prev + 1))
+                }
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 transition-all duration-300"
               >
@@ -659,9 +680,7 @@ export default function MarketplacePage() {
               <h3 className="text-2xl font-bold text-white mb-2">
                 {t("browse.noResults.title")}
               </h3>
-              <p className="text-gray-400">
-                {t("browse.noResults.subtitle")}
-              </p>
+              <p className="text-gray-400">{t("browse.noResults.subtitle")}</p>
             </div>
           )}
         </div>
