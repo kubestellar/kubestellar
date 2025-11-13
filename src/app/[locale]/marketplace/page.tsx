@@ -125,9 +125,7 @@ export default function MarketplacePage() {
               </div>
               <div className="text-center">
                 <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent mb-2">
-                  {Math.floor(
-                    plugins.reduce((sum, p) => sum + p.downloads, 0)
-                  )}
+                  {Math.floor(plugins.reduce((sum, p) => sum + p.downloads, 0))}
                   +
                 </div>
                 <div className="text-gray-400 text-sm md:text-base">
