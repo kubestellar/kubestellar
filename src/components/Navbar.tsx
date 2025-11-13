@@ -360,7 +360,7 @@ export default function Navbar() {
         {/* Grid lines background */}
         <GridLines />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-7xl mx-auto px-0.5 sm:px-2 lg:px-1 relative">
           <div className="flex justify-between h-16 items-center">
             {/* Left side: Logo */}
             <Link href="/" className="cursor-pointer">
@@ -581,6 +581,25 @@ export default function Navbar() {
                       </svg>
                       {t("products")}
                     </Link>
+                    <Link
+                      href="/ladder"
+                      className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md"
+                    >
+                      <svg
+                        className="w-4 h-4 mr-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                        ></path>
+                      </svg>
+                      {t("ladder")}
+                    </Link>
                     <a
                       href="#security"
                       className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md"
@@ -683,25 +702,6 @@ export default function Navbar() {
                         ></path>
                       </svg>
                       {t("programs")}
-                    </Link>
-                    <Link
-                      href="/ladder"
-                      className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-cyan-900/30 rounded transition-all duration-200 hover:text-cyan-300 hover:shadow-md"
-                    >
-                      <svg
-                        className="w-4 h-4 mr-3"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                        ></path>
-                      </svg>
-                      {t("ladder")}
                     </Link>
                     <a
                       href="#contact-us"
@@ -1010,6 +1010,29 @@ export default function Navbar() {
                     <span>{t("contributeHandbook")}</span>
                   </Link>
                 </div>
+                <div className="relative mb-2">
+                  <Link
+                    href="/ladder"
+                    className="text-sm sm:text-base font-medium text-gray-300 flex items-center space-x-1 px-3 py-2 rounded-lg"
+                  >
+                    <div className="relative">
+                      <svg
+                        className="w-5 h-5 mr-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                        ></path>
+                      </svg>
+                    </div>
+                    <span>{t("ladder")}</span>
+                  </Link>
+                </div>
                 <div className="relative mb-4">
                   <a
                     href="#security"
@@ -1083,29 +1106,6 @@ export default function Navbar() {
                       </svg>
                     </div>
                     <span>{t("programs")}</span>
-                  </Link>
-                </div>
-                <div className="relative mb-2">
-                  <Link
-                    href="/ladder"
-                    className="text-sm sm:text-base font-medium text-gray-300 flex items-center space-x-1 px-3 py-2 rounded-lg"
-                  >
-                    <div className="relative">
-                      <svg
-                        className="w-5 h-5 mr-3"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                        ></path>
-                      </svg>
-                    </div>
-                    <span>{t("ladder")}</span>
                   </Link>
                 </div>
                 <div className="relative mb-2">
