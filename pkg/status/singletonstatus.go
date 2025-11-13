@@ -63,22 +63,22 @@ func (c *Controller) updateWorkStatusToObject(ctx context.Context, workStatusON 
 
 func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
-	isSingletonRequested, nWECs, qualifiedWEC := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
-	logger.V(4).Info("Workload object (singleton status requested)", "object", wObjID, "isSingletonRequested", isSingletonRequested, "nWECs", nWECs)
+	isSingletonRequested, qualifiedWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
+	logger.V(4).Info("Workload object (singleton status requested)", "object", wObjID, "isSingletonRequested", isSingletonRequested, "nWECs", qualifiedWECs)
 
 	// TODO: GetMultiWECReportedStateRequestForObject is yet to be implemented.
 	// just declaring these variables, we will get its actual value once above function is implemented.
 	var isMultiWECRequested bool
-	logger.V(4).Info("Workload object (multiWEC status requested)", "object", wObjID, "isMultiWECRequested", isMultiWECRequested, "nWECsMulti", nWECs)
+	logger.V(4).Info("Workload object (multiWEC status requested)", "object", wObjID, "isMultiWECRequested", isMultiWECRequested, "nWECsMulti", qualifiedWECs)
 
-	if (isMultiWECRequested || isSingletonRequested) && nWECs == 1 {
-		logger.V(4).Info("Either singleton or multiWEC status is requested and nWEC == 1", "object: ", wObjID, "nWEC", nWECs)
-		return c.handleSingleton(ctx, wObjID, qualifiedWEC)
+	if (isMultiWECRequested || isSingletonRequested) && qualifiedWECs.Len() == 1 {
+		logger.V(4).Info("Either singleton or multiWEC status is requested and qualifiedWECs == 1", "object: ", wObjID, "qualifiedWECs", qualifiedWECs)
+		return c.handleSingleton(ctx, wObjID, qualifiedWECs)
 	}
 
-	if isMultiWECRequested && nWECs > 1 {
-		logger.V(4).Info("multiWEC status is requested and nWEC != 1", "object: ", wObjID, "nWEC", nWECs)
-		return c.handleMultiWEC(ctx, wObjID, nWECs)
+	if isMultiWECRequested && qualifiedWECs.Len() > 1 {
+		logger.V(4).Info("multiWEC status is requested and nWEC != 1", "object: ", wObjID, "nWEC", qualifiedWECs)
+		return c.handleMultiWEC(ctx, wObjID, qualifiedWECs)
 	}
 
 	logger.V(4).Info("None of the above condition for singleton and multiwec is true for workload object", wObjID)
