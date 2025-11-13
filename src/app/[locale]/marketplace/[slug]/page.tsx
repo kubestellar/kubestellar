@@ -333,6 +333,41 @@ export default function PluginDetailPage() {
                 </div>
               </div>
 
+              {/* Maintainers */}
+              <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6">
+                <h3 className="text-xl font-bold text-white mb-4">Maintainers</h3>
+                <ul className="space-y-2">
+                  <li className="text-gray-300 text-sm flex items-start gap-2">
+                    <span className="text-purple-400 mt-1">•</span>
+                    <span>
+                      Andy Anderson -{" "}
+                      <a
+                        href="https://github.com/pdettori"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-purple-400 hover:text-purple-300 transition-colors underline"
+                      >
+                        GitHub
+                      </a>
+                    </span>
+                  </li>
+                  {/* <li className="text-gray-300 text-sm flex items-start gap-2">
+                    <span className="text-purple-400 mt-1">•</span>
+                    <span>
+                      Mike Spreitzer -{" "}
+                      <a
+                        href="https://github.com/MikeSpreitzer"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-purple-400 hover:text-purple-300 transition-colors underline"
+                      >
+                        GitHub
+                      </a>
+                    </span>
+                  </li> */}
+                </ul>
+              </div>
+
               {/* Tags */}
               <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6">
                 <h3 className="text-xl font-bold text-white mb-4">Tags</h3>
