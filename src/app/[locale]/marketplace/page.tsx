@@ -5,10 +5,11 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Navbar, Footer } from "@/components";
 import { GridLines, StarField } from "@/components/";
-import { plugins } from "./plugins";
+import { usePlugins } from "./plugins";
 
 export default function MarketplacePage() {
   const t = useTranslations("marketplace");
+  const plugins = usePlugins();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedPricing, setSelectedPricing] = useState("All");

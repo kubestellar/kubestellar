@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
 export interface Plugin {
   id: string;
   name: string;
@@ -25,30 +29,33 @@ export interface Plugin {
   tags: string[];
 }
 
-export const plugins: Plugin[] = [
-  {
-    id: "1",
-    name: "KubeCtl Multi",
-    slug: "kubectl-multi",
-    tagline: "Execute kubectl commands across multiple clusters simultaneously",
-    description:
-      "Streamline your multi-cluster operations with KubeCtl Multi. Execute commands across all your KubeStellar-managed clusters with a single command.",
-    longDescription: `KubeCtl Multi is the ultimate productivity tool for managing multiple Kubernetes clusters through KubeStellar. Built specifically for the KubeStellar ecosystem, it allows you to execute kubectl commands across all your managed clusters simultaneously, saving hours of manual work.
+export function usePlugins(): Plugin[] {
+  const t = useTranslations("marketplace");
+
+  return [
+    {
+      id: "1",
+      name: "KubeCtl Multi",
+      slug: "kubectl-multi",
+      tagline: "Execute kubectl commands across multiple clusters simultaneously",
+      description:
+        "Streamline your multi-cluster operations with KubeCtl Multi. Execute commands across all your KubeStellar-managed clusters with a single command.",
+      longDescription: `KubeCtl Multi is the ultimate productivity tool for managing multiple Kubernetes clusters through KubeStellar. Built specifically for the KubeStellar ecosystem, it allows you to execute kubectl commands across all your managed clusters simultaneously, saving hours of manual work.
 
 With intelligent context switching and parallel execution, KubeCtl Multi ensures your operations are fast, reliable, and consistent across your entire infrastructure. Whether you're deploying applications, updating configurations, or troubleshooting issues, KubeCtl Multi makes it seamless.
 
 Perfect for DevOps teams managing edge deployments, hybrid clouds, or geographically distributed clusters.`,
-    icon: "🎯",
-    category: "CLI Tools",
-    pricing: {
-      type: "free",
-    },
-    author: "KubeStellar Core Team",
-    downloads: 15420,
-    rating: 4.8,
-    version: "2.1.0",
-    features: [
-      "Execute commands across all clusters simultaneously",
+      icon: "🎯",
+      category: t("categories.cliTools"),
+      pricing: {
+        type: "free",
+      },
+      author: "KubeStellar Core Team",
+      downloads: 15420,
+      rating: 4.8,
+      version: "2.1.0",
+      features: [
+        "Execute commands across all clusters simultaneously",
       "Intelligent context switching and management",
       "Parallel execution with customizable concurrency",
       "Built-in safety checks and rollback mechanisms",
@@ -81,7 +88,7 @@ Monitor sync health across your entire cluster fleet with beautiful dashboards, 
 
 Trusted by Fortune 500 companies to keep their distributed applications in perfect harmony.`,
     icon: "🔄",
-    category: "Synchronization",
+    category: t("categories.synchronization"),
     pricing: {
       type: "monthly",
       amount: 99,
@@ -130,7 +137,7 @@ Get instant visibility into security postures across all edge locations, automat
 
 SOC 2, ISO 27001, and HIPAA compliant out of the box.`,
     icon: "🛡️",
-    category: "Security",
+    category: t("categories.security"),
     pricing: {
       type: "monthly",
       amount: 149,
@@ -173,12 +180,12 @@ Our machine learning algorithms detect anomalies before they impact your applica
 
 Reduce MTTR by 70% and proactively prevent 90% of incidents with Stellar Insights.`,
     icon: "📊",
-    category: "Observability",
+    category: t("categories.observability"),
     pricing: {
       type: "one-time",
       amount: 299,
     },
-    author: "ObservaStar",
+    author: "ObservaStar Technologies",
     downloads: 12453,
     rating: 4.9,
     version: "2.3.1",
@@ -222,11 +229,11 @@ Built for both developers and operators, Cluster Navigator makes complex multi-c
 
 Free and open source, trusted by over 15,000 KubeStellar users worldwide.`,
     icon: "🗺️",
-    category: "Visualization",
+    category: t("categories.visualization"),
     pricing: {
       type: "free",
     },
-    author: "KubeStellar Community",
+    author: "KubeStellar Core Team",
     downloads: 18765,
     rating: 4.6,
     version: "1.5.3",
@@ -1086,3 +1093,7 @@ Free and open source, inspired by Chaos Mesh and powered by the community.`,
     tags: ["chaos-engineering", "testing", "resilience", "sre", "free"],
   },
 ];
+}
+
+// For backward compatibility, export a static version
+export const plugins: Plugin[] = [];
