@@ -1,0 +1,27 @@
+name: Feedback Wanted
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  feedback:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Comment feedback request
+        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            🎉 Thank you for your contribution! Your PR has been successfully merged.
+
+            We’d love to hear your thoughts to help improve KubeStellar.
+            Please take a moment to fill out our short feedback survey:
+
+            https://forms.gle/WJ7N6ZVtp44D9NK79
