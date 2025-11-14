@@ -1,51 +1,24 @@
-# Proposal: Multi-WEC Aggregated Status Controller Enhancement
+# Multi-WEC Aggregated Status
 
-## Note: This isn't fully implemented. Implementation work is ongoing and the feature won't work till implementation work is done. 
+This page describes how KubeStellar returns status information to workload objects in a Workload Description Space (WDS) when those objects are downsynced to more than one Workload Execution Cluster (WEC). This mechanism complements the existing singleton reported state feature and allows the `.status` field of the workload object in the WDS to reflect an aggregated result from multiple WECs.
 
-**Status:** Proposal  
-**Related Issue:** [#2809 – KubeStellar controller logic to map back the status from WECs to READY values in WDSes](https://github.com/kubestellar/kubestellar/issues/2809)
+## Overview
 
----
+KubeStellar propagates workload objects from a WDS to one or more WECs according to the bindings specified by the user. When a workload is downsynced to exactly one WEC, users may request singleton reported state, which copies the `.status` field from that WEC to the corresponding object in the WDS.
 
-## Current Scenario
+When a workload is downsynced to multiple WECs, the default behavior leaves the `.status` field of the WDS object empty. Users can inspect the `CombinedStatus` objects for full per-cluster details, but the workload object itself does not show a summarized readiness or health view.
 
-In the current KubeStellar implementation:
+The Multi-WEC Aggregated Status option allows users to request status aggregation in these multi-cluster cases. The aggregated status is written into the `.status` field of the workload object in the WDS using deterministic rules.
 
-### Case 1 — Single WEC and `wantSingletonReportedState` is true  
-The WDS workload `.status` is propagated from the single WEC.
+## Enabling Multi-WEC Status Reporting
 
-### Case 2 - Multiple WEC and `wantSingletonReportedState` is true  
-For workloads deployed to multiple WECs when `wantSingletonReportedState` is true then `.status` field in the WDS remains empty.
+Status return is configured in the `DownsyncModulation` section of a `BindingPolicy` or `Binding`. To request aggregated status from multiple WECs, set:
 
-### Case 3 — Multiple WECs and `wantSingletonReportedState` is false  
-For workloads deployed to multiple WECs, the `.status` field in the WDS remains empty.
+```yaml
+wantMultiWECReportedState: true
+```
 
-This leads to limited visibility in ArgoCD, where workloads appear as *Unknown*, even though all WECs are healthy.
-
-**Reference:**  
-- [PR #3297](https://github.com/kubestellar/kubestellar/pull/3297)  
-- [Multi-cluster example in docs](https://docs.kubestellar.io/release-0.28.0/direct/example-scenarios/#scenario-1-multi-cluster-workload-deployment-with-kubectl)
-
----
-
-## Goal
-
-KubeStellar already collects per-WEC status in `WorkStatus` objects. This enhancement propagates that aggregated information into the `.status` field of the original workload object in the WDS, enabling ArgoCD and similar tools to observe combined readiness and health across all WECs.
-
-This ensures required status fields are populated correctly but not limited to only that. We provide best effort to aggregate other status fields as much as possible.
-
-Key objectives:  
-- Maintain backward compatibility when `wantMultiWECReportedState` is false, preserving existing behavior.  
-- When `wantMultiWECReportedState` is enabled, provide fallback to the singleton mechanism if only one WEC is bound.  
-- Aggregate per-WEC `WorkStatus` objects and update the `.status` field in WDS workload objects with combined readiness and health status.
-
----
-
-## Solution Approach
-
-### 1. Extend BindingPolicy CRD
-
-The configuration bit `wantMultiWECReportedState` is added under each `DownsyncModulation` struct (not directly under `BindingPolicy`), analogously to how [singleton state return ](./combined-status.md#special-case-for-1-wec) is requested.
+This option parallels `wantSingletonReportedState` but applies in the case where more than one WEC is selected.
 
 Example:
 
@@ -56,142 +29,128 @@ metadata:
   name: multiwec-nginx
 spec:
   clusterSelectors:
-  - matchLabels: {"location": "edge"}
+    - matchLabels:
+        location: edge
   downsync:
-  - objectSelectors:
-    - matchLabels: {"app.kubernetes.io/name": "nginx-multi"}
-    wantMultiWECReportedState: true
+    - objectSelectors:
+        - matchLabels:
+            app.kubernetes.io/name: nginx-multi
+      wantMultiWECReportedState: true
 ```
 
-This example follows the [singleton status example](https://docs.kubestellar.io/release-0.28.0/direct/example-scenarios/#scenario-4-singleton-status) but replaces `wantSingletonReportedState` with `wantMultiWECReportedState`.
+For field definitions, see the DownsyncModulation API:
+https://github.com/kubestellar/kubestellar/blob/v0.29.0/api/control/v1alpha1/types.go#L138-L167
 
----
+## Behavior Summary
 
-### 2. Introduce `handleMultiWECReportedState()` Function (Planned)
+The effect of status return options depends on the number of selected WECs.
 
-A new controller function, `handleMultiWECReportedState()`, will implement multi-WEC aggregated status reporting using per-kind aggregation logic for common workload kinds such as Deployment, StatefulSet, DaemonSet, ReplicaSet, Job, CronJob, and Pod.
+| `wantSingletonReportedState` | `wantMultiWECReportedState` | WEC count | Result |
+|:--:|:--:|:--:|:--|
+| ✓ | ✗ | 1 | Copy status from the single WEC. |
+| ✓ | ✗ | 0 or >1 | Clear `.status`. |
+| ✗ | ✓ | 1 | Copy status from the single WEC. |
+| ✗ | ✓ | >1 | Aggregate status from all WECs. |
+| ✗ | ✗ | any | Leave `.status` empty. |
 
-Both `BindingPolicy` and `Binding` inherit the `DownsyncModulation` extension where this flag resides.
+If a Binding requests singleton reported state and matches exactly one WEC, that status takes precedence.
 
----
+## Aggregated Status Semantics
 
-### 3. Status Aggregation Rules
+The `.status` field of a Kubernetes workload object is defined for a single cluster. When aggregating from multiple WECs, KubeStellar applies approximation rules. The aggregation logic distinguishes two broad categories:
 
-The aggregation logic depends on the **workload object kind**.
+- Workload kinds for which Argo CD defines built-in health assessment.
+- All other kinds.
 
-#### Case 1 – Known Workload Kinds
+For Argo CD’s health rules, see:
+https://argo-cd.readthedocs.io/en/stable/operator-manual/health/
 
-For workload kinds recognized by ArgoCD, the controller applies predetermined field aggregation rules consistent with ArgoCD’s native health evaluation. These include:
+### Workload Kinds with Argo CD Health Rules
 
-##### **Deployment**  
-  - `replicas`, `updatedReplicas`, `availableReplicas`, `readyReplicas`: use `min()` across clusters to reflect the least ready state.  
-  - `conditions`: apply three-value logic per condition type:  
-    - `False` if any cluster reports `False`.  
-    - `True` if all clusters report `True`.  
-    - Otherwise, `Unknown`.  
-  - `observedGeneration`: use the minimum observed generation.  
-  - `unavailableReplicas`: use `max()` to represent the worst state.
+Only fields evaluated by Argo CD’s health logic are aggregated. These include readiness-related numeric fields and conditions.
 
-##### **StatefulSet**  
-  - `replicas`, `readyReplicas`, `currentReplicas`, `updatedReplicas`: use `min()`.  
-  - `conditions`: three-value logic as above.
+For Deployments, StatefulSets, ReplicaSets, and DaemonSets:
 
-##### **DaemonSet**  
-  - `currentNumberScheduled`, `desiredNumberScheduled`, `numberAvailable`, `numberReady`: use `min()`.  
-  - `conditions`: three-value logic.
+- Readiness-related numeric fields (such as `readyReplicas`, `availableReplicas`, and their equivalents) are aggregated using the minimum across WECs.
+- Conditions are aggregated using the condition rules described below.
 
-##### **ReplicaSet**  
-  - `replicas`, `readyReplicas`, `availableReplicas`: use `min()`.  
-  - `conditions`: three-value logic.
+For Jobs:
 
-##### **Job**  
-  - `active`, `succeeded`, `failed`: use `min()` for all numeric fields to represent the least-ready state across clusters.  
-  - `conditions`: three-value logic.
+- Numeric fields used by Argo CD’s health assessment (`active`, `succeeded`, `failed`) are aggregated using minimum.
+- Conditions are aggregated using the same condition rules.
 
-##### **CronJob**  
-  - `lastScheduleTime`: use the latest timestamp across clusters.  
-  - `conditions`: three-value logic.
+### General Aggregation Rules (Other Kinds)
 
-##### **Pod**  
-  - `phase`: aggregate by prioritizing `Failed` > `Unknown` > `Running` > `Succeeded` > `Pending`.  
-  - `conditions`: three-value logic.
+For workload kinds not evaluated by Argo CD:
 
-**Three-value logic for Conditions:**  
-- `False` if any cluster reports `False` for a condition type.  
-- `True` if all clusters report `True`.  
-- Otherwise, `Unknown`.
+- Numeric fields are aggregated using the minimum value.
+- Boolean fields are aggregated as `false` if any WEC reports `false`, `true` only if all report `true`.
+- Conditions follow the condition rules described below.
+- Timestamps from condition entries use the latest `lastTransitionTime`.
+- `reason` and `message` fields for a condition are taken from the condition entry with the latest `lastTransitionTime`.
+- List and map fields are aggregated only when their structure matches across all WECs. Fields with incompatible shapes are omitted.
 
-**Timestamps:**  
-- For all condition timestamps (`lastTransitionTime`), take the most recent timestamp across clusters.
+These rules avoid making assumptions about workload semantics while still providing a useful summary.
 
-**Strings (Reason, Message):**  
-- For each condition, take the `Reason` and `Message` from the condition with the most recent `lastTransitionTime`.
+## Condition Aggregation
 
-- **Slices and maps:**  
-  - Match items by keys (e.g., condition `type`) before per-field aggregation.
+Conditions use uniform rules across all workload kinds.
 
-#### Case 2 – Unknown Workload Kinds
+### Truth Value
 
-For workload kinds not recognized by ArgoCD, the controller performs generic per-field aggregation using the same logical rules as above but constrained for general applicability:
+| WEC condition values | Aggregated value |
+| -- | -- |
+| Any `False` | `False` |
+| All `True` | `True` |
+| Mix of `True` and `Unknown` | `Unknown` |
+| All `Unknown` | `Unknown` |
 
-- **Numeric fields:** use `min()` to represent the least-ready state across clusters.  
-- **Conditions:** apply the same three-value logic (False if any False, True if all True, otherwise Unknown).  
-- **Timestamps:** take the latest `lastTransitionTime`.  
-- **Strings:** pick the most recent `Reason` and `Message` values.  
-- **Slices or maps:** aggregate per key before applying the above rules.
+### Timestamps
 
-This ensures consistency across arbitrary resource kinds without making unsupported assumptions about summation or scaling of numeric fields.
+The aggregated condition uses the most recent `lastTransitionTime` across all WECs.
 
----
+### Reason and Message
 
-### 4. Implementation Approach
-
-1. Extend BindingPolicy CRD with `wantMultiWECReportedState` under `DownsyncModulation`.
-2. Add flag detection logic in the status controller.
-3. Implement `handleMultiWECReportedState()` (planned) using per-kind aggregation logic for common workload kinds.
-4. Update the workload `.status` only when the aggregated result differs from the current value (deep equality check).
-
-**Note:** The current function [singletonstatus.go at commit 7d8a2f4](https://github.com/kubestellar/kubestellar/blob/7d8a2f4/pkg/status/singletonstatus.go#L64) copies `.status` directly from one WEC when only one `WorkStatus` object exists.
-
----
+The `reason` and `message` fields come from the condition entry whose `lastTransitionTime` is the most recent.
 
 ## Example
 
-After aggregation, the corresponding WDS Deployment status:
+Consider a Deployment that is downsynced to two WECs, each reporting the Deployment as fully available. With Multi-WEC status reporting enabled, the WDS object contains:
 
 ```yaml
 status:
-  replicas: 2
-  readyReplicas: 2
-  availableReplicas: 2
+  replicas: 3
+  readyReplicas: 3
+  availableReplicas: 3
   conditions:
     - type: Available
       status: "True"
-      reason: AggregatedAllClustersReady
-      message: "Ready if all clusters report Ready; False if any cluster reports False; Unknown otherwise"
       lastTransitionTime: "2025-11-01T12:34:56Z"
+      reason: MinimumReplicasAvailable
+      message: Deployment has minimum availability.
 ```
 
-In this example, `reason` and `message` are synthesized summaries to indicate overall cluster results; they are not field-level merges.
+This aggregated status supports tools such as Argo CD in evaluating the workload’s health directly from the WDS object.
 
-# Note: Only fields relevant to ArgoCD's built-in health checks are aggregated.  
-# Reference: https://github.com/argoproj/argo-cd/blob/master/gitops-engine/pkg/health/health_deployment.go
+## Relation to Combined Status
 
----
+This feature updates only the `.status` field of the workload object in the WDS. The `CombinedStatus` mechanism continues to provide detailed per-WEC information and remains available for inspection and debugging.
 
-## Validation Plan
+See:  
+[Combining reported state](combined-status.md)
 
-- Verify aggregated `.status` in WDS after multi-cluster propagation.  
-- Confirm ArgoCD displays workloads as *Synced* and *Healthy*.  
-- Validate fallback to singleton logic when only one WEC is bound.  
-- Add end-to-end tests under `test/e2e/status/` to verify correctness.
+## Limitations
 
----
+- Aggregation is an approximation because workload `.status` fields are cluster-specific.
+- Only the fields used in Argo CD’s health rules are aggregated for the workload kinds supported by Argo CD.
+- For other kinds, aggregation is best-effort and avoids semantic assumptions.
+- Larger numbers of WECs increase status reporting volume; rate-limiting and batching apply.
 
-## References
+## See Also
 
-- [KubeStellar Status Controller](https://github.com/kubestellar/kubestellar/tree/main/pkg/status)  
-- ArgoCD health evaluation logic from [`health.go`](https://github.com/argoproj/argo-cd/blob/master/gitops-engine/pkg/health/health.go) and [ArgoCD Health Documentation](https://argo-cd.readthedocs.io/en/stable/operator-manual/health/)  
-- [Issue #2809 – Multi-WEC Aggregated Status Reporting](https://github.com/kubestellar/kubestellar/issues/2809)  
-- [Related PR #3297 – Add Comprehensive Singleton Status Report for Franco](https://github.com/kubestellar/kubestellar/pull/3297)  
-- [Related PR #3423](https://github.com/kubestellar/kubestellar/pull/3423)
+- [Binding](binding.md)
+- [Transforming desired state](transforming.md)
+- [Combining reported state](combined-status.md)
+- [Example scenarios](example-scenarios.md)
+- DownsyncModulation API reference: https://github.com/kubestellar/kubestellar/blob/v0.29.0/api/control/v1alpha1/types.go#L138-L167
+- Argo CD health checks: https://argo-cd.readthedocs.io/en/stable/operator-manual/health/
