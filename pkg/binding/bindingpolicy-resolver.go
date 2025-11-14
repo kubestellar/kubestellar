@@ -107,10 +107,10 @@ type BindingPolicyResolver interface {
 	// GetSingletonReportedStateRequestForObject returns the combined effects of all
 	// the resolutions regarding singleton reported state return for a given workload object.
 	// The returned `bool` indicates whether singleton reported state return is requested.
-	// When that is `true`, the returned `int` is the number of WECs that the resolutions
+	// When that is `true`, the returned `sets.Set[string]` is the qualified WECs that the resolutions
 	// collectively associate with the workload object;
-	// otherwise the returned `int` is unspecified.
-	GetSingletonReportedStateRequestForObject(util.ObjectIdentifier) (bool, int)
+	// otherwise the returned `sets.Set[string]` is empty.
+	GetSingletonReportedStateRequestForObject(util.ObjectIdentifier) (bool, sets.Set[string])
 
 	// GetSingletonReportedStateRequestsForBinding calls GetSingletonReportedStateRequestForObject
 	// for each of workload objects in the resolution if the resolution exists.
@@ -358,9 +358,9 @@ func (resolver *bindingPolicyResolver) ResolutionExists(bindingPolicyKey string)
 // GetSingletonReportedStateRequestForObject returns two things.
 // First is the `bool` indicating whether any BindingPolicy requests singleton reported state return
 // for the given object.
-// If that is true then the second is the number of WECs bound to that object,
-// otherwise the second value is undefined.
-func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject(objId util.ObjectIdentifier) (bool, int) {
+// If that is true then the second is the set of qualified WECs bound to that object,
+// otherwise the second value is empty.
+func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject(objId util.ObjectIdentifier) (bool, sets.Set[string]) {
 	resolver.RWMutex.RLock()
 	defer resolver.RWMutex.RUnlock()
 	var requested bool
@@ -374,7 +374,7 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject
 		}
 	}
 	if !requested {
-		return false, 0
+		return false, sets.New[string]()
 	}
 	requested = false
 	matchingWECs := sets.New[string]()
@@ -384,9 +384,11 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject
 			continue
 		}
 		requested = requested || thisRequest
-		matchingWECs = matchingWECs.Union(thisDests)
+		if thisRequest {
+			matchingWECs = matchingWECs.Union(thisDests)
+		}
 	}
-	return requested, matchingWECs.Len()
+	return requested, matchingWECs
 }
 
 func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestsForBinding(bindingPolicyKey string) []SingletonReportedStateReturnStatus {
@@ -400,8 +402,8 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestsForBindi
 	objIds := resolution.getWorkloadReferences()
 	ans := make([]SingletonReportedStateReturnStatus, len(objIds))
 	for idx, objId := range objIds {
-		want, numWECs := resolver.GetSingletonReportedStateRequestForObject(objId)
-		ans[idx] = SingletonReportedStateReturnStatus{objId, want, numWECs}
+		want, qualifiedWECs := resolver.GetSingletonReportedStateRequestForObject(objId)
+		ans[idx] = SingletonReportedStateReturnStatus{objId, want, qualifiedWECs.Len()}
 	}
 	return ans
 }

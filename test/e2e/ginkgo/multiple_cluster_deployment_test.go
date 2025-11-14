@@ -476,6 +476,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 	ginkgo.Context("singleton status creation and deletion", func() {
 		ginkgo.It("sets (or deletes) singleton status when a singleton bindingpolicy/deployment is created (or deleted)", func(ctx context.Context) {
 			util.DeleteDeployment(ctx, wds, ns, "nginx") // we don't have to delete nginx
+			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 0)
 			util.CreateDeployment(ctx, wds, ns, "nginx-singleton",
 				map[string]string{
 					"app.kubernetes.io/name": "nginx-singleton",
@@ -501,6 +502,28 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 0)
 			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 0)
 			util.ValidateSingletonStatusZeroValue(ctx, wds, ns, "nginx-singleton")
+		})
+
+		ginkgo.It("only counts number of qualified WECs", func(ctx context.Context) {
+			util.CreateBindingPolicy(ctx, ksWds, "nginx-singleton",
+				[]metav1.LabelSelector{
+					{MatchLabels: map[string]string{"name": "cluster1"}},
+				},
+				[]ksapi.DownsyncPolicyClause{{
+					DownsyncObjectTest: ksapi.DownsyncObjectTest{
+						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx"}}},
+					},
+					DownsyncModulation: ksapi.DownsyncModulation{WantSingletonReportedState: true}},
+				},
+			)
+			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 1)
+			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 1)
+			util.ValidateSingletonStatus(ctx, wds, ns, "nginx")
+			patch := []byte(`{"spec":{"clusterSelectors":[{"matchLabels":{"name":"CelestialNexus"}}]}}`)
+			_, err := ksWds.ControlV1alpha1().BindingPolicies().Patch(
+				ctx, "nginx-singleton", types.MergePatchType, patch, metav1.PatchOptions{})
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			util.ValidateSingletonStatusZeroValue(ctx, wds, ns, "nginx")
 		})
 	})
 
