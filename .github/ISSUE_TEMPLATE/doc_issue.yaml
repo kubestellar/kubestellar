@@ -26,11 +26,3 @@ body:
       description: Please describe the issue. Include relevant URLs.
     validations:
       required: true
-
-  - type: checkboxes
-    id: contribute
-    attributes:
-      label: Want to contribute?
-      options:
-        - label: I would like to work on this issue.
-          required: false
