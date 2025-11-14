@@ -1,0 +1,35 @@
+name: Issue Assignment Guide
+
+on:
+    issues:
+        types: [opened]
+
+permissions:
+    issues: write
+
+jobs:
+    post-assignment-guide:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Post assignment instructions
+              uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+              with:
+                  script: |
+                      const issue_number = context.payload.issue.number;
+                      const owner = context.repo.owner;
+                      const repo = context.repo.repo;
+
+                      const assignmentMessage = "👋 **Assignment Instructions**\n\n" +
+                        "To assign yourself to this issue, please use the slash command:\n" +
+                        "```\n" +
+                        "/assign\n" +
+                        "```\n\n" +
+                        "This will automatically assign the issue to you via our Prow bot. You can also use `/unassign` to remove yourself from an issue.\n\n" +
+                        "Thank you for your interest in contributing to KubeStellar! 🚀";
+
+                      await github.rest.issues.createComment({
+                        owner,
+                        repo,
+                        issue_number,
+                        body: assignmentMessage,
+                      });
