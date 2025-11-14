@@ -271,6 +271,20 @@ func (resolution *bindingPolicyResolution) getSingletonReportedStateRequestForOb
 	return false, false, nil
 }
 
+// getMultiWECReportedStateRequestForObject returns what this resolution requests regarding multi-wec reported state return.
+// The first returned bool reports whether this resolution matches the given workload object ID;
+// if not then the other returned values are meaningless.
+// The second returned bool indicates whether multi-wec reported state return is requested.
+// The returned set is the names of the matching WECs, and is immutable.
+func (resolution *bindingPolicyResolution) getMultiWECReportedStateRequestForObject(objId util.ObjectIdentifier) (bool, bool, sets.Set[string]) {
+	resolution.RLock()
+	defer resolution.RUnlock()
+	if objData, has := resolution.objectIdentifierToData[objId]; has {
+		return true, objData.Modulation.WantMultiWECReportedState, resolution.destinations
+	}
+	return false, false, nil
+}
+
 // destinationsMatch returns true if the destinations in the resolution
 // match the destinations in the binding spec.
 func destinationsMatch(resolvedDestinations sets.Set[string], bindingDestinations []v1alpha1.Destination) bool {

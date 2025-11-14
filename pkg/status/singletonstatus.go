@@ -64,24 +64,41 @@ func (c *Controller) updateWorkStatusToObject(ctx context.Context, workStatusON 
 func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
 	isSingletonRequested, nWECs := c.bindingPolicyResolver.GetSingletonReportedStateRequestForObject(wObjID)
-	logger.V(4).Info("Workload object (singleton status requested)", "object", wObjID, "isSingletonRequested", isSingletonRequested, "nWECs", nWECs)
 
-	// TODO: GetMultiWECReportedStateRequestForObject is yet to be implemented.
-	// just declaring these variables, we will get its actual value once above function is implemented.
-	var isMultiWECRequested bool
-	logger.V(4).Info("Workload object (multiWEC status requested)", "object", wObjID, "isMultiWECRequested", isMultiWECRequested, "nWECsMulti", nWECs)
+	isMultiWECRequested, nWECsMulti := c.bindingPolicyResolver.GetMultiWECReportedStateRequestForObject(wObjID)
 
-	if (isMultiWECRequested || isSingletonRequested) && nWECs == 1 {
-		logger.V(4).Info("Either singleton or multiWEC status is requested and nWEC == 1", "object: ", wObjID, "nWEC", nWECs)
+	// nWECs is the count of WEC matched by clusterselectors in binding policy when wantSingletonReportedState = true
+	// nWECsMulti is the count of WEC matched by clusterselectors in binding policy when wantMultiWECReportedState = true
+	// when both wantSingletonReportedState and wantMultiWECReportedState is set to true then nWECs and nWECsMulti is equal
+
+	logger.V(4).Info("Workload object (singleton status requested)", "object", wObjID, "isSingletonRequested", isSingletonRequested, "nWECs", nWECs,
+		"Workload object (multiWEC status requested)", "object", wObjID, "isMultiWECRequested", isMultiWECRequested, "nWECsMulti", nWECsMulti)
+
+	if isMultiWECRequested && isSingletonRequested {
+		logger.V(4).Info("Both singleton and multiWEC status are requested for the same object", wObjID)
+
+		if nWECs == 1 {
+			return c.handleSingleton(ctx, wObjID)
+		}
+		return c.handleMultiWEC(ctx, wObjID, nWECsMulti)
+	}
+
+	if isSingletonRequested && nWECs == 1 {
+		logger.V(4).Info("singleton status is requested and nWEC == 1", "object: ", wObjID, "nWEC", nWECs)
 		return c.handleSingleton(ctx, wObjID)
 	}
 
-	if isMultiWECRequested && nWECs > 1 {
-		logger.V(4).Info("multiWEC status is requested and nWEC != 1", "object: ", wObjID, "nWEC", nWECs)
-		return c.handleMultiWEC(ctx, wObjID, nWECs)
+	if isMultiWECRequested && nWECsMulti == 1 {
+		logger.V(4).Info("multiWEC status is requested and nWECsMulti == 1", "object: ", wObjID, "nWEC", nWECs)
+		return c.handleSingleton(ctx, wObjID)
 	}
 
-	logger.V(4).Info("None of the above condition for singleton and multiwec is true for workload object", wObjID)
+	if isMultiWECRequested && nWECsMulti > 1 {
+		logger.V(4).Info("multiWEC status is requested and nWEC != 1", "object: ", wObjID, "nWEC", nWECsMulti)
+		return c.handleMultiWEC(ctx, wObjID, nWECsMulti)
+	}
+
+	logger.V(4).Info("None of the condition mentioned in doc for execution of handleSingleton and handleMultiWEC function is matched.", wObjID)
 	if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers); err != nil {
 		return err
 	}
