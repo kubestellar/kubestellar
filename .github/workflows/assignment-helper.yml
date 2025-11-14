@@ -1,0 +1,68 @@
+name: Assignment Helper
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+
+jobs:
+  assignment-helper:
+    # Only run on issues (not PRs) and exclude bot comments
+    if: github.event.issue.pull_request == null && github.event.comment.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for assignment request and respond
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          script: |
+            const comment = context.payload.comment.body.toLowerCase();
+            const issue_number = context.payload.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const commenter = context.payload.comment.user.login;
+
+            // Don't trigger if the comment is exactly "/assign" - that's handled by Prow
+            if (comment.trim() === '/assign') {
+              console.log('Exact /assign command detected, skipping helper response');
+              return;
+            }
+
+            // Check if the comment contains natural language requests for assignment
+            const assignmentPatterns = [
+              /can\s+you\s+assign/,
+              /could\s+you\s+assign/,
+              /please\s+assign/,
+              /assign\s+me/,
+              /can\s+i\s+be\s+assigned/,
+              /could\s+i\s+be\s+assigned/,
+              /i\s+would\s+like\s+to\s+be\s+assigned/,
+              /assign\s+this\s+to\s+me/,
+              /can\s+i\s+take\s+this/,
+              /can\s+i\s+work\s+on\s+this/,
+              /could\s+i\s+work\s+on\s+this/,
+              /i\s+want\s+to\s+work\s+on\s+this/,
+              /assign\s+.*\s+to\s+me/,
+              /can\s+.*\s+assign.*me/,
+              /could.*assign.*me/
+            ];
+
+            const hasAssignmentRequest = assignmentPatterns.some(pattern => pattern.test(comment));
+
+            if (hasAssignmentRequest) {
+              console.log('Assignment request detected in comment');
+
+              const responseMessage = `👋 Hi @${commenter}!\n\nTo assign yourself to this issue, please use the slash command:\n\`\`\`\n/assign\n\`\`\`\n\nThis will automatically assign the issue to you via our Prow bot. You can also use \`/unassign\` to remove yourself from an issue.\n\n📚 For more information about contributing, please check out our [Contributors Guide](https://github.com/kubestellar/ui/blob/dev/CONTRIBUTING.md).\n\nThank you for your interest in contributing to KubeStellar! 🚀`;
+
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body: responseMessage,
+              });
+
+              console.log('Assignment helper response posted');
+            } else {
+              console.log('No assignment request detected in comment');
+            }
