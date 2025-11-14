@@ -104,26 +104,19 @@ type BindingPolicyResolver interface {
 	// given bindingpolicy key.
 	ResolutionExists(bindingPolicyKey string) bool
 
-	// GetSingletonReportedStateRequestForObject returns the combined effects of all
-	// the resolutions regarding singleton reported state return for a given workload object.
-	// The returned `bool` indicates whether singleton reported state return is requested.
+	// GetReportedStateRequestForObject returns the combined effects of all
+	// the resolutions regarding singleton reported state and multiwec reported state return for a given workload object.
+	// The returned `bool` indicates whether singleton or multiwec reported state return is requested.
 	// When that is `true`, the returned `int` is the number of WECs that the resolutions
 	// collectively associate with the workload object;
 	// otherwise the returned `int` is unspecified.
-	GetSingletonReportedStateRequestForObject(util.ObjectIdentifier) (bool, int)
+	// Returns: (wantSingleton, qualifiedWECsSingleton, wantMultiWEC, qualifiedWECsMulti)
+	GetReportedStateRequestForObject(util.ObjectIdentifier) (bool, int, bool, int)
 
 	// GetSingletonReportedStateRequestsForBinding calls GetSingletonReportedStateRequestForObject
 	// for each of workload objects in the resolution if the resolution exists.
 	// If the resolution doesn't exist then returns `nil`.
 	GetSingletonReportedStateRequestsForBinding(bindingPolicyKey string) []SingletonReportedStateReturnStatus
-
-	// GetMultiWECReportedStateRequestForObject returns the combined effects of all
-	// the resolutions regarding multi-wec reported state return for a given workload object.
-	// The returned `bool` indicates whether multi-wec reported state return is requested.
-	// When that is `true`, the returned `int` is the number of WECs that the resolutions
-	// collectively associate with the workload object;
-	// otherwise the returned `int` is unspecified.
-	GetMultiWECReportedStateRequestForObject(util.ObjectIdentifier) (bool, int)
 
 	// DeleteResolution deletes the resolution associated with the given key,
 	// if it exists.
@@ -363,38 +356,74 @@ func (resolver *bindingPolicyResolver) ResolutionExists(bindingPolicyKey string)
 	return true
 }
 
-// GetSingletonReportedStateRequestForObject returns two things.
-// First is the `bool` indicating whether any BindingPolicy requests singleton reported state return
+// GetReportedStateRequestForObject returns four things.
+// First and third is the `bool` indicating whether any BindingPolicy requests singleton or multiwec reported state return respectively
 // for the given object.
-// If that is true then the second is the number of WECs bound to that object,
-// otherwise the second value is undefined.
-func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestForObject(objId util.ObjectIdentifier) (bool, int) {
+// If that is true then the second and fourth is the number of WECs bound to that object respectively,
+// otherwise the second or fourth value is undefined.
+func (resolver *bindingPolicyResolver) GetReportedStateRequestForObject(objId util.ObjectIdentifier) (bool, int, bool, int) {
 	resolver.RWMutex.RLock()
 	defer resolver.RWMutex.RUnlock()
-	var requested bool
+
+	// Query singleton status
+	var singletonRequested bool
 	// First, just compute whether singleton reported state return is requested for this object.
 	// Avoid thrashing the heap with that set collection unless it is really necessary.
 	for _, resolution := range resolver.bindingPolicyToResolution {
 		matches, thisRequest, _ := resolution.getSingletonReportedStateRequestForObject(objId)
 		if matches && thisRequest {
-			requested = true
+			singletonRequested = true
 			break
 		}
 	}
-	if !requested {
-		return false, 0
-	}
-	requested = false
-	matchingWECs := sets.New[string]()
+
+	// Query multiwec
+	var multiWECRequested bool
 	for _, resolution := range resolver.bindingPolicyToResolution {
-		matches, thisRequest, thisDests := resolution.getSingletonReportedStateRequestForObject(objId)
-		if !matches {
-			continue
+		matches, thisRequest, _ := resolution.getMultiWECReportedStateRequestForObject(objId)
+		if matches && thisRequest {
+			multiWECRequested = true
+			break
 		}
-		requested = requested || thisRequest
-		matchingWECs = matchingWECs.Union(thisDests)
 	}
-	return requested, matchingWECs.Len()
+
+	if !singletonRequested && !multiWECRequested {
+		return false, 0, false, 0
+	}
+
+	// collect WEC for singleton
+	singletonWECs := sets.New[string]()
+	if singletonRequested {
+		singletonRequested = false
+		for _, resolution := range resolver.bindingPolicyToResolution {
+			matches, thisRequest, thisDests := resolution.getSingletonReportedStateRequestForObject(objId)
+			if !matches {
+				continue
+			}
+			singletonRequested = singletonRequested || thisRequest
+			if thisRequest {
+				singletonWECs = singletonWECs.Union(thisDests)
+			}
+		}
+	}
+
+	// Collect WEC for multiwec
+	multiWECs := sets.New[string]()
+	if multiWECRequested {
+		multiWECRequested = false
+		for _, resolution := range resolver.bindingPolicyToResolution {
+			matches, thisRequest, thisDests := resolution.getMultiWECReportedStateRequestForObject(objId)
+			if !matches {
+				continue
+			}
+			multiWECRequested = multiWECRequested || thisRequest
+			if thisRequest {
+				multiWECs = multiWECs.Union(thisDests)
+			}
+		}
+	}
+
+	return singletonRequested, singletonWECs.Len(), multiWECRequested, multiWECs.Len()
 }
 
 func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestsForBinding(bindingPolicyKey string) []SingletonReportedStateReturnStatus {
@@ -408,44 +437,10 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestsForBindi
 	objIds := resolution.getWorkloadReferences()
 	ans := make([]SingletonReportedStateReturnStatus, len(objIds))
 	for idx, objId := range objIds {
-		want, numWECs := resolver.GetSingletonReportedStateRequestForObject(objId)
+		want, numWECs, _, _ := resolver.GetReportedStateRequestForObject(objId)
 		ans[idx] = SingletonReportedStateReturnStatus{objId, want, numWECs}
 	}
 	return ans
-}
-
-// GetMultiWECReportedStateRequestForObject returns two things.
-// First is the `bool` indicating whether any BindingPolicy requests multi-wec reported state return
-// for the given object.
-// If that is true then the second is the number of WECs bound to that object,
-// otherwise the second value is undefined.
-func (resolver *bindingPolicyResolver) GetMultiWECReportedStateRequestForObject(objId util.ObjectIdentifier) (bool, int) {
-	resolver.RWMutex.RLock()
-	defer resolver.RWMutex.RUnlock()
-	var requested bool
-	// First, just compute whether multi-wec reported state return is requested for this object.
-	// Avoid thrashing the heap with that set collection unless it is really necessary.
-	for _, resolution := range resolver.bindingPolicyToResolution {
-		matches, thisRequest, _ := resolution.getMultiWECReportedStateRequestForObject(objId)
-		if matches && thisRequest {
-			requested = true
-			break
-		}
-	}
-	if !requested {
-		return false, 0
-	}
-	requested = false
-	matchingWECs := sets.New[string]()
-	for _, resolution := range resolver.bindingPolicyToResolution {
-		matches, thisRequest, thisDests := resolution.getMultiWECReportedStateRequestForObject(objId)
-		if !matches {
-			continue
-		}
-		requested = requested || thisRequest
-		matchingWECs = matchingWECs.Union(thisDests)
-	}
-	return requested, matchingWECs.Len()
 }
 
 // DeleteResolution deletes the resolution associated with the given key,
