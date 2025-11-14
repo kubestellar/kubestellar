@@ -4212,7 +4212,10 @@ GitHub verified, but this is not strictly necessary or enforced.</p>
 </li>
 <li>
 <p>Use the following command to copy the new SSH key to your clipboard:</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>clip<span class="w"> </span>&lt;<span class="w"> </span>~/.ssh/id_ed25519.pub
+<p><div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>clip<span class="w"> </span>&lt;<span class="w"> </span>~/.ssh/id_ed25519.pub
+</code></pre></div>
+<em>Note: in a WSL terminal/command line interface, the above command will probably trigger an error. Try "clip.exe" instead of "clip" to access the Windows clipboard:</em></p>
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>clip.exe<span class="w"> </span>&lt;<span class="w"> </span>~/.ssh/id_ed25519.pub
 </code></pre></div>
 </li>
 <li>
@@ -4228,7 +4231,7 @@ GitHub verified, but this is not strictly necessary or enforced.</p>
 <li>Your new SSH key should now be displayed under SSH keys.</li>
 <li>
 <p><strong>Optional</strong>: To test if your SSH key is connecting properly or not, run the following command in your CLI (more specific instructions can be found in the <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection">Github documentation</a>):</p>
-<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>ssh<span class="w"> </span>-T<span class="w"> </span>git@github.com
+<div class="language-shell highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>ssh<span class="w"> </span>-T<span class="w"> </span>git@github.com
 </code></pre></div>
 <ul>
 <li>If given a warning saying something like <code>The authenticity of the host '[host IP]' can't be established</code> along with a key fingerprint and a prompt to continue, verify if the provided key fingerprint matches any of those listed <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints">here</a></li>
