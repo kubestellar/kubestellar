@@ -8,7 +8,7 @@ KubeStellar end-to-end testing covers the following test matrix.
 
 However there is a restriction: when using OCP, only a release can be tested.
 
-This directory has a script that will run a given one of the six allowed cells in that matrix. The script is [run-test.sh](https://github.com/kubestellar/kubestellar/blob/main/test/e2e/run-test.sh). The command line flags say which cell to run. The default is the bash scenario using three new `kind` clusters and the local copy of the repo.
+This directory has a script that will run a given one of the six allowed cells in that matrix. The script is [run-test.sh](run-test.sh). The command line flags say which cell to run. The default is the bash scenario using three new `kind` clusters and the local copy of the repo.
 
 ## Version
 
@@ -16,7 +16,7 @@ This script will test the relevant release if `--released` appears on the comman
 
 ## Scenario
 
-Select the scenario by putting `--test-type $scenario` on the command line, where `$scenario` is either `bash` (for the scenario in the [bash subdirectory](https://github.com/kubestellar/kubestellar/blob/main/test/e2e/bash)) or `ginkgo` (for the scenario in the [ginkgo subdirectory](https://github.com/kubestellar/kubestellar/blob/main/test/e2e/ginkgo)). In order to run the ginkgo scenario you **need to** have [ginkgo](https://onsi.github.io/ginkgo/) installed; see [ginkgo Getting Started](https://onsi.github.io/ginkgo/#getting-started).
+Select the scenario by putting `--test-type $scenario` on the command line, where `$scenario` is either `bash` (for the scenario in the [bash subdirectory](bash)) or `ginkgo` (for the scenario in the [ginkgo subdirectory](ginkgo)). In order to run the ginkgo scenario you **need to** have [ginkgo](https://onsi.github.io/ginkgo/) installed; see [ginkgo Getting Started](https://onsi.github.io/ginkgo/#getting-started).
 
 ## Infrastructure
 
