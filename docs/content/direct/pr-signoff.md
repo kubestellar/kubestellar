@@ -123,6 +123,11 @@ For Windows users, **Git Bash** is also highly recommended.
     ```shell
     clip < ~/.ssh/id_ed25519.pub
     ```
+    _Note: in a WSL terminal/command line interface, the above command will probably trigger an error. Try "clip.exe" instead of "clip" to access the Windows clipboard:_
+
+    ```shell
+    clip.exe < ~/.ssh/id_ed25519.pub
+    ```
 
 4. After copying or saving your SSH key, navigate to **Settings** in your Github.
 5. Navigate to the **SSH and GPG keys** page under the Access section in the sidebar.
