@@ -26,3 +26,17 @@ body:
       description: Please describe the issue. Include relevant URLs.
     validations:
       required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        **👋 Assignment Instructions**
+
+        To assign yourself to this issue, please use the slash command:
+        ```
+        /assign
+        ```
+
+        This will automatically assign the issue to you via our Prow bot. You can also use `/unassign` to remove yourself from an issue.
+
+        Thank you for your interest in contributing to KubeStellar! 🚀
