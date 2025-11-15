@@ -129,7 +129,7 @@ theme:
     code: 'Roboto Mono'
   name: material
   icon:
-    repo: fontawesome/brands/github
+    repo: icons/github-mark.png
 
   language: en
   # Common files such as images, stylesheets, theme overrides
