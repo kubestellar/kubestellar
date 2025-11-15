@@ -141,7 +141,7 @@ title "📦 Installing kind (Kubernetes in Docker)"
 curl -SfLo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
 sudo install -m 555 kind /usr/local/bin/kind
 rm kind
-progress "⚙️ Icreasing setting for more than 2 kind clusters..."
+progress "⚙️ Increasing setting for more than 2 kind clusters..."
 sudo tee -a /etc/sysctl.conf << EOF
 # Enable more than 2 Kind clusters
 # https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files
