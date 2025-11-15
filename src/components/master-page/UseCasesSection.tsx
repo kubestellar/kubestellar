@@ -1,10 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import { GridLines, StarField } from "../index";
 import { useTranslations } from "next-intl";
 
 export default function UseCasesSection() {
   const t = useTranslations("useCasesSection");
+  const [flipped, setFlipped] = useState<{ [key: number]: boolean }>({});
+
+  const handleFlip = (index: number, isFlipped: boolean) => {
+    setFlipped(prev => ({ ...prev, [index]: isFlipped }));
+  };
+
   const getIcon = (iconType: string) => {
     switch (iconType) {
       case "globe":
@@ -256,42 +263,46 @@ export default function UseCasesSection() {
           {useCases.map((useCase, index) => (
             <div
               key={index}
-              className="group relative w-full max-w-sm h-[320px]"
+              className="w-full max-w-sm h-80"
               style={{ perspective: "1000px" }}
             >
               <div
-                className="relative w-full h-full transition-transform duration-700 cursor-pointer"
+                className="relative w-full h-full transition-transform duration-700 ease-in-out cursor-pointer"
                 style={{
                   transformStyle: "preserve-3d",
-                  transform: "rotateY(0deg)",
+                  transform: flipped[index]
+                    ? "rotateY(180deg)"
+                    : "rotateY(0deg)",
+                  WebkitTransformStyle: "preserve-3d",
+                  WebkitTransform: flipped[index]
+                    ? "rotateY(180deg)"
+                    : "rotateY(0deg)",
                 }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = "rotateY(180deg)";
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = "rotateY(0deg)";
-                }}
+                onMouseEnter={() => handleFlip(index, true)}
+                onMouseLeave={() => handleFlip(index, false)}
               >
                 {/* Front Face */}
                 <div
-                  className="absolute inset-0 w-full h-full bg-slate-800/50 backdrop-blur-md border border-slate-700 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50"
-                  style={{ backfaceVisibility: "hidden" }}
+                  className="absolute inset-0 w-full h-full bg-slate-800/50 backdrop-blur-md border border-slate-700 rounded-2xl overflow-hidden shadow-lg"
+                  style={{
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(0deg)",
+                    WebkitTransform: "rotateY(0deg)",
+                  }}
                 >
                   <div className="p-6 h-full flex flex-col">
-                    {/* Logo container */}
                     <div
                       className={`${useCase.iconBgColor} rounded-lg flex items-center justify-center mb-6 w-14 h-14 backdrop-blur-sm border border-white/10`}
                     >
-                      <div className="scale-110">{getIcon(useCase.icon)}</div>
+                      {getIcon(useCase.icon)}
                     </div>
 
-                    {/* Main heading */}
-                    <h3 className="font-bold text-white mb-5 transition-colors duration-300 group-hover:text-blue-300 text-xl leading-7">
+                    <h3 className="font-bold text-white mb-5 text-xl leading-7">
                       {useCase.title}
                     </h3>
 
-                    {/* Description text */}
-                    <p className="text-gray-300 font-normal transition-colors duration-300 group-hover:text-gray-200 text-base leading-6 line-clamp-6 flex-grow">
+                    <p className="text-gray-300 font-normal text-base leading-6 flex-grow overflow-hidden">
                       {useCase.description}
                     </p>
                   </div>
@@ -299,24 +310,23 @@ export default function UseCasesSection() {
 
                 {/* Back Face */}
                 <div
-                  className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-900/60 via-slate-800/60 to-blue-900/60 backdrop-blur-md border border-purple-500/30 rounded-2xl overflow-hidden"
+                  className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-900/80 via-slate-800/80 to-blue-900/80 backdrop-blur-md border border-purple-500/30 rounded-2xl overflow-hidden shadow-lg"
                   style={{
                     backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
                     transform: "rotateY(180deg)",
+                    WebkitTransform: "rotateY(180deg)",
                   }}
                 >
                   <div className="p-6 h-full flex flex-col justify-center">
-                    {/* Enhanced title */}
                     <h3 className="font-bold text-white mb-4 text-xl text-center">
                       {useCase.backContent.title}
                     </h3>
 
-                    {/* Enhanced description */}
                     <p className="text-gray-200 text-sm leading-relaxed mb-6 text-center">
                       {useCase.backContent.description}
                     </p>
 
-                    {/* Features list */}
                     <div className="space-y-2 mb-6">
                       {useCase.backContent.features.map(
                         (feature, featureIndex) => (
@@ -331,7 +341,6 @@ export default function UseCasesSection() {
                       )}
                     </div>
 
-                    {/* Decorative element */}
                     <div className="flex justify-center">
                       <div className="w-12 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
                     </div>
