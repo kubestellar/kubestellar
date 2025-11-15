@@ -1,4 +1,4 @@
-# Kubestellar end to end testing
+### End-to-end testing
 
 KubeStellar end-to-end testing covers the following test matrix.
 
@@ -26,19 +26,17 @@ When using `kind`, this test involves three `kind` clusters, so you **need to** 
 
 When using three pre-existing OCP clusters, your kubeconfig must include contexts named `kscore` (for the kubeflex hosting cluster), `cluster1` and `cluster2`. The following shows an example listing of adequate contexts.
 
-```bash
 $ kubectl config get-contexts
-CURRENT   NAME          CLUSTER                   AUTHINFO               NAMESPACE
-          kscore       <url>:port               <defaul-value>            default
-          cluster1     <url>:port               <defaul-value>            default
-*         cluster2     <url>:port               <defaul-value>            default
-```
+CURRENT NAME CLUSTER AUTHINFO NAMESPACE
+kscore <url>:port <defaul-value> default
+cluster1 <url>:port <defaul-value> default
+
+    cluster2     <url>:port               <defaul-value>            default
 
 FYI, if you need to rename a kubeconfig context in order to reach the above configuration then you can use the `kubectl config rename-context` command. For example:
 
-```bash 
 $ kubectl config rename-context <default-wec1-context-name> cluster1
-```
+
 
 ## Fail fast or run every test case
 
