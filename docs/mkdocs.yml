@@ -129,7 +129,7 @@ theme:
     code: 'Roboto Mono'
   name: material
   icon:
-    repo: icons/github-mark.png
+    repo: icons/github.svg
 
   language: en
   # Common files such as images, stylesheets, theme overrides
