@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+echo "🔍 Running pre-commit checks..."
+
+npx lint-staged
+npm run type-check
+npm run build:check
+
+echo "✅ All pre-commit checks passed!"

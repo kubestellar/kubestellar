@@ -17,7 +17,16 @@
     "test": "echo \"No tests specified\" && exit 0",
     "test:watch": "echo \"No tests specified\" && exit 0",
     "audit": "npm audit --audit-level=moderate",
-    "update-deps": "npm update && npm audit fix"
+    "update-deps": "npm update && npm audit fix",
+    "prepare": "husky install",
+    "build:check": "next build && echo '✅ Next.js build successful'",
+    "pre-commit": "npm run format:check && npm run lint && npm run type-check && npm run build:check"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write",
+      "next lint --fix --file"
+    ]
   },
   "dependencies": {
     "@react-three/drei": "^10.7.6",
@@ -25,7 +34,7 @@
     "framer-motion": "^12.23.22",
     "lucide-react": "^0.545.0",
     "mermaid": "^11.12.1",
-    "next": "15.3.5",
+    "next": "^15.5.6",
     "next-intl": "^4.3.12",
     "nextra": "^4.6.0",
     "nextra-theme-docs": "^4.6.0",
@@ -40,10 +49,12 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@types/three": "^0.180.0",
-    "eslint": "^9",
+    "eslint": "^9.39.1",
     "eslint-config-next": "15.3.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }
