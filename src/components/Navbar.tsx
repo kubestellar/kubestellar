@@ -5,8 +5,20 @@ import Link from "next/link";
 import Image from "next/image";
 import { GridLines, StarField, LanguageSwitcher } from "./index";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
+  const pathname = usePathname() || '/'
+  const stripLocale = (p: string) => p.replace(/^\/[a-zA-Z-]{2}(?=\/|$)/, '')
+  const current = stripLocale(pathname)
+  const isActive = (href: string) => {
+    const target = stripLocale(href)
+    return current === target || current.startsWith(`${target}/`)
+  }
+
+  // tiny class combiner
+  const cx = (...parts: Array<string | false | undefined>) => parts.filter(Boolean).join(' ')
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -379,10 +391,19 @@ export default function Navbar() {
             <div className="hidden lg:flex flex-1 justify-center">
               <div className="flex items-center space-x-8">
                 {/* Docs Link */}
-                <div className="relative group">
+                <div className="relative z-10 group">
                   <Link
                     href="/docs"
-                    className="text-sm font-medium text-gray-300 hover:text-blue-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-blue-500/10 hover:shadow-lg hover:shadow-blue-500/20 nav-link-hover"
+                    aria-current={isActive('/docs') ? 'page' : undefined}
+                    className={cx(
+                      "text-sm font-medium text-gray-300 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:text-blue-400 hover:bg-blue-500/10 hover:shadow-lg hover:shadow-blue-500/20 nav-link-hover",
+                      isActive('/docs') && "nav-glow "
+                    )}
+                    style={
+                      isActive('/docs')
+                        ? ({ ['--glow-from' as any]: '#6366f1', ['--glow-to' as any]: '#22d3ee' })
+                        : undefined
+                    }
                   >
                     <div className="relative">
                       <svg
@@ -404,10 +425,19 @@ export default function Navbar() {
                 </div>
 
                 {/* Playground Link */}
-                <div className="relative group">
+                <div className="relative group z-10">
                   <Link
                     href="/playground"
-                    className="text-sm font-medium text-gray-300 hover:text-orange-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-orange-500/10 hover:shadow-lg hover:shadow-orange-500/20 transform nav-link-hover"
+                    aria-current={isActive('/coming-soon') ? 'page' : undefined}
+                    className={cx(
+                      "text-sm font-medium text-gray-300 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:text-orange-400 hover:bg-orange-500/10 hover:shadow-lg hover:shadow-orange-500/20 nav-link-hover ",
+                      isActive('/coming-soon') && "nav-glow"
+                    )}
+                    style={
+                      isActive('/coming-soon')
+                        ? ({ ['--glow-from' as any]: '#f59e0b', ['--glow-to' as any]: '#fb923c' })
+                        : undefined
+                    }
                   >
                     <div className="relative">
                       <svg
@@ -433,7 +463,16 @@ export default function Navbar() {
                 <div className="relative group">
                   <Link
                     href="/marketplace"
-                    className="text-sm font-medium text-gray-300 hover:text-pink-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-pink-500/10 hover:shadow-lg hover:shadow-pink-500/20 transform nav-link-hover"
+                    aria-current={isActive('/marketplace') ? 'page' : undefined}
+                    className={cx(
+                      "text-sm font-medium text-gray-300 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:text-pink-400 hover:bg-pink-500/10 hover:shadow-lg hover:shadow-pink-500/20 nav-link-hover",
+                      isActive('/marketplace') && "nav-glow "
+                    )}
+                    style={
+                      isActive('/marketplace')
+                        ? ({ ['--glow-from' as any]: '#ec4899', ['--glow-to' as any]: '#d946ef' })
+                        : undefined
+                    }
                   >
                     <div className="relative">
                       <svg
@@ -507,6 +546,7 @@ export default function Navbar() {
                   >
                     <a
                       href="#join-in"
+                      aria-current={isActive('/contribute') ? 'page' : undefined}
                       className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md"
                     >
                       <svg
@@ -526,6 +566,7 @@ export default function Navbar() {
                     </a>
                     <Link
                       href="/contribute-handbook"
+                      aria-current={isActive('/contribute') ? 'page' : undefined}
                       className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md"
                     >
                       <svg
@@ -545,6 +586,7 @@ export default function Navbar() {
                     </Link>
                     <Link
                       href="/quick-installation"
+                      aria-current={isActive('/contribute') ? 'page' : undefined}
                       className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md"
                     >
                       <svg
@@ -564,6 +606,7 @@ export default function Navbar() {
                     </Link>
                     <Link
                       href="/products"
+                      aria-current={isActive('/contribute') ? 'page' : undefined}
                       className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md"
                     >
                       <svg
@@ -576,13 +619,14 @@ export default function Navbar() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth="2"
-                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v2M7 7h10"
+                          d="M19 11H5m14 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                         ></path>
                       </svg>
                       {t("products")}
                     </Link>
                     <Link
                       href="/ladder"
+                      aria-current={isActive('/contribute') ? 'page' : undefined}
                       className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md"
                     >
                       <svg
@@ -602,6 +646,7 @@ export default function Navbar() {
                     </Link>
                     <a
                       href="#security"
+                      aria-current={isActive('/contribute') ? 'page' : undefined}
                       className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-emerald-900/30 rounded transition-all duration-200 hover:text-emerald-300 hover:shadow-md"
                     >
                       <svg
@@ -667,6 +712,7 @@ export default function Navbar() {
                   >
                     <a
                       href="#get-involved"
+                      aria-current={isActive('/community') ? 'page' : undefined}
                       className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-cyan-900/30 rounded transition-all duration-200 hover:text-cyan-300 hover:shadow-md"
                     >
                       <svg
@@ -686,6 +732,7 @@ export default function Navbar() {
                     </a>
                     <Link
                       href="/programs"
+                      aria-current={isActive('/community') ? 'page' : undefined}
                       className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-cyan-900/30 rounded transition-all duration-200 hover:text-cyan-300 hover:shadow-md"
                     >
                       <svg
@@ -705,6 +752,7 @@ export default function Navbar() {
                     </Link>
                     <a
                       href="#contact-us"
+                      aria-current={isActive('/community') ? 'page' : undefined}
                       className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-cyan-900/30 rounded transition-all duration-200 hover:text-cyan-300 hover:shadow-md"
                     >
                       <svg
@@ -724,6 +772,7 @@ export default function Navbar() {
                     </a>
                     <Link
                       href="/partners"
+                      aria-current={isActive('/community') ? 'page' : undefined}
                       className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-cyan-900/30 rounded transition-all duration-200 hover:text-cyan-300 hover:shadow-md"
                     >
                       <svg
@@ -770,6 +819,7 @@ export default function Navbar() {
                     className="w-4 h-4 ml-1"
                     fill="none"
                     stroke="currentColor"
+                    strokeWidth="2"
                     viewBox="0 0 24 24"
                   >
                     <path
@@ -1070,7 +1120,7 @@ export default function Navbar() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth="2"
-                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v2M7 7h10"
+                        d="M19 11H5m14 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                       ></path>
                     </svg>
                     {t("products")}

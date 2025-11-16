@@ -4,6 +4,7 @@
   --breakpoint-lgcustom: 900px;
   --breakpoint-xl: 1200px;
 }
+
 :root {
   /* Dark mode colors (default) */
   --background: #0a0a0a;
@@ -81,11 +82,9 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 }
 
 .bg-star-pattern {
-  background-image: radial-gradient(
-    circle at 10px 10px,
-    rgba(255, 255, 255, 0.1) 1px,
-    transparent 0
-  );
+  background-image: radial-gradient(circle at 10px 10px,
+      rgba(255, 255, 255, 0.1) 1px,
+      transparent 0);
   background-size: 40px 40px;
 }
 
@@ -118,6 +117,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 
 /* Animations */
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0px);
@@ -129,6 +129,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;
@@ -320,6 +321,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 }
 
 @keyframes blink {
+
   0%,
   100% {
     opacity: 1;
@@ -365,6 +367,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 }
 
 @keyframes gradient-shift {
+
   0%,
   100% {
     background-position: 0% 50%;
@@ -388,6 +391,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 }
 
 @keyframes status-glow {
+
   0%,
   100% {
     box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
@@ -399,6 +403,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 }
 
 @keyframes status-pulse {
+
   0%,
   100% {
     transform: scale(1);
@@ -424,6 +429,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 }
 
 @keyframes command-glow {
+
   0%,
   100% {
     box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
@@ -445,6 +451,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 }
 
 @keyframes loading-bounce {
+
   0%,
   80%,
   100% {
@@ -467,6 +474,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 }
 
 @keyframes btn-float {
+
   0%,
   100% {
     transform: translateY(0px);
@@ -478,6 +486,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 }
 
 @keyframes stat-float {
+
   0%,
   100% {
     transform: translateY(0px);
@@ -708,12 +717,10 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent);
   transition: left 0.5s;
 }
 
@@ -744,6 +751,51 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+
+@layer components {
+  .nav-pill {
+    position: relative;
+    border-radius: .625rem;
+    transition: background .25s, color .25s;
+  }
+
+  .nav-glow {
+    --glow-from: #6366f1;
+    --glow-to: #22d3ee;
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--glow-from) 14%, transparent),
+        color-mix(in srgb, var(--glow-to) 12%, transparent));
+    box-shadow:
+      0 8px 22px -12px color-mix(in srgb, var(--glow-from) 55%, transparent),
+      0 0 34px -18px color-mix(in srgb, var(--glow-to) 65%, transparent);
+  }
+
+  .nav-glow::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: inherit;
+    background: radial-gradient(60% 55% at 50% 50%,
+        color-mix(in srgb, var(--glow-from) 28%, transparent) 0%, transparent 70%);
+    filter: blur(14px);
+    opacity: .55;
+    pointer-events: none;
+  }
+  /* emerald→teal */
+  .nav-glow-contribute {
+    --glow-from: #10b981;
+    --glow-to: #0d9488;
+  }
+
+  /* violet→fuchsia */
+  .nav-glow-community {
+    --glow-from: #8b5cf6;
+    --glow-to: #d946ef;
+  }
+
+
+}
+
 .nav-link-hover:hover {
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
@@ -756,12 +808,10 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent);
   transition: left 0.5s;
 }
 
@@ -825,12 +875,10 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 .nebula-1 {
   width: 300px;
   height: 300px;
-  background: radial-gradient(
-    circle,
-    rgba(147, 51, 234, 0.4) 0%,
-    rgba(59, 130, 246, 0.2) 50%,
-    transparent 70%
-  );
+  background: radial-gradient(circle,
+      rgba(147, 51, 234, 0.4) 0%,
+      rgba(59, 130, 246, 0.2) 50%,
+      transparent 70%);
   top: 20%;
   left: 10%;
   animation-duration: 50s;
@@ -839,12 +887,10 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 .nebula-2 {
   width: 200px;
   height: 200px;
-  background: radial-gradient(
-    circle,
-    rgba(236, 72, 153, 0.3) 0%,
-    rgba(168, 85, 247, 0.2) 50%,
-    transparent 70%
-  );
+  background: radial-gradient(circle,
+      rgba(236, 72, 153, 0.3) 0%,
+      rgba(168, 85, 247, 0.2) 50%,
+      transparent 70%);
   top: 60%;
   right: 20%;
   animation-duration: 70s;
@@ -854,12 +900,10 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 .nebula-3 {
   width: 150px;
   height: 150px;
-  background: radial-gradient(
-    circle,
-    rgba(34, 197, 94, 0.3) 0%,
-    rgba(59, 130, 246, 0.2) 50%,
-    transparent 70%
-  );
+  background: radial-gradient(circle,
+      rgba(34, 197, 94, 0.3) 0%,
+      rgba(59, 130, 246, 0.2) 50%,
+      transparent 70%);
   bottom: 30%;
   left: 60%;
   animation-duration: 45s;
@@ -976,10 +1020,12 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 }
 
 @keyframes pulse-glow {
+
   0%,
   100% {
     box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.3);
   }
+
   50% {
     box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.6);
   }
@@ -991,6 +1037,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
     opacity: 0;
     transform: translateY(-10px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -1002,6 +1049,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -1098,6 +1146,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 
 /* Enhanced icon animations */
 @keyframes iconFloat {
+
   0%,
   100% {
     transform: translateY(0px) scale(1.1);
@@ -1179,12 +1228,10 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent);
   transition: left 0.5s;
 }
 
@@ -1209,11 +1256,9 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   position: absolute;
   inset: 0;
   border-radius: 12px;
-  background: radial-gradient(
-    circle at center,
-    var(--glow-color, rgba(59, 130, 246, 0.2)) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle at center,
+      var(--glow-color, rgba(59, 130, 246, 0.2)) 0%,
+      transparent 70%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -1223,27 +1268,21 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 }
 
 .stat-card-1:hover .stat-glow {
-  background: radial-gradient(
-    circle at center,
-    rgba(34, 197, 94, 0.2) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle at center,
+      rgba(34, 197, 94, 0.2) 0%,
+      transparent 70%);
 }
 
 .stat-card-2:hover .stat-glow {
-  background: radial-gradient(
-    circle at center,
-    rgba(147, 51, 234, 0.2) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle at center,
+      rgba(147, 51, 234, 0.2) 0%,
+      transparent 70%);
 }
 
 .stat-card-3:hover .stat-glow {
-  background: radial-gradient(
-    circle at center,
-    rgba(16, 185, 129, 0.2) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle at center,
+      rgba(16, 185, 129, 0.2) 0%,
+      transparent 70%);
 }
 
 /* .stat-card-1:hover .stat-glow {
@@ -1476,12 +1515,10 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent);
   transition: left 0.5s;
 }
 
@@ -1501,10 +1538,12 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 
 /* Enhanced icon animations */
 @keyframes iconFloat {
+
   0%,
   100% {
     transform: translateY(0px) scale(1.1);
   }
+
   50% {
     transform: translateY(-2px) scale(1.1);
   }
@@ -1529,41 +1568,50 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   top: 20%;
   left: 10%;
 }
+
 .data-particle:nth-child(2) {
   top: 40%;
   left: 80%;
 }
+
 .data-particle:nth-child(3) {
   top: 70%;
   left: 30%;
 }
+
 .data-particle:nth-child(4) {
   top: 30%;
   left: 70%;
 }
+
 .data-particle:nth-child(5) {
   top: 80%;
   left: 60%;
 }
+
 .data-particle:nth-child(6) {
   top: 60%;
   left: 20%;
 }
 
 @keyframes particle-float {
+
   0%,
   100% {
     transform: translateY(0) translateX(0) scale(1);
     opacity: 0.7;
   }
+
   25% {
     transform: translateY(-20px) translateX(10px) scale(1.2);
     opacity: 1;
   }
+
   50% {
     transform: translateY(-10px) translateX(-15px) scale(0.8);
     opacity: 0.8;
   }
+
   75% {
     transform: translateY(-30px) translateX(5px) scale(1.1);
     opacity: 0.9;
@@ -1575,6 +1623,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   0% {
     stroke-opacity: 0.1;
   }
+
   100% {
     stroke-opacity: 0.4;
   }
@@ -1584,19 +1633,23 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   0% {
     transform: translateY(0) rotate(0deg);
   }
+
   50% {
     transform: translateY(-10px) rotate(1deg);
   }
+
   100% {
     transform: translateY(0) rotate(0deg);
   }
 }
 
 @keyframes blink {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0;
   }
@@ -1606,6 +1659,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(calc(-2544px));
   }
@@ -1669,9 +1723,11 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
+
   100% {
     transform: scale(1);
   }
@@ -1705,6 +1761,7 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1728,10 +1785,12 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 
 /* Bounce animation for button */
 @keyframes bounce-slow {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -1760,10 +1819,13 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
 
 /* Hide scrollbar while maintaining scroll functionality */
 .scrollbar-hide {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
+  display: none;
+  /* Chrome, Safari and Opera */
 }
