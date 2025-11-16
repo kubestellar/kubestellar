@@ -2,6 +2,7 @@
 
 @theme {
   --breakpoint-lgcustom: 900px;
+  --breakpoint-xl: 1200px;
 }
 :root {
   /* Dark mode colors (default) */

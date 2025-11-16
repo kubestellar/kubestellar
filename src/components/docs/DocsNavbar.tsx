@@ -186,11 +186,11 @@ export default function DocsNavbar() {
   
   const buttonClasses = `text-sm transition-colors px-2 py-1.5 rounded-md flex items-center gap-1.5 ${
     isDark 
-      ? 'text-gray-400 hover:text-gray-100 hover:bg-neutral-800'
-      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+      ? 'text-gray-300 hover:text-gray-100 hover:bg-neutral-800'
+      : 'text-gray-300 hover:text-gray-100 hover:bg-gray-100'
   }`;
   
-  const dropdownClasses = `absolute left-0 mt-1 w-52 rounded-md shadow-xl py-1 border z-50 ${
+  const dropdownClasses = `absolute left-0 top-full mt-0.5 w-52 rounded-md shadow-xl py-1 border z-50 ${
     isDark 
       ? 'bg-neutral-900 border-neutral-800'
       : 'bg-white border-gray-200'
@@ -211,34 +211,74 @@ export default function DocsNavbar() {
       }`} />
       
       <div className="mx-auto flex items-center gap-2 h-16 px-4 max-w-[90rem]">
-        <Link href="/" className="flex items-center hover:opacity-75 transition-opacity">
-          <Image
-            src="/KubeStellar-with-Logo-transparent.png"
-            alt="KubeStellar"
-            width={160}
-            height={40}
-            className="h-8 w-auto"
-            priority
-          />
-        </Link>
+        <Link href="/" className="cursor-pointer">
+              <div className="flex-shrink-0 cursor-pointer relative z-10">
+                <Image
+                  src="/KubeStellar-with-Logo-transparent.png"
+                  alt="Kubestellar logo"
+                  width={160}
+                  height={40}
+                  className="h-10 w-auto object-contain"
+                />
+              </div>
+            </Link>
 
         <div className="flex-1" />
 
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden md:flex items-center gap-1.5">
+          <Link
+            href="/playground"
+            className={`${buttonClasses} cursor-pointer relative hidden xl:flex`}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+              ></path>
+            </svg>
+            <span className="ml-2">Playground</span>
+          </Link>
+
+          <Link
+            href="/marketplace"
+            className={`${buttonClasses} cursor-pointer relative hidden xl:flex`}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+              ></path>
+            </svg>
+            <span className="ml-2">Marketplace</span>
+          </Link>
           
           <div 
-            className="relative" 
+            className="relative hidden xl:flex" 
             onMouseEnter={() => handleMouseEnter("contribute")}
             onMouseLeave={handleMouseLeave}
           >
             <button
               type="button"
-              className={buttonClasses}
+              className={`${buttonClasses} cursor-pointer`}
               aria-haspopup="true"
               aria-expanded={openDropdown === "contribute"}
             >
               <svg
-                className="w-3.5 h-3.5"
+                className="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -251,7 +291,7 @@ export default function DocsNavbar() {
                 />
               </svg>
               <span>Contribute</span>
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
@@ -265,7 +305,7 @@ export default function DocsNavbar() {
                 href="/#join-in"
                 className={dropdownItemClasses}
               >
-                <svg className="w-4 h-4 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
                 Join In
@@ -274,16 +314,74 @@ export default function DocsNavbar() {
                 href="/contribute-handbook"
                 className={dropdownItemClasses}
               >
-                <svg className="w-4 h-4 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
                 Contribute Handbook
               </Link>
               <Link
+                    href="/quick-installation"
+                    className={dropdownItemClasses}
+                  >
+                      <svg
+                        className="w-5 h-5 mr-2.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 10V3L4 14h7v7l9-11h-7z"
+                        ></path>
+                      </svg>
+                    <span>Quick Installation</span>
+                </Link>
+              <Link
+                    href="/products"
+                    className={dropdownItemClasses}
+                  >
+                      <svg
+                        className="w-5 h-5 mr-2.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                        ></path>
+                      </svg>
+                    <span>Products</span>
+                </Link>
+              <Link
+                    href="/ladder"
+                    className={dropdownItemClasses}
+                  >
+                      <svg
+                        className="w-5 h-5 mr-2.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                        ></path>
+                      </svg>
+                    <span>Ladder</span>
+                </Link>
+
+              <Link
                 href="/#security"
                 className={dropdownItemClasses}
               >
-                <svg className="w-4 h-4 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
                 Security
@@ -293,21 +391,21 @@ export default function DocsNavbar() {
           </div>
 
           <div 
-            className="relative"
+            className="relative hidden xl:flex"
             onMouseEnter={() => handleMouseEnter("community")}
             onMouseLeave={handleMouseLeave}
           >
             <button
               type="button"
-              className={buttonClasses}
+              className={`${buttonClasses} cursor-pointer`}
               aria-haspopup="true"
               aria-expanded={openDropdown === "community"}
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
               <span>Community</span>
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
@@ -321,7 +419,7 @@ export default function DocsNavbar() {
                 href="/#get-involved"
                 className={dropdownItemClasses}
               >
-                <svg className="w-4 h-4 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
                 Get Involved
@@ -330,25 +428,16 @@ export default function DocsNavbar() {
                 href="/programs"
                 className={dropdownItemClasses}
               >
-                <svg className="w-4 h-4 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 Programs
               </Link>
               <Link
-                href="/#ladder"
-                className={dropdownItemClasses}
-              >
-                <svg className="w-4 h-4 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-                Ladder
-              </Link>
-              <Link
                 href="/#contact-us"
                 className={dropdownItemClasses}
               >
-                <svg className="w-4 h-4 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 Contact Us
@@ -357,7 +446,7 @@ export default function DocsNavbar() {
                 href="/#partners"
                 className={dropdownItemClasses}
               >
-                <svg className="w-4 h-4 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 Partners
@@ -366,18 +455,18 @@ export default function DocsNavbar() {
             )}
           </div>
 
-          <div className="w-px h-5 bg-gray-300 dark:bg-neutral-700 mx-1" />
+          <div className="relative hidden xl:flex w-px h-5 bg-gray-300 dark:bg-neutral-700 mx-1" />
 
           <div 
             className="relative"
-            onMouseEnter={() => handleMouseEnter("version")}
+            onMouseEnter={() => handleMouseEnter ("version")}
             onMouseLeave={handleMouseLeave}
           >
             <button
-              className={`text-xs font-mono transition-colors px-2 py-1.5 rounded-md flex items-center gap-1.5 ${
+              className={`text-xs font-mono transition-colors px-2 py-1.5 rounded-md flex items-center gap-1.5 cursor-pointer ${
                 isDark 
-                  ? 'text-gray-400 hover:text-gray-100 hover:bg-neutral-800'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'text-gray-300 hover:text-gray-100 hover:bg-neutral-800'
+                  : 'text-gray-300 hover:text-gray-100 hover:bg-gray-100'
               }`}
               aria-haspopup="true"
               aria-expanded={openDropdown === "version"}
@@ -432,69 +521,15 @@ export default function DocsNavbar() {
           </div>
 
           <div 
-            className="relative"
-            onMouseEnter={() => handleMouseEnter("language")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <button
-              className={`text-sm transition-colors p-1.5 rounded-md flex items-center ${
-                isDark 
-                  ? 'text-gray-400 hover:text-gray-100 hover:bg-neutral-800'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-              }`}
-              aria-label="Change language"
-              aria-haspopup="true"
-              aria-expanded={openDropdown === "language"}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-              </svg>
-            </button>
-            {openDropdown === "language" && (
-              <div
-                className={`absolute right-0 mt-1 w-32 rounded-md shadow-xl py-1 border z-50 ${
-                  isDark 
-                    ? 'bg-neutral-900 border-neutral-800'
-                    : 'bg-white border-gray-200'
-                }`}
-                onMouseEnter={handleDropdownMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
-              <a href="#" className={`block px-3 py-2 text-sm transition-colors ${
-                isDark
-                  ? 'text-gray-300 hover:bg-neutral-800'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}>
-                English
-              </a>
-              <a href="#" className={`block px-3 py-2 text-sm transition-colors ${
-                isDark
-                  ? 'text-gray-300 hover:bg-neutral-800'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}>
-                日本語
-              </a>
-              <a href="#" className={`block px-3 py-2 text-sm transition-colors ${
-                isDark
-                  ? 'text-gray-300 hover:bg-neutral-800'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}>
-                简体中文
-              </a>
-              </div>
-            )}
-          </div>
-
-          <div 
-            className="relative"
+            className="relative hidden lg:flex  "
             onMouseEnter={() => handleMouseEnter("github")}
             onMouseLeave={handleMouseLeave}
           >
             <button
-              className={`text-sm transition-colors p-1.5 rounded-md flex items-center ${
+              className={`text-sm transition-colors p-1.5 rounded-md flex items-center cursor-pointer ${
                 isDark 
-                  ? 'text-gray-400 hover:text-gray-100 hover:bg-neutral-800'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'text-gray-300 hover:text-gray-100 hover:bg-neutral-800'
+                  : 'text-gray-300 hover:text-gray-100 hover:bg-gray-100'
               }`}
               aria-label="GitHub"
               aria-haspopup="true"
@@ -506,7 +541,7 @@ export default function DocsNavbar() {
             </button>
             {openDropdown === "github" && (
               <div
-                className={`absolute right-0 mt-1 w-44 rounded-md shadow-xl py-1 border z-50 ${
+                className={`absolute right-0 top-full mt-2 w-44 rounded-md shadow-xl py-1 border z-50 ${
                   isDark 
                     ? 'bg-neutral-900 border-neutral-800'
                     : 'bg-white border-gray-200'
@@ -563,24 +598,23 @@ export default function DocsNavbar() {
           </div>
         </div>
 
-        <button
-          onClick={() => {
+        <button onClick={() => {
             setIsSearchOpen(true);
             setTimeout(() => searchInputRef.current?.focus(), 100);
           }}
-          className={`hidden md:flex text-sm transition-colors px-3 py-1.5 rounded-md items-center gap-2 ml-2 ${
+          className={`hidden md:flex w-80 text-sm transition-colors px-3 py-1.5 rounded-md items-center gap-2 ml-2 cursor-pointer ${
             isDark 
-              ? 'text-gray-400 hover:text-gray-100 hover:bg-neutral-800 border border-neutral-800'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 border border-gray-200'
+              ? 'text-gray-300 hover:text-gray-100 hover:bg-neutral-800 border border-neutral-800'
+              : 'text-gray-300 hover:text-gray-100 hover:bg-gray-100 border border-gray-200'
           }`}
           aria-label="Search documentation"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <span className="text-xs">Search docs...</span>
-          <kbd className={`text-xs px-1.5 py-0.5 rounded ${
-            isDark ? 'bg-neutral-800 text-gray-400' : 'bg-gray-100 text-gray-500'
+          <kbd className={`ml-auto text-xs px-1.5 py-0.5 rounded ${
+            isDark ? 'bg-neutral-800 text-gray-300' : 'bg-gray-100 text-gray-500'
           }`}>
             ⌘K
           </kbd>
@@ -591,10 +625,10 @@ export default function DocsNavbar() {
             setIsSearchOpen(true);
             setTimeout(() => searchInputRef.current?.focus(), 100);
           }}
-          className={`md:hidden p-1.5 rounded-md transition-colors ${
+          className={`md:hidden p-1.5 rounded-md transition-colors cursor-pointer ${
             isDark 
-              ? 'text-gray-400 hover:text-gray-100 hover:bg-neutral-800'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              ? 'text-gray-300 hover:text-gray-100 hover:bg-neutral-800'
+              : 'text-gray-300 hover:text-gray-100 hover:bg-gray-100'
           }`}
           aria-label="Search documentation"
         >
@@ -604,10 +638,10 @@ export default function DocsNavbar() {
         </button>
 
         <button
-          className={`md:hidden p-1.5 rounded-md transition-colors ${
+          className={`xl:hidden p-1.5 rounded-md transition-colors cursor-pointer ${
             isDark 
-              ? 'text-gray-400 hover:text-gray-100 hover:bg-neutral-800'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              ? 'text-gray-300 hover:text-gray-100 hover:bg-neutral-800'
+              : 'text-gray-300 hover:text-gray-100 hover:bg-gray-100'
           }`}
           aria-label="Toggle menu"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -643,7 +677,7 @@ export default function DocsNavbar() {
             >
               {/* Search Input */}
               <div className="flex items-center gap-3 px-4 py-3 border-b border-neutral-700">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
@@ -658,7 +692,7 @@ export default function DocsNavbar() {
                   autoFocus
                 />
                 <kbd className={`text-xs px-2 py-1 rounded ${
-                  isDark ? 'bg-neutral-800 text-gray-400' : 'bg-gray-100 text-gray-500'
+                  isDark ? 'bg-neutral-800 text-gray-300' : 'bg-gray-100 text-gray-500'
                 }`}>
                   ESC
                 </kbd>
@@ -668,10 +702,10 @@ export default function DocsNavbar() {
               <div className="max-h-96 overflow-y-auto">
                 {searchQuery.trim() === "" ? (
                   <div className="px-4 py-8 text-center">
-                    <svg className="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                       Search for any word or phrase in the documentation...
                     </p>
                     <p className={`text-xs mt-2 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
@@ -680,17 +714,17 @@ export default function DocsNavbar() {
                   </div>
                 ) : isSearching ? (
                   <div className="px-4 py-8 text-center">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400 mb-3"></div>
-                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 mb-3"></div>
+                    <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                       Searching documentation...
                     </p>
                   </div>
                 ) : searchResults.length === 0 ? (
                   <div className="px-4 py-8 text-center">
-                    <svg className="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 12h.01M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                       No results found for &quot;{searchQuery}&quot;
                     </p>
                     <p className={`text-xs mt-2 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
@@ -718,7 +752,7 @@ export default function DocsNavbar() {
                           <div className={`mt-0.5 p-1.5 rounded flex-shrink-0 ${
                             isDark ? 'bg-neutral-700' : 'bg-gray-200'
                           }`}>
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                           </div>
@@ -730,14 +764,14 @@ export default function DocsNavbar() {
                                 {result.title}
                               </div>
                               <span className={`text-xs px-1.5 py-0.5 rounded flex-shrink-0 ${
-                                isDark ? 'bg-neutral-700 text-gray-400' : 'bg-gray-200 text-gray-600'
+                                isDark ? 'bg-neutral-700 text-gray-300' : 'bg-gray-200 text-gray-600'
                               }`}>
                                 {result.category}
                               </span>
                             </div>
                             <div 
                               className={`text-xs leading-relaxed ${
-                                isDark ? 'text-gray-400' : 'text-gray-600'
+                                isDark ? 'text-gray-300' : 'text-gray-600'
                               }`}
                               dangerouslySetInnerHTML={{ 
                                 __html: result.highlightedSnippet.replace(
@@ -781,73 +815,198 @@ export default function DocsNavbar() {
       )}
 
       {isMenuOpen && (
-        <div className={`md:hidden border-t ${
+        <div className={`xl:hidden border-t ${
           isDark ? 'border-neutral-800 bg-[#111]' : 'border-gray-200 bg-white'
         }`}>
           <div className="px-4 py-3 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
-            <div className={`text-xs font-semibold uppercase px-2 py-1.5 ${
-              isDark ? 'text-gray-400' : 'text-gray-500'
-            }`}>Contribute</div>
-            <Link href="/#join-in" className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+            <Link href="/playground" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}>
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+              Playground
+            </Link>
+            <Link href="/marketplace" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+              isDark
+                ? 'text-gray-300 hover:bg-neutral-800'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}>
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Marketplace
+            </Link>
+            
+            <div className={`text-sm font-medium uppercase px-2 py-1.5 mt-3 tracking-wider ${
+              isDark ? 'text-gray-300' : 'text-gray-500'
+            }`}>Contribute</div>
+            <Link href="/#join-in" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+              isDark
+                ? 'text-gray-300 hover:bg-neutral-800'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}>
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
               Join In
             </Link>
-            <Link href="/contribute-handbook" className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+            <Link href="/contribute-handbook" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}>
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
               Contribute Handbook
             </Link>
-            <Link href="/#security" className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+            <Link href="/quick-installation" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}>
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Quick Installation
+            </Link>
+            <Link href="/products" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+              isDark
+                ? 'text-gray-300 hover:bg-neutral-800'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}>
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Products
+            </Link>
+            <Link href="/ladder" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+              isDark
+                ? 'text-gray-300 hover:bg-neutral-800'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}>
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              Ladder
+            </Link>
+            <Link href="/#security" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+              isDark
+                ? 'text-gray-300 hover:bg-neutral-800'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}>
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
               Security
             </Link>
             
-            <div className={`text-xs font-semibold uppercase px-2 py-1.5 mt-3 ${
-              isDark ? 'text-gray-400' : 'text-gray-500'
+            <div className={`text-sm font-medium uppercase px-2 py-1.5 mt-3 tracking-wider ${
+              isDark ? 'text-gray-300' : 'text-gray-500'
             }`}>Community</div>
-            <Link href="/#get-involved" className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+            <Link href="/#get-involved" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}>
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
               Get Involved
             </Link>
-            <Link href="/programs" className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+            <Link href="/programs" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}>
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
               Programs
             </Link>
-            <Link href="/#ladder" className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+{/* --- REMOVED LADDER LINK FROM HERE --- */}
+            <Link href="/#contact-us" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}>
-              Ladder
-            </Link>
-            <Link href="/#contact-us" className={`block px-3 py-2 text-sm rounded-md transition-colors ${
-              isDark
-                ? 'text-gray-300 hover:bg-neutral-800'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}>
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
               Contact Us
             </Link>
-            <Link href="/#partners" className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+            <Link href="/#partners" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}>
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
               Partners
             </Link>
+
+            <div className={`md:hidden pt-3 border-t mt-3 ${
+              isDark ? 'border-neutral-800' : 'border-gray-200'
+            }`}>
+              <button
+                onClick={() => setOpenDropdown(openDropdown === 'version' ? null : 'version')}
+                className={`md:hidden w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors ${
+                  isDark
+                    ? 'text-gray-300 hover:bg-neutral-800'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <div className="flex items-center">
+                  <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  <span>Version: {currentVersion}</span>
+                </div>
+                <svg 
+                  className={`w-4 h-4 transition-transform ${openDropdown === 'version' ? 'rotate-180' : ''}`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {openDropdown === 'version' && (
+                <div className="md:hidden mt-1 space-y-1 pl-4">
+                  {Object.entries(VERSIONS).map(([key, value]) => (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        handleVersionChange(key as VersionKey);
+                        setOpenDropdown(null);
+                      }}
+                      className={`w-full text-left flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+                        currentVersion === key
+                          ? isDark
+                            ? 'bg-neutral-800 text-white font-medium'
+                            : 'bg-gray-100 text-gray-900 font-medium'
+                          : isDark
+                            ? 'text-gray-300 hover:bg-neutral-800'
+                            : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {currentVersion === key && (
+                        <svg className="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                      {currentVersion !== key && <span className="w-4 mr-3"></span>}
+                      {value.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <div className={`pt-3 border-t mt-3 ${
               isDark ? 'border-neutral-800' : 'border-gray-200'

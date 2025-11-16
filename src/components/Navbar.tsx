@@ -934,6 +934,30 @@ export default function Navbar() {
                     <span>{t("blog")}</span>
                   </Link>
                 </div>
+                <div className="relative mb-4">
+                  <Link
+                    href="/playground"
+                    className="text-sm sm:text-base font-medium text-gray-300 flex items-center space-x-1 px-3 py-2 rounded-lg"
+                  >
+                    <div className="relative">
+                      <svg
+                        className="w-5 h-5 mr-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                          className="group-hover:stroke-[2.5] transition-all duration-300"
+                        ></path>
+                      </svg>
+                    </div>
+                    <span>{t("playground")}</span>
+                  </Link>
+                </div>
                 {/* MARKETPLACE */}
                 <div className="relative mb-4">
                   <Link
@@ -1008,6 +1032,48 @@ export default function Navbar() {
                       </svg>
                     </div>
                     <span>{t("contributeHandbook")}</span>
+                  </Link>
+                </div>
+                <div className="relative mb-2">
+                  <Link
+                    href="/quick-installation"
+                    className="text-sm sm:text-base font-medium text-gray-300 flex items-center space-x-1 px-3 py-2 rounded-lg"
+                  >
+                    <svg
+                      className="w-5 h-5 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      ></path>
+                    </svg>
+                    {t("quickInstallation")}
+                  </Link>
+                </div>
+                <div className="relative mb-2">
+                  <Link
+                    href="/products"
+                    className="text-sm sm:text-base font-medium text-gray-300 flex items-center space-x-1 px-3 py-2 rounded-lg"
+                  >
+                    <svg
+                      className="w-5 h-5 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v2M7 7h10"
+                      ></path>
+                    </svg>
+                    {t("products")}
                   </Link>
                 </div>
                 <div className="relative mb-2">
