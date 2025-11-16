@@ -190,6 +190,31 @@ export default function MaintainerLadderPage() {
               <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
                 {t("subtitle")}
               </p>
+
+              {/* Tracking Sheet CTA */}
+              <div className="mt-8 flex justify-center">
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-300 animate-pulse"></div>
+                  <a
+                    href="http://kubestellar.io/ladder_stats"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative flex items-center gap-3 px-8 py-4 bg-gray-900 rounded-lg border border-blue-500/30 hover:border-blue-400/50 transition-all duration-300 group-hover:scale-105"
+                  >
+                    <div className="text-left">
+                      <div className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">
+                        How do we audit our contributor ladder?
+                      </div>
+                      <div className="text-lg font-semibold text-white flex items-center gap-2">
+                        View Real-Time Statistics
+                        <span className="text-blue-400 group-hover:translate-x-1 transition-transform inline-block">
+                          →
+                        </span>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </section>
