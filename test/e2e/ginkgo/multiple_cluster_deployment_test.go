@@ -967,7 +967,18 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					})
 
 				ginkgo.By("Verifying deployment was created successfully")
-				util.ValidateSingletonStatus(ctx, wds, ns, "nginx-openshift")
+				// Check deployment status with more detailed diagnostics
+				gomega.Eventually(func() error {
+					deployment, err := wds.AppsV1().Deployments(ns).Get(ctx, "nginx-openshift", metav1.GetOptions{})
+					if err != nil {
+						return fmt.Errorf("failed to get deployment: %v", err)
+					}
+					if deployment.Status.AvailableReplicas != 1 {
+						return fmt.Errorf("deployment has %d available replicas, expected 1. Ready replicas: %d, Total replicas: %d",
+							deployment.Status.AvailableReplicas, deployment.Status.ReadyReplicas, deployment.Status.Replicas)
+					}
+					return nil
+				}, 300*time.Second).Should(gomega.Succeed())
 
 				ginkgo.By("Creating binding policy for the OpenShift nginx deployment")
 				util.CreateBindingPolicy(ctx, ksWds, "nginx-openshift",
@@ -986,8 +997,29 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 1)
 
 				ginkgo.By("Verifying deployment reaches ready state on WECs")
-				util.ValidateSingletonStatus(ctx, wec1, ns, "nginx-openshift")
-				util.ValidateSingletonStatus(ctx, wec2, ns, "nginx-openshift")
+				// Check WEC1 deployment status
+				gomega.Eventually(func() error {
+					deployment, err := wec1.AppsV1().Deployments(ns).Get(ctx, "nginx-openshift", metav1.GetOptions{})
+					if err != nil {
+						return fmt.Errorf("failed to get deployment on wec1: %v", err)
+					}
+					if deployment.Status.AvailableReplicas != 1 {
+						return fmt.Errorf("wec1 deployment has %d available replicas, expected 1", deployment.Status.AvailableReplicas)
+					}
+					return nil
+				}, 300*time.Second).Should(gomega.Succeed())
+
+				// Check WEC2 deployment status
+				gomega.Eventually(func() error {
+					deployment, err := wec2.AppsV1().Deployments(ns).Get(ctx, "nginx-openshift", metav1.GetOptions{})
+					if err != nil {
+						return fmt.Errorf("failed to get deployment on wec2: %v", err)
+					}
+					if deployment.Status.AvailableReplicas != 1 {
+						return fmt.Errorf("wec2 deployment has %d available replicas, expected 1", deployment.Status.AvailableReplicas)
+					}
+					return nil
+				}, 300*time.Second).Should(gomega.Succeed())
 			})
 		})
 	})

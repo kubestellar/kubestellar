@@ -53,12 +53,6 @@ const (
 // IsOpenShiftCluster detects if we're running in an OpenShift cluster
 func IsOpenShiftCluster(ctx context.Context, client *kubernetes.Clientset) bool {
 	// Check for OpenShift-specific API groups
-	_, err := client.Discovery().ServerGroups()
-	if err != nil {
-		klog.V(3).Info("Failed to get server groups", "error", err)
-		return false
-	}
-
 	groups, err := client.Discovery().ServerGroups()
 	if err != nil {
 		klog.V(3).Info("Failed to get server groups", "error", err)
@@ -261,18 +255,9 @@ func CreateDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string,
 
 	var securityContext *corev1.SecurityContext
 	if isOpenShift {
-		// For OpenShift, set runAsUser to nil to allow OpenShift to assign non-root user
-		// and set allowPrivilegeEscalation to false for restricted-v2 SCC compatibility
-		securityContext = &corev1.SecurityContext{
-			AllowPrivilegeEscalation: &[]bool{false}[0],
-			RunAsNonRoot:            &[]bool{true}[0],
-			SeccompProfile: &corev1.SeccompProfile{
-				Type: corev1.SeccompProfileTypeRuntimeDefault,
-			},
-			Capabilities: &corev1.Capabilities{
-				Drop: []corev1.Capability{"ALL"},
-			},
-		}
+		// For OpenShift, use minimal security context that works with restricted-v2 SCC
+		// Let OpenShift's SCC handle user assignment and privilege management
+		securityContext = &corev1.SecurityContext{}
 	}
 
 	deployment := appsv1.Deployment{
