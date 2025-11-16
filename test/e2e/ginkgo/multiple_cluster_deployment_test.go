@@ -956,5 +956,39 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				return nil
 			})
 		})
+
+		ginkgo.Context("OpenShift compatibility", func() {
+			ginkgo.It("creates nginx deployment compatible with OpenShift security constraints", func(ctx context.Context) {
+				ginkgo.By("Creating nginx deployment with OpenShift-compatible security context")
+				util.CreateDeployment(ctx, wds, ns, "nginx-openshift",
+					map[string]string{
+						"app.kubernetes.io/name":         "nginx-openshift",
+						"test.kubestellar.io/test-label": "openshift-test",
+					})
+
+				ginkgo.By("Verifying deployment was created successfully")
+				util.ValidateSingletonStatus(ctx, wds, ns, "nginx-openshift")
+
+				ginkgo.By("Creating binding policy for the OpenShift nginx deployment")
+				util.CreateBindingPolicy(ctx, ksWds, "nginx-openshift",
+					[]metav1.LabelSelector{
+						{MatchLabels: map[string]string{"location-group": "edge"}},
+					},
+					[]ksapi.DownsyncPolicyClause{
+						{DownsyncObjectTest: ksapi.DownsyncObjectTest{
+							ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx-openshift"}}},
+						}},
+					},
+				)
+
+				ginkgo.By("Verifying nginx deployment is propagated to WECs without permission errors")
+				util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 1)
+				util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 1)
+
+				ginkgo.By("Verifying deployment reaches ready state on WECs")
+				util.ValidateSingletonStatus(ctx, wec1, ns, "nginx-openshift")
+				util.ValidateSingletonStatus(ctx, wec2, ns, "nginx-openshift")
+			})
+		})
 	})
 })
