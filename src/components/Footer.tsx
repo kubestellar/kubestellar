@@ -365,7 +365,7 @@ export default function Footer() {
       {/* Floating back to top button */}
       <button
         id="back-to-top"
-        className="fixed bottom-18 right-8 p-3 rounded-full bg-blue-600 text-white shadow-lg z-50 transition-all duration-300 opacity-0 translate-y-10 hover:bg-blue-700 hover:scale-110"
+        className="fixed bottom-18 right-8 p-3 rounded-full bg-blue-600 text-white shadow-lg z-40 transition-all duration-300 opacity-0 translate-y-10 hover:bg-blue-700 hover:scale-110"
         aria-label={t("backToTop")}
       >
         <svg
