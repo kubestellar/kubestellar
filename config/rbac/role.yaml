@@ -27,5 +27,3 @@ rules:
   - controlplanes/status
   verbs:
   - get
-  - patch
-  - update

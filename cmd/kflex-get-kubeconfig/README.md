@@ -3,9 +3,10 @@
 This is a simple utility for fetching a kubeconfig to use to access
 the apiservers of a KubeFlex `ControlPlane`.
 
-This utility is given either the name of the `ControlPlane` or a label
-selector (in the same format as given to `kubectl`) that is expected to
-match the labels of exactly 1 `ControlPlane`.
+This utility is given either (1) a non-empty string that is the name
+of the `ControlPlane` or (2) a non-empty label selector (in the same
+format as given to `kubectl`) that is expected to match the labels of
+exactly 1 `ControlPlane`.
 
 This utility is told whether to extract the in-cluster or external
 kubeconfig.
@@ -27,8 +28,8 @@ kflex-get-kubeconfig --output-file taste \
 ### Specific to this utility
 
 ```console
-      --control-plane-label-selector string   label selector that identifies exactly one ControlPlane
-      --control-plane-name string             name of ControlPlane to read; mutually exclusive with --control-plane-label-selector
+      --control-plane-label-selector string   label selector that identifies exactly one ControlPlane, or empty string (meaning to pick by name); default is empty string
+      --control-plane-name string             name of ControlPlane to read, or empty string (meaning to pick by label selector); default is empty string
       --in-cluster                            whether to extract the kubeconfig for use in the kubeflex hosting cluster (default true)
       --output-file string                    pathname of file where the kubeconfig will be written; '-' means stdout
 ```

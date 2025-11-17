@@ -61,10 +61,10 @@ Then go through one of the setup options below:
 
 #### Step 1: Create `.env` File for Frontend Configuration
 
-To configure the frontend, copy the `example.env` file to a `.env` file in the project root directory (where `package.json` is located).
+To configure the frontend, copy the `.env.example` file to a `.env` file in the project root directory (where `package.json` is located).
 
 ```bash
-cp example.env .env
+cp .env.example .env
 ```
 
 **Example `.env` file:**  
@@ -76,7 +76,7 @@ VITE_GIT_COMMIT_HASH=$GIT_COMMIT_HASH
 ```
 
 > [!NOTE] 
-> This is because `.env` files are intended to be a personal environment configuration file. The included `example.env` in the repo is a standard that most other node projects include for the same purpose. You rename the file to `.env` and then change its contents to align with your system and personal needs.
+> This is because `.env` files are intended to be a personal environment configuration file. The included `.env.example` in the repo is a standard that most other node projects include for the same purpose. You rename the file to `.env` and then change its contents to align with your system and personal needs.
 
 ##### Tracking Application Version and Git Commit Hash
 

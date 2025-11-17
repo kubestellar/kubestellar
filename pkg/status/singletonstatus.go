@@ -63,37 +63,33 @@ func (c *Controller) updateWorkStatusToObject(ctx context.Context, workStatusON 
 
 func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectIdentifier) error {
 	logger := klog.FromContext(ctx)
-	isSingletonRequested, nWECs, isMultiWECRequested, nWECsMulti := c.bindingPolicyResolver.GetReportedStateRequestForObject(wObjID)
+	isSingletonRequested, qualifiedWECsSingleton, isMultiWECRequested, qualifiedWECsMulti := c.bindingPolicyResolver.GetReportedStateRequestForObject(wObjID)
 
-	// nWECs is the count of WEC matched by clusterselectors in binding policy when wantSingletonReportedState = true
-	// nWECsMulti is the count of WEC matched by clusterselectors in binding policy when wantMultiWECReportedState = true
-	// when both wantSingletonReportedState and wantMultiWECReportedState is set to true then nWECs and nWECsMulti is equal
-
-	logger.V(4).Info("Workload object (singleton status requested)", "object", wObjID, "isSingletonRequested", isSingletonRequested, "nWECs", nWECs,
-		"Workload object (multiWEC status requested)", "object", wObjID, "isMultiWECRequested", isMultiWECRequested, "nWECsMulti", nWECsMulti)
+	logger.V(4).Info("Workload object reported state request", "object", wObjID, "isSingletonRequested", isSingletonRequested, "qualifiedWECsSingleton", util.K8sSet4Log(qualifiedWECsSingleton),
+		"isMultiWECRequested", isMultiWECRequested, "qualifiedWECsMulti", util.K8sSet4Log(qualifiedWECsMulti))
 
 	if isMultiWECRequested && isSingletonRequested {
-		logger.V(4).Info("Both singleton and multiWEC status are requested for the same object", wObjID)
+		logger.V(4).Info("Both singleton and multiWEC reported state return are requested for the same object", wObjID)
 
-		if nWECs == 1 {
-			return c.handleSingleton(ctx, wObjID)
+		if qualifiedWECsSingleton.Len() == 1 && qualifiedWECsMulti.Len() == 1 {
+			return c.handleSingleton(ctx, wObjID, qualifiedWECsSingleton)
 		}
-		return c.handleMultiWEC(ctx, wObjID, nWECsMulti)
+		return c.handleMultiWEC(ctx, wObjID, qualifiedWECsMulti)
 	}
 
-	if isSingletonRequested && nWECs == 1 {
-		logger.V(4).Info("singleton status is requested and nWEC == 1", "object: ", wObjID, "nWEC", nWECs)
-		return c.handleSingleton(ctx, wObjID)
+	if isSingletonRequested && qualifiedWECsSingleton.Len() == 1 {
+		logger.V(4).Info("singleton reported state return is requested and qualifiedWECsSingleton.Len() == 1 for object", "wObjID", wObjID, "qualifiedWECsSingleton", util.K8sSet4Log(qualifiedWECsSingleton))
+		return c.handleSingleton(ctx, wObjID, qualifiedWECsSingleton)
 	}
 
-	if isMultiWECRequested && nWECsMulti == 1 {
-		logger.V(4).Info("multiWEC status is requested and nWECsMulti == 1", "object: ", wObjID, "nWEC", nWECs)
-		return c.handleSingleton(ctx, wObjID)
+	if isMultiWECRequested && qualifiedWECsMulti.Len() == 1 {
+		logger.V(4).Info("multiWEC status is requested and nWECsMulti == 1", "object: ", wObjID, "qualifiedWECsMulti", util.K8sSet4Log(qualifiedWECsMulti))
+		return c.handleSingleton(ctx, wObjID, qualifiedWECsMulti)
 	}
 
-	if isMultiWECRequested && nWECsMulti > 1 {
-		logger.V(4).Info("multiWEC status is requested and nWEC != 1", "object: ", wObjID, "nWEC", nWECsMulti)
-		return c.handleMultiWEC(ctx, wObjID, nWECsMulti)
+	if isMultiWECRequested && qualifiedWECsMulti.Len() > 1 {
+		logger.V(4).Info("multiWEC status is requested and nWEC != 1", "object: ", wObjID, "qualifiedWECsMulti", util.K8sSet4Log(qualifiedWECsMulti))
+		return c.handleMultiWEC(ctx, wObjID, qualifiedWECsMulti)
 	}
 
 	logger.V(4).Info("None of the condition mentioned in doc for execution of handleSingleton and handleMultiWEC function is matched.", wObjID)
@@ -104,19 +100,26 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
 	return nil
 }
 
-func (c *Controller) handleSingleton(ctx context.Context, wObjID util.ObjectIdentifier) error {
+func (c *Controller) handleSingleton(ctx context.Context, wObjID util.ObjectIdentifier, qualifiedWEC sets.Set[string]) error {
 	logger := klog.FromContext(ctx)
-	var wsONs [2]cache.ObjectName
+	var wsON cache.ObjectName
 	var numWS int
 
+	// Get the WEC name
+	var qualifiedWECName string
+	for wecName := range qualifiedWEC {
+		qualifiedWECName = wecName
+		break
+	}
+
 	c.workStatusToObject.ReadInverse().ContGet(wObjID, func(wsONSet sets.Set[cache.ObjectName]) {
-		numWS = wsONSet.Len()
-		var idx int
 		for it := range wsONSet {
-			wsONs[idx] = it
-			idx++
-			if idx > 1 {
-				break
+			if it.Namespace == qualifiedWECName {
+				wsON = it
+				numWS++
+				if numWS > 1 {
+					break
+				}
 			}
 		}
 	})
@@ -129,7 +132,6 @@ func (c *Controller) handleSingleton(ctx context.Context, wObjID util.ObjectIden
 			"object", wObjID, "numWS", numWS)
 		return nil
 	}
-	wsON := wsONs[0]
 	wsObj, err := c.workStatusLister.ByNamespace(wsON.Namespace).Get(wsON.Name)
 	if err != nil {
 		return err

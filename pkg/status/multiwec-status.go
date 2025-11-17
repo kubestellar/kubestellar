@@ -19,15 +19,16 @@ package status
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdentifier, nWECs int) error {
+func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdentifier, qualifiedWECsMulti sets.Set[string]) error {
 	// TODO: Implement multiwec handling logic
 	logger := klog.FromContext(ctx)
-	logger.V(4).Info("TODO: Implement multiwec handling logic", "object", wObjID, "nWECs", nWECs)
+	logger.V(4).Info("Implement multiwec handling logic", "object", wObjID, "qualifiedWECsMulti", util.K8sSet4Log(qualifiedWECsMulti))
 
 	return nil
 }
