@@ -28,6 +28,21 @@ We're extremely grateful for security researchers and users that report vulnerab
 
 You can also email the private [kubestellar-security-announce@googlegroups.com](mailto:kubestellar-security-announce@googlegroups.com) list with the security details and the details expected for [all KubeStellar bug reports](https://github.com/kubestellar/kubestellar/blob/main/.github/ISSUE_TEMPLATE/bug_report.yaml).
 
+### Reporting a Private Security Vulnerability
+
+If you discover a security vulnerability, **please do not file a public GitHub issue**.  
+Instead, use one of the following private channels:
+
+1. **Email (preferred):** security@kubestellar.io
+2. **GitHub Security Advisory (private):** 
+   You can report the issue privately via GitHub's security advisories: 
+   https://docs.github.com/en/code-security/security-advisories
+
+We will acknowledge your report within 48 hours and work with you on a coordinated disclosure process.  
+Please **do not publicly disclose the vulnerability** until we have confirmed and released a fix.
+
+---
+
 ### When Should I Report a Vulnerability?
 
 - You think you discovered a potential security vulnerability in KubeStellar
