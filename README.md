@@ -1,4 +1,4 @@
-#  KubeStellar Documentation
+# KubeStellar Documentation
 
 <p align="center">
   <img src="./docs/overrides/favicons/android-72x72.png" alt="KubeStellar Logo" width="72"/>
