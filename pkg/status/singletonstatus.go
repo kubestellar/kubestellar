@@ -69,7 +69,9 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
 		"isMultiWECRequested", isMultiWECRequested, "qualifiedWECsMulti", util.K8sSet4Log(qualifiedWECsMulti))
 
 	if isMultiWECRequested && isSingletonRequested {
-
+		// if both are requested for same object then we can combine all qualified clusters(qualifiedWECsSingleton and qualifiedWECsMulti)
+		// then call handleMultiWEC function
+		// TODO: Implement combine all qualified WECs.
 		if qualifiedWECsSingleton.Len() == 1 && qualifiedWECsMulti.Len() == 1 {
 			return c.handleSingleton(ctx, wObjID, qualifiedWECsSingleton)
 		}
