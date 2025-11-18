@@ -65,8 +65,26 @@ kubectl --context "${hubctx}" wait --namespace ingress-nginx \
   --selector=app.kubernetes.io/component=controller \
   --timeout=90s
 
+
+get_bootstrap_sa_name() {
+    local v="$1"
+    if [ -z "$v" ]; then
+        echo "cluster-bootstrap"
+        return
+    fi
+    if [ "$(printf '%s\n' "$v" "0.11.0" | sort -V | head -1)" = "0.11.0" ]; then
+        echo "cluster-bootstrap"
+    else
+        echo "agent-registration-bootstrap"
+    fi
+}
+
 echo "Initialize the ocm hub cluster\n"
 clusteradm init --wait --context ${hubctx}
+
+CLUSTERADM_VERSION=$(clusteradm version --short 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+sa_name=$(get_bootstrap_sa_name "$CLUSTERADM_VERSION")
+
 joincmd=$(clusteradm get token --context ${hubctx} | grep clusteradm)
 
 echo "Join cluster1 to hub\n"
