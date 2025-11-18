@@ -105,16 +105,18 @@ type BindingPolicyResolver interface {
 	ResolutionExists(bindingPolicyKey string) bool
 
 	// GetReportedStateRequestForObject returns the combined effects of all
-	// the resolutions regarding singleton reported state and multiwec reported state return for a given workload object.
-	// The returned `bool` indicates whether singleton or multiwec reported state return is requested.
-	// When that is `true`, the returned `sets.Set[string]` is the qualified WECs that the resolutions
-	// collectively associate with the workload object;
-	// otherwise the returned `sets.Set[string]` is empty.
+	// the resolutions regarding singleton reported state and multiwec reported state requests for a given workload object.
+	// First and third is the `bool` indicating whether any BindingPolicy requests singleton or multiwec reported state return respectively
+	// for the given object.
+	// If those are true then the second and fourth are the set of qualified WECs bound to that object respectively,
+	// otherwise the second or fourth value is empty.
 	// Returns: (wantSingleton, qualifiedWECsSingleton, wantMultiWEC, qualifiedWECsMulti)
 	GetReportedStateRequestForObject(util.ObjectIdentifier) (bool, sets.Set[string], bool, sets.Set[string])
 
 	// GetSingletonReportedStateRequestsForBinding calls GetReportedStateRequestForObject
 	// for each of workload objects in the resolution if the resolution exists.
+	// For each workload object, it returns the objectID, whether singleton reported state is requested and
+	// the number of qualified WECs.
 	// If the resolution doesn't exist then returns `nil`.
 	GetSingletonReportedStateRequestsForBinding(bindingPolicyKey string) []SingletonReportedStateReturnStatus
 
@@ -359,7 +361,7 @@ func (resolver *bindingPolicyResolver) ResolutionExists(bindingPolicyKey string)
 // GetReportedStateRequestForObject returns four things.
 // First and third is the `bool` indicating whether any BindingPolicy requests singleton or multiwec reported state return respectively
 // for the given object.
-// If that is true then the second and fourth is the set of qualified WECs bound to that object respectively,
+// If those are true then the second and fourth are the set of qualified WECs bound to that object respectively,
 // otherwise the second or fourth value is empty.
 func (resolver *bindingPolicyResolver) GetReportedStateRequestForObject(objId util.ObjectIdentifier) (bool, sets.Set[string], bool, sets.Set[string]) {
 	resolver.RWMutex.RLock()

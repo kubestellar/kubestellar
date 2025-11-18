@@ -25,10 +25,10 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdentifier, qualifiedWECsMulti sets.Set[string]) error {
+func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdentifier, qualifiedWECs sets.Set[string]) error {
 	// TODO: Implement multiwec handling logic
 	logger := klog.FromContext(ctx)
-	logger.V(4).Info("Implement multiwec handling logic", "object", wObjID, "qualifiedWECsMulti", util.K8sSet4Log(qualifiedWECsMulti))
+	logger.V(4).Info("Implement multiwec handling logic", "object", wObjID, "qualifiedWECs", util.K8sSet4Log(qualifiedWECs))
 
 	return nil
 }

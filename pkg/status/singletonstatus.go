@@ -69,7 +69,6 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
 		"isMultiWECRequested", isMultiWECRequested, "qualifiedWECsMulti", util.K8sSet4Log(qualifiedWECsMulti))
 
 	if isMultiWECRequested && isSingletonRequested {
-		logger.V(4).Info("Both singleton and multiWEC reported state return are requested for the same object", wObjID)
 
 		if qualifiedWECsSingleton.Len() == 1 && qualifiedWECsMulti.Len() == 1 {
 			return c.handleSingleton(ctx, wObjID, qualifiedWECsSingleton)
@@ -77,22 +76,19 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
 		return c.handleMultiWEC(ctx, wObjID, qualifiedWECsMulti)
 	}
 
-	if isSingletonRequested && qualifiedWECsSingleton.Len() == 1 {
-		logger.V(4).Info("singleton reported state return is requested and qualifiedWECsSingleton.Len() == 1 for object", "wObjID", wObjID, "qualifiedWECsSingleton", util.K8sSet4Log(qualifiedWECsSingleton))
-		return c.handleSingleton(ctx, wObjID, qualifiedWECsSingleton)
+	if (isSingletonRequested && qualifiedWECsSingleton.Len() == 1) || (isMultiWECRequested && qualifiedWECsMulti.Len() == 1) {
+		qualifiedWECs := qualifiedWECsSingleton
+		if isMultiWECRequested && qualifiedWECsMulti.Len() == 1 {
+			qualifiedWECs = qualifiedWECsMulti
+		}
+		return c.handleSingleton(ctx, wObjID, qualifiedWECs)
 	}
 
-	if isMultiWECRequested && qualifiedWECsMulti.Len() == 1 {
-		logger.V(4).Info("multiWEC status is requested and nWECsMulti == 1", "object: ", wObjID, "qualifiedWECsMulti", util.K8sSet4Log(qualifiedWECsMulti))
-		return c.handleSingleton(ctx, wObjID, qualifiedWECsMulti)
-	}
-
-	if isMultiWECRequested && qualifiedWECsMulti.Len() > 1 {
-		logger.V(4).Info("multiWEC status is requested and nWEC != 1", "object: ", wObjID, "qualifiedWECsMulti", util.K8sSet4Log(qualifiedWECsMulti))
+	if isMultiWECRequested && qualifiedWECsMulti.Len() > 0 {
 		return c.handleMultiWEC(ctx, wObjID, qualifiedWECsMulti)
 	}
 
-	logger.V(4).Info("None of the condition mentioned in doc for execution of handleSingleton and handleMultiWEC function is matched.", wObjID)
+	logger.V(4).Info("None of the condition mentioned in doc for execution of handleSingleton and handleMultiWEC function is matched", "object", wObjID)
 	if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers); err != nil {
 		return err
 	}
