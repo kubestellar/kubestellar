@@ -93,7 +93,6 @@ export default function PartnersPage() {
       </div>
 
       <div className="relative z-10 pt-7">
-        {" "}
         {/* Add padding-top to account for fixed navbar */}
         {/* Header Section */}
         <section className="py-16 sm:py-20 lg:py-24 pb-8">
@@ -145,11 +144,17 @@ export default function PartnersPage() {
                             <Image
                               src={partner.logo}
                               alt={`${partner.name} logo`}
-                              width={partner.slug === "argocd" ? 130 : 96}
-                              height={partner.slug === "argocd" ? 130 : 96}
-                              className={`${partner.slug === "argocd" ? "w-[130px] h-[130px]" : "w-24 h-24"} object-contain ${partner.slug === "mvi" || partner.slug === "turbonomic" ? "bg-white rounded-lg p-2" : ""}`}
+                              width={130}
+                              height={130}
+                              className={`w-[100px] h-[100px] object-contain ${
+                                partner.slug === "mvi" ||
+                                partner.slug === "turbonomic"
+                                  ? "bg-white rounded-lg p-2"
+                                  : ""
+                              }`}
                             />
                           </div>
+
                           <h3 className="text-3xl font-bold text-white mb-5">
                             {partner.name}
                           </h3>
