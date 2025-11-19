@@ -47,13 +47,17 @@ The effect of status return options depends on the number of selected WECs.
 
 | `wantSingletonReportedState` | `wantMultiWECReportedState` | WEC count | Result |
 |:--:|:--:|:--:|:--|
-| ✓ | ✗ | 1 | Copy status from the single WEC. |
-| ✓ | ✗ | 0 or >1 | Clear `.status`. |
-| ✗ | ✓ | 1 | Copy status from the single WEC. |
-| ✗ | ✓ | >1 | Aggregate status from all WECs. |
-| ✗ | ✗ | any | Leave `.status` empty. |
+| T | F | 1 | Copy status from the single WEC. |
+| T | F | 0 or >1 | Clear `.status`. |
+| F | T | 1 | Copy status from the single WEC. |
+| F | T | >1 | Aggregate status from all WECs. |
+| T | T | 1 | Copy status from the single WEC. |
+| T | T | >1 | Aggregate status from all WECs (multi-WEC takes precedence). |
+| F | F | any | Leave `.status` empty. |
 
-If a Binding requests singleton reported state and matches exactly one WEC, that status takes precedence.
+**Legend:** T = true, F = false
+
+When both flags are enabled, the multi-WEC aggregation behavior takes precedence if more than one WEC is selected.
 
 ## Aggregated Status Semantics
 
