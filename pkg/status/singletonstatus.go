@@ -90,7 +90,7 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
 		return c.handleMultiWEC(ctx, wObjID, qualifiedWECsMulti)
 	}
 
-	logger.V(4).Info("None of the condition mentioned in doc for execution of handleSingleton and handleMultiWEC function is matched", "object", wObjID)
+	logger.V(4).Info("neither singleton nor multi-WEC reported state return applies", "object", wObjID)
 	if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers); err != nil {
 		return err
 	}
