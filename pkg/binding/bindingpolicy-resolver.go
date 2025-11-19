@@ -108,7 +108,7 @@ type BindingPolicyResolver interface {
 	// the resolutions regarding singleton reported state and multiwec reported state requests for a given workload object.
 	// First and third is the `bool` indicating whether any BindingPolicy requests singleton or multiwec reported state return respectively
 	// for the given object.
-	// If those are true then the second and fourth are the set of qualified WECs bound to that object respectively,
+	// When first or third value is true then the second or fourth are the set of qualified WECs bound to that object respectively,
 	// otherwise the second or fourth value is empty.
 	// Returns: (wantSingleton, qualifiedWECsSingleton, wantMultiWEC, qualifiedWECsMulti)
 	GetReportedStateRequestForObject(util.ObjectIdentifier) (bool, sets.Set[string], bool, sets.Set[string])
