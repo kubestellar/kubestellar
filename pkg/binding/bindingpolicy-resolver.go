@@ -375,19 +375,15 @@ func (resolver *bindingPolicyResolver) GetReportedStateRequestForObject(objId ut
 	// Single loop to check both singleton and multi-WEC requests and collect WECs
 	for _, resolution := range resolver.bindingPolicyToResolution {
 		singMatches, singRequest, singDests := resolution.getSingletonReportedStateRequestForObject(objId)
-		if singMatches {
-			if singRequest {
-				singletonRequested = true
-				singletonWECs = singletonWECs.Union(singDests)
-			}
+		if singMatches && singRequest {
+			singletonRequested = true
+			singletonWECs = singletonWECs.Union(singDests)
 		}
 
 		multiMatches, multiRequest, multiDests := resolution.getMultiWECReportedStateRequestForObject(objId)
-		if multiMatches {
-			if multiRequest {
-				multiWECRequested = true
-				multiWECs = multiWECs.Union(multiDests)
-			}
+		if multiMatches && multiRequest {
+			multiWECRequested = true
+			multiWECs = multiWECs.Union(multiDests)
 		}
 	}
 
