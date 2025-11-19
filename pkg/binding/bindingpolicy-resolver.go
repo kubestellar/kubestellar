@@ -105,8 +105,8 @@ type BindingPolicyResolver interface {
 	ResolutionExists(bindingPolicyKey string) bool
 
 	// GetReportedStateRequestForObject returns the combined effects of all
-	// the resolutions regarding singleton reported state and multiwec reported state requests for a given workload object.
-	// First and third is the `bool` indicating whether any BindingPolicy requests singleton or multiwec reported state return respectively
+	// the resolutions regarding singleton reported state and multi-WEC reported state requests for a given workload object.
+	// First and third is the `bool` indicating whether any BindingPolicy requests singleton or multi-WEC reported state return respectively
 	// for the given object.
 	// When first or third value is true then the second or fourth are the set of qualified WECs bound to that object respectively,
 	// otherwise the second or fourth value is empty.
@@ -359,7 +359,7 @@ func (resolver *bindingPolicyResolver) ResolutionExists(bindingPolicyKey string)
 }
 
 // GetReportedStateRequestForObject returns four things.
-// First and third is the `bool` indicating whether any BindingPolicy requests singleton or multiwec reported state return respectively
+// First and third is the `bool` indicating whether any BindingPolicy requests singleton or multi-WEC reported state return respectively
 // for the given object.
 // If those are true then the second and fourth are the set of qualified WECs bound to that object respectively,
 // otherwise the second or fourth value is empty.
@@ -367,60 +367,26 @@ func (resolver *bindingPolicyResolver) GetReportedStateRequestForObject(objId ut
 	resolver.RWMutex.RLock()
 	defer resolver.RWMutex.RUnlock()
 
-	// Query singleton status
 	var singletonRequested bool
-	// First, just compute whether singleton reported state return is requested for this object.
-	// Avoid thrashing the heap with that set collection unless it is really necessary.
-	for _, resolution := range resolver.bindingPolicyToResolution {
-		matches, thisRequest, _ := resolution.getSingletonReportedStateRequestForObject(objId)
-		if matches && thisRequest {
-			singletonRequested = true
-			break
-		}
-	}
-
-	// Query multiwec
 	var multiWECRequested bool
-	for _, resolution := range resolver.bindingPolicyToResolution {
-		matches, thisRequest, _ := resolution.getMultiWECReportedStateRequestForObject(objId)
-		if matches && thisRequest {
-			multiWECRequested = true
-			break
-		}
-	}
-
-	if !singletonRequested && !multiWECRequested {
-		return false, sets.New[string](), false, sets.New[string]()
-	}
-
-	// collect WEC for singleton
 	singletonWECs := sets.New[string]()
-	if singletonRequested {
-		singletonRequested = false
-		for _, resolution := range resolver.bindingPolicyToResolution {
-			matches, thisRequest, thisDests := resolution.getSingletonReportedStateRequestForObject(objId)
-			if !matches {
-				continue
-			}
-			singletonRequested = singletonRequested || thisRequest
-			if thisRequest {
-				singletonWECs = singletonWECs.Union(thisDests)
+	multiWECs := sets.New[string]()
+
+	// Single loop to check both singleton and multi-WEC requests and collect WECs
+	for _, resolution := range resolver.bindingPolicyToResolution {
+		singMatches, singRequest, singDests := resolution.getSingletonReportedStateRequestForObject(objId)
+		if singMatches {
+			if singRequest {
+				singletonRequested = true
+				singletonWECs = singletonWECs.Union(singDests)
 			}
 		}
-	}
 
-	// Collect WEC for multiwec
-	multiWECs := sets.New[string]()
-	if multiWECRequested {
-		multiWECRequested = false
-		for _, resolution := range resolver.bindingPolicyToResolution {
-			matches, thisRequest, thisDests := resolution.getMultiWECReportedStateRequestForObject(objId)
-			if !matches {
-				continue
-			}
-			multiWECRequested = multiWECRequested || thisRequest
-			if thisRequest {
-				multiWECs = multiWECs.Union(thisDests)
+		multiMatches, multiRequest, multiDests := resolution.getMultiWECReportedStateRequestForObject(objId)
+		if multiMatches {
+			if multiRequest {
+				multiWECRequested = true
+				multiWECs = multiWECs.Union(multiDests)
 			}
 		}
 	}
