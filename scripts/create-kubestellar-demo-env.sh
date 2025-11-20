@@ -183,15 +183,37 @@ images=("ghcr.io/loft-sh/vcluster:0.16.4"
         "quay.io/open-cluster-management/registration-operator:v0.15.2"
         "quay.io/kubestellar/postgresql:16.0.0-debian-11-r13")
 
-for image in "${images[@]}"; do
-    docker pull "$image" &
-done
-wait
+# Detect the host architecture
+ARCH=$(uname -m)
+case $ARCH in
+    x86_64)
+        PLATFORM="linux/amd64"
+        ;;
+    aarch64|arm64)
+        PLATFORM="linux/arm64"
+        ;;
+    *)
+        echo "Warning: Unsupported architecture: $ARCH. Defaulting to linux/amd64."
+        PLATFORM="linux/amd64"
+        ;;
+esac
+echo "Detected architecture: $ARCH (Platform: $PLATFORM)"
 
+# Iterate one by one to load the images
 for image in "${images[@]}"; do
+    echo "Processing $image..."
+
+    # 1. Pull the specific platform to ensure it's in the host's image store
+    docker pull --platform "$PLATFORM" "$image"
+    
+    # 2. Load into the cluster via direct Containerd pull (bypassing the flaky kind load)
     if [ "$k8s_platform" == "kind" ]; then
-        kind load docker-image "$image" --name kubeflex
+        echo "Pulling $image directly into kind node Containerd (bypassing kind load)..."
+        # The kind node is named kubeflex-control-plane
+        # Use 'ctr' to pull directly inside the node. This avoids the faulty 'docker save' export.
+        docker exec -i kubeflex-control-plane ctr --namespace k8s.io images pull --platform "$PLATFORM" "$image"
     else
+        echo "Importing $image into k3d cluster..."
         k3d image import "$image" --cluster kubeflex
     fi
 done
