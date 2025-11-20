@@ -179,7 +179,6 @@ kubectl config use-context $k8s_platform-kubeflex
 
 echo -e "\nPulling container images local..."
 images=("ghcr.io/loft-sh/vcluster:0.16.4"
-        "rancher/k3s:v1.27.2-k3s1"
         "quay.io/open-cluster-management/registration-operator:v0.15.2"
         "quay.io/kubestellar/postgresql:16.0.0-debian-11-r13")
 
@@ -208,10 +207,21 @@ for image in "${images[@]}"; do
     
     # 2. Load into the cluster via direct Containerd pull (bypassing the flaky kind load)
     if [ "$k8s_platform" == "kind" ]; then
-        echo "Pulling $image directly into kind node Containerd (bypassing kind load)..."
-        # The kind node is named kubeflex-control-plane
-        # Use 'ctr' to pull directly inside the node. This avoids the faulty 'docker save' export.
-        docker exec -i kubeflex-control-plane ctr --namespace k8s.io images pull --platform "$PLATFORM" "$image"
+        attempts=3
+        success=0
+        for ((i=1; i<=attempts; i++)); do
+            echo "Attempt $i/$attempts: Pulling $image directly into kind node Containerd..."
+            if docker exec -i kubeflex-control-plane ctr --namespace k8s.io images pull --platform "$PLATFORM" "$image"; then
+                success=1
+                break
+            fi
+            echo "Pull failed. Retrying in 5 seconds..." >&2
+            sleep 5
+        done
+        if [ $success -eq 0 ]; then
+            echo "Error: Failed to pull $image after $attempts attempts. Check network configuration."
+            exit 1
+        fi
     else
         echo "Importing $image into k3d cluster..."
         k3d image import "$image" --cluster kubeflex
