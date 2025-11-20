@@ -24,7 +24,7 @@ func AggregateDeploymentStatus(statuses []map[string]interface{}) (map[string]in
 }
 
 func aggregateConditions(statuses []map[string]interface{}) []interface{} {
-	// we focus on type processing with its reason ProgressDeadlineExceeded which is checked by Argo for determining health
+	// we focus on type Progressing with containing reason ProgressDeadlineExceeded which is checked by Argo for determining health
 	// If any of the statuses contains it we return its condition as aggregated condition
 
 	for _, status := range statuses {
