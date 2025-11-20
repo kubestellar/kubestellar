@@ -73,16 +73,21 @@ ko-build/setup-ko:
   sha-url: https://github.com/ko-build/setup-ko/commit/d006021bd0c28d1ce33a07e7943d48b079944c8d
   tag: v0.9
   tag-url: https://github.com/ko-build/setup-ko/tree/v0.9
+peter-evans/create-or-update-comment:
+  sha: 23ff15729ef2fc348714a3bb66d2f655ca9066f2
+  sha-url: https://github.com/peter-evans/create-or-update-comment/commit/23ff15729ef2fc348714a3bb66d2f655ca9066f2
+  tag: v3.1.0
+  tag-url: https://github.com/peter-evans/create-or-update-comment/tree/v3.1.0
 technote-space/assign-author:
   sha: 9558557c5c4816f38bd06176fbc324ba14bb3160
   sha-url: https://github.com/technote-space/assign-author/commit/9558557c5c4816f38bd06176fbc324ba14bb3160
   tag: v1.6.2
   tag-url: https://github.com/technote-space/assign-author/tree/v1.6.2
 rojopolis/spellcheck-github-actions:
-  sha: 336d2b4c911d9e582a8e7aa1143f0e862daefbc0
-  sha-url: https://github.com/rojopolis/spellcheck-github-actions/commit/336d2b4c911d9e582a8e7aa1143f0e862daefbc0
-  tag: 0.53.0
-  tag-url: https://github.com/rojopolis/spellcheck-github-actions/tree/0.53.0
+  sha: 6f2326b663e2dbab920da0fc4144b9f3202434ba
+  sha-url: https://github.com/rojopolis/spellcheck-github-actions/commit/6f2326b663e2dbab920da0fc4144b9f3202434ba
+  tag: 0.54.0
+  tag-url: https://github.com/rojopolis/spellcheck-github-actions/tree/0.54.0
 actions/upload-artifact:
   sha: 330a01c490aca151604b8cf639adc76d48f6c5d4
   sha-url: https://github.com/actions/upload-artifact/commit/330a01c490aca151604b8cf639adc76d48f6c5d4

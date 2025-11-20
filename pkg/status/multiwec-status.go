@@ -28,20 +28,22 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdentifier, nWECs int) error {
+func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdentifier, qualifiedWEC sets.Set[string]) error {
 	logger := klog.FromContext(ctx)
-	logger.V(4).Info("Implement multiwec handling logic", "object", wObjID, "nWECs", nWECs)
+	logger.V(4).Info("Implement multiwec handling logic", "object", wObjID, "qualifiedWEC", util.K8sSet4Log(qualifiedWEC))
 
 	var wsObjects []cache.ObjectName
 	c.workStatusToObject.ReadInverse().ContGet(wObjID, func(wsONSet sets.Set[cache.ObjectName]) {
-		wsObjects = make([]cache.ObjectName, 0, wsONSet.Len())
+		wsObjects = make([]cache.ObjectName, 0, qualifiedWEC.Len())
 		for wsON := range wsONSet {
-			wsObjects = append(wsObjects, wsON)
+			if qualifiedWEC.Has(wsON.Namespace) {
+				wsObjects = append(wsObjects, wsON)
+			}
 		}
 	})
 
 	if len(wsObjects) == 0 {
-		if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers); err != nil {
+		if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers, true); err != nil {
 			return err
 		}
 		logger.V(4).Info("No workstatus found for workload object",
@@ -69,7 +71,7 @@ func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdent
 	}
 
 	if len(statuses) == 0 {
-		if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers); err != nil {
+		if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers, true); err != nil {
 			return err
 		}
 		logger.V(4).Info("No workstatus found for workload object",
@@ -99,7 +101,7 @@ func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdent
 		return nil
 	}
 
-	if err := c.updateObjectStatus(ctx, wObjID, aggregatedStatus, c.listers); err != nil {
+	if err := c.updateObjectStatus(ctx, wObjID, aggregatedStatus, c.listers, true); err != nil {
 		return err
 	}
 

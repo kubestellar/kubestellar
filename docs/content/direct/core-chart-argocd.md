@@ -131,9 +131,9 @@ argocd:
   applications: # list of Argo CD applications to be create
   - name: scenario-6 # required, must be unique
     project: default # default: default
-    repoURL: https://github.com/pdettori/sample-apps.git
+    repoURL: https://github.com/kubestellar/kubestellar.git
     targetRevision: HEAD # default: HEAD
-    path: nginx
+    path: hack/argo/nginx
     destinationWDS: wds1
     destinationNamespace: nginx-sa # default: default
     syncPolicy: auto # default: manual
@@ -142,7 +142,7 @@ argocd:
 Alternatively, the same result can be achieved from Helm CLI by using the followig minimal argument (note that the default values are not explicitely set):
 
 ```shell
---set-json='argocd.applications=[ { "name": "scenario-6", "repoURL": "https://github.com/pdettori/sample-apps.git", "path": "nginx", "destinationWDS": "wds1", "destinationNamespace": "nginx-sa" } ]'
+--set-json='argocd.applications=[ { "name": "scenario-6", "repoURL": "https://github.com/kubestellar/kubestellar.git", "path": "hack/argo/nginx", "destinationWDS": "wds1", "destinationNamespace": "nginx-sa" } ]'
 ```
 
 ![alt text](images/argocd-application.png)

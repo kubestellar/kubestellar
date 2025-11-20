@@ -89,7 +89,7 @@ func (c *Controller) syncWorkStatus(ctx context.Context, ref workStatusRef) erro
 // updates both to indicate that singleton status return has not been done.
 // `status == nil` indicates that singleton status return is not desired.
 func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier util.ObjectIdentifier, status map[string]interface{},
-	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]) error {
+	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister], isMultiWEC bool) error {
 	logger := klog.FromContext(ctx)
 
 	if util.WEC2WDSExceptions.Has(objectIdentifier.GVK.GroupKind()) {
@@ -124,7 +124,11 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 		return fmt.Errorf("object cannot be cast to *unstructured.Unstructured: object: %s", util.RefToRuntimeObj(obj))
 	}
 	wantReturn := status != nil
-	_, haveReturn := unstrObj.GetLabels()[util.BindingPolicyLabelSingletonStatusKey]
+	labelKey := util.BindingPolicyLabelSingletonStatusKey
+	if isMultiWEC {
+		labelKey = util.BindingPolicyLabelMultiWECStatusKey
+	}
+	_, haveReturn := unstrObj.GetLabels()[labelKey]
 
 	if !(wantReturn || haveReturn) {
 		logger.V(5).Info("Workload object neither wants nor has returned status", "objectIdentifier", objectIdentifier)
@@ -132,7 +136,7 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 	}
 
 	if wantReturn && !haveReturn { // Ensure workload object is labeled as having returned reported state
-		err = c.handleSingletonLabel(ctx, unstrObj, objectIdentifier.GVR(), true)
+		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), true, labelKey)
 		if err != nil {
 			return err
 		}
@@ -160,28 +164,28 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 	}
 	if haveReturn && !wantReturn {
 		// Need to remove the label alleging that the workload object has returned reported state
-		return c.handleSingletonLabel(ctx, unstrObj, objectIdentifier.GVR(), false)
+		return c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, labelKey)
 	}
 	return nil
 }
 
-func (c *Controller) handleSingletonLabel(ctx context.Context, unstructuredObj *unstructured.Unstructured,
-	objGVR schema.GroupVersionResource, wantLabel bool) error {
+func (c *Controller) handleStatusReturnLabel(ctx context.Context, unstructuredObj *unstructured.Unstructured,
+	objGVR schema.GroupVersionResource, wantLabel bool, labelKey string) error {
 
 	labels := unstructuredObj.GetLabels() // gets a copy of the labels
-	_, foundLabel := labels[util.BindingPolicyLabelSingletonStatusKey]
+	_, foundLabel := labels[labelKey]
 	if foundLabel == wantLabel {
 		return nil
 	}
-	message := "Added managed-by.kubestellar.io/singletonstatus label to workload object"
+	message := fmt.Sprintf("Added %s label to workload object", labelKey)
 	if wantLabel {
 		if labels == nil {
 			labels = map[string]string{}
 		}
-		labels[util.BindingPolicyLabelSingletonStatusKey] = "true"
+		labels[labelKey] = "true"
 	} else {
-		message = "Removed managed-by.kubestellar.io/singletonstatus label from workload object"
-		delete(labels, util.BindingPolicyLabelSingletonStatusKey)
+		message = fmt.Sprintf("Removed %s label from workload object", labelKey)
+		delete(labels, labelKey)
 	}
 	unstructuredObj = unstructuredObj.DeepCopy() // avoid mutating the original object
 	unstructuredObj.SetLabels(labels)

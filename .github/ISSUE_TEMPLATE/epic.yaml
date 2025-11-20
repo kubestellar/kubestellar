@@ -47,3 +47,17 @@ body:
         - Out-of-scope (prototype x): Send Widgets to space
     validations:
       required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        **👋 Assignment Instructions**
+
+        To assign yourself to this epic, please use the slash command:
+        ```
+        /assign
+        ```
+
+        This will automatically assign the epic to you via our Prow bot. You can also use `/unassign` to remove yourself from an epic.
+
+        Thank you for your interest in contributing to KubeStellar! 🚀
