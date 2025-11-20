@@ -70,12 +70,14 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
 
 	if isMultiWECRequested && isSingletonRequested {
 		// if both are requested for same object then we can combine all qualified clusters(qualifiedWECsSingleton and qualifiedWECsMulti)
-		// then call handleMultiWEC function
-		// TODO: Implement combine all qualified WECs.
-		if qualifiedWECsSingleton.Len() == 1 && qualifiedWECsMulti.Len() == 1 {
-			return c.handleSingleton(ctx, wObjID, qualifiedWECsSingleton)
+		// then call handleSingleton function if combined qualified WECs is 1 else call handleMultiWEC function
+		qualifiedWECs := qualifiedWECsSingleton.Union(qualifiedWECsMulti)
+
+		if qualifiedWECs.Len() == 1 {
+			return c.handleSingleton(ctx, wObjID, qualifiedWECs)
 		}
-		return c.handleMultiWEC(ctx, wObjID, qualifiedWECsMulti)
+
+		return c.handleMultiWEC(ctx, wObjID, qualifiedWECs)
 	}
 
 	if (isSingletonRequested && qualifiedWECsSingleton.Len() == 1) || (isMultiWECRequested && qualifiedWECsMulti.Len() == 1) {
@@ -91,7 +93,7 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
 	}
 
 	logger.V(4).Info("neither singleton nor multi-WEC reported state return applies", "object", wObjID)
-	if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers); err != nil {
+	if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers, false); err != nil {
 		return err
 	}
 
@@ -123,7 +125,7 @@ func (c *Controller) handleSingleton(ctx context.Context, wObjID util.ObjectIden
 	})
 
 	if numWS != 1 {
-		if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers); err != nil {
+		if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers, false); err != nil {
 			return err
 		}
 		logger.V(4).Info("Cleaned singleton status for workload object",
@@ -141,7 +143,7 @@ func (c *Controller) handleSingleton(ctx context.Context, wObjID util.ObjectIden
 	if status == nil {
 		return nil
 	}
-	if err := c.updateObjectStatus(ctx, wObjID, status, c.listers); err != nil {
+	if err := c.updateObjectStatus(ctx, wObjID, status, c.listers, false); err != nil {
 		return err
 	}
 	logger.V(4).Info("Updated singleton status for workload object", "objId", wObjID, "workStatus", wsON)

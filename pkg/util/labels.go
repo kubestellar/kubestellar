@@ -31,6 +31,9 @@ const (
 	// BindingPolicyLabelSingletonStatusKey is the key for the singleton status reporting requirement.
 	BindingPolicyLabelSingletonStatusKey = "managed-by.kubestellar.io/singletonstatus"
 
+	// BindingPolicyLabelMultiWECStatusKey is the key for the multi-WEC aggregated status reporting.
+	BindingPolicyLabelMultiWECStatusKey = "managed-by.kubestellar.io/multiwecstatus"
+
 	// WorkStatusSourceRefKey is the key for the source reference in the WorkStatus.
 	WorkStatusSourceRefKey = "managed-by.kubestellar.io/sourceRef"
 )
