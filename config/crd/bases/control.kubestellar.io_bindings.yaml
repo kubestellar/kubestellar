@@ -104,14 +104,16 @@ spec:
                           type: string
                         wantMultiWECReportedState:
                           description: |-
-                            WantMultiWECReportedState, in short, indicates an expectation that the matching
-                            objects are distributed to multiple WECs, requests that .status from each
-                            WEC and propagates aggregated .status to object in WDS.
-                            If there's no matching WEC then will update empty status to WDS.
+                            WantMultiWECReportedState requests that the `.status` from the
+                            workload object in each WEC where that object is present be combined
+                            and returned into the `.status` of the object in the WDS. For a precise
+                            definition of how this interacts with `.wantSingletonReportedState`,
+                            see the comment on that field.
 
 
-                            If object is of a few particular kinds that this feature handles specially,
-                            the aggregation is done with awareness of, and consideration for, the semantics of their .status sections;
+                            If the object's kind is one of the few that this feature handles specially
+                            then the aggregation is done with awareness of, and consideration for,
+                            the semantics of their `.status` sections;
                             for the rest, the aggregation is done by simple general-purpose rules.
                             The basis of the aggregation logic is explained in the docs.
                             NOTE: This API isn't yet implemented.
@@ -124,16 +126,32 @@ spec:
                             to the WDS.
 
 
-                            For a precise description, start with a couple of definitions.
+                            For a precise description of this field and how it interacts with
+                            WantMultiWECReportedState, start with a few definitions.
+
+
                             For a given workload object, _singleton status return is requested_
                             if and only if there exists at least one BindingPolicy or Binding
                             that has `wantSingletonReportedState==true` in a clause that
                             matches/references the workload object.
 
 
-                            The _qualified WEC set_ of a workload object is the set of WECs that are
+                            For a given workload object, _multi-WEC status return is requested_
+                            if and only if there exists at least one BindingPolicy or Binding
+                            that has `wantMultiWECReportedState==true` in a clause that
+                            matches/references the workload object.
+
+
+                            The _qualified singleton WEC set_ of a workload object is the set of WECs that are
                             associated with that workload object by at least one BindingPolicy or Binding
                             that has `wantSingletonReportedState==true` in a clause that
+                            matches/references the workload object.
+
+
+                            The _qualified WEC set_ of a workload object is the set of WECs that are
+                            associated with that workload object by at least one BindingPolicy or Binding
+                            that has EITHER `wantSingletonReportedState==true`
+                            OR `wantMultiWECReportedState==true` in a clause that
                             matches/references the workload object.
 
 
@@ -143,11 +161,22 @@ spec:
                             of the size of the qualified WEC set of that object.
                             While singleton status return is _not_ requested, KubeStellar suppresses
                             the existence of a label with that name (key).
-                            While singleton status return is requested _and_ the size of the qualified
-                            WEC set is 1, KubeStellar propagates the object's `.status` from that WEC
+
+
+                            While either singleton or multi-WEC status return is requested on an object
+                            and the size of the object's qualified WEC set is 1, KubeStellar
+                            propagates the object's `.status` from that WEC
                             to the `.status` section of the object in the WDS.
-                            While either singleton status return is NOT requested or the size of the
-                            qualified WEC set is NOT 1, there is nothing in the `.status` of the object
+
+
+                            While multi-WEC status return is requested on an object and the size of
+                            the object's qualified WEC set is greater than 1, KubeStellar combines
+                            the `.status` of the object from each of those WECs and puts the
+                            combination in the `.status` of the object in the WDS.
+
+
+                            While neither of the above two conditions is true,
+                            there is nothing in the `.status` of the object
                             in the WDS that was propagated there from a WEC by KubeStellar.
                           type: boolean
                       required:
@@ -202,14 +231,16 @@ spec:
                           type: string
                         wantMultiWECReportedState:
                           description: |-
-                            WantMultiWECReportedState, in short, indicates an expectation that the matching
-                            objects are distributed to multiple WECs, requests that .status from each
-                            WEC and propagates aggregated .status to object in WDS.
-                            If there's no matching WEC then will update empty status to WDS.
+                            WantMultiWECReportedState requests that the `.status` from the
+                            workload object in each WEC where that object is present be combined
+                            and returned into the `.status` of the object in the WDS. For a precise
+                            definition of how this interacts with `.wantSingletonReportedState`,
+                            see the comment on that field.
 
 
-                            If object is of a few particular kinds that this feature handles specially,
-                            the aggregation is done with awareness of, and consideration for, the semantics of their .status sections;
+                            If the object's kind is one of the few that this feature handles specially
+                            then the aggregation is done with awareness of, and consideration for,
+                            the semantics of their `.status` sections;
                             for the rest, the aggregation is done by simple general-purpose rules.
                             The basis of the aggregation logic is explained in the docs.
                             NOTE: This API isn't yet implemented.
@@ -222,16 +253,32 @@ spec:
                             to the WDS.
 
 
-                            For a precise description, start with a couple of definitions.
+                            For a precise description of this field and how it interacts with
+                            WantMultiWECReportedState, start with a few definitions.
+
+
                             For a given workload object, _singleton status return is requested_
                             if and only if there exists at least one BindingPolicy or Binding
                             that has `wantSingletonReportedState==true` in a clause that
                             matches/references the workload object.
 
 
-                            The _qualified WEC set_ of a workload object is the set of WECs that are
+                            For a given workload object, _multi-WEC status return is requested_
+                            if and only if there exists at least one BindingPolicy or Binding
+                            that has `wantMultiWECReportedState==true` in a clause that
+                            matches/references the workload object.
+
+
+                            The _qualified singleton WEC set_ of a workload object is the set of WECs that are
                             associated with that workload object by at least one BindingPolicy or Binding
                             that has `wantSingletonReportedState==true` in a clause that
+                            matches/references the workload object.
+
+
+                            The _qualified WEC set_ of a workload object is the set of WECs that are
+                            associated with that workload object by at least one BindingPolicy or Binding
+                            that has EITHER `wantSingletonReportedState==true`
+                            OR `wantMultiWECReportedState==true` in a clause that
                             matches/references the workload object.
 
 
@@ -241,11 +288,22 @@ spec:
                             of the size of the qualified WEC set of that object.
                             While singleton status return is _not_ requested, KubeStellar suppresses
                             the existence of a label with that name (key).
-                            While singleton status return is requested _and_ the size of the qualified
-                            WEC set is 1, KubeStellar propagates the object's `.status` from that WEC
+
+
+                            While either singleton or multi-WEC status return is requested on an object
+                            and the size of the object's qualified WEC set is 1, KubeStellar
+                            propagates the object's `.status` from that WEC
                             to the `.status` section of the object in the WDS.
-                            While either singleton status return is NOT requested or the size of the
-                            qualified WEC set is NOT 1, there is nothing in the `.status` of the object
+
+
+                            While multi-WEC status return is requested on an object and the size of
+                            the object's qualified WEC set is greater than 1, KubeStellar combines
+                            the `.status` of the object from each of those WECs and puts the
+                            combination in the `.status` of the object in the WDS.
+
+
+                            While neither of the above two conditions is true,
+                            there is nothing in the `.status` of the object
                             in the WDS that was propagated there from a WEC by KubeStellar.
                           type: boolean
                       required:
