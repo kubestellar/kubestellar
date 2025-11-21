@@ -66,6 +66,7 @@ nav:
               - Binding: direct/binding.md
               - Transforming desired state: direct/transforming.md
               - Combining reported state: direct/combined-status.md
+              - Multi-WEC Aggregated Status: direct/multi-wec-aggregated-status.md
           - Authorization in WECs: direct/authorization.md
           - Example Scenarios: direct/example-scenarios.md
           - Third-party integrations:
