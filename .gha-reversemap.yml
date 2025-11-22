@@ -74,10 +74,10 @@ ko-build/setup-ko:
   tag: v0.9
   tag-url: https://github.com/ko-build/setup-ko/tree/v0.9
 peter-evans/create-or-update-comment:
-  sha: 23ff15729ef2fc348714a3bb66d2f655ca9066f2
-  sha-url: https://github.com/peter-evans/create-or-update-comment/commit/23ff15729ef2fc348714a3bb66d2f655ca9066f2
-  tag: v3.1.0
-  tag-url: https://github.com/peter-evans/create-or-update-comment/tree/v3.1.0
+  sha: e8674b075228eee787fea43ef493e45ece1004c9
+  sha-url: https://github.com/peter-evans/create-or-update-comment/commit/e8674b075228eee787fea43ef493e45ece1004c9
+  tag: v5.0.0
+  tag-url: https://github.com/peter-evans/create-or-update-comment/tree/v5.0.0
 technote-space/assign-author:
   sha: 9558557c5c4816f38bd06176fbc324ba14bb3160
   sha-url: https://github.com/technote-space/assign-author/commit/9558557c5c4816f38bd06176fbc324ba14bb3160
