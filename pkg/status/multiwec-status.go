@@ -88,6 +88,10 @@ func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdent
 		switch wObjID.GVK.Kind {
 		case "Deployment":
 			aggregatedStatus, errAggregate = aggregation.AggregateDeploymentStatus(statuses)
+		case "ReplicaSet":
+			aggregatedStatus, errAggregate = aggregation.AggregateReplicaSetStatus(statuses)
+		case "DaemonSet":
+			aggregatedStatus, errAggregate = aggregation.AggregateDaemonSetStatus(statuses)
 		}
 	default:
 		// for generic
