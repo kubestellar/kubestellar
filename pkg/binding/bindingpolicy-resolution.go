@@ -123,7 +123,13 @@ func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.O
 			ResourceVersion: resourceVersion,
 			Modulation:      modulation,
 		}
-		if objData == nil && modulation.WantSingletonReportedState || objData != nil && objData.Modulation.WantSingletonReportedState != modulation.WantSingletonReportedState {
+		// Notify when singleton or multi-WEC status flags change
+		singletonChanged := objData == nil && modulation.WantSingletonReportedState ||
+			objData != nil && objData.Modulation.WantSingletonReportedState != modulation.WantSingletonReportedState
+		multiWECChanged := objData == nil && modulation.WantMultiWECReportedState ||
+			objData != nil && objData.Modulation.WantMultiWECReportedState != modulation.WantMultiWECReportedState
+
+		if singletonChanged || multiWECChanged {
 			klog.InfoS("Noting addition/change of object to resolution", "resolution", fmt.Sprintf("%p", resolution), "objId", objIdentifier)
 			resolution.singletonRequestChangeConsumer(objIdentifier)
 		}
@@ -146,7 +152,7 @@ func (resolution *bindingPolicyResolution) removeObjectIdentifier(objIdentifier 
 	}
 
 	delete(resolution.objectIdentifierToData, objIdentifier)
-	if objData.Modulation.WantSingletonReportedState {
+	if objData.Modulation.WantSingletonReportedState || objData.Modulation.WantMultiWECReportedState {
 		klog.InfoS("Noting removal of object from resolution", "resolution", fmt.Sprintf("%p", resolution), "objId", objIdentifier)
 		resolution.singletonRequestChangeConsumer(objIdentifier)
 	}
