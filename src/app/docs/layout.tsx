@@ -1,7 +1,6 @@
 import { Layout } from 'nextra-theme-docs'
-import { Banner } from 'nextra/components'
 import 'nextra-theme-docs/style.css'
-import { DocsNavbar, DocsFooter } from '@/components/docs/index'
+import { DocsNavbar, DocsFooter, DocsBanner } from '@/components/docs/index'
 import { Inter, JetBrains_Mono } from "next/font/google"
 import "../globals.css"
 import { buildPageMapForBranch } from './page-map'
@@ -23,7 +22,7 @@ export const metadata = {
   description: 'Official documentation for KubeStellar - Multi-cluster orchestration platform',
 }
 
-const banner = <Banner storageKey="kubestellar-demo"><strong>Hacktoberfest 2025</strong> is here! Join us to learn, share, and contribute to our community🎉</Banner>
+const banner = <DocsBanner />
 const navbar = <DocsNavbar />
 const footer = <DocsFooter />
 
