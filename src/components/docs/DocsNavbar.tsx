@@ -301,15 +301,15 @@ export default function DocsNavbar() {
                 onMouseEnter={handleDropdownMouseEnter}
                 onMouseLeave={handleMouseLeave}
               >
-              <Link
-                href="/#join-in"
+              <a
+                href="https://kubestellar.io/joinus"
                 className={dropdownItemClasses}
               >
                 <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
                 Join In
-              </Link>
+              </a>
               <Link
                 href="/contribute-handbook"
                 className={dropdownItemClasses}
@@ -378,7 +378,7 @@ export default function DocsNavbar() {
                 </Link>
 
               <Link
-                href="/#security"
+                href="/docs/contribution-guidelines/security/security-inc"
                 className={dropdownItemClasses}
               >
                 <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -416,7 +416,7 @@ export default function DocsNavbar() {
                 onMouseLeave={handleMouseLeave}
               >
               <Link
-                href="/#get-involved"
+                href="/docs"
                 className={dropdownItemClasses}
               >
                 <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -443,7 +443,7 @@ export default function DocsNavbar() {
                 Contact Us
               </Link>
               <Link
-                href="/#partners"
+                href="/partners"
                 className={dropdownItemClasses}
               >
                 <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -843,7 +843,7 @@ export default function DocsNavbar() {
             <div className={`text-sm font-medium uppercase px-2 py-1.5 mt-3 tracking-wider ${
               isDark ? 'text-gray-300' : 'text-gray-500'
             }`}>Contribute</div>
-            <Link href="/#join-in" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+            <a href="https://kubestellar.io/joinus" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'
@@ -852,7 +852,7 @@ export default function DocsNavbar() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
               Join In
-            </Link>
+            </a>
             <Link href="/contribute-handbook" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
@@ -893,7 +893,7 @@ export default function DocsNavbar() {
               </svg>
               Ladder
             </Link>
-            <Link href="/#security" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+            <Link href="/docs/contribution-guidelines/security/security-inc" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'
@@ -907,7 +907,7 @@ export default function DocsNavbar() {
             <div className={`text-sm font-medium uppercase px-2 py-1.5 mt-3 tracking-wider ${
               isDark ? 'text-gray-300' : 'text-gray-500'
             }`}>Community</div>
-            <Link href="/#get-involved" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+            <Link href="/docs" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'
@@ -938,7 +938,7 @@ export default function DocsNavbar() {
               </svg>
               Contact Us
             </Link>
-            <Link href="/#partners" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+            <Link href="/partners" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'

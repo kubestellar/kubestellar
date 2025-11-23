@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
+import NextLink from "next/link";
 import { GridLines, StarField } from "./index";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -76,7 +77,7 @@ export default function Footer() {
             </p>
             <div className="flex space-x-6">
               <a
-                href="#"
+                href="https://x.com/KubeStellar"
                 className="group relative w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300"
               >
                 <svg
@@ -145,36 +146,36 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3">
               <li>
-                <Link
+                <NextLink
                   href="/docs"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   {t("overview")}
-                </Link>
+                </NextLink>
               </li>
               <li>
-                <Link
-                  href="/docs"
+                <NextLink
+                  href="/docs/user-guide-support/user-guide-intro"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   {t("userGuide")}
-                </Link>
+                </NextLink>
               </li>
               <li>
-                <Link
-                  href="/docs"
+                <NextLink
+                  href="/docs/contribution-guidelines/onboarding-inc"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   {t("onboarding")}
-                </Link>
+                </NextLink>
               </li>
               <li>
-                <Link
-                  href="/docs"
+                <NextLink
+                  href="/docs/what-is-kubestellar/release-notes"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
                   {t("releasesNotes")}
-                </Link>
+                </NextLink>
               </li>
             </ul>
           </div>
@@ -339,24 +340,24 @@ export default function Footer() {
 
             {/* Right side - policy links */}
             <div className="flex items-center space-x-8">
-              <a
-                href="#"
+              <Link
+                href="/docs/contribution-guidelines/license-inc"
                 className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
               >
                 {t("privacyPolicy")}
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/docs/contribution-guidelines/security/security-inc"
                 className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
               >
                 {t("termsOfService")}
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/docs/contribution-guidelines/security/security_contacts-inc"
                 className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
               >
                 {t("cookiePolicy")}
-              </a>
+              </Link>
             </div>
           </div>
         </div>

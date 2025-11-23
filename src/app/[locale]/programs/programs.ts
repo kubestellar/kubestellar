@@ -98,8 +98,8 @@ export const programs: Program[] = [
         "Applications should be submitted through the official European Summer of Code portal.",
       resources: [
         {
-          name: "Official ESoC Website (Link not available)",
-          url: "#",
+          name: "Official ESoC Website",
+          url: "https://www.esoc.dev/",
         },
         {
           name: "KubeStellar GitHub",

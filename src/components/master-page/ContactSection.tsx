@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { GridLines, StarField } from "../index";
 import { useTranslations } from "next-intl";
 
@@ -487,12 +488,12 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                       className="text-xs sm:text-sm text-gray-300 leading-relaxed"
                     >
                       {t("formPrivacy")}{" "}
-                      <a
-                        href="#"
+                      <Link
+                        href="/docs/contribution-guidelines/license-inc"
                         className="text-blue-400 hover:text-blue-300 underline transition-colors duration-200"
                       >
                         {t("formPrivacyLink")}
-                      </a>{" "}
+                      </Link>{" "}
                       {t("formPrivacyCont")}
                     </label>
                   </div>

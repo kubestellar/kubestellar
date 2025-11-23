@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import NextLink from "next/link";
 
 export default function ComingSoonCTA() {
   const t = useTranslations("comingSoonPage");
@@ -37,12 +38,12 @@ export default function ComingSoonCTA() {
             <p className="text-gray-400 text-sm mb-4">
               {t("cta.documentsDescription")}
             </p>
-            <Link
+            <NextLink
               href="/docs"
               className="inline-flex items-center px-4 py-2 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-colors text-sm"
             >
               {t("cta.documentsAction")}
-            </Link>
+            </NextLink>
           </div>
 
           {/* Quick Installation Card */}

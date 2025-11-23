@@ -75,7 +75,7 @@ export default function Footer() {
             </p>
             <div className="flex space-x-6">
               <a
-                href="#"
+                href="https://x.com/KubeStellar"
                 className="group relative w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300"
               >
                 <svg
@@ -295,24 +295,24 @@ export default function Footer() {
 
             {/* Right side - policy links */}
             <div className="flex items-center space-x-8">
-              <a
-                href="#"
+              <Link
+                href="/docs/contribution-guidelines/license-inc"
                 className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
               >
                 Privacy Policy
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/docs/contribution-guidelines/security/security-inc"
                 className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
               >
                 Terms of Service
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/docs/contribution-guidelines/security/security_contacts-inc"
                 className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
               >
                 Cookie Policy
-              </a>
+              </Link>
             </div>
           </div>
         </div>

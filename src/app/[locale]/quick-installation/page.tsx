@@ -620,7 +620,7 @@ const QuickInstallationPage = () => {
             {/* Single Guide Button */}
             <div className="text-center">
               <a
-                href="https://docs.kubestellar.io/latest/direct/pre-reqs/"
+                href="/docs/install-configure/pre-reqs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center rounded-lg bg-gradient-to-r from-purple-600/80 to-blue-600/80 px-6 py-3 text-sm font-medium text-white transition-all hover:from-purple-500/80 hover:to-blue-500/80 hover:scale-105 hover:shadow-lg"
@@ -737,7 +737,7 @@ const QuickInstallationPage = () => {
                       <span>
                         {t("installNext3")}{" "}
                         <Link
-                          href="https://docs.kubestellar.io/latest/direct/get-started/"
+                          href="/docs"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-emerald-300 hover:text-emerald-200 underline"

@@ -223,19 +223,19 @@ export default function GetStartedSection() {
               </p>
               <div className="mt-4 grid grid-cols-1 gap-2">
                 <Link
-                  href="#"
+                  href="/docs"
                   className="block p-2 rounded bg-white/20 hover:bg-white/30 text-white text-sm pl-5"
                 >
                   {t("card3Link1")}
                 </Link>
                 <Link
-                  href="#"
+                  href="/docs/what-is-kubestellar/architecture"
                   className="block p-2 rounded bg-white/20 hover:bg-white/30 text-white text-sm pl-5"
                 >
                   {t("card3Link2")}
                 </Link>
                 <Link
-                  href="#"
+                  href="docs/use-integrate/kubestellar-api/control"
                   className="block p-2 rounded bg-white/20 hover:bg-white/30 text-white text-sm pl-5"
                 >
                   {t("card3Link3")}
