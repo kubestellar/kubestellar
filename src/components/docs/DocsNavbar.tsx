@@ -187,7 +187,7 @@ export default function DocsNavbar() {
   const buttonClasses = `text-sm transition-colors px-2 py-1.5 rounded-md flex items-center gap-1.5 ${
     isDark 
       ? 'text-gray-300 hover:text-gray-100 hover:bg-neutral-800'
-      : 'text-gray-300 hover:text-gray-100 hover:bg-gray-100'
+      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
   }`;
   
   const dropdownClasses = `absolute left-0 top-full mt-0.5 w-52 rounded-md shadow-xl py-1 border z-50 ${
@@ -466,7 +466,7 @@ export default function DocsNavbar() {
               className={`text-xs font-mono transition-colors px-2 py-1.5 rounded-md flex items-center gap-1.5 cursor-pointer ${
                 isDark 
                   ? 'text-gray-300 hover:text-gray-100 hover:bg-neutral-800'
-                  : 'text-gray-300 hover:text-gray-100 hover:bg-gray-100'
+                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
               }`}
               aria-haspopup="true"
               aria-expanded={openDropdown === "version"}
@@ -481,7 +481,7 @@ export default function DocsNavbar() {
                 className={`absolute right-0 mt-1 w-44 rounded-md shadow-xl py-1 border z-50 ${
                   isDark 
                     ? 'bg-neutral-900 border-neutral-800'
-                    : 'bg-white border-gray-200'
+                    : 'bg-white border-gray-200 '
                 }`}
                 onMouseEnter={handleDropdownMouseEnter}
                 onMouseLeave={handleMouseLeave}
@@ -529,7 +529,7 @@ export default function DocsNavbar() {
               className={`text-sm transition-colors p-1.5 rounded-md flex items-center cursor-pointer ${
                 isDark 
                   ? 'text-gray-300 hover:text-gray-100 hover:bg-neutral-800'
-                  : 'text-gray-300 hover:text-gray-100 hover:bg-gray-100'
+                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
               }`}
               aria-label="GitHub"
               aria-haspopup="true"
@@ -605,7 +605,7 @@ export default function DocsNavbar() {
           className={`hidden md:flex w-80 text-sm transition-colors px-3 py-1.5 rounded-md items-center gap-2 ml-2 cursor-pointer ${
             isDark 
               ? 'text-gray-300 hover:text-gray-100 hover:bg-neutral-800 border border-neutral-800'
-              : 'text-gray-300 hover:text-gray-100 hover:bg-gray-100 border border-gray-200'
+              : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100 border border-gray-200'
           }`}
           aria-label="Search documentation"
         >
