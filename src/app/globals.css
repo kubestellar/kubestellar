@@ -71,6 +71,21 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   background: #ffffff;
 }
 
+html:not(.dark) .nextra-banner {
+  background: #eff6ff !important; /* bg-blue-50 */
+  color: #1f2937 !important; /* gray-800 */
+}
+
+html:not(.dark) .nextra-banner button {
+  background: transparent !important;
+  color: #1f2937 !important; /* gray-800 */
+}
+
+html:not(.dark) .nextra-banner button:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+  opacity: 1 !important;
+}
+
 /* Custom Tailwind utilities */
 .text-gradient {
   background: linear-gradient(to right, rgb(147, 51, 234), rgb(59, 130, 246));
