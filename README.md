@@ -9,7 +9,7 @@
 <p align="center">
   Official documentation repository for <strong><a href="https://kubestellar.io" target="_blank">KubeStellar</a></strong>, 
   a CNCF Sandbox Project enabling seamless multi-cluster configuration management 
-  for edge, multi-cloud, and hybrid cloud environments.
+  for edge, multi-cloud and hybrid cloud environments.
 </p>
 
 <p align="center">
