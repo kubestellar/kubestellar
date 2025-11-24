@@ -120,7 +120,7 @@ export default async function Page(props: PageProps) {
   }
 
   // 3. Process partial includes: {% include-markdown "path" start="..." end="..." %}
-  const includeMarkdownRegex = /{%-?\s*include-markdown\s+["']([^"']+)["']\s+start=["']([^"']+)["']\s+end=["']([^"']+)["']\s*-?%}/gs;
+  const includeMarkdownRegex = /{%-?\s*include-markdown\s+["']([^"']+)["']\s+start=["']([^"']+)["']\s+end=["']([^"']+)["']\s*-?%}/g;
   const includeMarkdownMatches = Array.from(processedContent.matchAll(includeMarkdownRegex));
 
   if (includeMarkdownMatches.length > 0) {
