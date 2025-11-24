@@ -40,8 +40,8 @@ import (
 // before reading, and write locked before writing to any field.
 type bindingPolicyResolution struct {
 	// One immutable function that gets called synchronously whenever there is a change
-	// in the requiresSingletonReportedState setting for an object.
-	singletonRequestChangeConsumer func(util.ObjectIdentifier)
+	// in the requiresSingletonReportedState or requiresMultiWECReportedState setting for an object.
+	reportedStateRequestChangeConsumer func(util.ObjectIdentifier)
 
 	sync.RWMutex
 
@@ -131,7 +131,7 @@ func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.O
 
 		if singletonChanged || multiWECChanged {
 			klog.InfoS("Noting addition/change of object to resolution", "resolution", fmt.Sprintf("%p", resolution), "objId", objIdentifier)
-			resolution.singletonRequestChangeConsumer(objIdentifier)
+			resolution.reportedStateRequestChangeConsumer(objIdentifier)
 		}
 		return true
 	}
@@ -154,7 +154,7 @@ func (resolution *bindingPolicyResolution) removeObjectIdentifier(objIdentifier 
 	delete(resolution.objectIdentifierToData, objIdentifier)
 	if objData.Modulation.WantSingletonReportedState || objData.Modulation.WantMultiWECReportedState {
 		klog.InfoS("Noting removal of object from resolution", "resolution", fmt.Sprintf("%p", resolution), "objId", objIdentifier)
-		resolution.singletonRequestChangeConsumer(objIdentifier)
+		resolution.reportedStateRequestChangeConsumer(objIdentifier)
 	}
 	return true
 }

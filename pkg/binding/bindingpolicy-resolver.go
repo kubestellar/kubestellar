@@ -459,7 +459,7 @@ func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.
 	ownerReference.BlockOwnerDeletion = &[]bool{false}[0]
 
 	bindingPolicyResolution := &bindingPolicyResolution{
-		singletonRequestChangeConsumer: func(objId util.ObjectIdentifier) {
+		reportedStateRequestChangeConsumer: func(objId util.ObjectIdentifier) {
 			resolver.broker.NotifySingletonRequestCallbacks(bindingpolicy.Name, objId)
 		},
 		objectIdentifierToData: make(map[util.ObjectIdentifier]*ObjectData),
