@@ -74,6 +74,71 @@ html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   z-index: 20;
 }
 
+/* Fix sidebar scrolling and theme toggle visibility */
+.nextra-sidebar-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Make the navigation list scrollable with proper padding at bottom */
+.nextra-sidebar-container nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 80px !important; /* Space for theme toggle */
+}
+
+/* Ensure theme toggle stays at bottom and visible */
+.nextra-sidebar-container > div:last-child,
+.nextra-sidebar-container > button:last-of-type {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 10 !important;
+  margin-top: auto !important;
+  padding: 1rem !important;
+  background: inherit !important;
+  border-top: 1px solid;
+}
+
+html.dark .nextra-sidebar-container > div:last-child,
+html.dark .nextra-sidebar-container > button:last-of-type {
+  background: #111 !important;
+  border-top-color: #333 !important;
+}
+
+html:not(.dark) .nextra-sidebar-container > div:last-child,
+html:not(.dark) .nextra-sidebar-container > button:last-of-type {
+  background: #ffffff !important;
+  border-top-color: #e5e7eb !important;
+}
+
+/* Style the scrollbar */
+.nextra-sidebar-container nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.nextra-sidebar-container nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nextra-sidebar-container nav::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 3px;
+}
+
+.nextra-sidebar-container nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+html.dark .nextra-sidebar-container nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+html.dark .nextra-sidebar-container nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
 html:not(.dark) .nextra-banner {
   background: #eff6ff !important; /* bg-blue-50 */
   color: #1f2937 !important; /* gray-800 */
