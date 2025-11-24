@@ -56,7 +56,7 @@ export async function buildPageMapForBranch(branch: string) {
 
   // Strong types for page-map nodes (no `any`)
   type MdxPageNode = { kind: 'MdxPage'; name: string; route: string }
-  type FolderNode = { kind: 'Folder'; name: string; route: string; children: PageMapNode[] }
+type FolderNode = { kind: 'Folder'; name: string; route: string; children: PageMapNode[]; theme?: { collapsed?: boolean } }
   type MetaNode = { kind: 'Meta'; data: Record<string, string> }
   type PageMapNode = MdxPageNode | FolderNode | MetaNode
 
@@ -238,7 +238,18 @@ export async function buildPageMapForBranch(branch: string) {
 
     if (!children.length) continue
 
-    _pageMap.push({ kind: 'Folder', name: categoryName, route: `/${basePath}/${categorySlug}`, children })
+    const folderNode: FolderNode & { theme?: { collapsed?: boolean } } = {
+      kind: 'Folder',
+      name: categoryName,
+      route: `/${basePath}/${categorySlug}`,
+      children
+    }
+
+    if (categoryName.toLowerCase().startsWith('what is kubestellar')) {
+      folderNode.theme = { collapsed: false }
+    }
+
+    _pageMap.push(folderNode)
   }
 
   const remainingFiles = allDocFiles.filter(fp => {
