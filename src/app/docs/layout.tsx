@@ -46,7 +46,7 @@ export default async function DocsLayout({ children }: Props) {
           banner={banner}
           navbar={navbar}
           pageMap={pageMap}
-          docsRepositoryBase="https://github.com/kubestellar/kubestellar"
+          docsRepositoryBase="https://github.com/kubestellar/kubestellar/edit/main/docs/content"
           footer={footer}
           darkMode={true}
         >
