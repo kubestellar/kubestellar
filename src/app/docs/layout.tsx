@@ -49,6 +49,10 @@ export default async function DocsLayout({ children }: Props) {
           docsRepositoryBase="https://github.com/kubestellar/kubestellar/edit/main/docs/content"
           footer={footer}
           darkMode={true}
+          sidebar={{
+            defaultMenuCollapseLevel: 1,
+            toggleButton: true
+          }}
         >
           {children}
         </Layout>
