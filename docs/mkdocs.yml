@@ -81,7 +81,7 @@ nav:
       - UI (User Interface): ui-docs/ui-overview.md
       - Teardown: direct/teardown.md
   - Contributing:
-      - Overview (How to join in): direct/contribute.md
+      - Overview (How to join in): contribution-guidelines/contribute.md
       - Code of Conduct: contribution-guidelines/coc-inc.md
       - Guidelines: contribution-guidelines/contributing-inc.md
       - Contributor Ladder: contribution-guidelines/contributor_ladder.md
@@ -89,17 +89,17 @@ nav:
       - Governance: contribution-guidelines/governance-inc.md
       - Onboarding: contribution-guidelines/onboarding-inc.md
       - Website:
-          - Docs Management Overview: contribution-guidelines/operations/document-management.md
-          - Style Guide: contribution-guidelines/operations/docs-styleguide.md
-          - Testing website PRs: contribution-guidelines/operations/testing-doc-prs.md
+          - Docs Management Overview: contribution-guidelines/document-management.md
+          - Style Guide: contribution-guidelines/docs-styleguide.md
+          - Testing website PRs: contribution-guidelines/testing-doc-prs.md
       - Security:
           - Policy: contribution-guidelines/security/security-inc.md
           - Contacts: contribution-guidelines/security/security_contacts-inc.md
-      - Testing: direct/testing.md
-      - Packaging: direct/packaging.md
-      - Release Process: direct/release.md
-      - Release Testing: direct/release-testing.md
-      - Sign-off and Signing Contributions: direct/pr-signoff.md
+      - Testing: contribution-guidelines/testing.md
+      - Packaging: contribution-guidelines/packaging.md
+      - Release Process: contribution-guidelines/release-process.md
+      - Release Testing: contribution-guidelines/release-testing.md
+      - Sign-off and Signing Contributions: contribution-guidelines/signoff-signing.md
   - Community:
     - Get Involved: Community/_index.md
     - Contact Us:
