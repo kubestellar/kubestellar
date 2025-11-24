@@ -460,7 +460,7 @@ func (resolver *bindingPolicyResolver) createResolution(bindingpolicy *v1alpha1.
 
 	bindingPolicyResolution := &bindingPolicyResolution{
 		reportedStateRequestChangeConsumer: func(objId util.ObjectIdentifier) {
-			resolver.broker.NotifySingletonRequestCallbacks(bindingpolicy.Name, objId)
+			resolver.broker.NotifyReportedStateRequestCallbacks(bindingpolicy.Name, objId)
 		},
 		objectIdentifierToData: make(map[util.ObjectIdentifier]*ObjectData),
 		destinations:           sets.New[string](),

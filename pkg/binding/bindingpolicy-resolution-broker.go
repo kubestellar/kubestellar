@@ -43,9 +43,9 @@ type ResolutionBroker interface {
 	// The callbacks are called the same goroutine as this call.
 	NotifyBindingPolicyCallbacks(bindingPolicyKey string)
 
-	// NotifySingletonRequestCallbacks calls all the registered callbacks for the
+	// NotifyReportedStateRequestCallbacks calls all the registered callbacks for the
 	// given policy and workload object, in the same goroutine.
-	NotifySingletonRequestCallbacks(bindingPolicyKey string, objId util.ObjectIdentifier)
+	NotifyReportedStateRequestCallbacks(bindingPolicyKey string, objId util.ObjectIdentifier)
 }
 
 type ResolutionCallbacks struct {
@@ -148,13 +148,13 @@ func (broker *resolutionBroker) NotifyBindingPolicyCallbacks(bindingPolicyKey st
 	}
 }
 
-func (broker *resolutionBroker) NotifySingletonRequestCallbacks(bindingPolicyKey string, objId util.ObjectIdentifier) {
+func (broker *resolutionBroker) NotifyReportedStateRequestCallbacks(bindingPolicyKey string, objId util.ObjectIdentifier) {
 	broker.Lock()
 	defer broker.Unlock()
-	klog.InfoS("Relaying singleton request callback", "broker", fmt.Sprintf("%p=%v", broker, broker), "binding", bindingPolicyKey, "objId", objId, "numCallbacks", len(broker.callbackses))
+	klog.InfoS("Relaying reported state request callback", "broker", fmt.Sprintf("%p=%v", broker, broker), "binding", bindingPolicyKey, "objId", objId, "numCallbacks", len(broker.callbackses))
 
 	for idx, callbacks := range broker.callbackses {
-		klog.InfoS("Relaying singleton request callback", "binding", bindingPolicyKey, "objId", objId, "idx", idx, "callbacks", callbacks)
+		klog.InfoS("Relaying reported state request callback", "binding", bindingPolicyKey, "objId", objId, "idx", idx, "callbacks", callbacks)
 		callbacks.SingletonReportedStateRequestChanged(bindingPolicyKey, objId)
 	}
 
