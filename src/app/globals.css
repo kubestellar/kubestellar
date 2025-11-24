@@ -70,6 +70,9 @@ html:not(.dark) .nextra-docs-theme aside {
 html:not(.dark) .nextra-docs-theme .nextra-sidebar-container {
   background: #ffffff;
 }
+.nextra-sidebar-container {
+  z-index: 20;
+}
 
 html:not(.dark) .nextra-banner {
   background: #eff6ff !important; /* bg-blue-50 */

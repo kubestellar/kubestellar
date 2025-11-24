@@ -61,46 +61,100 @@ export default async function Page(props: PageProps) {
 
   const rawText = await response.text()
 
-  let contentWithIncludes = rawText;
+  // --- START PROCESSING INCLUDES ---
+  let processedContent = rawText;
+
+  // 1. Process Jekyll-style includes: {% include "path" %}
   const includeRegex = /{%\s*include\s+["']([^"']+)["']\s*%}/g;
-  const includeMatches = Array.from(rawText.matchAll(includeRegex));
+  const includeMatches = Array.from(processedContent.matchAll(includeRegex));
 
   if (includeMatches.length > 0) {
     const uniqueIncludes = [...new Set(includeMatches.map(m => m[1]))];
-    
     const includeContents = await Promise.all(uniqueIncludes.map(async (relativePath) => {
       const resolvedPath = resolvePath(filePath, relativePath);
       const url = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${docsPath}${resolvedPath}`;
-      
       try {
         const res = await fetch(url, { headers: makeGitHubHeaders(), cache: 'no-store' });
-        if (res.ok) {
-            return { path: relativePath, text: await res.text() };
-        }
-        
+        if (res.ok) return { path: relativePath, text: await res.text() };
         const rootUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${resolvedPath}`;
         const rootRes = await fetch(rootUrl, { headers: makeGitHubHeaders(), cache: 'no-store' });
-        if (rootRes.ok) {
-            return { path: relativePath, text: await rootRes.text() };
-        }
-
+        if (rootRes.ok) return { path: relativePath, text: await rootRes.text() };
         return { path: relativePath, text: `> **Error**: Could not include \`${relativePath}\` (File not found)` };
       } catch {
         return { path: relativePath, text: `> **Error**: Failed to fetch \`${relativePath}\`` };
       }
     }));
-
     includeContents.forEach(({ path, text }) => {
       const escapedPath = path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const pattern = new RegExp(`{%\\s*include\\s+["']${escapedPath}["']\\s*%}`, 'g');
-      contentWithIncludes = contentWithIncludes.replace(pattern, () => text);
+      processedContent = processedContent.replace(pattern, () => text);
     });
   }
+
+  // 2. Process full markdown includes (without start/end): {% include-markdown "path" %}
+  const fullIncludeMarkdownRegex = /{%-?\s*include-markdown\s+["']([^"']+)["']\s*-?%}/g;
+  // This regex is designed to not match the version with start/end attributes.
+  // We'll process these matches and remove them from the main string before the next step.
+  const fullIncludeMarkdownMatches = Array.from(processedContent.matchAll(fullIncludeMarkdownRegex));
+  
+  if (fullIncludeMarkdownMatches.length > 0) {
+    for (const match of fullIncludeMarkdownMatches) {
+      const [fullMatch, relativePath] = match;
+      // Skip if it's the more complex version
+      if (fullMatch.includes('start=') || fullMatch.includes('end=')) continue;
+
+      const resolvedPath = resolvePath(filePath, relativePath);
+      const url = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${resolvedPath}`;
+      try {
+        const res = await fetch(url, { headers: makeGitHubHeaders(), cache: 'no-store' });
+        if (res.ok) {
+          const fileContent = await res.text();
+          processedContent = processedContent.replace(fullMatch, () => fileContent);
+        } else {
+           processedContent = processedContent.replace(fullMatch, `> **Error**: Could not include \`${relativePath}\` (File not found)`);
+        }
+      } catch {
+        processedContent = processedContent.replace(fullMatch, `> **Error**: Failed to fetch \`${relativePath}\``);
+      }
+    }
+  }
+
+  // 3. Process partial includes: {% include-markdown "path" start="..." end="..." %}
+  const includeMarkdownRegex = /{%-?\s*include-markdown\s+["']([^"']+)["']\s+start=["']([^"']+)["']\s+end=["']([^"']+)["']\s*-?%}/gs;
+  const includeMarkdownMatches = Array.from(processedContent.matchAll(includeMarkdownRegex));
+
+  if (includeMarkdownMatches.length > 0) {
+    for (const match of includeMarkdownMatches) {
+      const [fullMatch, relativePath, startMarker, endMarker] = match;
+      const resolvedPath = resolvePath(filePath, relativePath);
+      const url = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${resolvedPath}`;
+      try {
+        const res = await fetch(url, { headers: makeGitHubHeaders(), cache: 'no-store' });
+        if (res.ok) {
+          const fileContent = await res.text();
+          const startIndex = fileContent.indexOf(startMarker);
+          const endIndex = fileContent.indexOf(endMarker);
+          if (startIndex !== -1 && endIndex !== -1) {
+            const extractedContent = fileContent.substring(startIndex + startMarker.length, endIndex).trim();
+            processedContent = processedContent.replace(fullMatch, extractedContent);
+          } else {
+            processedContent = processedContent.replace(fullMatch, `> **Error**: Markers not found in \`${relativePath}\``);
+          }
+        } else {
+          processedContent = processedContent.replace(fullMatch, `> **Error**: Could not include \`${relativePath}\` (File not found)`);
+        }
+      } catch {
+        processedContent = processedContent.replace(fullMatch, `> **Error**: Failed to fetch \`${relativePath}\``);
+      }
+    }
+  }
+  // --- END PROCESSING INCLUDES ---
 
   const filePathToRoute = new Map<string, string>();
   Object.entries(routeMap).forEach(([r, fp]) => filePathToRoute.set(fp, r));
 
-  let rewrittenText = contentWithIncludes.replace(/(!?\[.*?\])\((.*?)\)/g, (match, label, link) => {
+  // Rewrite Markdown links/images using the fully processed content
+  let rewrittenText = processedContent.replace(/(!?\[.*?\])\((.*?)\)/g, (match, label, link) => {
     if (/^(http|https|mailto:|#)/.test(link)) return match;
 
     const isImage = label.startsWith('!');
@@ -133,16 +187,29 @@ export default async function Page(props: PageProps) {
     return `<img ${pre}src="${rawUrl}"${post}>`;
   });
 
-  const processedData = convertHtmlScriptsToJsxComments(rewrittenText)
+  // 3. Pre-process Jinja and Pymdown syntax before MDX compilation
+  const preProcessedText = rewrittenText
+    // Replace Jinja-style variables {{ config.var_name }} with a placeholder.
+    // This prevents MDX from trying to parse it as a JSX expression.
+    .replace(/{{\s*config\.([\w_]+)\s*}}/g, (match, varName) => `[${varName}]`)
+    // Convert Pymdown code block attributes into standard MDX attributes.
+    // e.g., ``` {.bash .no-copy} -> ```bash .no-copy
+    // e.g., ``` title="file.sh" -> ```sh title="file.sh"
+    .replace(/```\s*{([^}]+)}\s*\n/g, (match, attrs) => {
+        // Normalize attributes: remove leading dot, handle multiple attrs.
+        const normalizedAttrs = attrs.replace(/^\./, '').replace(/\s+\./g, ' ');
+        return `\`\`\`${normalizedAttrs}\n`;
+    });
+
+
+  const processedData = convertHtmlScriptsToJsxComments(preProcessedText)
     .replace(/<br\s*\/?>/gi, '<br />')
     .replace(/align=center/g, 'align="center"')
     .replace(/frameborder="0"/g, 'frameBorder="0"')
     .replace(/allowfullscreen/g, 'allowFullScreen')
     .replace(/scrolling=no/g, 'scrolling="no"')
     .replace(/onload="[^"]*"/g, '')
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')
-    .replace(/<\/?ol>/g, '')
-    .replace(/<\/?li>/g, '')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '');
 
   const rawJs = await compileMdx(processedData, { filePath })
   const { default: MDXContent, toc, metadata } = evaluate(rawJs, component)
