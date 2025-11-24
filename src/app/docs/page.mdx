@@ -1,208 +1,58 @@
-# Getting Started with KubeStellar
+# Welcome to KubeStellar Documentation
 
-## Set Up A Demo System
+KubeStellar simplifies multi-cluster Kubernetes management, enabling you to deploy and manage workloads across multiple clusters with ease.
 
-This page shows two ways to create one particular simple configuration that is suitable for kicking the tires (not production usage). This configuration has one `kind` cluster serving as your KubeFlex hosting cluster and two more serving as WECs. This page covers steps 2--7 from [the full installation and usage outline](user-guide-intro.md#the-full-story). This page concludes with forwarding you to some example scenarios that illustrate the remaining steps.
+## Quick Navigation
 
-The two ways to create this simple configuration are as follows.
+### 🚀 New to KubeStellar?
 
-1. A [quick automated setup](#quick-start-using-the-automated-script) using our demo setup script, which creates a basic working environment for those who want to start experimenting right away.
-2. A [Step by step walkthrough](#step-by-step-setup) that demonstrates the core concepts and components, showing how to manually set up a simple single-host system.
+Start here to understand what KubeStellar is and how it works:
 
-### Note for Windows users
+- **[Overview](what-is-kubestellar)** - Learn about KubeStellar's architecture and core concepts
+- **[Use Cases](use-cases)** - Discover common scenarios and applications
+- **[Quick Installation](quick-installation)** - Get up and running in minutes
 
-For some users on WSL, use of the setup procedure on this page and/or the demo environment creation script may require running as the user `root` in Linux. There is a [known issue about this](knownissue-helm-ghcr.md).
+### 📦 Install & Configure
 
-### Important: Shell Variables for Example Scenarios
+Ready to set up KubeStellar? Follow our installation guides:
 
-After completing the setup, you will need to define several shell variables to run the example scenarios. The meanings of these variables are defined [at the start of the example scenarios document](example-scenarios.md#assumptions-and-variables). What is shown later in this document are the specific values that are correct for the setup procedure described in this guide.
+- **[Prerequisites](install-configure/pre-reqs)** - Check system requirements
+- **[Core Setup](install-configure/core-chart)** - Install KubeStellar core components
+- **[KubeFlex Hosting Cluster](install-configure/kubeflex-hosting-cluster)** - Set up your hosting environment
+- **[Register Workload Clusters](install-configure/workload-execution-clusters)** - Connect your execution clusters
 
-The key variables you'll need are:
+### 🎯 Use & Integrate
 
-- `host_context`, `its_cp`, `its_context` - for accessing the hosting cluster and ITS
-- `wds_cp`, `wds_context` - for accessing the WDS
-- `wec1_name`, `wec2_name`, `wec1_context`, `wec2_context` - for accessing the workload execution clusters
-- `label_query_both`, `label_query_one` - for cluster selection in scenarios
+Learn how to leverage KubeStellar's features:
 
-## Quick Start Using the Automated Script
+- **[KubeStellar API](use-integrate/kubestellar-api)** - Control workload distribution and status
+- **[Example Scenarios](use-integrate/example-scenarios)** - Follow practical examples
+- **[Third-party Integrations](use-integrate/third-party-integrations)** - Connect with ArgoCD and other tools
 
-If you want to quickly setup a basic environment, you can use our automated installation script.
+### 📚 User Guide & Support
 
-### Install software prerequisites
+Get help and find solutions:
 
-Be sure to [install the software prerequisites](pre-reqs.md) _before_ running the script!
+- **[User Guide](user-guide-support/user-guide-intro)** - Complete usage documentation
+- **[Troubleshooting](user-guide-support/troubleshooting)** - Resolve common issues
+- **[Known Issues](user-guide-support/known-issues)** - Current limitations and workarounds
 
-The script will check for the pre-reqs and exit if they are not present.
+### 🛠️ UI & Tools
 
-### Run the script
+Explore KubeStellar's ecosystem:
 
-The script can install KubeStellar's demonstration environment on top of kind or k3d.
+- **[UI Overview](ui-tools/ui-overview)** - Web interface and visualization
+- **[Plugins](ui-tools/plugins)** - Extend functionality
+- **[Galaxy Marketplace](ui-tools/galaxy-marketplace)** - Discover community resources
 
-For use with kind:
+## Get Started Now
 
-```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v<LATEST_RELEASE>/scripts/create-kubestellar-demo-env.sh) --platform kind
-```
+Choose your path:
 
-For use with k3d:
+1. **Quick Demo** - Run our [automated setup script](quick-installation) to create a demo environment in minutes
+2. **Step-by-Step** - Follow the [detailed installation guide](install-configure/kubeflex-hosting-cluster) to understand each component
+3. **Production** - Review the [full deployment guide](user-guide-support/user-guide-intro) for production-ready configurations
 
-```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v<LATEST_RELEASE>/scripts/create-kubestellar-demo-env.sh) --platform k3d
-```
+---
 
-(Replace `<LATEST_RELEASE>` with the current version, e.g. `0.27.1`.)
-
-If successful, the script will output the variable definitions that you would use when proceeding to the example scenarios. After successfully running the script, proceed to the [Exercise KubeStellar](#exercise-kubestellar) section below.
-
-_Note: the script does the same things as described in the [Step by Step Setup](#step-by-step-setup) but with a little more concurrency. While this is great for getting started quickly with a demo system, you may want to follow the manual setup below to better understand the components and how to create a [configuration that meets your needs](#next-steps)._
-
-
-## Step by Step Setup
-
-This walks you through the steps to produce the same configuration as does the script above, suitable for study but not production usage. For general setup information, see [the full story](user-guide-intro.md#the-full-story).
-
-### Install software prerequisites
-
-The following command will check for the prerequisites that you will need for the later steps. See [the prerequisites doc](pre-reqs.md) for more details.
-
-```shell
-bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v<LATEST_RELEASE>/scripts/check_pre_req.sh) kflex ocm helm kubectl docker kind
-```
-
-If that script complains then take it seriously! For example:
-
-```console
-$ bash <(curl https://raw.githubusercontent.com/kubestellar/kubestellar/v0.27.1/scripts/check_pre_req.sh) kflex ocm helm kubectl docker kind
-✔ KubeFlex (Kubeflex version: v0.8.2.5fd5f9c 2025-03-10T14:58:02Z)
-✔ OCM CLI (:v0.11.0-0-g73281f6)
-  structured version ':v0.11.0-0-g73281f6' is less than required minimum ':v0.7' or ':v0.10' but less than ':v0.11'
-```
-
-This setup recipe uses [kind](https://kind.sigs.k8s.io/) to create three Kubernetes clusters on your machine. Note that `kind` does not support three or more concurrent clusters unless you raise some limits as described in this known issue: [Pod errors due to "too many open files"](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files).
-
-### Cleanup from previous runs
-
-```shell
-kind delete cluster --name kubeflex
-kind delete cluster --name cluster1
-kind delete cluster --name cluster2
-kubectl config delete-context cluster1
-kubectl config delete-context cluster2
-```
-
-Optional: `set -e` after cleanup.
-
-### Set the Version appropriately
-
-```shell
-kubestellar_version=<LATEST_RELEASE>
-```
-
-### Create a kind cluster to host KubeFlex
-
-```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v<LATEST_RELEASE>/scripts/create-kind-cluster-with-SSL-passthrough.sh) --name kubeflex --port 9443
-```
-
-### Use Core Helm chart to initialize KubeFlex and create ITS and WDS
-
-```shell
-helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-  --version "$kubestellar_version" \
-  --set-json ITSes='[{"name":"its1"}]' \
-  --set-json WDSes='[{"name":"wds1"},{"name":"wds2","type":"host"}]' \
-  --set verbosity.default=5
-```
-
-Set contexts:
-
-```shell
-kubectl config use-context kind-kubeflex
-kflex ctx --set-current-for-hosting
-kflex ctx --overwrite-existing-context wds1
-kflex ctx --overwrite-existing-context wds2
-kflex ctx --overwrite-existing-context its1
-```
-
-#### Wait for ITS initialization
-
-```shell
-kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 90s
-kubectl --context kind-kubeflex wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 150s
-kubectl --context kind-kubeflex wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 90s
-kubectl --context kind-kubeflex wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 150s
-```
-
-*See [Core Helm Chart](core-chart.md) for details.*
-
-### Create and register two workload execution clusters
-
-1. Create clusters and join:
-
-    ```shell
-    flags="--force-internal-endpoint-lookup"
-    clusters=(cluster1 cluster2)
-    for cluster in "${clusters[@]}"; do
-      kind create cluster --name ${cluster}
-      kubectl config rename-context kind-${cluster} ${cluster}
-      clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | \
-        awk '{print $0 " --context '${cluster}' --singleton '${flags}'"}' | sh
-    done
-    ```
-
-2. Wait for CSRs:
-
-    ```shell
-    while true; do
-      kubectl --context its1 get csr
-      if [ $(kubectl --context its1 get csr | grep -c Pending) -ge 2 ]; then
-        echo "Both CSRs found."
-        break
-      fi
-      sleep 10
-    done
-    ```
-
-3. Approve CSRs:
-
-    ```shell
-    clusteradm --context its1 accept --clusters cluster1
-    clusteradm --context its1 accept --clusters cluster2
-    ```
-
-4. Label managed clusters:
-
-    ```shell
-    kubectl --context its1 get managedclusters
-    kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
-    kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
-    ```
-
-### Variables for running the example scenarios
-
-```shell
-host_context=kind-kubeflex
-its_cp=its1
-its_context=its1
-wds_cp=wds1
-wds_context=wds1
-wec1_name=cluster1
-wec2_name=cluster2
-wec1_context=$wec1_name
-wec2_context=$wec2_name
-label_query_both=location-group=edge
-label_query_one=name=cluster1
-```
-
-## Exercise KubeStellar
-
-1. Define shell variables (above).
-2. Proceed to [Scenario 1](example-scenarios.md#scenario-1-multi-cluster-workload-deployment-with-kubectl) or others.
-
-## Next Steps
-
-See [the full story](user-guide-intro.md#the-full-story) for production-oriented flexibility.
-
-## Troubleshooting
-
-See [troubleshooting](troubleshooting.md) if issues arise.
+**Need help?** Check our [troubleshooting guide](user-guide-support/troubleshooting) or explore the [known issues](user-guide-support/known-issues).
