@@ -434,7 +434,7 @@ export default function DocsNavbar() {
                 Programs
               </Link>
               <Link
-                href="/#contact-us"
+                href="/#contact"
                 className={dropdownItemClasses}
               >
                 <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -591,6 +591,46 @@ export default function DocsNavbar() {
                   isDark ? 'bg-neutral-800' : 'bg-gray-200'
                 }`}>
                   {githubStats.forks}
+                </span>
+              </a>
+              <a
+                href="https://github.com/kubestellar/kubestellar/watchers"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center justify-between px-3 py-2 text-sm transition-colors ${
+                  isDark
+                    ? 'text-gray-300 hover:bg-neutral-800'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2C5.454 2 1.73 5.11.458 9.09a1.5 1.5 0 000 1.82C1.73 14.89 5.454 18 10 18s8.27-3.11 9.542-7.09a1.5 1.5 0 000-1.82C18.27 5.11 14.546 2 10 2zm0 14c-3.866 0-7.09-2.61-8.13-6C2.91 6.61 6.134 4 10 4s7.09 2.61 8.13 6c-1.04 3.39-4.264 6-8.13 6zm0-8a2 2 0 110 4 2 2 0 010-4z" />
+                  </svg>
+                  Watch
+                </span>
+                <span className={`text-xs px-1.5 py-0.5 rounded ${
+                  isDark ? 'bg-neutral-800' : 'bg-gray-200'
+                }`}>
+                  {githubStats.watchers}
+                </span>
+              </a>
+              <a
+                href="https://github.com/kubestellar/docs/issues"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center justify-between px-3 py-2 text-sm transition-colors ${
+                  isDark
+                    ? 'text-gray-300 hover:bg-neutral-800'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"/>
+                    <path d="M8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                  </svg>
+                  Create Issue
                 </span>
               </a>
               </div>
@@ -928,7 +968,7 @@ export default function DocsNavbar() {
               Programs
             </Link>
 {/* --- REMOVED LADDER LINK FROM HERE --- */}
-            <Link href="/#contact-us" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+            <Link href="/#contact" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'

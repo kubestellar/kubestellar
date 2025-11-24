@@ -437,8 +437,8 @@ export default function PartnersPage() {
 
               <div className="text-center">
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                  <a
-                    href="#contact-us"
+                  <Link
+                    href="/#contact"
                     className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/50"
                   >
                     <svg
@@ -455,7 +455,7 @@ export default function PartnersPage() {
                       />
                     </svg>
                     {t("partnershipOpportunities.contactButton")}
-                  </a>
+                  </Link>
 
                   <a
                     href="https://kubestellar.io/slack"
