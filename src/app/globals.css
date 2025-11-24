@@ -165,6 +165,74 @@ html:not(.dark) .nextra-banner button:hover {
   opacity: 1 !important;
 }
 
+.ks-doc-figure {
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.ks-doc-figure img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.ks-doc-figure figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #475569;
+  font-style: italic;
+}
+
+html.dark .ks-doc-figure figcaption {
+  color: rgba(248, 250, 252, 0.75);
+}
+
+.badge-grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  align-items: center;
+  justify-items: start;
+  width: 100%;
+}
+
+.badge-grid-container > p {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
+
+.badge-grid-container > p > a {
+  display: inline-block;
+  margin: 0;
+  text-align: left;
+  line-height: 0;
+}
+
+.badge-grid-container > p > a > img {
+  height: auto;
+  max-width: 100%;
+  display: block;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .badge-grid-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .badge-grid-container {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Custom Tailwind utilities */
 .text-gradient {
   background: linear-gradient(to right, rgb(147, 51, 234), rgb(59, 130, 246));

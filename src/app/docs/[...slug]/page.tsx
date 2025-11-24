@@ -34,6 +34,80 @@ function resolvePath(baseFile: string, relativePath: string) {
   return stack.join('/');
 }
 
+function wrapMarkdownImagesWithFigures(markdown: string) {
+  // Skip images that are part of link badges: [![...](...)](...)
+  const imageRegex = /(?<!\[)!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g;
+
+  return markdown.replace(imageRegex, (_match, alt = '', src, title) => {
+    const captionText = title || alt;
+    const titleAttr = title ? ` title="${title}"` : '';
+    const figcaption = captionText ? `<figcaption>${captionText}</figcaption>` : '';
+
+    return `
+<figure class="ks-doc-figure">
+  <img src="${src}" alt="${alt}"${titleAttr} />
+  ${figcaption}
+</figure>
+`;
+  });
+}
+
+function wrapBadgeLinksInGrid(markdown: string) {
+  const badgePattern = /\[!\[([^\]]*)\]\(([^)]*(?:shields\.io|badge|deepwiki)[^)]*)\)\]\(([^)]*)\)/gi;
+  
+  const allBadges: Array<{ fullMatch: string; startIndex: number; endIndex: number }> = [];
+  let match;
+  
+  while ((match = badgePattern.exec(markdown)) !== null) {
+    allBadges.push({
+      fullMatch: match[0],
+      startIndex: match.index,
+      endIndex: match.index + match[0].length
+    });
+  }
+  
+  if (allBadges.length === 0) return markdown;
+  
+  const groups: string[][] = [];
+  let currentGroup: string[] = [];
+  let lastEndIndex = -1;
+  
+  for (const badge of allBadges) {
+    if (currentGroup.length === 0 || badge.startIndex - lastEndIndex < 200) {
+      currentGroup.push(badge.fullMatch);
+    } else {
+      if (currentGroup.length > 0) groups.push(currentGroup);
+      currentGroup = [badge.fullMatch];
+    }
+    lastEndIndex = badge.endIndex;
+  }
+  if (currentGroup.length > 0) groups.push(currentGroup);
+  
+  let result = markdown;
+  let offset = 0;
+  
+  for (const group of groups) {
+    if (group.length > 0) {
+      const badgesToWrap = group.slice(0, 9);
+      const firstBadge = badgesToWrap[0];
+      const lastBadge = badgesToWrap[badgesToWrap.length - 1];
+      const firstIndex = result.indexOf(firstBadge, offset);
+      
+      if (firstIndex !== -1) {
+        const lastIndex = result.indexOf(lastBadge, firstIndex) + lastBadge.length;
+        const beforeSection = result.substring(0, firstIndex);
+        const afterSection = result.substring(lastIndex);
+        const wrapped = `<div class="badge-grid-container">\n${badgesToWrap.map(b => `  <p>${b}</p>`).join('\n')}\n</div>`;
+        
+        result = beforeSection + wrapped + afterSection;
+        offset = beforeSection.length + wrapped.length;
+      }
+    }
+  }
+  
+  return result;
+}
+
 export default async function Page(props: PageProps) {
   const params = await props.params
   const searchParams = await props.searchParams
@@ -61,8 +135,18 @@ export default async function Page(props: PageProps) {
 
   const rawText = await response.text()
 
+  function removeCommentPatterns(content: string): string {
+    let cleaned = content;
+    cleaned = cleaned.replace(/\{\/Note[^}]*\/\}/g, '');
+    cleaned = cleaned.replace(/\{\/ALL-CONTRIBUTORS-LIST[^}]*\/\}/gi, '');
+    cleaned = cleaned.replace(/\{\/prettier-ignore[^}]*\/\}/gi, '');
+    cleaned = cleaned.replace(/\{\/markdownlint[^}]*\/\}/gi, '');
+    cleaned = cleaned.replace(/<!--[\s\S]*?(?:Note that this repo|ALL-CONTRIBUTORS-LIST|prettier-ignore|markdownlint)[\s\S]*?-->/gi, '');
+    return cleaned;
+  }
+
   // --- START PROCESSING INCLUDES ---
-  let processedContent = rawText;
+  let processedContent = removeCommentPatterns(rawText);
 
   // 1. Process Jekyll-style includes: {% include "path" %}
   const includeRegex = /{%\s*include\s+["']([^"']+)["']\s*%}/g;
@@ -75,10 +159,10 @@ export default async function Page(props: PageProps) {
       const url = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${docsPath}${resolvedPath}`;
       try {
         const res = await fetch(url, { headers: makeGitHubHeaders(), cache: 'no-store' });
-        if (res.ok) return { path: relativePath, text: await res.text() };
+        if (res.ok) return { path: relativePath, text: removeCommentPatterns(await res.text()) };
         const rootUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${resolvedPath}`;
         const rootRes = await fetch(rootUrl, { headers: makeGitHubHeaders(), cache: 'no-store' });
-        if (rootRes.ok) return { path: relativePath, text: await rootRes.text() };
+        if (rootRes.ok) return { path: relativePath, text: removeCommentPatterns(await rootRes.text()) };
         return { path: relativePath, text: `> **Error**: Could not include \`${relativePath}\` (File not found)` };
       } catch {
         return { path: relativePath, text: `> **Error**: Failed to fetch \`${relativePath}\`` };
@@ -87,7 +171,7 @@ export default async function Page(props: PageProps) {
     includeContents.forEach(({ path, text }) => {
       const escapedPath = path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const pattern = new RegExp(`{%\\s*include\\s+["']${escapedPath}["']\\s*%}`, 'g');
-      processedContent = processedContent.replace(pattern, () => text);
+      processedContent = processedContent.replace(pattern, () => removeCommentPatterns(text));
     });
   }
 
@@ -109,7 +193,7 @@ export default async function Page(props: PageProps) {
         const res = await fetch(url, { headers: makeGitHubHeaders(), cache: 'no-store' });
         if (res.ok) {
           const fileContent = await res.text();
-          processedContent = processedContent.replace(fullMatch, () => fileContent);
+          processedContent = processedContent.replace(fullMatch, () => removeCommentPatterns(fileContent));
         } else {
            processedContent = processedContent.replace(fullMatch, `> **Error**: Could not include \`${relativePath}\` (File not found)`);
         }
@@ -136,7 +220,7 @@ export default async function Page(props: PageProps) {
           const endIndex = fileContent.indexOf(endMarker);
           if (startIndex !== -1 && endIndex !== -1) {
             const extractedContent = fileContent.substring(startIndex + startMarker.length, endIndex).trim();
-            processedContent = processedContent.replace(fullMatch, extractedContent);
+            processedContent = processedContent.replace(fullMatch, removeCommentPatterns(extractedContent));
           } else {
             processedContent = processedContent.replace(fullMatch, `> **Error**: Markers not found in \`${relativePath}\``);
           }
@@ -186,6 +270,11 @@ export default async function Page(props: PageProps) {
     
     return `<img ${pre}src="${rawUrl}"${post}>`;
   });
+
+  rewrittenText = wrapMarkdownImagesWithFigures(rewrittenText);
+
+  // Wrap badges in grid container before HTML processing
+  rewrittenText = wrapBadgeLinksInGrid(rewrittenText);
 
   // 3. Pre-process Jinja and Pymdown syntax before MDX compilation
   const preProcessedText = rewrittenText
