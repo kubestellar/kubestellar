@@ -69,7 +69,7 @@ export async function buildPageMapForBranch(branch: string) {
 
   const CATEGORY_MAPPINGS: Array<[string, NavItem[]]> = [
     ['What is Kubestellar?', [
-      { 'Overview': 'README.md' },
+      { 'Overview': 'readme.md' },
       { file: 'architecture.md' },
       { file: 'related-projects.md' },
       { file: 'roadmap.md' },
@@ -182,11 +182,28 @@ export async function buildPageMapForBranch(branch: string) {
                     const foundFile = allDocFiles.find(f => f.toLowerCase() === value.toLowerCase());
                     if (foundFile) {
                         processedFiles.add(foundFile);
-                        const baseName = foundFile.replace(/\.(md|mdx)$/i, '').split('/').pop()!;
-                        // Correct route for root files like README.md
+                        let baseName = foundFile.replace(/\.(md|mdx)$/i, '').split('/').pop()!;
+                        // Handle readme files - convert to lowercase for routing
+                        if (baseName.toLowerCase() === 'readme') {
+                            baseName = 'readme';
+                        }
+                        // Handle index files specially
+                        const isIndexFile = baseName.toLowerCase() === 'index';
                         const isRootFile = !foundFile.includes('/');
-                        const route = isRootFile ? `/${basePath}` : `/${basePath}/${parentSlug}/${baseName}`;
-                        const alias = isRootFile ? '' : route.replace(`/${basePath}/`, '');
+                        
+                        let route: string;
+                        if (isIndexFile && foundFile.includes('/')) {
+                            // For index files in subdirectories, use the parent directory name
+                            const pathParts = foundFile.split('/');
+                            const dirName = pathParts[pathParts.length - 2];
+                            route = `/${basePath}/${parentSlug}/${dirName}`;
+                        } else if (isRootFile) {
+                            route = `/${basePath}/${parentSlug}/${baseName}`;
+                        } else {
+                            route = `/${basePath}/${parentSlug}/${baseName}`;
+                        }
+                        
+                        const alias = route.replace(`/${basePath}/`, '');
                         aliases.push({ alias, fp: foundFile });
                         node = { kind: 'MdxPage' as const, name: title, route };
                         keyForMeta = title;
