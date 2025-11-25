@@ -54,10 +54,10 @@ function wrapMarkdownImagesWithFigures(markdown: string) {
 
 function wrapBadgeLinksInGrid(markdown: string) {
   const badgePattern = /\[!\[([^\]]*)\]\(([^)]*(?:shields\.io|badge|deepwiki)[^)]*)\)\]\(([^)]*)\)/gi;
-  
+
   const allBadges: Array<{ fullMatch: string; startIndex: number; endIndex: number }> = [];
   let match;
-  
+
   while ((match = badgePattern.exec(markdown)) !== null) {
     allBadges.push({
       fullMatch: match[0],
@@ -65,13 +65,13 @@ function wrapBadgeLinksInGrid(markdown: string) {
       endIndex: match.index + match[0].length
     });
   }
-  
+
   if (allBadges.length === 0) return markdown;
-  
+
   const groups: string[][] = [];
   let currentGroup: string[] = [];
   let lastEndIndex = -1;
-  
+
   for (const badge of allBadges) {
     if (currentGroup.length === 0 || badge.startIndex - lastEndIndex < 200) {
       currentGroup.push(badge.fullMatch);
@@ -82,41 +82,41 @@ function wrapBadgeLinksInGrid(markdown: string) {
     lastEndIndex = badge.endIndex;
   }
   if (currentGroup.length > 0) groups.push(currentGroup);
-  
+
   let result = markdown;
   let offset = 0;
-  
+
   for (const group of groups) {
     if (group.length > 0) {
       const badgesToWrap = group.slice(0, 9);
       const firstBadge = badgesToWrap[0];
       const lastBadge = badgesToWrap[badgesToWrap.length - 1];
       const firstIndex = result.indexOf(firstBadge, offset);
-      
+
       if (firstIndex !== -1) {
         const lastIndex = result.indexOf(lastBadge, firstIndex) + lastBadge.length;
         const beforeSection = result.substring(0, firstIndex);
         const afterSection = result.substring(lastIndex);
         const wrapped = `<div class="badge-grid-container">\n${badgesToWrap.map(b => `  <p>${b}</p>`).join('\n')}\n</div>`;
-        
+
         result = beforeSection + wrapped + afterSection;
         offset = beforeSection.length + wrapped.length;
       }
     }
   }
-  
+
   return result;
 }
 
 export default async function Page(props: PageProps) {
   const params = await props.params
   const searchParams = await props.searchParams
-  
+
   const version = (searchParams.version as VersionKey) || getDefaultVersion()
   const branch = getBranchForVersion(version)
-  
+
   const { routeMap, filePaths } = await buildPageMapForBranch(branch)
-  
+
   const route = params.slug ? params.slug.join('/') : ''
 
   const filePath =
@@ -142,6 +142,20 @@ export default async function Page(props: PageProps) {
     cleaned = cleaned.replace(/\{\/prettier-ignore[^}]*\/\}/gi, '');
     cleaned = cleaned.replace(/\{\/markdownlint[^}]*\/\}/gi, '');
     cleaned = cleaned.replace(/<!--[\s\S]*?(?:Note that this repo|ALL-CONTRIBUTORS-LIST|prettier-ignore|markdownlint)[\s\S]*?-->/gi, '');
+
+    // Remove specific unwanted headings/comments
+    cleaned = cleaned.replace(/\{\/Included in website\. Edit CONTRIBUTING\.md for GitHub\.\/\}/gi, '');
+    cleaned = cleaned.replace(/<!--\s*Included in website\. Edit CONTRIBUTING\.md for GitHub\.\s*-->/gi, '');
+
+    cleaned = cleaned.replace(/\{\/Canonical GitHub version\. Edit contributing-inc\.md for website\.\/\}/gi, '');
+    cleaned = cleaned.replace(/<!--\s*Canonical GitHub version\. Edit contributing-inc\.md for website\.\s*-->/gi, '');
+
+    cleaned = cleaned.replace(/\{\/A wrapper file to include the GOVERNANCE file from the repository root\/\}/gi, '');
+    cleaned = cleaned.replace(/<!--\s*A wrapper file to include the GOVERNANCE file from the repository root\s*-->/gi, '');
+
+    cleaned = cleaned.replace(/\{\/Code management[\s\S]*?Quay\.io[\s\S]*?\/\}/gi, '');
+    cleaned = cleaned.replace(/<!--\s*Code management[\s\S]*?Quay\.io[\s\S]*?-->/gi, '');
+
     return cleaned;
   }
 
@@ -163,6 +177,12 @@ export default async function Page(props: PageProps) {
         const rootUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${resolvedPath}`;
         const rootRes = await fetch(rootUrl, { headers: makeGitHubHeaders(), cache: 'no-store' });
         if (rootRes.ok) return { path: relativePath, text: removeCommentPatterns(await rootRes.text()) };
+
+        // Suppress error for coming-soon.md
+        if (relativePath.includes('coming-soon.md')) {
+          return { path: relativePath, text: '' };
+        }
+
         return { path: relativePath, text: `> **Error**: Could not include \`${relativePath}\` (File not found)` };
       } catch {
         return { path: relativePath, text: `> **Error**: Failed to fetch \`${relativePath}\`` };
@@ -180,7 +200,7 @@ export default async function Page(props: PageProps) {
   // This regex is designed to not match the version with start/end attributes.
   // We'll process these matches and remove them from the main string before the next step.
   const fullIncludeMarkdownMatches = Array.from(processedContent.matchAll(fullIncludeMarkdownRegex));
-  
+
   if (fullIncludeMarkdownMatches.length > 0) {
     for (const match of fullIncludeMarkdownMatches) {
       const [fullMatch, relativePath] = match;
@@ -195,7 +215,12 @@ export default async function Page(props: PageProps) {
           const fileContent = await res.text();
           processedContent = processedContent.replace(fullMatch, () => removeCommentPatterns(fileContent));
         } else {
-           processedContent = processedContent.replace(fullMatch, `> **Error**: Could not include \`${relativePath}\` (File not found)`);
+          // Suppress error for coming-soon.md
+          if (relativePath.includes('coming-soon.md')) {
+            processedContent = processedContent.replace(fullMatch, '');
+          } else {
+            processedContent = processedContent.replace(fullMatch, `> **Error**: Could not include \`${relativePath}\` (File not found)`);
+          }
         }
       } catch {
         processedContent = processedContent.replace(fullMatch, `> **Error**: Failed to fetch \`${relativePath}\``);
@@ -225,7 +250,12 @@ export default async function Page(props: PageProps) {
             processedContent = processedContent.replace(fullMatch, `> **Error**: Markers not found in \`${relativePath}\``);
           }
         } else {
-          processedContent = processedContent.replace(fullMatch, `> **Error**: Could not include \`${relativePath}\` (File not found)`);
+          // Suppress error for coming-soon.md
+          if (relativePath.includes('coming-soon.md')) {
+            processedContent = processedContent.replace(fullMatch, '');
+          } else {
+            processedContent = processedContent.replace(fullMatch, `> **Error**: Could not include \`${relativePath}\` (File not found)`);
+          }
         }
       } catch {
         processedContent = processedContent.replace(fullMatch, `> **Error**: Failed to fetch \`${relativePath}\``);
@@ -243,22 +273,22 @@ export default async function Page(props: PageProps) {
 
     const isImage = label.startsWith('!');
     const [linkUrl, linkHash] = link.split('#');
-    
+
     const resolvedPath = resolvePath(filePath, linkUrl);
-    
+
     if (isImage) {
-       const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${docsPath}${resolvedPath}`;
-       return `${label}(${rawUrl})`;
+      const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${docsPath}${resolvedPath}`;
+      return `${label}(${rawUrl})`;
     } else {
-       let targetRoute = filePathToRoute.get(resolvedPath);
-       if (!targetRoute) targetRoute = filePathToRoute.get(resolvedPath + '.md');
-       if (!targetRoute) targetRoute = filePathToRoute.get(resolvedPath + '.mdx');
-       
-       if (targetRoute) {
-         return `${label}(/docs/${targetRoute}${linkHash ? '#' + linkHash : ''})`;
-       }
-       
-       return `${label}(https://raw.githubusercontent.com/${user}/${repo}/${branch}/${docsPath}${resolvedPath})`;
+      let targetRoute = filePathToRoute.get(resolvedPath);
+      if (!targetRoute) targetRoute = filePathToRoute.get(resolvedPath + '.md');
+      if (!targetRoute) targetRoute = filePathToRoute.get(resolvedPath + '.mdx');
+
+      if (targetRoute) {
+        return `${label}(/docs/${targetRoute}${linkHash ? '#' + linkHash : ''})`;
+      }
+
+      return `${label}(https://raw.githubusercontent.com/${user}/${repo}/${branch}/${docsPath}${resolvedPath})`;
     }
   });
 
@@ -267,7 +297,7 @@ export default async function Page(props: PageProps) {
 
     const resolvedPath = resolvePath(filePath, src);
     const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${docsPath}${resolvedPath}`;
-    
+
     return `<img ${pre}src="${rawUrl}"${post}>`;
   });
 
@@ -285,9 +315,9 @@ export default async function Page(props: PageProps) {
     // e.g., ``` {.bash .no-copy} -> ```bash .no-copy
     // e.g., ``` title="file.sh" -> ```sh title="file.sh"
     .replace(/```\s*{([^}]+)}\s*\n/g, (match, attrs) => {
-        // Normalize attributes: remove leading dot, handle multiple attrs.
-        const normalizedAttrs = attrs.replace(/^\./, '').replace(/\s+\./g, ' ');
-        return `\`\`\`${normalizedAttrs}\n`;
+      // Normalize attributes: remove leading dot, handle multiple attrs.
+      const normalizedAttrs = attrs.replace(/^\./, '').replace(/\s+\./g, ' ');
+      return `\`\`\`${normalizedAttrs}\n`;
     });
 
 

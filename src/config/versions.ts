@@ -1,5 +1,9 @@
 export const VERSIONS = {
-  "v0.29.0": { branch: "release-0.29.0", label: "v0.29.0 (Latest)", isDefault: true },
+  "v0.29.0": {
+    branch: "release-0.29.0",
+    label: "v0.29.0 (Latest)",
+    isDefault: true,
+  },
   "v0.29.0-rc.1": { branch: "release-0.29.0-rc.1", label: "v0.29.0-rc.1" },
   "v0.28.0": { branch: "release-0.28.0", label: "v0.28.0" },
   "v0.27.2": { branch: "release-0.27.2", label: "v0.27.2" },
