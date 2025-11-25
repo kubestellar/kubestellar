@@ -30,6 +30,7 @@
 
 Visit our website: [http://prod.previews.kubestellar.io/en](http://prod.previews.kubestellar.io/en)
 
+Website preview for a PR \#\#\#: [PR-\#\#\#.previews.kubestellar.io/en](PR-###.previews.kubestellar.io/en)
 ## Overview
 
 **KubeStellar** simplifies Kubernetes operations across distributed infrastructure by providing powerful multi-cluster configuration management capabilities. This repository serves as the canonical source for all KubeStellar documentation, powering the official documentation website at <a href="https://kubestellar.io" target="_blank">kubestellar.io</a>.
