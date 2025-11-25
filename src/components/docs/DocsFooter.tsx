@@ -79,15 +79,15 @@ export default function Footer() {
                 className="group relative w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300"
               >
                 <svg
-  className="w-7 h-7 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
-  fill="currentColor"
-  viewBox="0 0 24 24"
->
-  <path
-    className="transition-colors duration-300 text-gray-400 group-hover:text-white"
-    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-  />
-</svg>
+                  className="w-7 h-7 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    className="transition-colors duration-300 text-gray-400 group-hover:text-white"
+                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                  />
+                </svg>
               </a>
               <a
                 href="https://github.com/kubestellar"
@@ -221,8 +221,8 @@ export default function Footer() {
             </ul>
           </div>
           {/* Stay updated */}
-          <div className="col-span-2 sm:col-span-6 lg:col-span-2 sm:order-2 lg:order-6 md:ml-12 lg:ml-0 mt-4 sm:mt-0" >
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider sm:mt-3 md:mt-2 lg:mt-1 mb-4">
+          <div className="col-span-2 sm:col-span-6 lg:col-span-3 sm:order-2 lg:order-6 md:ml-12 lg:ml-0 mt-4 sm:mt-0" >
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider sm:mt-3 md:mt-2 lg:mt-1 mb-4 text-center">
               Stay Updated
             </h3>
             <div className="bg-gray-800/50 backdrop-blur-md rounded-lg p-4 border border-gray-700/50 transform transition-all duration-300 hover:border-blue-500/30">
@@ -279,7 +279,7 @@ export default function Footer() {
                 <span>Subscribed!</span>
               </div>
             </div>
-            <p className="mt-3 text-xs text-gray-400">
+            <p className="mt-3 text-xs text-gray-400 text-center">
               We respect your privacy. No spam.
             </p>
           </div>
