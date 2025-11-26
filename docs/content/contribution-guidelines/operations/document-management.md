@@ -2,7 +2,7 @@
 
 **The KubeStellar website is upgrading from an mkdocs-based collection of sites for all its components to a unified Nextra-based site which can display documents imported from all of the Github repositories in the KubeStellar project**
 
-
+THIS IS A SUPERFLUOUS copy of this file and is scheduled to be removed.
 
 
 
