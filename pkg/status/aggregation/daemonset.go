@@ -16,16 +16,9 @@ limitations under the License.
 
 package aggregation
 
-func AggregateDaemonSetStatus(statuses []map[string]interface{}) (map[string]interface{}, error) {
-	if len(statuses) == 0 {
-		return nil, nil
-	}
+func AggregateDaemonSetStatus(statuses []map[string]any) (map[string]any, error) {
 
-	if len(statuses) == 1 {
-		return statuses[0], nil
-	}
-
-	aggregatedStatus := make(map[string]interface{})
+	aggregatedStatus := make(map[string]any)
 
 	aggregatedStatus["currentNumberScheduled"] = GetMin(statuses, "currentNumberScheduled")
 	aggregatedStatus["numberMisscheduled"] = GetMax(statuses, "numberMisscheduled")

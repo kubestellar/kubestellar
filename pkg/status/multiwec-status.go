@@ -52,7 +52,7 @@ func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdent
 	}
 
 	// collect status
-	statuses := make([]map[string]interface{}, 0, len(wsObjects))
+	statuses := make([]map[string]any, 0, len(wsObjects))
 	for _, wsON := range wsObjects {
 		wsObj, err := c.workStatusLister.ByNamespace(wsON.Namespace).Get(wsON.Name)
 		if err != nil {
@@ -79,8 +79,15 @@ func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdent
 		return nil
 	}
 
+	if len(statuses) == 1 {
+		if err := c.updateObjectStatus(ctx, wObjID, statuses[0], c.listers, true); err != nil {
+			return err
+		}
+		return nil
+	}
+
 	// Aggregate for known kind that Kubestellar handle specially which are mainly kind available as built-in healthchecks for Argocd
-	var aggregatedStatus map[string]interface{}
+	var aggregatedStatus map[string]any
 	var errAggregate error
 
 	switch wObjID.GVK.Group {
