@@ -16,16 +16,9 @@ limitations under the License.
 
 package aggregation
 
-func AggregateReplicaSetStatus(statuses []map[string]interface{}) (map[string]interface{}, error) {
-	if len(statuses) == 0 {
-		return nil, nil
-	}
+func AggregateReplicaSetStatus(statuses []map[string]any) (map[string]any, error) {
 
-	if len(statuses) == 1 {
-		return statuses[0], nil
-	}
-
-	aggregatedStatus := make(map[string]interface{})
+	aggregatedStatus := make(map[string]any)
 
 	aggregatedStatus["replicas"] = GetMin(statuses, "replicas")
 	aggregatedStatus["fullyLabeledReplicas"] = GetMin(statuses, "fullyLabeledReplicas")
@@ -38,12 +31,12 @@ func AggregateReplicaSetStatus(statuses []map[string]interface{}) (map[string]in
 	return aggregatedStatus, nil
 }
 
-func aggregateReplicaSetConditions(statuses []map[string]interface{}) []interface{} {
+func aggregateReplicaSetConditions(statuses []map[string]any) []any {
 	// Focus on type ReplicaFailure condition which indicates issues with replica creation
 	// If any of the statuses contains it we return its condition as aggregated condition
 
 	for _, status := range statuses {
-		conditions, ok := status["conditions"].([]interface{})
+		conditions, ok := status["conditions"].([]any)
 
 		if !ok {
 			continue
@@ -51,18 +44,18 @@ func aggregateReplicaSetConditions(statuses []map[string]interface{}) []interfac
 
 		// cond is the single elements from conditions
 		for _, cond := range conditions {
-			c, ok := cond.(map[string]interface{})
+			c, ok := cond.(map[string]any)
 			if !ok {
 				continue
 			}
 
 			if c["type"] == "ReplicaFailure" {
-				return []interface{}{cond}
+				return []any{cond}
 			}
 
 		}
 	}
 
-	return []interface{}{}
+	return []any{}
 
 }
