@@ -3,7 +3,7 @@
 **The KubeStellar website is upgrading from collection of mkdocs-based individual sites for each of its components to a unified Nextra-based site which can display documents imported from all of the component Github repositories in the KubeStellar project** 
 
 The new site is going live in November 2025, and this document is therefore being revised extensively and actively. 
-[Information about the legacy website built via mkdocs is still viewable directly in the Github Repository](https://github.com/kubestellar/kubestellar/blob/main/docs/content/contribution-guidelines/operations/mkdocs-management.md)
+[Information about the legacy website built via mkdocs is still viewable directly in the Github Repository](https://github.com/kubestellar/kubestellar/blob/release-0.29.0/docs/content/contribution-guidelines/operations/document-management.md)
 
 ## Websites
 
