@@ -114,10 +114,10 @@ node --version
 ## We look forward to seeing your contributions!
 
 ---
->:warning:  The following material is from the legacy mkdocs site and may not apply to the Nextra site. It is subject to revision/deletion in the near future.
+> :warning:  The following material is from the legacy mkdocs site and may not apply to the Nextra site. It is subject to revision/deletion in the near future.
 ---
 
->:info: Active javascript variables  will not reliably render on the Nextra site and have been replaced with mnemonic strings like `REPO_OWNER`
+> :info: Active javascript variables  will not reliably render on the Nextra site and have been replaced with mnemonic strings like `REPO_OWNER`
 ---
 ### Legacy Websites
 
