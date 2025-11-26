@@ -92,6 +92,7 @@ nav:
           - Docs Management Overview: contribution-guidelines/document-management.md
           - Style Guide: contribution-guidelines/docs-styleguide.md
           - Testing website PRs: contribution-guidelines/testing-doc-prs.md
+          - Legacy mkdocs info: contribution-guidelines/operations/mkdocs-management.md
       - Security:
           - Policy: contribution-guidelines/security/security-inc.md
           - Contacts: contribution-guidelines/security/security_contacts-inc.md
