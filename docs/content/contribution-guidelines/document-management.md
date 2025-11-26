@@ -1,32 +1,42 @@
-## Kubestellar Website Overview 
+## Kubestellar Web Documentation Structure
 
-**The KubeStellar website is upgrading from an mkdocs-based collection of sites for all its components to a unified Nextra-based site which can display documents imported from all of the Github repositories in the KubeStellar project**
+**The KubeStellar website is upgrading from collection of mkdocs-based individual sites for each of its components to a unified Nextra-based site which can display documents imported from all of the component Github repositories in the KubeStellar project** 
 
+The new site is going live in November 2025, and this document is therefore being revised extensively and actively. For the moment, much of the [legacy website information](#legacy-websites) is still included in the lower section for reference purposes.
 
+## Websites
 
+### One Website for All: Kubestellar.io
 
+The new Nextra-based [**Kubestellar.io**](https://kubestellar.io) site has migrated away from a mkdocs-rendered static site to a site using next.js which can support active content. The documentation source files for this new site are actually distributed across the multiple repos in the [Github Kubestellar organization](https://github.com/kubestellar)
 
+---
+###  Design Repository: kubestellar/docs
 
-### Websites
+The [KubeStellar/docs](https://github.com/kubestellar/docs) repository contains the Nextra components and source files to generate the main navigation pages and layout of the site.
+It uses the remote file capacity of the Nextra engine to pull and render MarkDown (MD) and MDX documentation files from documentation files in the component repositorys of KubeStellar (kubestellar/kubestellar, kubestellar/ui, kubestellar/kubeflex, kubestellar/a2a, etc)
 
+_Note: this means that to modify the style and overall structure of the KubeStellar site, one must work with the files in the docs repository, but to update documentation for Kubestellar or any of it's particular components, one must work on files in that component repository_
 
+Doing a GitHub Pull Request on the docs repository itself will build and deploy a preview of the resulting site via Netlify. Updates the component repository documentation files will not be rendered on the main site until a cron job and/or an admin triggers a refresh.
 
-We have two web sites, as follows.
+### Component repositories: kubestellar, kubeflex, etc.
 
-- `https://kubestellar.io`. This is hosted by GoDaddy and administered by [Andy Anderson](mailto://andy@clubanderson.com). It contains a few redirects. The most important is that `https://kubestellar.io/` redirects to `https://docs.kubestellar.io/`.
-- `https://docs.kubestellar.io`. This is a GitHub pages website based on the `github.com/kubestellar/kubestellar/` repository.
+All of the component documentation is updated via commits to [the individual Github repositories](https://github.com/kubestellar) of the KubeStellar project. There may be additional information, scripts, etc. accessible via Github which are not directly exposed on the Nextra-based site.
 
-**A contributor may have their own copy of the latter website**, at `https://${repo_owner}.github.io/${fork_name}`, if they have [set up the fork properly to render the webpages](#creating-a-fork-that-can-use-the-generate-and-push-docs-action). This is useful for generating previews of changes before they are merged into the `main` branch of the shared repository. **A PR that modifies the website should include such a preview.** See the section below on [Serving up documents globally from a fork of the repo via GitHub](#serving-up-documents-globally-from-a-fork-of-the-repository-via-github).
+### Future migration: contribution information
 
+At this time the documentation and instructions, best practices, etc., for contributing to the KubeStellar project are part of the [kubestellar/kubestellar](htpps://github.com/kubestellar/kubestellar) repository. We anticipate moving those files into the kubestellar/docs repository in the future as they have global application to the whole KubeStellar open-source project.
+
+---
 ### Dual-use documentation sources
 
-The documentation that is rendered to the website (as described in the
-rest of this page) is designed so that it can also be usefully viewed
+The documentation that is rendered from the repositiories to the website is designed so that it can also be usefully viewed
 directly at GitHub. For example, you can view this page both (a) on
-the website at
-[https://docs.kubestellar.io/unreleased-development/contribution-guidelines/operations/document-management/](https://docs.kubestellar.io/unreleased-development/contribution-guidelines/operations/document-management/)
+the website at 
+[/docs/contribution-guidelines/document-management/](/docs/contribution-guidelines/document-management/)
 and (b) directly in GitHub at
-[https://github.com/kubestellar/kubestellar/blob/main/docs/content/contribution-guidelines/operations/document-management.md](https://github.com/kubestellar/kubestellar/blob/main/docs/content/contribution-guidelines/operations/document-management.md). Unfortunately,
+[https://github.com/kubestellar/kubestellar/blob/main/docs/content/contribution-guidelines/document-management.md](https://github.com/kubestellar/kubestellar/blob/main/docs/content/contribution-guidelines/document-management.md). Unfortunately, occasionally
 those two uses interpret the documentation sources a bit
 differently. To the degree possible, we choose to write the
 documentation sources in a way that is rendered consistently in those
@@ -38,7 +48,87 @@ rendering take precedence.
 
 With more contributors writing pages for our documentation, we are implementing a [Style Guide](docs-styleguide.md) to help ensure more usable documenations with a consistent style and voice.
 
-### GitHub pages
+---
+## Local Development: Preparing to contribute to the KubeStellar website
+
+If you are interested in working on our site, your local system must first be properly configured with node.js and next.js. These instructions are copied from the Local Development section of [README file for kubestellar/docs](https://github.com/kubestellar/docs/blob/main/README.md)
+
+This documentation site is built with [Next.js](https://nextjs.org/), providing a modern, performant documentation experience.
+
+### Prerequisites
+
+- **Node.js** v18.0.0 or higher ([Download](https://nodejs.org/))
+- **npm** or **yarn** package manager
+
+**Note for WSL users:** search for hints on the correct procedure to install node.js, npm, and yarn in your environment. 
+
+Verify your Node.js installation:
+
+```bash
+node --version
+```
+
+### Setup Instructions
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/kubestellar/kubestellar.git
+   cd docd
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **Start the development server:**
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+   The site will be available at `http://localhost:3000` with hot-reload enabled for instant feedback.
+
+4. **Build for production:**
+
+   ```bash
+   npm run build
+   # or
+   yarn build
+   ```
+
+5. **Preview the production build:**
+
+   ```bash
+   npm start
+   # or
+   yarn start
+   ```
+
+## We look forward to seeing your contributions!
+
+---
+
+---
+## The following material is only included for reference re the legacy mkdocs version of the site and will be deleted in a future revision.. Use of mkdocs plugins will not reliably render on the Nextra site.
+
+### Legacy Websites
+
+We have two web sites, as follows.
+
+- `https://kubestellar.io`. This was hosted by GoDaddy and administered by [Andy Anderson](mailto://andy@clubanderson.com). It contains a few redirects. The most important is that `https://kubestellar.io/` redirects to `https://docs.kubestellar.io/`.
+- `https://docs.kubestellar.io`. This is a GitHub pages website based on the `github.com/kubestellar/kubestellar/` repository.
+
+**A contributor may have their own copy of the docs website**, at `https://CONTRIBUTOR.github.io/${fork_name}`, if they have [set up the fork properly to render the webpages](#creating-a-fork-that-can-use-the-generate-and-push-docs-action). This is useful for generating previews of changes before they are merged into the `main` branch of the shared repository. **A PR that modifies the website should include such a preview.** See the section below on [Serving up documents globally from a fork of the repo via GitHub](#serving-up-documents-globally-from-a-fork-of-the-repository-via-github).
+
+
+### GitHub pages -- LEGACY Site
 
 Our documentation is powered by [mike](https://github.com/jimporter/mike) and [MkDocs](https://www.mkdocs.org/). MkDocs is powered by [Python-Markdown](https://pypi.org/project/Markdown/). These are immensely configurable and extensible. You can see our MkDocs configuration in `docs/mkdocs.yml`. Following are some of the choices we have made.
 
@@ -51,13 +141,15 @@ Our documentation is powered by [mike](https://github.com/jimporter/mike) and [M
 - [Pygments](https://pypi.org/project/Pygments/) for even fancier code highlighting.
 - MkDocs plugin [mkdocs-static-i18n](https://github.com/ultrabug/mkdocs-static-i18n/tree/0.53#readme) to support multiple languages. We currently only have documentation in English. If you're interested in contributing translations, please let us know!
 
-#### Note on using include-markdown for "wrapper" files
+#### LEGACY: Note on using include-markdown for "wrapper" files
 
 There are several places where pages in the website are generated by including a file in the root of the repository by wrapping it in a short file in the docs file tree via an include directive. This is especially used for including assorted REQUIRED files from the root (denoted by all-caps filenames). For ease of navigation _during the editing process_ such wrapper files should be indicated by including **-inc** or **-include** as part of their filename. This will reduce the chance of a future documentation contributor editing the wrong file.
 
 -----
 
-## Rendering and Previewing modifications to the website
+## LEGACY: Rendering and Previewing modifications to the website
+
+**Note: a properly configured PR for the NEXTRA site will automatically deploy a preview site via Netlify**
 
 You may preview possible changes to the website either
 (a) by downloading and rendering the documents locally, or
