@@ -249,11 +249,11 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/release-0.29.0/contribution-guidelines/operations/document-management/</loc>
+         <loc>https://docs.kubestellar.io/release-0.29.0/contribution-guidelines/operations/mkdocs-management/</loc>
          <lastmod>2025-11-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.29.0/en/contribution-guidelines/operations/document-management/"/>
-         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/release-0.29.0/fr/contribution-guidelines/operations/document-management/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.29.0/en/contribution-guidelines/operations/mkdocs-management/"/>
+         <xhtml:link rel="alternate" hreflang="fr" href="https://docs.kubestellar.io/release-0.29.0/fr/contribution-guidelines/operations/mkdocs-management/"/>
          
     </url>
     <url>
