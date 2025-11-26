@@ -1,6 +1,15 @@
 ## Kubestellar Website Overview 
 
+**The KubeStellar website is upgrading from an mkdocs-based collection of sites for all its components to a unified Nextra-based site which can display documents imported from all of the Github repositories in the KubeStellar project**
+
+THIS IS A SUPERFLUOUS copy of this file and is scheduled to be removed.
+
+
+
+
 ### Websites
+
+
 
 We have two web sites, as follows.
 
@@ -492,7 +501,7 @@ All of this is invoke in a target in our <a href="{{ config.repo_url }}/blob/{{c
 ``` {.bash .no-copy}
 .PHONY: docs-ecutable
 docs-ecutable: 
-	MANIFEST=$(MANIFEST) docs/scripts/docs-ecutable.sh
+    MANIFEST=$(MANIFEST) docs/scripts/docs-ecutable.sh
 ```
 
 You give the path from that follows the '{{config.repo_url}}/docs' path, and name of the .md file you want to 'execute'/'test' as the value for the <b><i>MANIFEST</i></b> variable:
@@ -516,10 +525,10 @@ All of this is invoked in a target in our <a href="{{ config.repo_url }}/blob/{{
 ``` {.bash .no-copy}
 .PHONY: execute-html
 execute-html: venv
-	. $(VENV)/activate; \
-	cd docs; \
-	mkdocs build; \
-	scripts/execute-html.sh "$$PWD/.." "generated/$(MANIFEST)/index.html"
+    . $(VENV)/activate; \
+    cd docs; \
+    mkdocs build; \
+    scripts/execute-html.sh "$$PWD/.." "generated/$(MANIFEST)/index.html"
 ```
 
 The `make` target requires the variable `MANIFEST` to be set to the directory that contains the generated `index.html` file, relative to '{{config.repo_url}}/docs/generated'. This is the name of the markdown source file, relative to '{{config.repo_url}}/docs/content' and with the `.md` extension dropped.

@@ -1,5 +1,17 @@
 # Testing a KubeStellar documentation PR
 
+The new Nextra-based kubestellar/docs repository will create a preview Site via netlify whenever a PR is created for a branch of the repository.
+
+This process is automated and we intend to extend it to PRs from forks of the docs repository.
+
+Note, however that this process is *not* triggered by modifications to the markdown files in the kubestellar component repositories which are imported into the main kubestellar.io website. We are investigating how best to generate previews of such changes.
+
+Note that any PRs created for the website _must_ include a preview site to enable a visual demonstration for the review process.
+
+---
+---
+### Legacy notes about PRs for the doc site -- may no longer be applicable
+
 If a contributor has _**not**_ created a sharable preview of a documentation PR [as documented in the documents management overview](document-management.md#serving-up-documents-globally-from-a-fork-of-the-repository-via-github) , here are the steps to checkout a git pull request for local testing.
 
 ## STEP 1: Checkout the Pull Request**
