@@ -114,10 +114,11 @@ node --version
 ## We look forward to seeing your contributions!
 
 ---
-
+>:warning:  The following material is from the legacy mkdocs site and may not apply to the Nextra site. It is subject to revision/deletion in the near future.
 ---
-## The following material is only included for reference re the legacy mkdocs version of the site and will be deleted in a future revision.. Use of mkdocs plugins will not reliably render on the Nextra site.
 
+>:info: Active javascript variables  will not reliably render on the Nextra site and have been replaced with mnemonic strings like `REPO_OWNER`
+---
 ### Legacy Websites
 
 We have two web sites, as follows.
@@ -125,7 +126,7 @@ We have two web sites, as follows.
 - `https://kubestellar.io`. This was hosted by GoDaddy and administered by [Andy Anderson](mailto://andy@clubanderson.com). It contains a few redirects. The most important is that `https://kubestellar.io/` redirects to `https://docs.kubestellar.io/`.
 - `https://docs.kubestellar.io`. This is a GitHub pages website based on the `github.com/kubestellar/kubestellar/` repository.
 
-**A contributor may have their own copy of the docs website**, at `https://CONTRIBUTOR.github.io/${fork_name}`, if they have [set up the fork properly to render the webpages](#creating-a-fork-that-can-use-the-generate-and-push-docs-action). This is useful for generating previews of changes before they are merged into the `main` branch of the shared repository. **A PR that modifies the website should include such a preview.** See the section below on [Serving up documents globally from a fork of the repo via GitHub](#serving-up-documents-globally-from-a-fork-of-the-repository-via-github).
+**A contributor may have their own copy of the docs website**, at `https://CONTRIBUTOR.github.io/FORK_NAME`, if they have [set up the fork properly to render the webpages](#creating-a-fork-that-can-use-the-generate-and-push-docs-action). This is useful for generating previews of changes before they are merged into the `main` branch of the shared repository. **A PR that modifies the website should include such a preview.** See the section below on [Serving up documents globally from a fork of the repo via GitHub](#serving-up-documents-globally-from-a-fork-of-the-repository-via-github).
 
 
 ### GitHub pages -- LEGACY Site
@@ -224,7 +225,7 @@ in your PR.
 6. Select the branch you wish to render and click on the second Run Workflow Button ![Selecting the branch to render](https://github.com/user-attachments/assets/427b827d-555c-4d36-b9c8-485eda002428)
 7. If that workflow completes successfully, it will automatically call the **Pages build and deployment** workflow.
 8. You can observe the progress of the workflows on the Actions page; a green checkmark circle indicates successful completion.<br />![Relevant workflow runs](https://github.com/user-attachments/assets/b9ce40f8-b744-4b3c-bc20-a4814243e85e)
-9. After a minute or so, you should be able to preview your new version of the website at `https://${repo_owner}.github.io/${fork_name}/${branch_name}`
+9. After a minute or so, you should be able to preview your new version of the website at `https://REPO_OWNER.github.io/FORK_NAME/BRANCH_NAME`
 
 #### Informational Errors
 
@@ -234,7 +235,7 @@ The "Generate and push docs" workflow triggers the broken links crawler workflow
 
 Each branch of your fork will render as its own version. You can use the release dropdown inside the rendered pages to quickly switch between versions.
 
-Note: the **main** branch will render as `https://${repo_owner}.github.io/${fork_name}/main`, **NOT** as "unreleased-development" which is a special alias on the main kubestellar.io website.
+Note: the **main** branch will render as `https://REPO_OWNDER.github.io/FORK_NAME/main`, **NOT** as "unreleased-development" which is a special alias on the main kubestellar.io website.
 
 #### Removing outdated (draft branch) versions after rendering
 
@@ -712,7 +713,7 @@ Use `mike delete $branch_name`, either acting locally on your checked out `gh-pa
 ## Publishing Workflow
 
 All documentation building and publishing is done using GitHub Actions in
-`.github/workflows/docs-gen-and-push.yml`. This workflow is triggered either manually or by a push to a branch named `main` or `release-<something>` or `doc-<something>`. This workflow will actually do something _ONLY_ if either (a) it is acting on the shared GitHub repository at `github.com/kubestellar/kubestellar` and on behalf of the repository owner or (b) it is acting on a contributor's fork of that repo and on behalf of that same contributor. The published site appears at `https://pages.github.io/kubestellar/${branch}` in case (a) and at `https://${repo_owner}.github.io/${fork_name}/${branch}` in case (b). This workflow will build and publish a website _version_ whose name is the same as the name of the branch that it is working on. This workflow will also update the relevant `mike` alias, if necessary.
+`.github/workflows/docs-gen-and-push.yml`. This workflow is triggered either manually or by a push to a branch named `main` or `release-<something>` or `doc-<something>`. This workflow will actually do something _ONLY_ if either (a) it is acting on the shared GitHub repository at `github.com/kubestellar/kubestellar` and on behalf of the repository owner or (b) it is acting on a contributor's fork of that repo and on behalf of that same contributor. The published site appears at `https://pages.github.io/kubestellar/BRANCH` in case (a) and at `https://REPO_OWNER.github.io/FORM_NAME/BRANCH` in case (b). This workflow will build and publish a website _version_ whose name is the same as the name of the branch that it is working on. This workflow will also update the relevant `mike` alias, if necessary.
 
 The `.github/workflows/docs-gen-and-push.yml` workflow only updates
 the `gh-pages` branch of the relevant repo. There is one more step
