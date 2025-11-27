@@ -14,6 +14,10 @@ spec:
     spec:
       template:
         spec:
+          volumes:
+          - name: wds-kubeconfig-volume
+            secret:
+              secretName: '{{"{{.WDSSecretName}}"}}'
           containers:
           - name: create-argocd-secret
             image: quay.io/kubestellar/kubectl:{{$.Values.KUBECTL_VERSION}}
@@ -26,7 +30,7 @@ spec:
               
               echo "Creating ArgoCD Secret for WDS {{"{{.ControlPlaneName}}"}}"
               
-              # TODO: Get kubeconfig from mounted WDS secret (to be added)
+              # TODO: Get kubeconfig from mounted WDS secret at /etc/kube/wds (to be added)
               
               # Create ArgoCD cluster Secret
               cat <<YAML | kubectl apply -f -
@@ -48,7 +52,10 @@ spec:
                     }
                   }
               YAML
-              
+            volumeMounts:
+            - name: wds-kubeconfig-volume
+              mountPath: /etc/kube/wds
+              readOnly: true
           restartPolicy: Never
       backoffLimit: 1
 {{- end }}
