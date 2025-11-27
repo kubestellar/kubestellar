@@ -11,15 +11,12 @@ spec:
   postCreateHooks:
     - hookName: kubestellar-controller
       vars:
-        APIGroups: '{{ .APIGroups | default "" }}'
+        APIGroups: "{{ .APIGroups | default "" }}"
     - hookName: transport-controller
-      vars:
-        WDSSecretName: admin-kubeconfig
-        WDSkubeconfig: kubeconfig-incluster
     {{- if $.Values.argocd.install }}
     - hookName: argocd-wds-registration
     {{- end }}
   globalVars:
     ControlPlaneName: {{ .name }}
-    ITSName: '{{ .ITSName | default "" }}'
+    ITSName: "{{ .ITSName | default "" }}"
 {{- end }}
