@@ -14,16 +14,6 @@ spec:
     spec:
       template:
         spec:
-          initContainers:
-          - name: wait-wds-ready
-            image: quay.io/kubestellar/kubectl:{{$.Values.KUBECTL_VERSION}}
-            command:
-            - kubectl
-            - wait
-            - --for=condition=Ready
-            - controlplane/{{"{{.ControlPlaneName}}"}}
-            - --timeout=300s
-          
           containers:
           - name: create-argocd-secret
             image: quay.io/kubestellar/kubectl:{{$.Values.KUBECTL_VERSION}}
@@ -33,17 +23,10 @@ spec:
               set -e
               
               # TODO: Implement kubeconfig extraction and Secret creation
-              # This is a placeholder structure waiting for Franco's guidance
               
               echo "Creating ArgoCD Secret for WDS {{"{{.ControlPlaneName}}"}}"
               
-              # Get kubeconfig from WDS secret
-              # key=$(kubectl get controlplane {{"{{.ControlPlaneName}}"}} -o=jsonpath='{.status.secretRef.inClusterKey}')
-              # secret_name=$(kubectl get controlplane {{"{{.ControlPlaneName}}"}} -o=jsonpath='{.status.secretRef.name}')
-              # secret_namespace=$(kubectl get controlplane {{"{{.ControlPlaneName}}"}} -o=jsonpath='{.status.secretRef.namespace}')
-              
-              # Parse kubeconfig and extract certificates
-              # TODO: Need to extract caData, certData, keyData
+              # TODO: Get kubeconfig from mounted WDS secret (to be added)
               
               # Create ArgoCD cluster Secret
               cat <<YAML | kubectl apply -f -
