@@ -73,7 +73,7 @@ Perfect for DevOps teams managing edge deployments, hybrid clouds, or geographic
       compatibility: ["Linux", "macOS", "Windows"],
       screenshots: [],
       documentation: "https://docs.kubestellar.io/plugins/kubectl-multi",
-      github: "https://github.com/kubestellar/kubectl-multi",
+      github: "https://github.com/kubestellar/kubectl-multi-plugin",
       tags: ["kubectl", "multi-cluster", "cli", "automation", "productivity"],
     },
     {
