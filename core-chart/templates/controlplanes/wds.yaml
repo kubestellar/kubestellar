@@ -16,6 +16,9 @@ spec:
       vars:
         WDSSecretName: admin-kubeconfig
         WDSkubeconfig: kubeconfig-incluster
+    {{- if $.Values.argocd.install }}
+    - hookName: argocd-wds-registration
+    {{- end }}
   globalVars:
     ControlPlaneName: {{ .name }}
     ITSName: '{{ .ITSName | default "" }}'

@@ -1,0 +1,71 @@
+{{- if and .Values.argocd.install .Values.InstallPCHs }}
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: PostCreateHook
+metadata:
+  name: argocd-wds-registration
+  labels:
+    kflex.kubestellar.io/cptype: wds
+spec:
+  templates:
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: '{{"{{.HookName}}"}}'
+    spec:
+      template:
+        spec:
+          initContainers:
+          - name: wait-wds-ready
+            image: quay.io/kubestellar/kubectl:{{$.Values.KUBECTL_VERSION}}
+            command:
+            - kubectl
+            - wait
+            - --for=condition=Ready
+            - controlplane/{{"{{.ControlPlaneName}}"}}
+            - --timeout=300s
+          
+          containers:
+          - name: create-argocd-secret
+            image: quay.io/kubestellar/kubectl:{{$.Values.KUBECTL_VERSION}}
+            command: ["/bin/bash", "-c"]
+            args:
+            - |
+              set -e
+              
+              # TODO: Implement kubeconfig extraction and Secret creation
+              # This is a placeholder structure waiting for Franco's guidance
+              
+              echo "Creating ArgoCD Secret for WDS {{"{{.ControlPlaneName}}"}}"
+              
+              # Get kubeconfig from WDS secret
+              # key=$(kubectl get controlplane {{"{{.ControlPlaneName}}"}} -o=jsonpath='{.status.secretRef.inClusterKey}')
+              # secret_name=$(kubectl get controlplane {{"{{.ControlPlaneName}}"}} -o=jsonpath='{.status.secretRef.name}')
+              # secret_namespace=$(kubectl get controlplane {{"{{.ControlPlaneName}}"}} -o=jsonpath='{.status.secretRef.namespace}')
+              
+              # Parse kubeconfig and extract certificates
+              # TODO: Need to extract caData, certData, keyData
+              
+              # Create ArgoCD cluster Secret
+              cat <<YAML | kubectl apply -f -
+              apiVersion: v1
+              kind: Secret
+              metadata:
+                name: {{"{{.ControlPlaneName}}"}}-cluster
+                namespace: {{$.Release.Namespace}}
+                labels:
+                  argocd.argoproj.io/secret-type: cluster
+              type: Opaque
+              stringData:
+                name: {{"{{.ControlPlaneName}}"}}
+                server: https://{{"{{.ControlPlaneName}}"}}.svc
+                config: |
+                  {
+                    "tlsClientConfig": {
+                      "insecure": false
+                    }
+                  }
+              YAML
+              
+          restartPolicy: Never
+      backoffLimit: 1
+{{- end }}
