@@ -1,8 +1,8 @@
 actions/checkout:
-  sha: 08c6903cd8c0fde910a37f88322edcfb5dd907a8
-  sha-url: https://github.com/actions/checkout/commit/08c6903cd8c0fde910a37f88322edcfb5dd907a8
-  tag: v5.0.0
-  tag-url: https://github.com/actions/checkout/tree/v5.0.0
+  sha: 1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+  sha-url: https://github.com/actions/checkout/commit/1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+  tag: v6.0.0
+  tag-url: https://github.com/actions/checkout/tree/v6.0.0
 actions/stale:
   sha: 5f858e3efba33a5ca4407a664cc011ad407f2008
   sha-url: https://github.com/actions/stale/commit/5f858e3efba33a5ca4407a664cc011ad407f2008
@@ -34,15 +34,15 @@ actions/setup-python:
   tag: v6.0.0
   tag-url: https://github.com/actions/setup-python/tree/v6.0.0
 actions/setup-go:
-  sha: 44694675825211faa026b3c33043df3e48a5fa00
-  sha-url: https://github.com/actions/setup-go/commit/44694675825211faa026b3c33043df3e48a5fa00
-  tag: v6.0.0
-  tag-url: https://github.com/actions/setup-go/tree/v6.0.0
+  sha: 4dc6199c7b1a012772edbd06daecab0f50c9053c
+  sha-url: https://github.com/actions/setup-go/commit/4dc6199c7b1a012772edbd06daecab0f50c9053c
+  tag: v6.1.0
+  tag-url: https://github.com/actions/setup-go/tree/v6.1.0
 anchore/sbom-action/download-syft:
-  sha: 8e94d75ddd33f69f691467e42275782e4bfefe84
-  sha-url: https://github.com/anchore/sbom-action/commit/8e94d75ddd33f69f691467e42275782e4bfefe84
-  tag: v0.20.9
-  tag-url: https://github.com/anchore/sbom-action/tree/v0.20.9
+  sha: fbfd9c6c189226748411491745178e0c2017392d
+  sha-url: https://github.com/anchore/sbom-action/commit/fbfd9c6c189226748411491745178e0c2017392d
+  tag: v0.20.10
+  tag-url: https://github.com/anchore/sbom-action/tree/v0.20.10
 goreleaser/goreleaser-action:
   sha: e435ccd777264be153ace6237001ef4d979d3a7a
   sha-url: https://github.com/goreleaser/goreleaser-action/commit/e435ccd777264be153ace6237001ef4d979d3a7a
