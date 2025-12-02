@@ -49,7 +49,7 @@ type ResolutionBroker interface {
 }
 
 type ResolutionCallbacks struct {
-	BindingPolicyChanged                 func(bindingPolicyKey string)
+	BindingPolicyChanged        func(bindingPolicyKey string)
 	ReportedStateRequestChanged func(bindingPolicyKey string, objId util.ObjectIdentifier)
 }
 
