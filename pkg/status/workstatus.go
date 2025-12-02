@@ -132,7 +132,7 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 	wantSingleton := wantReturn && !isMultiWEC
 	wantMultiWEC := wantReturn && isMultiWEC
 
-	if !wantReturn && !wantMultiWEC && !wantSingleton {
+	if !wantReturn && !haveMultiWEC && !haveSingleton {
 		logger.V(5).Info("Workload object neither wants nor has returned status", "objectIdentifier", objectIdentifier)
 		return nil
 	}
@@ -172,13 +172,17 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 	}
 
 	if haveSingleton && !wantReturn {
-		// Need to remove the label alleging that the workload object has returned reported state for singleton
-		return c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, util.BindingPolicyLabelSingletonStatusKey)
+		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, util.BindingPolicyLabelSingletonStatusKey)
+		if err != nil {
+			return err
+		}
 	}
 
 	if haveMultiWEC && !wantReturn {
-		// Need to remove the label alleging that the workload object has returned reported state for multi-WEC
-		return c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, util.BindingPolicyLabelMultiWECStatusKey)
+		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, util.BindingPolicyLabelMultiWECStatusKey)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
