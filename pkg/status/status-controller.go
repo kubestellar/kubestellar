@@ -177,7 +177,7 @@ func NewController(logger logr.Logger,
 			controller.workqueue.Add(bindingRef(bindingPolicyKey))
 		},
 		ReportedStateRequestChanged: func(bindingPolicyKey string, objId util.ObjectIdentifier) {
-			logger.V(5).Info("Enqueuing reference to workload object due to change in singleton return request", "binding", bindingPolicyKey, "objId", objId)
+			logger.V(5).Info("Enqueuing reference to workload object due to change in reported state request", "binding", bindingPolicyKey, "objId", objId)
 			controller.workqueue.Add(workloadObjectRef{objId})
 		}})
 	if err != nil {
