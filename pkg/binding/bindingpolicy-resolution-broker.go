@@ -49,8 +49,8 @@ type ResolutionBroker interface {
 }
 
 type ResolutionCallbacks struct {
-	BindingPolicyChanged                 func(bindingPolicyKey string)
-	SingletonReportedStateRequestChanged func(bindingPolicyKey string, objId util.ObjectIdentifier)
+	BindingPolicyChanged        func(bindingPolicyKey string)
+	ReportedStateRequestChanged func(bindingPolicyKey string, objId util.ObjectIdentifier)
 }
 
 // Resolution is an internal representation of what a BindingPolicy is calling for.
@@ -155,7 +155,7 @@ func (broker *resolutionBroker) NotifyReportedStateRequestCallbacks(bindingPolic
 
 	for idx, callbacks := range broker.callbackses {
 		klog.InfoS("Relaying reported state request callback", "binding", bindingPolicyKey, "objId", objId, "idx", idx, "callbacks", callbacks)
-		callbacks.SingletonReportedStateRequestChanged(bindingPolicyKey, objId)
+		callbacks.ReportedStateRequestChanged(bindingPolicyKey, objId)
 	}
 
 }
