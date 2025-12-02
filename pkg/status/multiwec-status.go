@@ -80,7 +80,7 @@ func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdent
 	}
 
 	if len(statuses) == 1 {
-		if err := c.updateObjectStatus(ctx, wObjID, statuses[0], c.listers, true); err != nil {
+		if err := c.updateObjectStatus(ctx, wObjID, statuses[0], c.listers, false); err != nil {
 			return err
 		}
 		return nil
