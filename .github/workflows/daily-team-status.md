@@ -17,7 +17,9 @@ permissions:
   contents: read
   issues: read
   pull-requests: read
-network: defaults
+network:
+  firewall: true
+sandbox: awf
 tools:
   github:
 safe-outputs:
