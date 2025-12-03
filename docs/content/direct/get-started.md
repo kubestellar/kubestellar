@@ -14,6 +14,10 @@ The two ways to create this simple configuration are as follows.
 
 For some users on WSL, use of the setup procedure on this page and/or the demo environment creation script may require running as the user `root` in Linux. There is a [known issue about this](knownissue-helm-ghcr.md).
 
+### Note for MacOS users
+Running multiple `kind` clusters on macOS may require increasing Docker Desktop’s memory allocation  
+(4–6 GB recommended). Users with 8 GB RAM should avoid running more than 2–3 clusters concurrently or prefer `k3d` for lower overhead.
+
 ### Important: Shell Variables for Example Scenarios
 
 After completing the setup, you will need to define several shell variables to run the example scenarios. The meanings of these variables are defined [at the start of the example scenarios document](example-scenarios.md#assumptions-and-variables). What is shown later in this document are the specific values that are correct for the setup procedure described in this guide.
