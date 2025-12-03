@@ -16,24 +16,23 @@ limitations under the License.
 
 package aggregation
 
-func AggregateDeploymentStatus(statuses []map[string]any) (map[string]any, error) {
+func AggregateReplicaSetStatus(statuses []map[string]any) (map[string]any, error) {
 
 	aggregatedStatus := make(map[string]any)
 
 	aggregatedStatus["replicas"] = GetMin(statuses, "replicas")
-	aggregatedStatus["updatedReplicas"] = GetMin(statuses, "updatedReplicas")
-	aggregatedStatus["availableReplicas"] = GetMin(statuses, "availableReplicas")
+	aggregatedStatus["fullyLabeledReplicas"] = GetMin(statuses, "fullyLabeledReplicas")
 	aggregatedStatus["readyReplicas"] = GetMin(statuses, "readyReplicas")
-	aggregatedStatus["unavailableReplicas"] = GetMax(statuses, "unavailableReplicas")
+	aggregatedStatus["availableReplicas"] = GetMin(statuses, "availableReplicas")
 	aggregatedStatus["observedGeneration"] = GetMin(statuses, "observedGeneration")
 
-	aggregatedStatus["conditions"] = aggregateConditions(statuses)
+	aggregatedStatus["conditions"] = aggregateReplicaSetConditions(statuses)
 
 	return aggregatedStatus, nil
 }
 
-func aggregateConditions(statuses []map[string]any) []any {
-	// we focus on type Progressing with containing reason ProgressDeadlineExceeded which is checked by Argo for determining health
+func aggregateReplicaSetConditions(statuses []map[string]any) []any {
+	// Focus on type ReplicaFailure condition which indicates issues with replica creation
 	// If any of the statuses contains it we return its condition as aggregated condition
 
 	for _, status := range statuses {
@@ -50,7 +49,7 @@ func aggregateConditions(statuses []map[string]any) []any {
 				continue
 			}
 
-			if c["type"] == "Progressing" && c["reason"] == "ProgressDeadlineExceeded" {
+			if c["type"] == "ReplicaFailure" {
 				return []any{cond}
 			}
 
