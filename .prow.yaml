@@ -64,6 +64,8 @@ presubmits:
           command:
             - ./test/e2e/ci/test-demo-env.sh
             - kind
+          securityContext:
+            privileged: true
           resources:
             requests:
               memory: 8Gi
@@ -80,6 +82,8 @@ presubmits:
           command:
             - ./test/e2e/ci/test-demo-env.sh
             - k3d
+          securityContext:
+            privileged: true
           resources:
             requests:
               memory: 8Gi
