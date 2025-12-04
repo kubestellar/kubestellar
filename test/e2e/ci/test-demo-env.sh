@@ -45,6 +45,12 @@ echo "Demo environment created successfully with $platform"
 # Run E2E test only for kind since use-kubestellar.sh only supports kind,ocp
 if [ "$platform" == "kind" ]; then
     echo "Running E2E bash test for $platform..."
+
+    # Do the steps in ${common_srcs}/setup-kubestellar.sh not already done
+    kubectl --context its1 label managedcluster cluster1 region=east
+    kubectl --context its1 create cm -n customization-properties cluster1 --from-literal clusterURL=https://my.clusters/1001-abcd
+    kubectl --context its1 label managedcluster cluster2 region=west
+    kubectl --context its1 create cm -n customization-properties cluster2 --from-literal clusterURL=https://my.clusters/2002-cdef
     
     cd "${bash_dir}"
     if ! ./use-kubestellar.sh --env $platform; then
