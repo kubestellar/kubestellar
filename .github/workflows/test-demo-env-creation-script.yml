@@ -192,7 +192,7 @@ jobs:
           date
           set -x
           kubectl --context k3d-kubeflex get pods -A
-          kubectl --context k3d-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do { echo; kubectl --context k3d-kubeflex describe pod -n $ns $name; echo; kubectl --context k3d-kubeflex get pod -n $ns $name -o 'jsonpath={.spec.initContainers}' | jq -r '.[] | .name' | while read ctr; do echo -e "\nLog for ns $ns pod $name initContainer $ctr:\n";  kubectl --context k3d-kubeflex logs -n $ns $name || true; done; kubectl --context k3d-kubeflex get pod -n $ns $name -o 'jsonpath={.spec.containers}' | jq -r '.[] | .name' | while read ctr; do echo -e "\nLog for ns $ns pod $name container $ctr:\n";  kubectl --context k3d-kubeflex logs -n $ns $name || true; done; } || true; done
+          kubectl --context k3d-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do { echo; kubectl --context k3d-kubeflex describe pod -n $ns $name; echo; kubectl --context k3d-kubeflex get pod -n $ns $name -o 'jsonpath={.spec.initContainers}' | jq -r '.[] | .name' | while read ctr; do echo -e "\nLog for ns $ns pod $name initContainer $ctr:\n";  kubectl --context k3d-kubeflex logs -n $ns $name -c "$ctr" || true; done; kubectl --context k3d-kubeflex get pod -n $ns $name -o 'jsonpath={.spec.containers}' | jq -r '.[] | .name' | while read ctr; do echo -e "\nLog for ns $ns pod $name container $ctr:\n";  kubectl --context k3d-kubeflex logs -n $ns $name -c "$ctr" || true; done; } || true; done
 
       - name: show KubeFlex ControlPlane objects
         if: always()
