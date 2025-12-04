@@ -52,39 +52,3 @@ presubmits:
             requests:
               memory: 4Gi
               cpu: 2
-
-  - name: pull-kubestellar-test-demo-env-kind
-    optional: true
-    run_if_changed: "^scripts/create-kubestellar-demo-env\\.sh$"
-    decorate: true
-    clone_uri: "https://github.com/kubestellar/kubestellar"
-    spec:
-      containers:
-        - image: ghcr.io/kubestellar/infra/build:1.24.2-1
-          command:
-            - ./test/e2e/ci/test-demo-env.sh
-            - kind
-          securityContext:
-            privileged: true
-          resources:
-            requests:
-              memory: 8Gi
-              cpu: 4
-
-  - name: pull-kubestellar-test-demo-env-k3d
-    optional: true
-    run_if_changed: "^scripts/create-kubestellar-demo-env\\.sh$"
-    decorate: true
-    clone_uri: "https://github.com/kubestellar/kubestellar"
-    spec:
-      containers:
-        - image: ghcr.io/kubestellar/infra/build:1.24.2-1
-          command:
-            - ./test/e2e/ci/test-demo-env.sh
-            - k3d
-          securityContext:
-            privileged: true
-          resources:
-            requests:
-              memory: 8Gi
-              cpu: 4
