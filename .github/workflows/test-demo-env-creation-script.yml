@@ -6,16 +6,12 @@ on:
   # So we can trigger manually if needed
   workflow_dispatch:
   pull_request:
-    paths-ignore:
-      - "docs/**"
-      - ".github/ISSUE_TEMPLATE/**"
-      - ".github/workflows/**"
-      - "!.github/workflows/pr-test-e2e.yml"
-      - "**/*.md"
-      - ".gha-reversemap.yml"
-      - "hack/verify-*"
-      - "hack/boilerplate/*"
-      - "hack/gha-reversemap.sh"
+    paths:
+      - ".github/workflows/test-demo-env-creation-script.yml"
+      - "scripts/create-kubestellar-demo-env.sh"
+      - "test/e2e/ci/test-demo-env.sh"
+      - "test/e2e/common/setup-shell.sh"
+      - "test/e2e/bash/use-kubestellar.sh"
   push:
     paths:
       - ".github/workflows/test-demo-env-creation-script.yml"
@@ -194,8 +190,13 @@ jobs:
         if: always()
         run: |
           date
+          set -x
           kubectl --context k3d-kubeflex get pods -A
-          kubectl --context k3d-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context k3d-kubeflex describe pod -n $ns $name; echo; kubectl --context k3d-kubeflex logs -n $ns $name || true; done
+          kubectl --context k3d-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do { echo; kubectl --context k3d-kubeflex describe pod -n $ns $name; echo; kubectl --context k3d-kubeflex get pod -n $ns $name -o 'jsonpath={.spec.initContainers}' | jq -r '.[] | .name' | while read ctr; do echo -e "\nLog for ns $ns pod $name initContainer $ctr:\n";  kubectl --context k3d-kubeflex logs -n $ns $name || true; done; kubectl --context k3d-kubeflex get pod -n $ns $name -o 'jsonpath={.spec.containers}' | jq -r '.[] | .name' | while read ctr; do echo -e "\nLog for ns $ns pod $name container $ctr:\n";  kubectl --context k3d-kubeflex logs -n $ns $name || true; done; } || true; done
+
+      - name: show KubeFlex ControlPlane objects
+        if: always()
+        run: kubectl --context k3d-kubeflex get ControlPlane -o yaml
 
       - name: Dump kubeflex-controller-manager logs
         if: always()
@@ -234,6 +235,10 @@ jobs:
       - name: show transport controller log
         if: always()
         run: kubectl --context k3d-kubeflex -n wds1-system logs $(kubectl --context k3d-kubeflex -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}')
+
+      - name: show ConfigMap transport-controller-config
+        if: always()
+        run: kubectl --context k3d-kubeflex get cm -n wds1-system transport-controller-config -o yaml
 
       - name: show bindingpolicies
         if: always()
