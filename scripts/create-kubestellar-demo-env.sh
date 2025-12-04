@@ -242,17 +242,31 @@ done
 
 echo -e "Checking that the CSR for cluster 1 and 2 appears..."
 
-echo""
+echo
 echo "Waiting for cluster1 and cluster2 to be ready and then approve their CSRs"
 checking_cluster cluster1
 checking_cluster cluster2
 
-echo""
+echo
 echo "Checking the new clusters are in the OCM inventory and label them"
 kubectl --context its1 get managedclusters
 kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
 kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
-echo""
+
+echo
+echo Waiting for transport controller to create namespace customization-properties
+# We allow versions of kubectl that do not support `kubectl wait --for=create`
+wait_counter=0
+while ! (kubectl --context its1 get ns customization-properties) ; do
+    if (($wait_counter > 20)); then
+        echo "Namespace customization-properties failed to appear!" >&2
+        exit 1
+    fi
+    ((wait_counter += 1))
+    sleep 10
+done
+
+echo
 echo -e "\033[33m✔\033[0m Congratulations! Your KubeStellar demo environment is now ready to use."
 
 cat <<EOF

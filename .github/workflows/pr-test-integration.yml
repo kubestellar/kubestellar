@@ -20,7 +20,7 @@ on:
       - "docs/**"
       - ".github/ISSUE_TEMPLATE/**"
       - ".github/workflows/**"
-      - "!.github/workflows/pr-test-e2e.yml"
+      - "!.github/workflows/pr-test-integration.yml"
       - "**/*.md"
       - ".gha-reversemap.yml"
       - "hack/verify-*"
