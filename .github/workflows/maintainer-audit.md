@@ -15,13 +15,52 @@ permissions: read-all
 
 tools:
   github:
-    read-only: true
+    allowed:
+      - get_file_contents
+      - search_issues
+      - search_pull_requests
+      - list_commits
   bash:
-  cache-memory: true
-  edit:
 
 safe-outputs:
   jobs:
+    update-audit-state:
+      description: "Update audit state file via PR"
+      runs-on: ubuntu-latest
+      output: "State updated successfully!"
+      inputs:
+        state_content:
+          description: "JSON content for .github/audit-state.json"
+          required: true
+          type: string
+        username:
+          description: "Username just audited"
+          required: true
+          type: string
+      permissions:
+        contents: write
+        pull-requests: write
+      steps:
+        - uses: actions/checkout@v4
+        - name: Update state file
+          run: |
+            mkdir -p .github
+            echo '${{ inputs.state_content }}' > .github/audit-state.json
+        - name: Create PR with state update
+          uses: peter-evans/create-pull-request@v6
+          with:
+            commit-message: "chore: update maintainer audit progress to @${{ inputs.username }}"
+            branch: "audit-state-${{ inputs.username }}-${{ github.run_number }}"
+            title: "chore: audit state update for @${{ inputs.username }}"
+            body: |
+              Automated audit state update.
+              
+              **Maintainer:** @${{ inputs.username }}
+              **Run:** ${{ github.run_number }}
+            delete-branch: true
+            add-paths: |
+              .github/audit-state.json
+    
     send-maintainer-email:
       description: "Send maintainer audit report via Postmark"
       runs-on: ubuntu-latest
@@ -213,10 +252,11 @@ Scope the search to these repos:
 
 ## Process
 
-### Step 1: Check Cache Memory
-Load progress from `/tmp/gh-aw/cache-memory/maintainer_audit_progress.json`:
-- If found, read `last_index` and increment by 1
-- If not found or missing, start at index 0
+### Step 1: Load State from Repository
+Load progress from `.github/audit-state.json` in the repository:
+- Use `github.get_file_contents` to read the file
+- Parse JSON to get `last_index` and increment by 1
+- If file doesn't exist or fails to load, start at index 0
 
 ### Step 2: Select Next Maintainer
 - Get maintainer at current index from the list above (0-18)
@@ -331,19 +371,20 @@ Create a JSON entry for the email safe-output job:
 
 **Note:** Keep it as pure Markdown - no HTML conversion needed. Postmark will send as plain text.
 
-### Step 10: Update Cache Memory
+### Step 10: Output State Update
 
-Write to `/tmp/gh-aw/cache-memory/maintainer_audit_progress.json`:
+Create a safe-output entry to update the state file:
 ```json
 {
-  "last_index": {next_index},
-  "last_username": "{username}",
-  "last_audit_date": "{iso_timestamp}",
-  "last_result": "PASS or FAIL"
+  "type": "update_audit_state",
+  "state_content": "{\"last_index\": {next_index}, \"last_username\": \"{username}\", \"last_audit_date\": \"{iso_timestamp}\", \"last_result\": \"PASS or FAIL\"}",
+  "username": "{username}"
 }
 ```
 
-Where `next_index` is the current index + 1 (or 0 if wrapping).
+Where `next_index` is the current index + 1 (or 0 if wrapping to start of list).
+
+The safe-output job will create a PR to update `.github/audit-state.json`, ensuring state persists across runs.
 
 ## Example Markdown Email Structure
 

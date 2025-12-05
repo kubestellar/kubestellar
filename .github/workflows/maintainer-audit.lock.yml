@@ -41,13 +41,52 @@
 #
 # tools:
 #   github:
-#     read-only: true
+#     allowed:
+#       - get_file_contents
+#       - search_issues
+#       - search_pull_requests
+#       - list_commits
 #   bash:
-#   cache-memory: true
-#   edit:
 #
 # safe-outputs:
 #   jobs:
+#     update-audit-state:
+#       description: "Update audit state file via PR"
+#       runs-on: ubuntu-latest
+#       output: "State updated successfully!"
+#       inputs:
+#         state_content:
+#           description: "JSON content for .github/audit-state.json"
+#           required: true
+#           type: string
+#         username:
+#           description: "Username just audited"
+#           required: true
+#           type: string
+#       permissions:
+#         contents: write
+#         pull-requests: write
+#       steps:
+#         - uses: actions/checkout@v4
+#         - name: Update state file
+#           run: |
+#             mkdir -p .github
+#             echo '${{ inputs.state_content }}' > .github/audit-state.json
+#         - name: Create PR with state update
+#           uses: peter-evans/create-pull-request@v6
+#           with:
+#             commit-message: "chore: update maintainer audit progress to @${{ inputs.username }}"
+#             branch: "audit-state-${{ inputs.username }}-${{ github.run_number }}"
+#             title: "chore: audit state update for @${{ inputs.username }}"
+#             body: |
+#               Automated audit state update.
+#
+#               **Maintainer:** @${{ inputs.username }}
+#               **Run:** ${{ github.run_number }}
+#             delete-branch: true
+#             add-paths: |
+#               .github/audit-state.json
+#
 #     send-maintainer-email:
 #       description: "Send maintainer audit report via Postmark"
 #       runs-on: ubuntu-latest
@@ -177,12 +216,15 @@
 #   conclusion["conclusion"]
 #   detection["detection"]
 #   send_maintainer_email["send_maintainer_email"]
+#   update_audit_state["update_audit_state"]
 #   activation --> agent
 #   agent --> conclusion
 #   activation --> conclusion
 #   agent --> detection
 #   agent --> send_maintainer_email
 #   detection --> send_maintainer_email
+#   agent --> update_audit_state
+#   detection --> update_audit_state
 # ```
 #
 # Original Prompt:
@@ -240,10 +282,11 @@
 #
 # ## Process
 #
-# ### Step 1: Check Cache Memory
-# Load progress from `/tmp/gh-aw/cache-memory/maintainer_audit_progress.json`:
-# - If found, read `last_index` and increment by 1
-# - If not found or missing, start at index 0
+# ### Step 1: Load State from Repository
+# Load progress from `.github/audit-state.json` in the repository:
+# - Use `github.get_file_contents` to read the file
+# - Parse JSON to get `last_index` and increment by 1
+# - If file doesn't exist or fails to load, start at index 0
 #
 # ### Step 2: Select Next Maintainer
 # - Get maintainer at current index from the list above (0-18)
@@ -358,19 +401,20 @@
 #
 # **Note:** Keep it as pure Markdown - no HTML conversion needed. Postmark will send as plain text.
 #
-# ### Step 10: Update Cache Memory
+# ### Step 10: Output State Update
 #
-# Write to `/tmp/gh-aw/cache-memory/maintainer_audit_progress.json`:
+# Create a safe-output entry to update the state file:
 # ```json
 # {
-#   "last_index": {next_index},
-#   "last_username": "{username}",
-#   "last_audit_date": "{iso_timestamp}",
-#   "last_result": "PASS or FAIL"
+#   "type": "update_audit_state",
+#   "state_content": "{\"last_index\": {next_index}, \"last_username\": \"{username}\", \"last_audit_date\": \"{iso_timestamp}\", \"last_result\": \"PASS or FAIL\"}",
+#   "username": "{username}"
 # }
 # ```
 #
-# Where `next_index` is the current index + 1 (or 0 if wrapping).
+# Where `next_index` is the current index + 1 (or 0 if wrapping to start of list).
+#
+# The safe-output job will create a PR to update `.github/audit-state.json`, ensuring state persists across runs.
 #
 # ## Example Markdown Email Structure
 #
@@ -451,8 +495,6 @@
 # ```
 #
 # Pinned GitHub Actions:
-#   - actions/cache@v4 (0057852bfaa89a56745cba8c7296529d2fc39830)
-#     https://github.com/actions/cache/commit/0057852bfaa89a56745cba8c7296529d2fc39830
 #   - actions/checkout@v5 (93cb6efe18208431cddfb8368fd83d5badbf9bfd)
 #     https://github.com/actions/checkout/commit/93cb6efe18208431cddfb8368fd83d5badbf9bfd
 #   - actions/download-artifact@v6 (018cc2cf5baa6db3ef3c5f8a56943fffe632ef53)
@@ -596,26 +638,6 @@ jobs:
         run: |
           mkdir -p /tmp/gh-aw/agent
           echo "Created /tmp/gh-aw/agent directory for agentic workflow temporary files"
-      # Cache memory file share configuration from frontmatter processed below
-      - name: Create cache-memory directory
-        run: |
-          mkdir -p /tmp/gh-aw/cache-memory
-          echo "Cache memory directory created at /tmp/gh-aw/cache-memory"
-          echo "This folder provides persistent file storage across workflow runs"
-          echo "LLMs and agentic tools can freely read and write files in this directory"
-      - name: Cache memory file share data
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          key: memory-${{ github.workflow }}-${{ github.run_id }}
-          path: /tmp/gh-aw/cache-memory
-          restore-keys: |
-            memory-${{ github.workflow }}-
-            memory-
-      - name: Upload cache-memory data as artifact
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
-        with:
-          name: cache-memory
-          path: /tmp/gh-aw/cache-memory
       - name: Configure Git credentials
         env:
           REPO_NAME: ${{ github.repository }}
@@ -713,7 +735,7 @@ jobs:
         run: |
           mkdir -p /tmp/gh-aw/safeoutputs
           cat > /tmp/gh-aw/safeoutputs/config.json << 'EOF'
-          {"missing_tool":{"max":0},"noop":{"max":1},"send-maintainer-email":{"description":"Send maintainer audit report via Postmark","inputs":{"markdown_body":{"default":null,"description":"Markdown email content","required":true,"type":"string"},"subject":{"default":null,"description":"Email subject line","required":true,"type":"string"},"username":{"default":null,"description":"GitHub username being audited","required":true,"type":"string"}},"output":"Email sent successfully!"}}
+          {"missing_tool":{"max":0},"noop":{"max":1},"send-maintainer-email":{"description":"Send maintainer audit report via Postmark","inputs":{"markdown_body":{"default":null,"description":"Markdown email content","required":true,"type":"string"},"subject":{"default":null,"description":"Email subject line","required":true,"type":"string"},"username":{"default":null,"description":"GitHub username being audited","required":true,"type":"string"}},"output":"Email sent successfully!"},"update-audit-state":{"description":"Update audit state file via PR","inputs":{"state_content":{"default":null,"description":"JSON content for .github/audit-state.json","required":true,"type":"string"},"username":{"default":null,"description":"Username just audited","required":true,"type":"string"}},"output":"State updated successfully!"}}
           EOF
           cat > /tmp/gh-aw/safeoutputs/tools.json << 'EOF'
           [
@@ -1897,7 +1919,12 @@ jobs:
                   "GITHUB_TOOLSETS=context,repos,issues,pull_requests",
                   "ghcr.io/github/github-mcp-server:v0.24.0"
                 ],
-                "tools": ["*"],
+                "tools": [
+                  "get_file_contents",
+                  "search_issues",
+                  "search_pull_requests",
+                  "list_commits"
+                ],
                 "env": {
                   "GITHUB_PERSONAL_ACCESS_TOKEN": "\${GITHUB_MCP_SERVER_TOKEN}"
                 }
@@ -2069,10 +2096,11 @@ jobs:
           
           ## Process
           
-          ### Step 1: Check Cache Memory
-          Load progress from `/tmp/gh-aw/cache-memory/maintainer_audit_progress.json`:
-          - If found, read `last_index` and increment by 1
-          - If not found or missing, start at index 0
+          ### Step 1: Load State from Repository
+          Load progress from `.github/audit-state.json` in the repository:
+          - Use `github.get_file_contents` to read the file
+          - Parse JSON to get `last_index` and increment by 1
+          - If file doesn't exist or fails to load, start at index 0
           
           ### Step 2: Select Next Maintainer
           - Get maintainer at current index from the list above (0-18)
@@ -2187,19 +2215,20 @@ jobs:
           
           **Note:** Keep it as pure Markdown - no HTML conversion needed. Postmark will send as plain text.
           
-          ### Step 10: Update Cache Memory
+          ### Step 10: Output State Update
           
-          Write to `/tmp/gh-aw/cache-memory/maintainer_audit_progress.json`:
+          Create a safe-output entry to update the state file:
           ```json
           {
-            "last_index": {next_index},
-            "last_username": "{username}",
-            "last_audit_date": "{iso_timestamp}",
-            "last_result": "PASS or FAIL"
+            "type": "update_audit_state",
+            "state_content": "{\"last_index\": {next_index}, \"last_username\": \"{username}\", \"last_audit_date\": \"{iso_timestamp}\", \"last_result\": \"PASS or FAIL\"}",
+            "username": "{username}"
           }
           ```
           
-          Where `next_index` is the current index + 1 (or 0 if wrapping).
+          Where `next_index` is the current index + 1 (or 0 if wrapping to start of list).
+          
+          The safe-output job will create a PR to update `.github/audit-state.json`, ensuring state persists across runs.
           
           ## Example Markdown Email Structure
           
@@ -2311,46 +2340,6 @@ jobs:
           <instruction>When you need to create temporary files or directories during your work, always use the /tmp/gh-aw/agent/ directory that has been pre-created for you. Do NOT use the root /tmp/ directory directly.</instruction>
           </temporary-files>
           
-          PROMPT_EOF
-      - name: Append edit tool accessibility instructions to prompt
-        env:
-          GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
-        run: |
-          cat << 'PROMPT_EOF' | envsubst >> "$GH_AW_PROMPT"
-          <file-editing>
-          <description>File Editing Access Permissions</description>
-          <allowed-paths>
-            <path name="workspace">$GITHUB_WORKSPACE</path>
-            <path name="temporary">/tmp/gh-aw/</path>
-          </allowed-paths>
-          <restriction>Do NOT attempt to edit files outside these directories as you do not have the necessary permissions.</restriction>
-          </file-editing>
-          
-          PROMPT_EOF
-      - name: Append cache memory instructions to prompt
-        env:
-          GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
-        run: |
-          cat << 'PROMPT_EOF' | envsubst >> "$GH_AW_PROMPT"
-          
-          ---
-          
-          ## Cache Folder Available
-          
-          You have access to a persistent cache folder at `/tmp/gh-aw/cache-memory/` where you can read and write files to create memories and store information.
-          
-          - **Read/Write Access**: You can freely read from and write to any files in this folder
-          - **Persistence**: Files in this folder persist across workflow runs via GitHub Actions cache
-          - **Last Write Wins**: If multiple processes write to the same file, the last write will be preserved
-          - **File Share**: Use this as a simple file share - organize files as you see fit
-          
-          Examples of what you can store:
-          - `/tmp/gh-aw/cache-memory/notes.txt` - general notes and observations
-          - `/tmp/gh-aw/cache-memory/preferences.json` - user preferences and settings
-          - `/tmp/gh-aw/cache-memory/history.log` - activity history and logs
-          - `/tmp/gh-aw/cache-memory/state/` - organized state files in subdirectories
-          
-          Feel free to create, read, update, and organize files in this folder as needed for your tasks.
           PROMPT_EOF
       - name: Append safe outputs instructions to prompt
         env:
@@ -2515,7 +2504,10 @@ jobs:
       - name: Execute GitHub Copilot CLI
         id: agentic_execution
         # Copilot CLI tool arguments (sorted):
-        # --allow-tool github
+        # --allow-tool github(get_file_contents)
+        # --allow-tool github(list_commits)
+        # --allow-tool github(search_issues)
+        # --allow-tool github(search_pull_requests)
         # --allow-tool safeoutputs
         # --allow-tool shell(cat)
         # --allow-tool shell(date)
@@ -2529,12 +2521,11 @@ jobs:
         # --allow-tool shell(uniq)
         # --allow-tool shell(wc)
         # --allow-tool shell(yq)
-        # --allow-tool write
         timeout-minutes: 20
         run: |
           set -o pipefail
           sudo -E awf --env-all --container-workdir "${GITHUB_WORKSPACE}" --mount /tmp:/tmp:rw --mount "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}:rw" --mount /usr/bin/gh:/usr/bin/gh:ro --allow-domains api.enterprise.githubcopilot.com,api.github.com,github.com,raw.githubusercontent.com,registry.npmjs.org --log-level info --proxy-logs-dir /tmp/gh-aw/sandbox/firewall/logs \
-            -- npx -y @github/copilot@0.0.366 --add-dir /tmp/gh-aw/ --log-level all --log-dir /tmp/gh-aw/sandbox/agent/logs/ --add-dir "${GITHUB_WORKSPACE}" --disable-builtin-mcps --allow-tool github --allow-tool safeoutputs --allow-tool 'shell(cat)' --allow-tool 'shell(date)' --allow-tool 'shell(echo)' --allow-tool 'shell(grep)' --allow-tool 'shell(head)' --allow-tool 'shell(ls)' --allow-tool 'shell(pwd)' --allow-tool 'shell(sort)' --allow-tool 'shell(tail)' --allow-tool 'shell(uniq)' --allow-tool 'shell(wc)' --allow-tool 'shell(yq)' --allow-tool write --add-dir /tmp/gh-aw/cache-memory/ --allow-all-paths --prompt "$(cat /tmp/gh-aw/aw-prompts/prompt.txt)" \
+            -- npx -y @github/copilot@0.0.366 --add-dir /tmp/gh-aw/ --log-level all --log-dir /tmp/gh-aw/sandbox/agent/logs/ --add-dir "${GITHUB_WORKSPACE}" --disable-builtin-mcps --allow-tool 'github(get_file_contents)' --allow-tool 'github(list_commits)' --allow-tool 'github(search_issues)' --allow-tool 'github(search_pull_requests)' --allow-tool safeoutputs --allow-tool 'shell(cat)' --allow-tool 'shell(date)' --allow-tool 'shell(echo)' --allow-tool 'shell(grep)' --allow-tool 'shell(head)' --allow-tool 'shell(ls)' --allow-tool 'shell(pwd)' --allow-tool 'shell(sort)' --allow-tool 'shell(tail)' --allow-tool 'shell(uniq)' --allow-tool 'shell(wc)' --allow-tool 'shell(yq)' --prompt "$(cat /tmp/gh-aw/aw-prompts/prompt.txt)" \
             2>&1 | tee /tmp/gh-aw/agent-stdio.log
         env:
           COPILOT_AGENT_RUNNER_TYPE: STANDALONE
@@ -6279,4 +6270,45 @@ jobs:
                 return;
               }
             }
+
+  update_audit_state:
+    needs:
+      - agent
+      - detection
+    if: >
+      ((!cancelled()) && (needs.agent.result != 'skipped')) && (contains(needs.agent.outputs.output_types, 'update_audit_state'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Download agent output artifact
+        continue-on-error: true
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: agent_output.json
+          path: /tmp/gh-aw/safe-jobs/
+      - name: Setup Safe Job Environment Variables
+        run: |
+          find "/tmp/gh-aw/safe-jobs/" -type f -print
+          echo "GH_AW_AGENT_OUTPUT=/tmp/gh-aw/safe-jobs/agent_output.json" >> "$GITHUB_ENV"
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Update state file
+        run: |
+          mkdir -p .github
+          echo '${{ inputs.state_content }}' > .github/audit-state.json
+      - name: Create PR with state update
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
+        with:
+          add-paths: |
+            .github/audit-state.json
+          body: |
+            Automated audit state update.
+
+            **Maintainer:** @${{ inputs.username }}
+            **Run:** ${{ github.run_number }}
+          branch: audit-state-${{ inputs.username }}-${{ github.run_number }}
+          commit-message: "chore: update maintainer audit progress to @${{ inputs.username }}"
+          delete-branch: true
+          title: "chore: audit state update for @${{ inputs.username }}"
 

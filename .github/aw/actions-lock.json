@@ -14,6 +14,11 @@
       "repo": "actions/setup-node",
       "version": "v4",
       "sha": "49933ea5288caeca8642d1e84afbd3f7d6820020"
+    },
+    "peter-evans/create-pull-request@v6": {
+      "repo": "peter-evans/create-pull-request",
+      "version": "v6",
+      "sha": "c5a7806660adbe173f04e3e038b0ccdcd758773c"
     }
   }
 }
