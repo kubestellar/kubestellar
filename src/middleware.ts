@@ -8,5 +8,8 @@ export default createMiddleware({
 });
 
 export const config = {
-  matcher: ["/((?!docs|api|_next|_vercel|agenda|.*\\..*).*)", "/"],
+  matcher: [
+    "/((?!docs|api|_next|_vercel|agenda|blog|code|community|drive|infomercial|join_us|joinus|ladder|ladder_stats|linkedin|quickstart|slack|survey|tv|youtube|.*\\..*).*)",
+    "/",
+  ],
 };
