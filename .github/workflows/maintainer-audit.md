@@ -78,6 +78,10 @@ safe-outputs:
           description: "GitHub username being audited"
           required: true
           type: string
+        email:
+          description: "Maintainer's email address"
+          required: true
+          type: string
       permissions:
         contents: read
       steps:
@@ -86,18 +90,16 @@ safe-outputs:
           env:
             POSTMARK_API_TOKEN: "${{ secrets.POSTMARK_API_TOKEN }}"
             POSTMARK_FROM_EMAIL: "${{ secrets.POSTMARK_FROM_EMAIL }}"
-            POSTMARK_TO_EMAIL: "${{ secrets.POSTMARK_TO_EMAIL }}"
           with:
             script: |
               const fs = require('fs');
               const postmarkToken = process.env.POSTMARK_API_TOKEN;
               const fromEmail = process.env.POSTMARK_FROM_EMAIL;
-              const toEmail = process.env.POSTMARK_TO_EMAIL;
               const isStaged = process.env.GH_AW_SAFE_OUTPUTS_STAGED === 'true';
               const outputContent = process.env.GH_AW_AGENT_OUTPUT;
               
-              if (!postmarkToken || !fromEmail || !toEmail) {
-                core.setFailed('Missing Postmark secrets: POSTMARK_API_TOKEN, POSTMARK_FROM_EMAIL, POSTMARK_TO_EMAIL');
+              if (!postmarkToken || !fromEmail) {
+                core.setFailed('Missing Postmark secrets: POSTMARK_API_TOKEN, POSTMARK_FROM_EMAIL');
                 return;
               }
               
@@ -131,9 +133,9 @@ safe-outputs:
               
               for (let i = 0; i < emailItems.length; i++) {
                 const item = emailItems[i];
-                const { subject, markdown_body, username } = item;
+                const { subject, markdown_body, username, email } = item;
                 
-                if (!subject || !markdown_body || !username) {
+                if (!subject || !markdown_body || !username || !email) {
                   core.warning(`Email ${i + 1}: Missing required fields, skipping`);
                   continue;
                 }
@@ -141,6 +143,7 @@ safe-outputs:
                 if (isStaged) {
                   let summaryContent = "## 📧 Staged Mode: Email Preview\n\n";
                   summaryContent += "**Subject:** " + subject + "\n\n";
+                  summaryContent += "**To:** " + email + "\n\n";
                   summaryContent += "**Username:** @" + username + "\n\n";
                   summaryContent += "**Markdown Preview (first 500 chars):**\n\n```markdown\n" + markdown_body.substring(0, 500) + "...\n```\n\n";
                   await core.summary.addRaw(summaryContent).write();
@@ -148,7 +151,7 @@ safe-outputs:
                   continue;
                 }
                 
-                core.info(`Sending email ${i + 1}/${emailItems.length} for @${username}`);
+                core.info(`Sending email ${i + 1}/${emailItems.length} to ${email} (@${username})`);
                 
                 try {
                   const response = await fetch('https://api.postmarkapp.com/email', {
@@ -160,7 +163,7 @@ safe-outputs:
                     },
                     body: JSON.stringify({
                       From: fromEmail,
-                      To: toEmail,
+                      To: email,
                       Subject: subject,
                       TextBody: markdown_body,
                       MessageStream: 'outbound'
@@ -192,27 +195,31 @@ Audit ONE maintainer per run using a round-robin system, tracking progress in ca
 
 ## Maintainer List (Round-Robin Order)
 
-The complete list of maintainers to audit:
+The complete list of maintainers to audit with their email addresses:
 
-1. clubanderson
-<!-- 2. mikespreitzer
-3. dumb0002
-4. waltforme
-5. pdettori
-6. francostellari
-7. kproche
-8. nupurshivani
-9. onkar717
-10. kunal-511
-11. mavrick-1
-12. gaurab-khanal
-13. naman9271
-14. btwshivam
-15. rxinui
-16. vedansh-5
-17. sagar2366
-18. oksaumya
-19. rupam-it -->
+| Index | Username | Email |
+|-------|----------|-------|
+| 0 | clubanderson | andy@clubanderson.com |
+| 1 | mikespreitzer | mspreitz@us.ibm.com |
+| 2 | dumb0002 | Braulio.Dumba@ibm.com |
+| 3 | waltforme | jun.duan@ibm.com |
+| 4 | pdettori | dettori@us.ibm.com |
+| 5 | francostellari | stellari@us.ibm.com |
+| 6 | kproche | kproche@us.ibm.com |
+| 7 | nupurshivani | nupurjha.me@gmail.com |
+| 8 | onkar717 | onkarwork2234@gmail.com |
+| 9 | kunal-511 | yoyokvunal@gmail.com |
+| 10 | mavrick-1 | mavrickrishi@gmail.com |
+| 11 | gaurab-khanal | khanalgaurab98@gmail.com |
+| 12 | naman9271 | namanjain9271@gmail.com |
+| 13 | btwshivam | shivam200446@gmail.com |
+| 14 | rxinui | rainui.ly@gmail.com |
+| 15 | vedansh-5 | vedanshsaini7719@gmail.com |
+| 16 | sagar2366 | sagarutekar2366@gmail.com |
+| 17 | oksaumya | saumyakr2006@gmail.com |
+| 18 | rupam-it | Mannarupam3@gmail.com |
+
+**Total: 19 maintainers**
 
 ## Audit Criteria (Last 60 Days)
 
@@ -259,8 +266,9 @@ Load progress from `.github/audit-state.json` in the repository:
 - If file doesn't exist or fails to load, start at index 0
 
 ### Step 2: Select Next Maintainer
-- Get maintainer at current index from the list above (0-18)
+- Get maintainer username and email at current index from the table above (0-18)
 - If index >= 19, wrap to 0
+- Store both `username` and `email` for later use
 
 ### Step 3: Calculate Date Range
 Calculate the date 60 days ago from today in YYYY-MM-DD format.
@@ -365,9 +373,12 @@ Create a JSON entry for the email safe-output job:
   "type": "send_maintainer_email",
   "subject": "🌟 Your KubeStellar Impact Report - @{username}",
   "markdown_body": "{pure_markdown_content}",
-  "username": "{username}"
+  "username": "{username}",
+  "email": "{email}"
 }
 ```
+
+Where `email` is the maintainer's email address from the table in Step 2.
 
 **Note:** Keep it as pure Markdown - no HTML conversion needed. Postmark will send as plain text.
 
