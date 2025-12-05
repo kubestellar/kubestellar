@@ -41,38 +41,23 @@ export default function ContactSection() {
     setIsSubmitting(true);
 
     try {
-      // Create mailto link for Google Groups mailing list
-      const subject = encodeURIComponent(`[KubeStellar] ${formData.subject}`);
-      const body = encodeURIComponent(
-        `Hi KubeStellar Community,
+      const formPayload = new URLSearchParams({
+        "form-name": "contact",
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+      });
 
-Name: ${formData.name}
-Email: ${formData.email}
-Subject: ${formData.subject}
+      const res = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formPayload.toString(),
+      });
 
-Message:
-${formData.message}
+      if (!res.ok) throw new Error("Form submission failed");
 
-Best regards,
-${formData.name}
-
----
-This message was sent via the KubeStellar website contact form.
-Google Groups: https://groups.google.com/g/kubestellar-dev`
-      );
-
-      const mailtoLink = `mailto:kubestellar-dev@googlegroups.com?subject=${subject}&body=${body}`;
-
-      // Small delay to show loading state
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      // Open email client
-      window.location.href = mailtoLink;
-
-      // Show success message
       setShowSuccess(true);
-
-      // Reset form
       setFormData({
         name: "",
         email: "",
@@ -81,13 +66,10 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
         privacy: false,
       });
 
-      // Hide success message after 8 seconds
       setTimeout(() => setShowSuccess(false), 8000);
     } catch (error) {
-      console.error("Error submitting form:", error);
-      alert(
-        "There was an error opening your email client. Please try again or visit https://groups.google.com/g/kubestellar-dev directly."
-      );
+      console.error("Submission error:", error);
+      alert("Submission failed. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
@@ -337,9 +319,15 @@ Google Groups: https://groups.google.com/g/kubestellar-dev`
                 </h3>
 
                 <form
+                  name="contact"
+                  method="POST"
+                  data-netlify="true"
+                  data-netlify-honeypot="bot-field"
                   onSubmit={handleSubmit}
                   className="space-y-3 sm:space-y-4 flex-1 flex flex-col"
                 >
+                  <input type="hidden" name="form-name" value="contact" />
+                  <input type="hidden" name="bot-field" />
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                       <label

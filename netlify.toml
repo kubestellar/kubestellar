@@ -1,12 +1,21 @@
 # Netlify configuration file
 # https://docs.netlify.com/configure-builds/file-based-configuration/
 
+
 [build]
   command = "npm run build"
   publish = ".next"
 
+[build.environment]
+  NODE_VERSION = "20.11.1"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Forms configuration
+[forms]
+  # Enable spam filtering
+  spam_protection = true
 
 # Redirects for short URLs
 [[redirects]]
