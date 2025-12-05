@@ -82,6 +82,11 @@ _loginfo() {
     echo -e "$(date -Iseconds);INFO;$1"
 }
 
+# Log a warning
+_logwarn() {
+    echo -e "$(date -Iseconds);WARNING;$1"
+}
+
 # Exit with an error
 _exit_with_error() {
     echo -e "$(date -Iseconds);ERROR;$2" >&2
@@ -208,13 +213,11 @@ _update_action_version_infile() {
     fi
 }
 
-# Get commit sha of an action ref stored in the reverse map
+# Get commit sha of an action ref stored in the reverse map.
+# Returns `null` if not found.
 _get_sha_from_reversemap() {
     action_ref=$1
     query=$(yq ".\"$action_ref\".sha" $REVERSEMAP_FILE)
-    if [[ $? -ne 0 ]]; then
-        _exit_with_error $ERR_NO_SHA "no sha has been found for $action_ref in $REVERSEMAP_FILE"
-    fi
     _return "$query"
 }
 
@@ -232,16 +235,16 @@ run_verify_mapusage() {
             action=$( echo "$ref" | cut -d@ -f1)
             version=$(echo "$ref" | cut -d@ -f2)
             if ! [[ "$version" =~ [0-9a-f]{40} ]]; then
-                _loginfo "$file uses $ref, whose version $version is not a commit hash"
+                _logwarn "$file uses $ref, whose version $version is not a commit hash"
                 failed=true
                 continue
             fi
             goodsha=$(jq -r --arg action "$action" 'getpath([$action])' <<<"$shadict")
             if [ "$goodsha" == null ]; then
-                _loginfo "$file uses $ref, and the reversemap has no entry for $action"
+                _logwarn "$file uses $ref, and the reversemap has no entry for $action"
                 failed=true
             elif ! [ "$version" == "$goodsha" ]; then
-                _loginfo "$file uses $ref, whose version $version is not the right one ($goodsha)"
+                _logwarn "$file uses $ref, whose version $version is not the right one ($goodsha)"
                 failed=true
             fi
         done
@@ -260,8 +263,12 @@ run_apply_reversemap() {
         for action_fullref in $action_fullrefs; do
             action_ref=$(echo "$action_fullref" | cut -d "@" -f 1)
             action_sha=$(_get_sha_from_reversemap "$action_ref")
-            _loginfo "found '$action_ref' in reversemap with sha=$action_sha"
-            _update_action_version_infile "$file" "$action_ref" "$action_sha"
+            if [ null == "$action_sha" ]; then
+                _logwarn "Did not find '$action_ref' in reversemap, will not update its version in $file"
+            else
+                _loginfo "found '$action_ref' in reversemap with sha=$action_sha"
+                _update_action_version_infile "$file" "$action_ref" "$action_sha"
+            fi
         done
     done
 }
@@ -295,9 +302,13 @@ run_cli() {
         ;;
     "verify-mapusage")
         shift
+        files=$@
+        if [[ "$#" -eq 0 ]]; then
+            files="$GITHUB_WORKFLOWS_PATH/*.y*ml"
+        fi
         _check_yq_version
-        _loginfo "verifying reversemap usage in all workflows"
-        run_verify_mapusage ${GITHUB_WORKFLOWS_PATH}/*.y*ml
+        _loginfo "verifying reversemap usage in $files"
+        run_verify_mapusage $files
         ;;
     "apply-reversemap")
         shift
