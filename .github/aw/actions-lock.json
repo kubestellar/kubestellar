@@ -1,0 +1,19 @@
+{
+  "entries": {
+    "actions/checkout@v4": {
+      "repo": "actions/checkout",
+      "version": "v4",
+      "sha": "34e114876b0b11c390a56381ad16ebd13914f8d5"
+    },
+    "actions/github-script@v7": {
+      "repo": "actions/github-script",
+      "version": "v7",
+      "sha": "f28e40c7f34bde8b3046d885e986cb6290c5673b"
+    },
+    "actions/setup-node@v4": {
+      "repo": "actions/setup-node",
+      "version": "v4",
+      "sha": "49933ea5288caeca8642d1e84afbd3f7d6820020"
+    }
+  }
+}
