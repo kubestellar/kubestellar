@@ -33,7 +33,7 @@ jobs:
     name: Spellcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
       - uses: rojopolis/spellcheck-github-actions@16d0338a5a3b5e3111a078029fb9a07a8125053d
         name: Spellcheck
