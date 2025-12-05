@@ -15,6 +15,7 @@ permissions: read-all
 
 tools:
   github:
+    github-token: ${{ secrets.GH_AUDIT_TOKEN }}
     allowed:
       - get_file_contents
       - search_issues
