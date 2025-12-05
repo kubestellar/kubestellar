@@ -416,7 +416,7 @@ export default function DocsNavbar() {
                 onMouseLeave={handleMouseLeave}
               >
               <Link
-                href="/docs"
+                href="/contribute-handbook"
                 className={dropdownItemClasses}
               >
                 <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -947,7 +947,7 @@ export default function DocsNavbar() {
             <div className={`text-sm font-medium uppercase px-2 py-1.5 mt-3 tracking-wider ${
               isDark ? 'text-gray-300' : 'text-gray-500'
             }`}>Community</div>
-            <Link href="/docs" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+            <Link href="/contribute-handbook" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'
