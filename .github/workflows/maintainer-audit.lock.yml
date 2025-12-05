@@ -57,8 +57,8 @@
 #           description: "Email subject line"
 #           required: true
 #           type: string
-#         html_body:
-#           description: "HTML email content"
+#         markdown_body:
+#           description: "Markdown email content"
 #           required: true
 #           type: string
 #         username:
@@ -118,9 +118,9 @@
 #
 #               for (let i = 0; i < emailItems.length; i++) {
 #                 const item = emailItems[i];
-#                 const { subject, html_body, username } = item;
+#                 const { subject, markdown_body, username } = item;
 #
-#                 if (!subject || !html_body || !username) {
+#                 if (!subject || !markdown_body || !username) {
 #                   core.warning(`Email ${i + 1}: Missing required fields, skipping`);
 #                   continue;
 #                 }
@@ -129,7 +129,7 @@
 #                   let summaryContent = "## 📧 Staged Mode: Email Preview\n\n";
 #                   summaryContent += "**Subject:** " + subject + "\n\n";
 #                   summaryContent += "**Username:** @" + username + "\n\n";
-#                   summaryContent += "**HTML Preview (first 500 chars):**\n\n```html\n" + html_body.substring(0, 500) + "...\n```\n\n";
+#                   summaryContent += "**Markdown Preview (first 500 chars):**\n\n```markdown\n" + markdown_body.substring(0, 500) + "...\n```\n\n";
 #                   await core.summary.addRaw(summaryContent).write();
 #                   core.info("📝 Email preview written to step summary");
 #                   continue;
@@ -149,7 +149,7 @@
 #                       From: fromEmail,
 #                       To: toEmail,
 #                       Subject: subject,
-#                       HtmlBody: html_body,
+#                       TextBody: markdown_body,
 #                       MessageStream: 'outbound'
 #                     })
 #                   });
@@ -252,11 +252,29 @@
 # ### Step 3: Calculate Date Range
 # Calculate the date 60 days ago from today in YYYY-MM-DD format.
 #
-# ### Step 4: Gather Metrics Using GitHub Search
+# ### Step 4: Analyze Maintainer's Interests
+#
+# Before gathering metrics, understand what the maintainer likes to work on:
+#
+# **A. Analyze Past PRs (Last 6 months)**
+# - Search: `org:kubestellar is:pr is:merged author:{username} merged:>={date_180_days_ago}`
+# - For each PR (up to 10-15 recent ones):
+#   - Extract file paths changed (look for patterns like `/docs/`, `/src/`, `*_test.*`, `.yaml`, etc.)
+#   - Note PR labels (e.g., `documentation`, `bug`, `feature`, `testing`)
+#   - Track which repos they contribute to most
+# - **Detect patterns:**
+#   - **Documentation focus:** Many changes in `/docs/`, `*.md` files
+#   - **Frontend/UI focus:** Changes in `/ui/`, `/src/components/`, `*.tsx`, `*.css`
+#   - **Backend/Core:** Changes in `/pkg/`, `/cmd/`, `*.go`, `*.java`
+#   - **Testing:** Changes in `*_test.*`, `/tests/`, `*_spec.*`
+#   - **DevOps/CI:** Changes in `.github/workflows/`, `Dockerfile`, `*.yaml`
+#   - **Favorite repos:** Count contributions per repo
+#
+# ### Step 5: Gather Current Metrics
 #
 # Use the GitHub MCP tools to search and count:
 #
-# **A. Help-Wanted Issues**
+# **A. Help-Wanted Issues Created**
 # - Search: `org:kubestellar is:issue label:"help wanted" author:{username} created:>={date_60_days_ago}`
 # - Count total results
 #
@@ -270,7 +288,33 @@
 # - Search: `org:kubestellar is:pr is:merged author:{username} merged:>={date_60_days_ago}`
 # - Count total results
 #
-# ### Step 5: Evaluate Criteria
+# ### Step 6: Find Personalized Opportunities
+#
+# Based on their interest patterns, find **Top 3** opportunities in each category:
+#
+# **A. Help-Wanted Issues in Their Favorite Areas**
+# - Search across all KubeStellar repos: `org:kubestellar is:issue is:open label:"help wanted"`
+# - Filter/rank by:
+#   - Repos they've contributed to before (higher priority)
+#   - File paths/labels matching their detected interests
+#   - Recent activity (updated within last 14 days)
+# - Select top 3 issues with direct links
+#
+# **B. PRs Needing Review in Their Expertise Areas**
+# - Search: `org:kubestellar is:pr is:open review:required`
+# - Filter/rank by:
+#   - Repos they're active in
+#   - File paths matching their interest patterns (docs, backend, frontend, etc.)
+#   - PRs without recent review activity
+# - Select top 3 PRs with direct links
+#
+# **C. Repos That Could Use Their Skills**
+# - Based on their detected focus areas (docs, backend, UI, testing, DevOps):
+#   - Match to KubeStellar repos that align (e.g., docs contributor → kubestellar/docs)
+#   - Note recent issues/PRs in those repos needing attention
+# - Suggest top 3 repos with reasons why
+#
+# ### Step 7: Evaluate Criteria
 #
 # Compare actual counts against requirements:
 # - Help-wanted issues: actual >= 2 ? ✅ PASS : ❌ FAIL
@@ -279,40 +323,42 @@
 #
 # Overall: PASS if all three criteria pass, otherwise FAIL
 #
-# ### Step 6: Generate Markdown Email
+# ### Step 8: Generate Personalized Markdown Email
 #
-# Create a professional Markdown-formatted email:
+# Create an **encouraging, actionable** Markdown email:
 #
 # **Structure:**
-# - Header with KubeStellar branding
-# - Maintainer username and audit metadata
-# - Three metric sections with:
-#   - ✅ PASS or ❌ FAIL status
-#   - Actual count vs requirement
-#   - GitHub search link for verification
-# - Overall result summary
-# - Footer with automation note
+# 1. **Warm greeting** with maintainer's username
+# 2. **Quick stats summary** (metric results with ✅/❌)
+# 3. **"Your Impact Areas"** section:
+#    - Detected interests from past PRs (e.g., "You love working on documentation and testing!")
+#    - Most active repos
+# 4. **"Where You Can Help Next"** - Personalized recommendations:
+#    - **🏷️ Help-Wanted Issues for You:** Top 3 issues matching their interests with direct links
+#    - **👀 PRs That Need Your Review:** Top 3 PRs in their expertise areas with direct links
+#    - **🎯 Repos Looking for Your Skills:** Top 3 repos with explanations
+# 5. **Encouraging closing:**
+#    - If PASS: Celebrate their contributions and suggest maintaining momentum
+#    - If FAIL: Focus on opportunities, frame as "here's how to get back on track"
+# 6. **Footer:** Automation note with timestamp
 #
-# **Markdown Format Benefits:**
-# - Cleaner, more readable in plain text
-# - Better email client compatibility
-# - Easier to generate and validate
+# **Tone:** Supportive and constructive, not punitive
 #
-# ### Step 7: Output Safe-Output Entry
+# ### Step 9: Output Safe-Output Entry
 #
 # Create a JSON entry for the email safe-output job:
 # ```json
 # {
 #   "type": "send_maintainer_email",
-#   "subject": "Maintainer Audit Report - @{username} - {PASS/FAIL}",
-#   "html_body": "{markdown_converted_to_html}",
+#   "subject": "🌟 Your KubeStellar Impact Report - @{username}",
+#   "markdown_body": "{pure_markdown_content}",
 #   "username": "{username}"
 # }
 # ```
 #
-# **Note:** Generate the email in Markdown format, then convert to HTML for Postmark compatibility (most email clients render HTML well).
+# **Note:** Keep it as pure Markdown - no HTML conversion needed. Postmark will send as plain text.
 #
-# ### Step 8: Update Cache Memory
+# ### Step 10: Update Cache Memory
 #
 # Write to `/tmp/gh-aw/cache-memory/maintainer_audit_progress.json`:
 # ```json
@@ -329,49 +375,79 @@
 # ## Example Markdown Email Structure
 #
 # ```markdown
-# # 🔍 Maintainer Audit Report
+# Hey @clubanderson! 👋
 #
-# **KubeStellar Organization**
-#
-# ---
-#
-# ## Audit for: @{username}
-#
-# **Audit Date:** 2025-12-05  
-# **Period:** Last 60 days (since 2025-10-06)
+# Here's your KubeStellar impact snapshot for the last 60 days.
 #
 # ---
 #
-# ### ✅ Help-Wanted Issues: PASS
-# Created **5** issues (required: ≥2)  
-# [View on GitHub](https://github.com/search?q=org%3Akubestellar+is%3Aissue+label%3A%22help+wanted%22+author%3A{username}+created%3A%3E%3D2025-10-06)
+# ## 📊 Quick Stats
 #
-# ### ❌ Unique PRs Commented: FAIL
-# Commented on **6** unique PRs (required: ≥8)  
-# [View Merged PRs](https://github.com/search?q=org%3Akubestellar+is%3Apr+is%3Amerged+commenter%3A{username})
+# ✅ **Help-Wanted Issues:** 5 created (required: ≥2)  
+# ❌ **PR Reviews:** 6 unique PRs (required: ≥8) — *Let's boost this!*  
+# ✅ **PRs Merged:** 4 merged (required: ≥3)
 #
-# ### ✅ Merged PRs: PASS
-# Merged **4** PRs (required: ≥3)  
-# [View on GitHub](https://github.com/search?q=org%3Akubestellar+is%3Apr+is%3Amerged+author%3A{username})
+# **Overall:** 2 of 3 criteria met
 #
 # ---
 #
-# ## Overall Result: ❌ FAIL
+# ## 🎯 Your Impact Areas
 #
-# **Summary:** 2 of 3 criteria passed. The maintainer needs to increase PR review activity.
+# Based on your recent contributions, you're passionate about:
+# - 📝 **Documentation** (60% of your PRs touch `/docs/`)
+# - 🧪 **Testing** (noticed several `*_test.go` files)
+# - Most active in: **kubestellar/docs**, **kubestellar/kubestellar**
 #
 # ---
 #
-# *Automated by GitHub Agentic Workflows • Run at 2025-12-05 20:00 UTC*
+# ## 🌟 Where You Can Help Next
+#
+# ### 🏷️ Help-Wanted Issues Perfect For You
+#
+# 1. **[Improve Getting Started Guide](https://github.com/kubestellar/docs/issues/123)**  
+#    `kubestellar/docs` • Labels: documentation, good-first-issue
+#
+# 2. **[Add Integration Test Coverage](https://github.com/kubestellar/kubestellar/issues/456)**  
+#    `kubestellar/kubestellar` • Labels: testing, help-wanted
+#
+# 3. **[Document API Reference](https://github.com/kubestellar/docs/issues/789)**  
+#    `kubestellar/docs` • Labels: documentation, help-wanted
+#
+# ### 👀 PRs That Need Your Review
+#
+# 1. **[Update deployment docs for v0.25](https://github.com/kubestellar/docs/pull/234)**  
+#    `kubestellar/docs` • Docs changes, no reviews yet
+#
+# 2. **[Add E2E test for multi-cluster](https://github.com/kubestellar/kubestellar/pull/567)**  
+#    `kubestellar/kubestellar` • Testing PR, needs expert eyes
+#
+# 3. **[Fix typos in contributor guide](https://github.com/kubestellar/docs/pull/890)**  
+#    `kubestellar/docs` • Quick review needed
+#
+# ### 🎯 Repos Looking for Your Skills
+#
+# 1. **kubestellar/docs** — Your top repo! Several open doc issues need attention.
+# 2. **kubestellar/kubestellar** — Core repo could use more test coverage (your strength!).
+# 3. **kubestellar/kubeflex** — Growing repo, needs documentation help.
+#
+# ---
+#
+# ## 💪 Keep Up the Great Work!
+#
+# You're making a real difference in KubeStellar! To hit all 3 criteria next time, focus on reviewing a couple more PRs in areas you love. Your expertise in docs and testing is invaluable. 🙌
+#
+# ---
+#
+# *Automated by GitHub Agentic Workflows • 2025-12-05 20:18 UTC*
 # ```
 #
 # ## Important Notes
 #
-# - Generate the email content in **Markdown format** first
-# - Convert Markdown to simple HTML if needed for Postmark (use basic tags: h1, h2, p, a, strong, em)
-# - Keep formatting clean and email-client friendly
-# - Include clickable GitHub search links for transparency
-# - Use emojis sparingly for visual indicators (✅ ❌ 🔍)
+# - **Pure Markdown** - no HTML conversion, sent as plain text via Postmark
+# - **Encouraging tone** - focus on opportunities, not failures
+# - **Personalized recommendations** - based on detected interests from PR history
+# - **Actionable links** - direct links to specific issues/PRs they can tackle
+# - **Context-aware** - adapt tone based on PASS/FAIL (celebrate or motivate)
 # ```
 #
 # Pinned GitHub Actions:
@@ -637,7 +713,7 @@ jobs:
         run: |
           mkdir -p /tmp/gh-aw/safeoutputs
           cat > /tmp/gh-aw/safeoutputs/config.json << 'EOF'
-          {"missing_tool":{"max":0},"noop":{"max":1},"send-maintainer-email":{"description":"Send maintainer audit report via Postmark","inputs":{"html_body":{"default":null,"description":"HTML email content","required":true,"type":"string"},"subject":{"default":null,"description":"Email subject line","required":true,"type":"string"},"username":{"default":null,"description":"GitHub username being audited","required":true,"type":"string"}},"output":"Email sent successfully!"}}
+          {"missing_tool":{"max":0},"noop":{"max":1},"send-maintainer-email":{"description":"Send maintainer audit report via Postmark","inputs":{"markdown_body":{"default":null,"description":"Markdown email content","required":true,"type":"string"},"subject":{"default":null,"description":"Email subject line","required":true,"type":"string"},"username":{"default":null,"description":"GitHub username being audited","required":true,"type":"string"}},"output":"Email sent successfully!"}}
           EOF
           cat > /tmp/gh-aw/safeoutputs/tools.json << 'EOF'
           [
@@ -2005,11 +2081,29 @@ jobs:
           ### Step 3: Calculate Date Range
           Calculate the date 60 days ago from today in YYYY-MM-DD format.
           
-          ### Step 4: Gather Metrics Using GitHub Search
+          ### Step 4: Analyze Maintainer's Interests
+          
+          Before gathering metrics, understand what the maintainer likes to work on:
+          
+          **A. Analyze Past PRs (Last 6 months)**
+          - Search: `org:kubestellar is:pr is:merged author:{username} merged:>={date_180_days_ago}`
+          - For each PR (up to 10-15 recent ones):
+            - Extract file paths changed (look for patterns like `/docs/`, `/src/`, `*_test.*`, `.yaml`, etc.)
+            - Note PR labels (e.g., `documentation`, `bug`, `feature`, `testing`)
+            - Track which repos they contribute to most
+          - **Detect patterns:**
+            - **Documentation focus:** Many changes in `/docs/`, `*.md` files
+            - **Frontend/UI focus:** Changes in `/ui/`, `/src/components/`, `*.tsx`, `*.css`
+            - **Backend/Core:** Changes in `/pkg/`, `/cmd/`, `*.go`, `*.java`
+            - **Testing:** Changes in `*_test.*`, `/tests/`, `*_spec.*`
+            - **DevOps/CI:** Changes in `.github/workflows/`, `Dockerfile`, `*.yaml`
+            - **Favorite repos:** Count contributions per repo
+          
+          ### Step 5: Gather Current Metrics
           
           Use the GitHub MCP tools to search and count:
           
-          **A. Help-Wanted Issues**
+          **A. Help-Wanted Issues Created**
           - Search: `org:kubestellar is:issue label:"help wanted" author:{username} created:>={date_60_days_ago}`
           - Count total results
           
@@ -2023,7 +2117,33 @@ jobs:
           - Search: `org:kubestellar is:pr is:merged author:{username} merged:>={date_60_days_ago}`
           - Count total results
           
-          ### Step 5: Evaluate Criteria
+          ### Step 6: Find Personalized Opportunities
+          
+          Based on their interest patterns, find **Top 3** opportunities in each category:
+          
+          **A. Help-Wanted Issues in Their Favorite Areas**
+          - Search across all KubeStellar repos: `org:kubestellar is:issue is:open label:"help wanted"`
+          - Filter/rank by:
+            - Repos they've contributed to before (higher priority)
+            - File paths/labels matching their detected interests
+            - Recent activity (updated within last 14 days)
+          - Select top 3 issues with direct links
+          
+          **B. PRs Needing Review in Their Expertise Areas**
+          - Search: `org:kubestellar is:pr is:open review:required`
+          - Filter/rank by:
+            - Repos they're active in
+            - File paths matching their interest patterns (docs, backend, frontend, etc.)
+            - PRs without recent review activity
+          - Select top 3 PRs with direct links
+          
+          **C. Repos That Could Use Their Skills**
+          - Based on their detected focus areas (docs, backend, UI, testing, DevOps):
+            - Match to KubeStellar repos that align (e.g., docs contributor → kubestellar/docs)
+            - Note recent issues/PRs in those repos needing attention
+          - Suggest top 3 repos with reasons why
+          
+          ### Step 7: Evaluate Criteria
           
           Compare actual counts against requirements:
           - Help-wanted issues: actual >= 2 ? ✅ PASS : ❌ FAIL
@@ -2032,40 +2152,42 @@ jobs:
           
           Overall: PASS if all three criteria pass, otherwise FAIL
           
-          ### Step 6: Generate Markdown Email
+          ### Step 8: Generate Personalized Markdown Email
           
-          Create a professional Markdown-formatted email:
+          Create an **encouraging, actionable** Markdown email:
           
           **Structure:**
-          - Header with KubeStellar branding
-          - Maintainer username and audit metadata
-          - Three metric sections with:
-            - ✅ PASS or ❌ FAIL status
-            - Actual count vs requirement
-            - GitHub search link for verification
-          - Overall result summary
-          - Footer with automation note
+          1. **Warm greeting** with maintainer's username
+          2. **Quick stats summary** (metric results with ✅/❌)
+          3. **"Your Impact Areas"** section:
+             - Detected interests from past PRs (e.g., "You love working on documentation and testing!")
+             - Most active repos
+          4. **"Where You Can Help Next"** - Personalized recommendations:
+             - **🏷️ Help-Wanted Issues for You:** Top 3 issues matching their interests with direct links
+             - **👀 PRs That Need Your Review:** Top 3 PRs in their expertise areas with direct links
+             - **🎯 Repos Looking for Your Skills:** Top 3 repos with explanations
+          5. **Encouraging closing:**
+             - If PASS: Celebrate their contributions and suggest maintaining momentum
+             - If FAIL: Focus on opportunities, frame as "here's how to get back on track"
+          6. **Footer:** Automation note with timestamp
           
-          **Markdown Format Benefits:**
-          - Cleaner, more readable in plain text
-          - Better email client compatibility
-          - Easier to generate and validate
+          **Tone:** Supportive and constructive, not punitive
           
-          ### Step 7: Output Safe-Output Entry
+          ### Step 9: Output Safe-Output Entry
           
           Create a JSON entry for the email safe-output job:
           ```json
           {
             "type": "send_maintainer_email",
-            "subject": "Maintainer Audit Report - @{username} - {PASS/FAIL}",
-            "html_body": "{markdown_converted_to_html}",
+            "subject": "🌟 Your KubeStellar Impact Report - @{username}",
+            "markdown_body": "{pure_markdown_content}",
             "username": "{username}"
           }
           ```
           
-          **Note:** Generate the email in Markdown format, then convert to HTML for Postmark compatibility (most email clients render HTML well).
+          **Note:** Keep it as pure Markdown - no HTML conversion needed. Postmark will send as plain text.
           
-          ### Step 8: Update Cache Memory
+          ### Step 10: Update Cache Memory
           
           Write to `/tmp/gh-aw/cache-memory/maintainer_audit_progress.json`:
           ```json
@@ -2082,49 +2204,79 @@ jobs:
           ## Example Markdown Email Structure
           
           ```markdown
-          # 🔍 Maintainer Audit Report
+          Hey @clubanderson! 👋
           
-          **KubeStellar Organization**
-          
-          ---
-          
-          ## Audit for: @{username}
-          
-          **Audit Date:** 2025-12-05  
-          **Period:** Last 60 days (since 2025-10-06)
+          Here's your KubeStellar impact snapshot for the last 60 days.
           
           ---
           
-          ### ✅ Help-Wanted Issues: PASS
-          Created **5** issues (required: ≥2)  
-          [View on GitHub](https://github.com/search?q=org%3Akubestellar+is%3Aissue+label%3A%22help+wanted%22+author%3A{username}+created%3A%3E%3D2025-10-06)
+          ## 📊 Quick Stats
           
-          ### ❌ Unique PRs Commented: FAIL
-          Commented on **6** unique PRs (required: ≥8)  
-          [View Merged PRs](https://github.com/search?q=org%3Akubestellar+is%3Apr+is%3Amerged+commenter%3A{username})
+          ✅ **Help-Wanted Issues:** 5 created (required: ≥2)  
+          ❌ **PR Reviews:** 6 unique PRs (required: ≥8) — *Let's boost this!*  
+          ✅ **PRs Merged:** 4 merged (required: ≥3)
           
-          ### ✅ Merged PRs: PASS
-          Merged **4** PRs (required: ≥3)  
-          [View on GitHub](https://github.com/search?q=org%3Akubestellar+is%3Apr+is%3Amerged+author%3A{username})
+          **Overall:** 2 of 3 criteria met
           
           ---
           
-          ## Overall Result: ❌ FAIL
+          ## 🎯 Your Impact Areas
           
-          **Summary:** 2 of 3 criteria passed. The maintainer needs to increase PR review activity.
+          Based on your recent contributions, you're passionate about:
+          - 📝 **Documentation** (60% of your PRs touch `/docs/`)
+          - 🧪 **Testing** (noticed several `*_test.go` files)
+          - Most active in: **kubestellar/docs**, **kubestellar/kubestellar**
           
           ---
           
-          *Automated by GitHub Agentic Workflows • Run at 2025-12-05 20:00 UTC*
+          ## 🌟 Where You Can Help Next
+          
+          ### 🏷️ Help-Wanted Issues Perfect For You
+          
+          1. **[Improve Getting Started Guide](https://github.com/kubestellar/docs/issues/123)**  
+             `kubestellar/docs` • Labels: documentation, good-first-issue
+          
+          2. **[Add Integration Test Coverage](https://github.com/kubestellar/kubestellar/issues/456)**  
+             `kubestellar/kubestellar` • Labels: testing, help-wanted
+          
+          3. **[Document API Reference](https://github.com/kubestellar/docs/issues/789)**  
+             `kubestellar/docs` • Labels: documentation, help-wanted
+          
+          ### 👀 PRs That Need Your Review
+          
+          1. **[Update deployment docs for v0.25](https://github.com/kubestellar/docs/pull/234)**  
+             `kubestellar/docs` • Docs changes, no reviews yet
+          
+          2. **[Add E2E test for multi-cluster](https://github.com/kubestellar/kubestellar/pull/567)**  
+             `kubestellar/kubestellar` • Testing PR, needs expert eyes
+          
+          3. **[Fix typos in contributor guide](https://github.com/kubestellar/docs/pull/890)**  
+             `kubestellar/docs` • Quick review needed
+          
+          ### 🎯 Repos Looking for Your Skills
+          
+          1. **kubestellar/docs** — Your top repo! Several open doc issues need attention.
+          2. **kubestellar/kubestellar** — Core repo could use more test coverage (your strength!).
+          3. **kubestellar/kubeflex** — Growing repo, needs documentation help.
+          
+          ---
+          
+          ## 💪 Keep Up the Great Work!
+          
+          You're making a real difference in KubeStellar! To hit all 3 criteria next time, focus on reviewing a couple more PRs in areas you love. Your expertise in docs and testing is invaluable. 🙌
+          
+          ---
+          
+          *Automated by GitHub Agentic Workflows • 2025-12-05 20:18 UTC*
           ```
           
           ## Important Notes
           
-          - Generate the email content in **Markdown format** first
-          - Convert Markdown to simple HTML if needed for Postmark (use basic tags: h1, h2, p, a, strong, em)
-          - Keep formatting clean and email-client friendly
-          - Include clickable GitHub search links for transparency
-          - Use emojis sparingly for visual indicators (✅ ❌ 🔍)
+          - **Pure Markdown** - no HTML conversion, sent as plain text via Postmark
+          - **Encouraging tone** - focus on opportunities, not failures
+          - **Personalized recommendations** - based on detected interests from PR history
+          - **Actionable links** - direct links to specific issues/PRs they can tackle
+          - **Context-aware** - adapt tone based on PASS/FAIL (celebrate or motivate)
           
           PROMPT_EOF
       - name: Append XPIA security instructions to prompt
@@ -6078,9 +6230,9 @@ jobs:
 
             for (let i = 0; i < emailItems.length; i++) {
               const item = emailItems[i];
-              const { subject, html_body, username } = item;
+              const { subject, markdown_body, username } = item;
 
-              if (!subject || !html_body || !username) {
+              if (!subject || !markdown_body || !username) {
                 core.warning(`Email ${i + 1}: Missing required fields, skipping`);
                 continue;
               }
@@ -6089,7 +6241,7 @@ jobs:
                 let summaryContent = "## 📧 Staged Mode: Email Preview\n\n";
                 summaryContent += "**Subject:** " + subject + "\n\n";
                 summaryContent += "**Username:** @" + username + "\n\n";
-                summaryContent += "**HTML Preview (first 500 chars):**\n\n```html\n" + html_body.substring(0, 500) + "...\n```\n\n";
+                summaryContent += "**Markdown Preview (first 500 chars):**\n\n```markdown\n" + markdown_body.substring(0, 500) + "...\n```\n\n";
                 await core.summary.addRaw(summaryContent).write();
                 core.info("📝 Email preview written to step summary");
                 continue;
@@ -6109,7 +6261,7 @@ jobs:
                     From: fromEmail,
                     To: toEmail,
                     Subject: subject,
-                    HtmlBody: html_body,
+                    TextBody: markdown_body,
                     MessageStream: 'outbound'
                   })
                 });
