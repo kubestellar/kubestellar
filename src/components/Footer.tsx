@@ -151,7 +151,7 @@ export default function Footer() {
               <ul className="space-y-1 sm:space-y-3">
                 <li>
                   <Link
-                    href="/docs"
+                    href="https://kubestellar.io/docs"
                     className="text-gray-400 hover:text-white transition-colors duration-200 text-xs sm:text-sm inline-block"
                   >
                     {t("overview")}
@@ -159,7 +159,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/docs"
+                    href="https://kubestellar.io/docs/user-guide-support/user-guide-intro"
                     className="text-gray-400 hover:text-white transition-colors duration-200 text-xs sm:text-sm inline-block"
                   >
                     {t("userGuide")}
@@ -167,7 +167,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/docs"
+                    href="https://kubestellar.io/docs/contribution-guidelines/onboarding-inc"
                     className="text-gray-400 hover:text-white transition-colors duration-200 text-xs sm:text-sm inline-block"
                   >
                     {t("onboarding")}
@@ -175,7 +175,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/docs"
+                    href="https://kubestellar.io/docs/contribution-guidelines/release-notes"
                     className="text-gray-400 hover:text-white transition-colors duration-200 text-xs sm:text-sm inline-block"
                   >
                     {t("releasesNotes")}

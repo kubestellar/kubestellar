@@ -317,7 +317,7 @@ export default function DocsNavbar() {
                 <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
-                Contribute Handbook
+                Contributor Handbook
               </Link>
               <Link
                     href="/quick-installation"
@@ -416,7 +416,7 @@ export default function DocsNavbar() {
                 onMouseLeave={handleMouseLeave}
               >
               <Link
-                href="/docs"
+                href="/contribute-handbook"
                 className={dropdownItemClasses}
               >
                 <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -901,7 +901,7 @@ export default function DocsNavbar() {
               <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
-              Contribute Handbook
+              Contributor Handbook
             </Link>
             <Link href="/quick-installation" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
@@ -947,7 +947,7 @@ export default function DocsNavbar() {
             <div className={`text-sm font-medium uppercase px-2 py-1.5 mt-3 tracking-wider ${
               isDark ? 'text-gray-300' : 'text-gray-500'
             }`}>Community</div>
-            <Link href="/docs" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+            <Link href="/contribute-handbook" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'

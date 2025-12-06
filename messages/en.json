@@ -29,12 +29,12 @@
     "overview": "Overview",
     "userGuide": "User Guide",
     "onboarding": "Onboarding",
-    "releasesNotes": "Releases Notes",
+    "releasesNotes": "Release Notes",
     "gettingStarted": "Getting Started",
     "installationPage": "Installation Page",
     "ladder": "Ladder",
     "products": "Products",
-    "contributeHandbook": "Contribute Handbook",
+    "contributeHandbook": "Contributor Handbook",
     "resources": "Resources",
     "playground": "Playground",
     "programs": "Programs",
@@ -72,7 +72,7 @@
     "marketplace": "Marketplace",
     "contribute": "Contribute",
     "joinIn": "Join In",
-    "contributeHandbook": "Contribute Handbook",
+    "contributeHandbook": "Contributor Handbook",
     "quickInstallation": "Quick Installation",
     "products": "Products",
     "security": "Security",
@@ -311,7 +311,7 @@
     }
   },
   "communityHandbook": {
-    "title": "Contribute",
+    "title": "Contributor",
     "titleSpan": "Handbook",
     "learnMore": "Learn More",
     "cards": {

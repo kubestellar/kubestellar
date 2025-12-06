@@ -666,7 +666,7 @@ export default function Navbar() {
                     style={{ display: "none" }}
                   >
                     <Link
-                      href="/docs"
+                      href="/contribute-handbook"
                       className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-cyan-900/30 rounded transition-all duration-200 hover:text-cyan-300 hover:shadow-md"
                     >
                       <svg
@@ -920,7 +920,7 @@ export default function Navbar() {
                 <div className="relative mb-4">
                   <Link
                     target="_blank"
-                    href="https://kubestellar.io/blog"
+                    href="/blog"
                     className="text-sm sm:text-base font-medium text-gray-300 flex items-center space-x-1 px-3 py-2 rounded-lg"
                   >
                     <div className="relative">
@@ -1144,7 +1144,7 @@ export default function Navbar() {
                 </div>
                 <div className="relative mb-2">
                   <Link
-                    href="/docs"
+                    href="/contribute-handbook"
                     className="text-sm sm:text-base font-medium text-gray-300 flex items-center space-x-1 px-3 py-2 rounded-lg"
                   >
                     <div className="relative">
