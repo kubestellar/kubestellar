@@ -173,7 +173,7 @@ export default function Footer() {
                   href="/contribute-handbook"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  Contribute Handbook
+                  Contributor Handbook
                 </Link>
               </li>
             </ul>
