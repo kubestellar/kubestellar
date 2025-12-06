@@ -171,14 +171,14 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 		logger.V(5).Info("Updated status of workload object", "objectIdentifier", objectIdentifier)
 	}
 
-	if haveSingleton && !wantReturn {
+	if haveSingleton && !wantSingleton {
 		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, util.BindingPolicyLabelSingletonStatusKey)
 		if err != nil {
 			return err
 		}
 	}
 
-	if haveMultiWEC && !wantReturn {
+	if haveMultiWEC && !wantMultiWEC {
 		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, util.BindingPolicyLabelMultiWECStatusKey)
 		if err != nil {
 			return err
