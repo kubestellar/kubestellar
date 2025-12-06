@@ -93,6 +93,7 @@ func (c *Controller) syncWorkloadObject(ctx context.Context, wObjID util.ObjectI
 	}
 
 	logger.V(4).Info("neither singleton nor multi-WEC reported state return applies", "object", wObjID)
+	// handles status clearing for both singleton and multi-WEC when status == nil
 	if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers, false); err != nil {
 		return err
 	}
