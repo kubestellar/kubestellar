@@ -35,18 +35,18 @@ The tools output is not visible to the user unless you explicitly print it. Alwa
 ## Starting the Conversation
 
 1. **Initial Discovery**
-   
+
    Start by asking the user:
-   
+
    ```
    🔍 Let's debug your agentic workflow!
-   
+
    First, which workflow would you like to debug?
-   
+
    I can help you:
    - List all workflows with: `gh aw status`
    - Or tell me the workflow name directly (e.g., 'weekly-research', 'issue-triage')
-   
+
    Note: For running workflows, they must have a `workflow_dispatch` trigger.
    ```
 
@@ -63,20 +63,20 @@ The tools output is not visible to the user unless you explicitly print it. Alwa
 3. **Choose Debug Mode**
 
    Once a valid workflow is identified, ask the user:
-   
+
    ```
    📊 How would you like to debug this workflow?
-   
+
    **Option 1: Analyze existing logs** 📂
    - I'll download and analyze logs from previous runs
    - Best for: Understanding past failures, performance issues, token usage
    - Command: `gh aw logs <workflow-name> --json`
-   
+
    **Option 2: Run and audit** ▶️
    - I'll run the workflow now and then analyze the results
    - Best for: Testing changes, reproducing issues, validating fixes
    - Commands: `gh aw run <workflow-name>` → automatically poll `gh aw audit <run-id> --json` until the audit finishes
-   
+
    Which option would you prefer? (1 or 2)
    ```
 
@@ -87,17 +87,18 @@ The tools output is not visible to the user unless you explicitly print it. Alwa
 When the user chooses to analyze existing logs:
 
 1. **Download Logs**
+
    ```bash
    gh aw logs <workflow-name> --json
    ```
-   
+
    This command:
    - Downloads workflow run artifacts and logs
    - Provides JSON output with metrics, errors, and summaries
    - Includes token usage, cost estimates, and execution time
 
 2. **Analyze the Results**
-   
+
    Review the JSON output and identify:
    - **Errors and Warnings**: Look for error patterns in logs
    - **Token Usage**: High token counts may indicate inefficient prompts
@@ -106,7 +107,7 @@ When the user chooses to analyze existing logs:
    - **Success/Failure Patterns**: Analyze workflow conclusions
 
 3. **Provide Insights**
-   
+
    Based on the analysis, provide:
    - Clear explanation of what went wrong (if failures exist)
    - Specific recommendations for improvement
@@ -114,7 +115,7 @@ When the user chooses to analyze existing logs:
    - Command to apply fixes: `gh aw compile <workflow-name>`
 
 4. **Iterative Refinement**
-   
+
    If changes are made:
    - Help user edit the workflow file
    - Run `gh aw compile <workflow-name>` to validate
@@ -125,29 +126,31 @@ When the user chooses to analyze existing logs:
 When the user chooses to run and audit:
 
 1. **Verify workflow_dispatch Trigger**
-   
+
    Check that the workflow has `workflow_dispatch` in its `on:` trigger:
+
    ```yaml
    on:
      workflow_dispatch:
    ```
-   
+
    If not present, inform the user and offer to add it temporarily for testing.
 
 2. **Run the Workflow**
+
    ```bash
    gh aw run <workflow-name>
    ```
-   
+
    This command:
    - Triggers the workflow on GitHub Actions
    - Returns the run URL and run ID
    - May take time to complete
 
 3. **Capture the run ID and poll audit results**
-   
    - If `gh aw run` prints the run ID, record it immediately; otherwise ask the user to copy it from the GitHub Actions UI.
    - Start auditing right away using a basic polling loop:
+
    ```bash
    while ! gh aw audit <run-id> --json 2>&1 | grep -q '"status":\s*"\(completed\|failure\|cancelled\)"'; do
       echo "⏳ Run still in progress. Waiting 45 seconds..."
@@ -156,12 +159,13 @@ When the user chooses to run and audit:
    gh aw audit <run-id> --json
    done
    ```
+
    - If the audit output reports `"status": "in_progress"` (or the command fails because the run is still executing), wait ~45 seconds and run the same command again.
    - Keep polling until you receive a terminal status (`completed`, `failure`, or `cancelled`) and let the user know you're still working between attempts.
    - Remember that `gh aw audit` downloads artifacts into `logs/run-<run-id>/`, so note those paths (e.g., `run_summary.json`, `agent-stdio.log`) for deeper inspection.
 
 4. **Analyze Results**
-   
+
    Similar to Option 1, review the final audit data for:
    - Errors and failures in the execution
    - Tool usage patterns
@@ -169,7 +173,7 @@ When the user chooses to run and audit:
    - Missing tool reports
 
 5. **Provide Recommendations**
-   
+
    Based on the audit:
    - Explain what happened during execution
    - Identify root causes of issues
@@ -192,41 +196,48 @@ Use these tactics when a run is still executing or finishes without artifacts:
 When analyzing workflows, pay attention to:
 
 ### 1. **Permission Issues**
-   - Insufficient permissions in frontmatter
-   - Token authentication failures
-   - Suggest: Review `permissions:` block
+
+- Insufficient permissions in frontmatter
+- Token authentication failures
+- Suggest: Review `permissions:` block
 
 ### 2. **Tool Configuration**
-   - Missing required tools
-   - Incorrect tool allowlists
-   - MCP server connection failures
-   - Suggest: Check `tools:` and `mcp-servers:` configuration
+
+- Missing required tools
+- Incorrect tool allowlists
+- MCP server connection failures
+- Suggest: Check `tools:` and `mcp-servers:` configuration
 
 ### 3. **Prompt Quality**
-   - Vague or ambiguous instructions
-   - Missing context expressions (e.g., `${{ github.event.issue.number }}`)
-   - Overly complex multi-step prompts
-   - Suggest: Simplify, add context, break into sub-tasks
+
+- Vague or ambiguous instructions
+- Missing context expressions (e.g., `${{ github.event.issue.number }}`)
+- Overly complex multi-step prompts
+- Suggest: Simplify, add context, break into sub-tasks
 
 ### 4. **Timeouts**
-   - Workflows exceeding `timeout-minutes`
-   - Long-running operations
-   - Suggest: Increase timeout, optimize prompt, or add concurrency controls
+
+- Workflows exceeding `timeout-minutes`
+- Long-running operations
+- Suggest: Increase timeout, optimize prompt, or add concurrency controls
 
 ### 5. **Token Usage**
-   - Excessive token consumption
-   - Repeated context loading
-   - Suggest: Use `cache-memory:` for repeated runs, optimize prompt length
+
+- Excessive token consumption
+- Repeated context loading
+- Suggest: Use `cache-memory:` for repeated runs, optimize prompt length
 
 ### 6. **Network Issues**
-   - Blocked domains in `network:` allowlist
-   - Missing ecosystem permissions
-   - Suggest: Update `network:` configuration with required domains/ecosystems
+
+- Blocked domains in `network:` allowlist
+- Missing ecosystem permissions
+- Suggest: Update `network:` configuration with required domains/ecosystems
 
 ### 7. **Safe Output Problems**
-   - Issues creating GitHub entities (issues, PRs, discussions)
-   - Format errors in output
-   - Suggest: Review `safe-outputs:` configuration
+
+- Issues creating GitHub entities (issues, PRs, discussions)
+- Format errors in output
+- Suggest: Review `safe-outputs:` configuration
 
 ## Workflow Improvement Recommendations
 
@@ -243,35 +254,38 @@ When suggesting improvements:
 Before finishing:
 
 1. **Compile the Workflow**
+
    ```bash
    gh aw compile <workflow-name>
    ```
-   
+
    Ensure no syntax errors or validation warnings.
 
 2. **Check for Security Issues**
-   
+
    If the workflow is production-ready, suggest:
+
    ```bash
    gh aw compile <workflow-name> --strict
    ```
-   
+
    This enables strict validation with security checks.
 
 3. **Review Changes**
-   
+
    Summarize:
    - What was changed
    - Why it was changed
    - Expected improvement
    - Next steps (commit, push, test)
-   
+
 4. **Ask to Run Again**
-   
+
    After changes are made and validated, explicitly ask the user:
+
    ```
    Would you like to run the workflow again with the new changes to verify the improvements?
-   
+
    I can help you:
    - Run it now: `gh aw run <workflow-name>`
    - Or monitor the next scheduled/triggered run
@@ -290,6 +304,7 @@ Before finishing:
 ## Final Words
 
 After completing the debug session:
+
 - Summarize the findings and changes made
 - Remind the user to commit and push changes
 - Suggest monitoring the next run to verify improvements
