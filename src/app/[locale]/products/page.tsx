@@ -68,7 +68,8 @@ export default function ProductsPage() {
       fullName: t("products.kubectlMulti.fullName"),
       description: t("products.kubectlMulti.description"),
       hasDemo: true,
-      demoVideo: "https://www.youtube.com/embed/YtocfNSKqgI?si=SJc798MuZ2o9LeP_",
+      demoVideo:
+        "https://www.youtube.com/embed/YtocfNSKqgI?si=SJc798MuZ2o9LeP_",
     },
     {
       id: "galaxy-marketplace",
@@ -238,34 +239,34 @@ export default function ProductsPage() {
                         >
                           {product.id === "kubestellar-ui" ||
                           product.id === "galaxy-marketplace" ? (
-                          <>
-                            <svg
-                              className="w-4 h-4 mr-2"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              strokeWidth="2"
-                            >
-                              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                            </svg>
-                            {t("watchDemoButton")}
-                          </>
-                        ) : (
-                          <>
-                            <svg
-                              className="w-4 h-4 mr-2"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              strokeWidth="2"
-                            >
-                              <circle cx="12" cy="12" r="10" />
-                              <path d="M2 12h20" />
-                              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                            </svg>
-                            {t("websiteButton")}
-                          </>
-                        )}
+                            <>
+                              <svg
+                                className="w-4 h-4 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                strokeWidth="2"
+                              >
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                              </svg>
+                              {t("watchDemoButton")}
+                            </>
+                          ) : (
+                            <>
+                              <svg
+                                className="w-4 h-4 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                strokeWidth="2"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M2 12h20" />
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                              </svg>
+                              {t("websiteButton")}
+                            </>
+                          )}
                         </a>
                       )}
                     </div>
@@ -279,13 +280,13 @@ export default function ProductsPage() {
 
       {/* Video Modal */}
       {selectedProduct && selectedProduct.demoVideo && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
           onClick={() => setSelectedProduct(null)}
         >
-          <div 
+          <div
             className="relative w-full max-w-5xl bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-blue-500/30"
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             {/* Close button */}
             <button
