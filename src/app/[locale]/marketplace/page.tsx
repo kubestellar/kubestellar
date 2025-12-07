@@ -14,7 +14,7 @@ import { useEffect } from "react";
 export default function MarketplacePage() {
   const router = useRouter();
   useEffect(() => {
-    router.replace("/coming-soon");
+    router.replace("/coming-soon-marketplace");
   }, [router]);
 
   return <Loader />;

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Navbar, Footer, GridLines, StarField } from "@/components";
 import { useTranslations } from "next-intl";
 
@@ -17,6 +17,7 @@ interface Product {
 
 export default function ProductsPage() {
   const t = useTranslations("productsPage");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Product data with translatable strings
   const products: Product[] = [
@@ -208,15 +209,31 @@ export default function ProductsPage() {
                         </svg>
                         {t("repoButton")}
                       </a>
-                      <a
-                        href={product.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all duration-200"
-                      >
-                        {product.id === "kubectl-multi" ||
-                        product.id === "kubestellar-ui" ||
-                        product.id === "galaxy-marketplace" ? (
+                      {product.id === "kubectl-multi" ? (
+                        <button
+                          onClick={() => setIsModalOpen(true)}
+                          className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all duration-200"
+                        >
+                          <svg
+                            className="w-4 h-4 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            strokeWidth="2"
+                          >
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                          </svg>
+                          {t("watchDemoButton")}
+                        </button>
+                      ) : (
+                        <a
+                          href={product.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all duration-200"
+                        >
+                          {product.id === "kubestellar-ui" ||
+                          product.id === "galaxy-marketplace" ? (
                           <>
                             <svg
                               className="w-4 h-4 mr-2"
@@ -245,7 +262,8 @@ export default function ProductsPage() {
                             {t("websiteButton")}
                           </>
                         )}
-                      </a>
+                        </a>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -254,6 +272,62 @@ export default function ProductsPage() {
           </div>
         </div>
       </section>
+
+      {/* Video Modal */}
+      {isModalOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div 
+            className="relative w-full max-w-5xl bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-blue-500/30"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-gray-800/90 hover:bg-gray-700 rounded-full transition-colors duration-200 text-white"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            {/* Video content */}
+            <div className="aspect-video">
+              <iframe
+                className="w-full h-full"
+                src="https://www.youtube.com/embed/YtocfNSKqgI?si=SJc798MuZ2o9LeP_"
+                title="kubectl-multi Plugin Demo"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
+
+            {/* Modal footer */}
+            <div className="p-6 bg-gray-800/50 border-t border-gray-700/50">
+              <h3 className="text-xl font-bold text-white mb-2">
+                kubectl-multi Plugin Demo
+              </h3>
+              <p className="text-gray-400 text-sm">
+                Watch how kubectl-multi simplifies multi-cluster Kubernetes management
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <Footer />
