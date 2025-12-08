@@ -188,26 +188,42 @@ safe-outputs:
 
 # Maintainer Audit Report
 
-You are conducting automated maintainer audits for the KubeStellar organization.
+Generate a personalized maintainer audit report for **clubanderson** (`andy@clubanderson.com`).
 
-**⚠️ CRITICAL EXECUTION RULES:**
+## Task Overview
 
-1. **ONE EXECUTION ONLY**: Execute the workflow ONCE. After you complete Step 10, you MUST stop completely.
-2. **NO LOOPS**: Do NOT restart from Step 1. Do NOT re-analyze the same user.
-3. **LINEAR PROGRESSION**: Steps 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → STOP.
-4. **If you find yourself at Step 1 again, STOP IMMEDIATELY** - you've already completed the audit.
+Analyze clubanderson's contributions over the last 60 days and create an encouraging email report with personalized recommendations. This is a **single-pass analysis** - gather all data once, generate the email, output the safe-output JSON, then stop.
 
-## Your Mission
+## Required Data Collection
 
-Audit **clubanderson** (locked for testing). Execute steps 1-11 exactly once. After Step 10 (Output Safe-Output Entry), output the safe-output JSON and STOP. Do not continue. Do not loop back.
+Calculate dates once at the start:
+- `date_60_days_ago`: 60 days before today (YYYY-MM-DD)
+- `date_180_days_ago`: 180 days before today (for interest analysis)
+- `date_30_days_ago`: 30 days before today (for repo health)
 
-## Target Maintainer (TEST MODE - LOCKED)
+Then collect the following data **one time only** using GitHub searches:
 
-**Username:** clubanderson  
-**Email:** andy@clubanderson.com  
-**Index:** 0
+### 1. Interest Analysis (Last 6 Months)
+Search once: `org:kubestellar is:pr is:merged author:clubanderson merged:>={date_180_days_ago}`
+- Examine 10-15 recent PRs
+- Detect patterns: CI/CD, docs, UI, testing, DevOps
+- Note favorite repos
 
-This is the ONLY maintainer to audit. Ignore any references to other maintainers.
+### 2. Current Metrics (Last 60 Days)
+- **Help-wanted issues created**: Search once: `org:kubestellar is:issue label:"help wanted" author:clubanderson created:>={date_60_days_ago}` (count total)
+- **Unique PRs commented**: Search once for merged + once for open, deduplicate PR numbers:
+  - `org:kubestellar is:pr is:merged commenter:clubanderson updated:>={date_60_days_ago}`
+  - `org:kubestellar is:pr is:open commenter:clubanderson updated:>={date_60_days_ago}`
+- **Merged PRs authored**: Search once: `org:kubestellar is:pr is:merged author:clubanderson merged:>={date_60_days_ago}` (count total)
+
+### 3. Opportunities
+- **Help-wanted issues**: Search once: `org:kubestellar is:issue is:open label:"help wanted"` (pick top 3 matching interests)
+- **PRs needing review**: Search once: `org:kubestellar is:pr is:open review:required` (pick top 3 matching expertise)
+
+### 4. Repo Health (for help-wanted suggestions)
+For clubanderson's active repos, search once per repo:
+- Issues: `org:kubestellar is:issue repo:{repo} created:>={date_30_days_ago}`
+- PRs: `org:kubestellar is:pr repo:{repo} created:>={date_30_days_ago}`
 
 ## Audit Criteria (Last 60 Days)
 
@@ -249,241 +265,16 @@ Scope the search to these repos:
 - kubestellar/ui
 - kubestellar/ui-plugins
 
-## Process
+## Evaluation Criteria
 
-**⚠️ CRITICAL: Execution Strategy**
+Compare collected metrics against requirements:
+- ✅ Help-wanted issues ≥ 2
+- ✅ Unique PRs commented ≥ 8  
+- ✅ Merged PRs ≥ 3
 
-This workflow audits **ONE maintainer per run**. Follow this linear process **without repeating steps**:
+## Output Format
 
-1. **Load state** → Get next maintainer index
-2. **Select maintainer** → Store username + email
-3. **Calculate dates** → Compute 60-day and 180-day cutoffs ONCE
-4. **Analyze interests** → ONE search for past PRs, extract patterns
-5. **Gather metrics** → THREE searches total (help-wanted, PRs commented, PRs merged)
-6. **Find opportunities** → TWO searches (help-wanted issues, PRs needing review)
-7. **Suggest help-wanted areas** → Analyze repo health + expertise for creating new issues
-8. **Evaluate** → Compare metrics to requirements
-9. **Generate email** → Create personalized report
-10. **Output results** → Write safe-output entries
-11. **Update state** → Save next index
-
-**Do NOT repeat searches or loop over the same user's data.** Each search should happen **exactly once**.
-
----
-
-### Step 1: Load State from Repository (TESTING MODE - LOCKED)
-
-**🔒 TEST MODE: Always use index 0 (clubanderson)**
-
-For now, ignore the state file and **always audit clubanderson**:
-- Set index to `0`
-- Do NOT load or increment from `.github/audit-state.json`
-- Skip round-robin logic entirely
-
-### Step 2: Select Maintainer (LOCKED TO clubanderson)
-
-**🔒 TEST MODE: Always audit clubanderson**
-
-- Username: `clubanderson`
-- Email: `andy@clubanderson.com`
-- Index: `0`
-
-Store these values and proceed to Step 3.
-
-### Step 3: Calculate Date Range
-
-Calculate the date 60 days ago from today in YYYY-MM-DD format.
-
-### Step 4: Analyze Maintainer's Interests
-
-Before gathering metrics, understand what the maintainer likes to work on:
-
-**A. Analyze Past PRs (Last 6 months) - ONE SEARCH ONLY**
-
-- Search ONCE: `org:kubestellar is:pr is:merged author:{username} merged:>={date_180_days_ago}`
-- Examine up to 10-15 recent PRs from the results:
-  - Extract file paths changed (look for patterns like `/docs/`, `/src/`, `*_test.*`, `.yaml`, etc.)
-  - Note PR labels (e.g., `documentation`, `bug`, `feature`, `testing`)
-  - Track which repos they contribute to most
-- **Detect patterns:**
-  - **Documentation focus:** Many changes in `/docs/`, `*.md` files
-  - **Frontend/UI focus:** Changes in `/ui/`, `/src/components/`, `*.tsx`, `*.css`
-  - **Backend/Core:** Changes in `/pkg/`, `/cmd/`, `*.go`, `*.java`
-  - **Testing:** Changes in `*_test.*`, `/tests/`, `*_spec.*`
-  - **DevOps/CI:** Changes in `.github/workflows/`, `Dockerfile`, `*.yaml`
-  - **Favorite repos:** Count contributions per repo
-- **Store these patterns and proceed immediately to Step 5**
-
-### Step 5: Gather Current Metrics
-
-**IMPORTANT:** Perform each search **ONCE** and store the results. Do not repeat searches.
-
-Use the GitHub MCP tools to search and count:
-
-**A. Help-Wanted Issues Created**
-
-- Search ONCE: `org:kubestellar is:issue label:"help wanted" author:{username} created:>={date_60_days_ago}`
-- Count total results and store the count
-
-**B. Unique PRs Commented On**
-
-- Search merged PRs ONCE: `org:kubestellar is:pr is:merged commenter:{username} updated:>={date_60_days_ago}`
-- Search open PRs ONCE: `org:kubestellar is:pr is:open commenter:{username} updated:>={date_60_days_ago}`
-- Extract PR numbers from both result sets
-- Count unique PR numbers (deduplicate) and store the count
-- **Do NOT repeat these searches after getting the results**
-
-**C. Merged PRs Authored**
-
-- Search ONCE: `org:kubestellar is:pr is:merged author:{username} merged:>={date_60_days_ago}`
-- Count total results and store the count
-
-**Once you have all three metrics (A, B, C), proceed immediately to Step 6.**
-
-### Step 6: Find Personalized Opportunities
-
-**IMPORTANT:** Search for opportunities **ONCE** per category. Use the results to pick the top 3.
-
-Based on their interest patterns, find **Top 3** opportunities in each category:
-
-**A. Help-Wanted Issues in Their Favorite Areas**
-
-- Search ONCE across all KubeStellar repos: `org:kubestellar is:issue is:open label:"help wanted"`
-- From the results, filter/rank by:
-  - Repos they've contributed to before (higher priority)
-  - File paths/labels matching their detected interests
-  - Recent activity (updated within last 14 days)
-- Select top 3 issues with direct links
-- **Do NOT search again after getting results**
-
-**B. PRs Needing Review in Their Expertise Areas**
-
-- Search ONCE: `org:kubestellar is:pr is:open review:required`
-- From the results, filter/rank by:
-  - Repos they're active in
-  - File paths matching their interest patterns (docs, backend, frontend, etc.)
-  - PRs without recent review activity
-- Select top 3 PRs with direct links
-- **Do NOT search again after getting results**
-
-**C. Repos That Could Use Their Skills**
-
-- Based on their detected focus areas (docs, backend, UI, testing, DevOps):
-  - Match to KubeStellar repos that align (e.g., docs contributor → kubestellar/docs)
-  - Note recent issues/PRs in those repos needing attention
-- Suggest top 3 repos with reasons why
-
-**Once you have gathered opportunities from A, B, and C above, proceed immediately to Step 7.**
-
-### Step 7: Suggest Areas for Creating Help-Wanted Issues
-
-**IMPORTANT:** Analyze repo health and maintainer expertise to suggest where THEY should create new help-wanted issues.
-
-**A. Repo Health Analysis**
-
-For each KubeStellar repo the maintainer is active in:
-- Check recent issue activity (last 30 days): `org:kubestellar is:issue repo:{repo_name} created:>={date_30_days_ago}`
-- Check recent PR activity (last 30 days): `org:kubestellar is:pr repo:{repo_name} created:>={date_30_days_ago}`
-- Identify "cold spots" - repos with low issue/PR activity that may need help-wanted issues to attract contributors
-
-**B. Maintainer Expertise Matching**
-
-Based on Step 4 (their detected interests):
-- Match their expertise areas (docs, testing, UI, backend, DevOps) to repos where they're active
-- Identify specific areas where they could create help-wanted issues:
-  - **Documentation gaps** - Missing or outdated docs they could outline as help-wanted
-  - **Testing coverage** - Areas lacking tests where they could define test scenarios
-  - **UI improvements** - UX enhancements they've identified
-  - **Technical debt** - Refactoring opportunities in their domain
-
-**C. Generate Top 3 Suggestions**
-
-Create **specific, actionable** suggestions like:
-- "Create help-wanted issues for testing coverage in kubestellar/kubestellar `/pkg/` modules"
-- "Document API endpoints in kubestellar/docs - outline structure as help-wanted for new contributors"
-- "Create UI accessibility issues in kubestellar/ui based on your recent work"
-
-Each suggestion should explain:
-- **What** to create (specific issue type/area)
-- **Where** (repo + path/component)
-- **Why** (repo health gap OR leveraging their expertise)
-
-**Once you have these suggestions, proceed to Step 8.**
-
-### Step 8: Evaluate Criteria
-
-Compare actual counts against requirements:
-
-- Help-wanted issues: actual >= 2 ? ✅ PASS : ❌ FAIL
-- Unique PRs commented: actual >= 8 ? ✅ PASS : ❌ FAIL
-- Merged PRs: actual >= 3 ? ✅ PASS : ❌ FAIL
-
-Overall: PASS if all three criteria pass, otherwise FAIL
-
-### Step 9: Generate Personalized Markdown Email
-
-Create an **encouraging, actionable** Markdown email:
-
-**Structure:**
-
-1. **Warm greeting** with maintainer's username
-2. **Quick stats summary** (metric results with ✅/❌)
-3. **"Your Impact Areas"** section:
-   - Detected interests from past PRs (e.g., "You love working on documentation and testing!")
-   - Most active repos
-4. **"Where You Can Help Next"** - Personalized recommendations:
-   - **🏷️ Help-Wanted Issues for You:** Top 3 issues matching their interests with direct links
-   - **👀 PRs That Need Your Review:** Top 3 PRs in their expertise areas with direct links
-   - **🎯 Repos Looking for Your Skills:** Top 3 repos with explanations
-5. **"Consider Creating Help-Wanted Issues"** - NEW SECTION:
-   - **✨ Suggestions from Step 7:** Top 3 areas where they should create help-wanted issues
-   - Include **what**, **where**, and **why** for each suggestion
-6. **Encouraging closing:**
-   - If PASS: Celebrate their contributions and suggest maintaining momentum
-   - If FAIL: Focus on opportunities, frame as "here's how to get back on track"
-7. **Footer:** Automation note with timestamp
-
-**Tone:** Supportive and constructive, not punitive
-
-**Formatting Rules:**
-- DO NOT use markdown headings (##, ###) - they look weird in plain text emails
-- Use plain text section labels with emojis and horizontal rules (---) for separation
-- Use plain text, NOT inline code backticks for usernames (write `@username` not `` `@username` ``)
-- Use **bold** for emphasis, _italic_ for secondary emphasis
-- Use standard markdown lists with `-` or numbered `1.`
-- Avoid wrapping normal text in backticks unless it's actual code/commands
-
-### Step 10: Output Safe-Output Entry
-
-Create a JSON entry for the email safe-output job:
-
-```json
-{
-  "type": "send_maintainer_email",
-  "subject": "🌟 Your KubeStellar Impact Report - @{username}",
-  "markdown_body": "{pure_markdown_content}",
-  "username": "{username}",
-  "email": "{email}"
-}
-```
-
-Where `email` is the maintainer's email address from the table in Step 2.
-
-**Note:** Keep it as pure Markdown - no HTML conversion needed. Postmark will send as plain text.
-
-**AFTER creating this safe-output entry, your work is COMPLETE. Stop execution. Do NOT restart from Step 1.**
-
-### Step 11: Output State Update (TESTING MODE - DISABLED)
-
-**🔒 TEST MODE: Do NOT update state**
-
-Skip the state update output entirely. Do NOT create a safe-output entry for `update_audit_state`.
-
-Since we're locked to clubanderson for testing, there's no need to track progress.
-
-## Example Markdown Email Structure
-
-**IMPORTANT:** Follow this example format exactly. Notice NO markdown headings (##), just plain text labels with emojis and horizontal rules.
+Generate a personalized Markdown email following this structure (NO markdown headings `##`):
 
 ```markdown
 Hey @clubanderson! 👋
@@ -494,80 +285,57 @@ Here's your KubeStellar impact snapshot for the last 60 days.
 
 📊 **Quick Stats**
 
-✅ **Help-Wanted Issues:** 5 created (required: ≥2)  
-❌ **PR Reviews:** 6 unique PRs (required: ≥8) — _Let's boost this!_  
-✅ **PRs Merged:** 4 merged (required: ≥3)
+✅ **Help-Wanted Issues:** X created (required: ≥2)  
+✅/❌ **PR Reviews:** Y unique PRs (required: ≥8)  
+✅ **PRs Merged:** Z merged (required: ≥3)
 
-**Overall:** 2 of 3 criteria met
+**Overall:** Pass/Fail
 
 ---
 
 🎯 **Your Impact Areas**
 
-Based on your recent contributions, you're passionate about:
-
-- 📝 **Documentation** (60% of your PRs touch `/docs/`)
-- 🧪 **Testing** (noticed several `*_test.go` files)
-- Most active in: **kubestellar/docs**, **kubestellar/kubestellar**
+[Detected interests from interest analysis]
 
 ---
 
 🌟 **Where You Can Help Next**
 
 🏷️ **Help-Wanted Issues Perfect For You**
-
-1. **[Improve Getting Started Guide](https://github.com/kubestellar/docs/issues/123)**  
-   kubestellar/docs • Labels: documentation, good-first-issue
-
-2. **[Add Integration Test Coverage](https://github.com/kubestellar/kubestellar/issues/456)**  
-   kubestellar/kubestellar • Labels: testing, help-wanted
-
-3. **[Document API Reference](https://github.com/kubestellar/docs/issues/789)**  
-   kubestellar/docs • Labels: documentation, help-wanted
+[Top 3 with links]
 
 👀 **PRs That Need Your Review**
-
-1. **[Update deployment docs for v0.25](https://github.com/kubestellar/docs/pull/234)**  
-   kubestellar/docs • Docs changes, no reviews yet
-
-2. **[Add E2E test for multi-cluster](https://github.com/kubestellar/kubestellar/pull/567)**  
-   kubestellar/kubestellar • Testing PR, needs expert eyes
-
-3. **[Fix typos in contributor guide](https://github.com/kubestellar/docs/pull/890)**  
-   kubestellar/docs • Quick review needed
+[Top 3 with links]
 
 🎯 **Repos Looking for Your Skills**
-
-1. **kubestellar/docs** — Your top repo! Several open doc issues need attention.
-2. **kubestellar/kubestellar** — Core repo could use more test coverage (your strength!).
-3. **kubestellar/kubeflex** — Growing repo, needs documentation help.
+[Top 3 with reasons]
 
 ---
 
 ✨ **Consider Creating Help-Wanted Issues**
 
-Here are areas where YOU could create help-wanted issues to grow our contributor base:
-
-1. **Testing coverage for `/pkg/` modules in kubestellar/kubestellar**  
-   _Why:_ Low recent test activity detected. Your testing expertise could outline specific test scenarios as help-wanted issues for new contributors.
-
-2. **Document API endpoints in kubestellar/docs**  
-   _Why:_ You're the docs expert! Create help-wanted issues with outlines for missing API documentation.
-
-3. **Accessibility improvements in kubestellar/ui**  
-   _Why:_ Based on your recent UI work, you could identify accessibility gaps and create structured help-wanted issues.
+[Top 3 suggestions based on repo health + expertise]
 
 ---
 
-💪 **Keep Up the Great Work!**
-
-You're making a real difference in KubeStellar! To hit all 3 criteria next time, focus on reviewing a couple more PRs in areas you love. Your expertise in docs and testing is invaluable. 🙌
+💪 **[Encouraging closing based on pass/fail]**
 
 ---
 
-_Automated by GitHub Agentic Workflows • 2025-12-05 20:18 UTC_
+_Automated by GitHub Agentic Workflows • {timestamp}_
 ```
 
----
+Then output the safe-output JSON:
 
-**END OF WORKFLOW INSTRUCTIONS. Your audit is complete after Step 10. Stop here.**
+```json
+{
+  "type": "send_maintainer_email",
+  "subject": "🌟 Your KubeStellar Impact Report - @clubanderson",
+  "markdown_body": "[generated email]",
+  "username": "clubanderson",
+  "email": "andy@clubanderson.com"
+}
+```
+
+**After outputting this JSON, your task is complete. Stop.**
+
