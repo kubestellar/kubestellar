@@ -326,17 +326,25 @@ Here's your KubeStellar impact snapshot for the last 60 days.
 _Automated by GitHub Agentic Workflows • {timestamp}_
 ```
 
-Then output the safe-output JSON:
+## Final Step: Output Safe-Output
+
+Create a **valid JSON object** for the safe-output system. Use the `safeoutputs` tool to output:
 
 ```json
 {
   "type": "send_maintainer_email",
   "subject": "🌟 Your KubeStellar Impact Report - @clubanderson",
-  "markdown_body": "[generated email]",
+  "markdown_body": "<YOUR_GENERATED_EMAIL_HERE>",
   "username": "clubanderson",
   "email": "andy@clubanderson.com"
 }
 ```
 
-**After outputting this JSON, your task is complete. Stop.**
+**Important**:
+- Replace `<YOUR_GENERATED_EMAIL_HERE>` with the actual email markdown you generated
+- Escape any quotes or special characters in the markdown_body
+- Output this as a single valid JSON object
+- Do NOT output intermediate JSON attempts
+
+**After successfully outputting this JSON object, stop immediately.**
 
