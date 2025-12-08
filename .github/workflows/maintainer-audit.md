@@ -274,10 +274,11 @@ This workflow audits **ONE maintainer per run**. Follow this linear process **wi
 4. **Analyze interests** → ONE search for past PRs, extract patterns
 5. **Gather metrics** → THREE searches total (help-wanted, PRs commented, PRs merged)
 6. **Find opportunities** → TWO searches (help-wanted issues, PRs needing review)
-7. **Evaluate** → Compare metrics to requirements
-8. **Generate email** → Create personalized report
-9. **Output results** → Write safe-output entries
-10. **Update state** → Save next index
+7. **Suggest help-wanted areas** → Analyze repo health + expertise for creating new issues
+8. **Evaluate** → Compare metrics to requirements
+9. **Generate email** → Create personalized report
+10. **Output results** → Write safe-output entries
+11. **Update state** → Save next index
 
 **Do NOT repeat searches or loop over the same user's data.** Each search should happen **exactly once**.
 
@@ -387,7 +388,42 @@ Based on their interest patterns, find **Top 3** opportunities in each category:
 
 **Once you have gathered opportunities from A, B, and C above, proceed immediately to Step 7.**
 
-### Step 7: Evaluate Criteria
+### Step 7: Suggest Areas for Creating Help-Wanted Issues
+
+**IMPORTANT:** Analyze repo health and maintainer expertise to suggest where THEY should create new help-wanted issues.
+
+**A. Repo Health Analysis**
+
+For each KubeStellar repo the maintainer is active in:
+- Check recent issue activity (last 30 days): `org:kubestellar is:issue repo:{repo_name} created:>={date_30_days_ago}`
+- Check recent PR activity (last 30 days): `org:kubestellar is:pr repo:{repo_name} created:>={date_30_days_ago}`
+- Identify "cold spots" - repos with low issue/PR activity that may need help-wanted issues to attract contributors
+
+**B. Maintainer Expertise Matching**
+
+Based on Step 4 (their detected interests):
+- Match their expertise areas (docs, testing, UI, backend, DevOps) to repos where they're active
+- Identify specific areas where they could create help-wanted issues:
+  - **Documentation gaps** - Missing or outdated docs they could outline as help-wanted
+  - **Testing coverage** - Areas lacking tests where they could define test scenarios
+  - **UI improvements** - UX enhancements they've identified
+  - **Technical debt** - Refactoring opportunities in their domain
+
+**C. Generate Top 3 Suggestions**
+
+Create **specific, actionable** suggestions like:
+- "Create help-wanted issues for testing coverage in kubestellar/kubestellar `/pkg/` modules"
+- "Document API endpoints in kubestellar/docs - outline structure as help-wanted for new contributors"
+- "Create UI accessibility issues in kubestellar/ui based on your recent work"
+
+Each suggestion should explain:
+- **What** to create (specific issue type/area)
+- **Where** (repo + path/component)
+- **Why** (repo health gap OR leveraging their expertise)
+
+**Once you have these suggestions, proceed to Step 8.**
+
+### Step 8: Evaluate Criteria
 
 Compare actual counts against requirements:
 
@@ -397,7 +433,7 @@ Compare actual counts against requirements:
 
 Overall: PASS if all three criteria pass, otherwise FAIL
 
-### Step 8: Generate Personalized Markdown Email
+### Step 9: Generate Personalized Markdown Email
 
 Create an **encouraging, actionable** Markdown email:
 
@@ -412,10 +448,13 @@ Create an **encouraging, actionable** Markdown email:
    - **🏷️ Help-Wanted Issues for You:** Top 3 issues matching their interests with direct links
    - **👀 PRs That Need Your Review:** Top 3 PRs in their expertise areas with direct links
    - **🎯 Repos Looking for Your Skills:** Top 3 repos with explanations
-5. **Encouraging closing:**
+5. **"Consider Creating Help-Wanted Issues"** - NEW SECTION:
+   - **✨ Suggestions from Step 7:** Top 3 areas where they should create help-wanted issues
+   - Include **what**, **where**, and **why** for each suggestion
+6. **Encouraging closing:**
    - If PASS: Celebrate their contributions and suggest maintaining momentum
    - If FAIL: Focus on opportunities, frame as "here's how to get back on track"
-6. **Footer:** Automation note with timestamp
+7. **Footer:** Automation note with timestamp
 
 **Tone:** Supportive and constructive, not punitive
 
@@ -427,7 +466,7 @@ Create an **encouraging, actionable** Markdown email:
 - Use standard markdown lists with `-` or numbered `1.`
 - Avoid wrapping normal text in backticks unless it's actual code/commands
 
-### Step 9: Output Safe-Output Entry
+### Step 10: Output Safe-Output Entry
 
 Create a JSON entry for the email safe-output job:
 
@@ -445,7 +484,7 @@ Where `email` is the maintainer's email address from the table in Step 2.
 
 **Note:** Keep it as pure Markdown - no HTML conversion needed. Postmark will send as plain text.
 
-### Step 10: Output State Update (TESTING MODE - DISABLED)
+### Step 11: Output State Update (TESTING MODE - DISABLED)
 
 **🔒 TEST MODE: Do NOT update state**
 
@@ -513,6 +552,21 @@ Based on your recent contributions, you're passionate about:
 1. **kubestellar/docs** — Your top repo! Several open doc issues need attention.
 2. **kubestellar/kubestellar** — Core repo could use more test coverage (your strength!).
 3. **kubestellar/kubeflex** — Growing repo, needs documentation help.
+
+---
+
+✨ **Consider Creating Help-Wanted Issues**
+
+Here are areas where YOU could create help-wanted issues to grow our contributor base:
+
+1. **Testing coverage for `/pkg/` modules in kubestellar/kubestellar**  
+   _Why:_ Low recent test activity detected. Your testing expertise could outline specific test scenarios as help-wanted issues for new contributors.
+
+2. **Document API endpoints in kubestellar/docs**  
+   _Why:_ You're the docs expert! Create help-wanted issues with outlines for missing API documentation.
+
+3. **Accessibility improvements in kubestellar/ui**  
+   _Why:_ Based on your recent UI work, you could identify accessibility gaps and create structured help-wanted issues.
 
 ---
 
