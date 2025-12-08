@@ -307,16 +307,43 @@
 #
 # ## Process
 #
-# ### Step 1: Load State from Repository
-# Load progress from `.github/audit-state.json` in the repository:
-# - Use `github.get_file_contents` to read the file
-# - Parse JSON to get `last_index` and increment by 1
-# - If file doesn't exist or fails to load, start at index 0
+# **⚠️ CRITICAL: Execution Strategy**
 #
-# ### Step 2: Select Next Maintainer
-# - Get maintainer username and email at current index from the table above (0-18)
-# - If index >= 19, wrap to 0
-# - Store both `username` and `email` for later use
+# This workflow audits **ONE maintainer per run**. Follow this linear process **without repeating steps**:
+#
+# 1. **Load state** → Get next maintainer index
+# 2. **Select maintainer** → Store username + email
+# 3. **Calculate dates** → Compute 60-day and 180-day cutoffs ONCE
+# 4. **Analyze interests** → ONE search for past PRs, extract patterns
+# 5. **Gather metrics** → THREE searches total (help-wanted, PRs commented, PRs merged)
+# 6. **Find opportunities** → TWO searches (help-wanted issues, PRs needing review)
+# 7. **Evaluate** → Compare metrics to requirements
+# 8. **Generate email** → Create personalized report
+# 9. **Output results** → Write safe-output entries
+# 10. **Update state** → Save next index
+#
+# **Do NOT repeat searches or loop over the same user's data.** Each search should happen **exactly once**.
+#
+# ---
+#
+# ### Step 1: Load State from Repository (TESTING MODE - LOCKED)
+#
+# **🔒 TEST MODE: Always use index 0 (clubanderson)**
+#
+# For now, ignore the state file and **always audit clubanderson**:
+# - Set index to `0`
+# - Do NOT load or increment from `.github/audit-state.json`
+# - Skip round-robin logic entirely
+#
+# ### Step 2: Select Maintainer (LOCKED TO clubanderson)
+#
+# **🔒 TEST MODE: Always audit clubanderson**
+#
+# - Username: `clubanderson`
+# - Email: `andy@clubanderson.com`
+# - Index: `0`
+#
+# Store these values and proceed to Step 3.
 #
 # ### Step 3: Calculate Date Range
 # Calculate the date 60 days ago from today in YYYY-MM-DD format.
@@ -325,9 +352,9 @@
 #
 # Before gathering metrics, understand what the maintainer likes to work on:
 #
-# **A. Analyze Past PRs (Last 6 months)**
-# - Search: `org:kubestellar is:pr is:merged author:{username} merged:>={date_180_days_ago}`
-# - For each PR (up to 10-15 recent ones):
+# **A. Analyze Past PRs (Last 6 months) - ONE SEARCH ONLY**
+# - Search ONCE: `org:kubestellar is:pr is:merged author:{username} merged:>={date_180_days_ago}`
+# - Examine up to 10-15 recent PRs from the results:
 #   - Extract file paths changed (look for patterns like `/docs/`, `/src/`, `*_test.*`, `.yaml`, etc.)
 #   - Note PR labels (e.g., `documentation`, `bug`, `feature`, `testing`)
 #   - Track which repos they contribute to most
@@ -338,50 +365,62 @@
 #   - **Testing:** Changes in `*_test.*`, `/tests/`, `*_spec.*`
 #   - **DevOps/CI:** Changes in `.github/workflows/`, `Dockerfile`, `*.yaml`
 #   - **Favorite repos:** Count contributions per repo
+# - **Store these patterns and proceed immediately to Step 5**
 #
 # ### Step 5: Gather Current Metrics
+#
+# **IMPORTANT:** Perform each search **ONCE** and store the results. Do not repeat searches.
 #
 # Use the GitHub MCP tools to search and count:
 #
 # **A. Help-Wanted Issues Created**
-# - Search: `org:kubestellar is:issue label:"help wanted" author:{username} created:>={date_60_days_ago}`
-# - Count total results
+# - Search ONCE: `org:kubestellar is:issue label:"help wanted" author:{username} created:>={date_60_days_ago}`
+# - Count total results and store the count
 #
 # **B. Unique PRs Commented On**
-# - Search merged PRs: `org:kubestellar is:pr is:merged commenter:{username} updated:>={date_60_days_ago}`
-# - Search open PRs: `org:kubestellar is:pr is:open commenter:{username} updated:>={date_60_days_ago}`
+# - Search merged PRs ONCE: `org:kubestellar is:pr is:merged commenter:{username} updated:>={date_60_days_ago}`
+# - Search open PRs ONCE: `org:kubestellar is:pr is:open commenter:{username} updated:>={date_60_days_ago}`
 # - Extract PR numbers from both result sets
-# - Count unique PR numbers (deduplicate)
+# - Count unique PR numbers (deduplicate) and store the count
+# - **Do NOT repeat these searches after getting the results**
 #
 # **C. Merged PRs Authored**
-# - Search: `org:kubestellar is:pr is:merged author:{username} merged:>={date_60_days_ago}`
-# - Count total results
+# - Search ONCE: `org:kubestellar is:pr is:merged author:{username} merged:>={date_60_days_ago}`
+# - Count total results and store the count
+#
+# **Once you have all three metrics (A, B, C), proceed immediately to Step 6.**
 #
 # ### Step 6: Find Personalized Opportunities
+#
+# **IMPORTANT:** Search for opportunities **ONCE** per category. Use the results to pick the top 3.
 #
 # Based on their interest patterns, find **Top 3** opportunities in each category:
 #
 # **A. Help-Wanted Issues in Their Favorite Areas**
-# - Search across all KubeStellar repos: `org:kubestellar is:issue is:open label:"help wanted"`
-# - Filter/rank by:
+# - Search ONCE across all KubeStellar repos: `org:kubestellar is:issue is:open label:"help wanted"`
+# - From the results, filter/rank by:
 #   - Repos they've contributed to before (higher priority)
 #   - File paths/labels matching their detected interests
 #   - Recent activity (updated within last 14 days)
 # - Select top 3 issues with direct links
+# - **Do NOT search again after getting results**
 #
 # **B. PRs Needing Review in Their Expertise Areas**
-# - Search: `org:kubestellar is:pr is:open review:required`
-# - Filter/rank by:
+# - Search ONCE: `org:kubestellar is:pr is:open review:required`
+# - From the results, filter/rank by:
 #   - Repos they're active in
 #   - File paths matching their interest patterns (docs, backend, frontend, etc.)
 #   - PRs without recent review activity
 # - Select top 3 PRs with direct links
+# - **Do NOT search again after getting results**
 #
 # **C. Repos That Could Use Their Skills**
 # - Based on their detected focus areas (docs, backend, UI, testing, DevOps):
 #   - Match to KubeStellar repos that align (e.g., docs contributor → kubestellar/docs)
 #   - Note recent issues/PRs in those repos needing attention
 # - Suggest top 3 repos with reasons why
+#
+# **Once you have gathered opportunities from A, B, and C above, proceed immediately to Step 7.**
 #
 # ### Step 7: Evaluate Criteria
 #
@@ -430,20 +469,13 @@
 #
 # **Note:** Keep it as pure Markdown - no HTML conversion needed. Postmark will send as plain text.
 #
-# ### Step 10: Output State Update
+# ### Step 10: Output State Update (TESTING MODE - DISABLED)
 #
-# Create a safe-output entry to update the state file:
-# ```json
-# {
-#   "type": "update_audit_state",
-#   "state_content": "{\"last_index\": {next_index}, \"last_username\": \"{username}\", \"last_audit_date\": \"{iso_timestamp}\", \"last_result\": \"PASS or FAIL\"}",
-#   "username": "{username}"
-# }
-# ```
+# **🔒 TEST MODE: Do NOT update state**
 #
-# Where `next_index` is the current index + 1 (or 0 if wrapping to start of list).
+# Skip the state update output entirely. Do NOT create a safe-output entry for `update_audit_state`.
 #
-# The safe-output job will create a PR to update `.github/audit-state.json`, ensuring state persists across runs.
+# Since we're locked to clubanderson for testing, there's no need to track progress.
 #
 # ## Example Markdown Email Structure
 #
@@ -2146,16 +2178,43 @@ jobs:
           
           ## Process
           
-          ### Step 1: Load State from Repository
-          Load progress from `.github/audit-state.json` in the repository:
-          - Use `github.get_file_contents` to read the file
-          - Parse JSON to get `last_index` and increment by 1
-          - If file doesn't exist or fails to load, start at index 0
+          **⚠️ CRITICAL: Execution Strategy**
           
-          ### Step 2: Select Next Maintainer
-          - Get maintainer username and email at current index from the table above (0-18)
-          - If index >= 19, wrap to 0
-          - Store both `username` and `email` for later use
+          This workflow audits **ONE maintainer per run**. Follow this linear process **without repeating steps**:
+          
+          1. **Load state** → Get next maintainer index
+          2. **Select maintainer** → Store username + email
+          3. **Calculate dates** → Compute 60-day and 180-day cutoffs ONCE
+          4. **Analyze interests** → ONE search for past PRs, extract patterns
+          5. **Gather metrics** → THREE searches total (help-wanted, PRs commented, PRs merged)
+          6. **Find opportunities** → TWO searches (help-wanted issues, PRs needing review)
+          7. **Evaluate** → Compare metrics to requirements
+          8. **Generate email** → Create personalized report
+          9. **Output results** → Write safe-output entries
+          10. **Update state** → Save next index
+          
+          **Do NOT repeat searches or loop over the same user's data.** Each search should happen **exactly once**.
+          
+          ---
+          
+          ### Step 1: Load State from Repository (TESTING MODE - LOCKED)
+          
+          **🔒 TEST MODE: Always use index 0 (clubanderson)**
+          
+          For now, ignore the state file and **always audit clubanderson**:
+          - Set index to `0`
+          - Do NOT load or increment from `.github/audit-state.json`
+          - Skip round-robin logic entirely
+          
+          ### Step 2: Select Maintainer (LOCKED TO clubanderson)
+          
+          **🔒 TEST MODE: Always audit clubanderson**
+          
+          - Username: `clubanderson`
+          - Email: `andy@clubanderson.com`
+          - Index: `0`
+          
+          Store these values and proceed to Step 3.
           
           ### Step 3: Calculate Date Range
           Calculate the date 60 days ago from today in YYYY-MM-DD format.
@@ -2164,9 +2223,9 @@ jobs:
           
           Before gathering metrics, understand what the maintainer likes to work on:
           
-          **A. Analyze Past PRs (Last 6 months)**
-          - Search: `org:kubestellar is:pr is:merged author:{username} merged:>={date_180_days_ago}`
-          - For each PR (up to 10-15 recent ones):
+          **A. Analyze Past PRs (Last 6 months) - ONE SEARCH ONLY**
+          - Search ONCE: `org:kubestellar is:pr is:merged author:{username} merged:>={date_180_days_ago}`
+          - Examine up to 10-15 recent PRs from the results:
             - Extract file paths changed (look for patterns like `/docs/`, `/src/`, `*_test.*`, `.yaml`, etc.)
             - Note PR labels (e.g., `documentation`, `bug`, `feature`, `testing`)
             - Track which repos they contribute to most
@@ -2177,50 +2236,62 @@ jobs:
             - **Testing:** Changes in `*_test.*`, `/tests/`, `*_spec.*`
             - **DevOps/CI:** Changes in `.github/workflows/`, `Dockerfile`, `*.yaml`
             - **Favorite repos:** Count contributions per repo
+          - **Store these patterns and proceed immediately to Step 5**
           
           ### Step 5: Gather Current Metrics
+          
+          **IMPORTANT:** Perform each search **ONCE** and store the results. Do not repeat searches.
           
           Use the GitHub MCP tools to search and count:
           
           **A. Help-Wanted Issues Created**
-          - Search: `org:kubestellar is:issue label:"help wanted" author:{username} created:>={date_60_days_ago}`
-          - Count total results
+          - Search ONCE: `org:kubestellar is:issue label:"help wanted" author:{username} created:>={date_60_days_ago}`
+          - Count total results and store the count
           
           **B. Unique PRs Commented On**
-          - Search merged PRs: `org:kubestellar is:pr is:merged commenter:{username} updated:>={date_60_days_ago}`
-          - Search open PRs: `org:kubestellar is:pr is:open commenter:{username} updated:>={date_60_days_ago}`
+          - Search merged PRs ONCE: `org:kubestellar is:pr is:merged commenter:{username} updated:>={date_60_days_ago}`
+          - Search open PRs ONCE: `org:kubestellar is:pr is:open commenter:{username} updated:>={date_60_days_ago}`
           - Extract PR numbers from both result sets
-          - Count unique PR numbers (deduplicate)
+          - Count unique PR numbers (deduplicate) and store the count
+          - **Do NOT repeat these searches after getting the results**
           
           **C. Merged PRs Authored**
-          - Search: `org:kubestellar is:pr is:merged author:{username} merged:>={date_60_days_ago}`
-          - Count total results
+          - Search ONCE: `org:kubestellar is:pr is:merged author:{username} merged:>={date_60_days_ago}`
+          - Count total results and store the count
+          
+          **Once you have all three metrics (A, B, C), proceed immediately to Step 6.**
           
           ### Step 6: Find Personalized Opportunities
+          
+          **IMPORTANT:** Search for opportunities **ONCE** per category. Use the results to pick the top 3.
           
           Based on their interest patterns, find **Top 3** opportunities in each category:
           
           **A. Help-Wanted Issues in Their Favorite Areas**
-          - Search across all KubeStellar repos: `org:kubestellar is:issue is:open label:"help wanted"`
-          - Filter/rank by:
+          - Search ONCE across all KubeStellar repos: `org:kubestellar is:issue is:open label:"help wanted"`
+          - From the results, filter/rank by:
             - Repos they've contributed to before (higher priority)
             - File paths/labels matching their detected interests
             - Recent activity (updated within last 14 days)
           - Select top 3 issues with direct links
+          - **Do NOT search again after getting results**
           
           **B. PRs Needing Review in Their Expertise Areas**
-          - Search: `org:kubestellar is:pr is:open review:required`
-          - Filter/rank by:
+          - Search ONCE: `org:kubestellar is:pr is:open review:required`
+          - From the results, filter/rank by:
             - Repos they're active in
             - File paths matching their interest patterns (docs, backend, frontend, etc.)
             - PRs without recent review activity
           - Select top 3 PRs with direct links
+          - **Do NOT search again after getting results**
           
           **C. Repos That Could Use Their Skills**
           - Based on their detected focus areas (docs, backend, UI, testing, DevOps):
             - Match to KubeStellar repos that align (e.g., docs contributor → kubestellar/docs)
             - Note recent issues/PRs in those repos needing attention
           - Suggest top 3 repos with reasons why
+          
+          **Once you have gathered opportunities from A, B, and C above, proceed immediately to Step 7.**
           
           ### Step 7: Evaluate Criteria
           
@@ -2269,20 +2340,13 @@ jobs:
           
           **Note:** Keep it as pure Markdown - no HTML conversion needed. Postmark will send as plain text.
           
-          ### Step 10: Output State Update
+          ### Step 10: Output State Update (TESTING MODE - DISABLED)
           
-          Create a safe-output entry to update the state file:
-          ```json
-          {
-            "type": "update_audit_state",
-            "state_content": "{\"last_index\": {next_index}, \"last_username\": \"{username}\", \"last_audit_date\": \"{iso_timestamp}\", \"last_result\": \"PASS or FAIL\"}",
-            "username": "{username}"
-          }
-          ```
+          **🔒 TEST MODE: Do NOT update state**
           
-          Where `next_index` is the current index + 1 (or 0 if wrapping to start of list).
+          Skip the state update output entirely. Do NOT create a safe-output entry for `update_audit_state`.
           
-          The safe-output job will create a PR to update `.github/audit-state.json`, ensuring state persists across runs.
+          Since we're locked to clubanderson for testing, there's no need to track progress.
           
           ## Example Markdown Email Structure
           
