@@ -203,9 +203,11 @@ Audit **clubanderson** (locked for testing). Execute steps 1-11 exactly once. Af
 
 ## Target Maintainer (TEST MODE - LOCKED)
 
-**clubanderson** (`andy@clubanderson.com`) - Index 0
+**Username:** clubanderson  
+**Email:** andy@clubanderson.com  
+**Index:** 0
 
-**For future reference (not used during testing):** The full maintainer list is: clubanderson, mikespreitzer, dumb0002, waltforme, pdettori, francostellari, kproche, nupurshivani, onkar717, kunal-511, mavrick-1, gaurab-khanal, naman9271, btwshivam, rxinui, vedansh-5, sagar2366, oksaumya, rupam-it.
+This is the ONLY maintainer to audit. Ignore any references to other maintainers.
 
 ## Audit Criteria (Last 60 Days)
 
