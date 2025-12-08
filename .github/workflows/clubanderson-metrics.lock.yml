@@ -156,33 +156,35 @@
 #
 # ## Task
 #
-# 1. Calculate the date 60 days ago from today (YYYY-MM-DD format)
-# 2. Run these GitHub searches (org-wide across kubestellar):
-#    - Help-wanted issues created: `org:kubestellar is:issue label:"help wanted" author:clubanderson created:>={date_60_days_ago}`
-#    - PRs commented on (merged): `org:kubestellar is:pr is:merged commenter:clubanderson updated:>={date_60_days_ago}`
-#    - PRs commented on (open): `org:kubestellar is:pr is:open commenter:clubanderson updated:>={date_60_days_ago}`
-#    - Merged PRs: `org:kubestellar is:pr is:merged author:clubanderson merged:>={date_60_days_ago}`
-#    - Open help-wanted issues: `org:kubestellar is:issue is:open label:"help wanted"`
-#    - Open PRs needing review: `org:kubestellar is:pr is:open review:required`
-#    - Recent open issues (last 30 days) in active repos: `org:kubestellar is:issue is:open created:>={date_30_days_ago} repo:kubestellar/docs OR repo:kubestellar/ui OR repo:kubestellar/ui-plugins`
+# **Run only 5 searches total, then analyze results for everything else:**
 #
-# 3. Count metrics and check criteria:
+# 1. Calculate dates once: `date_60_days_ago` and `date_30_days_ago`
+#
+# 2. Run these 5 searches:
+#    - **Search 1** - Help-wanted issues created: `org:kubestellar is:issue label:"help wanted" author:clubanderson created:>={date_60_days_ago}`
+#    - **Search 2** - PRs commented (both merged + open): `org:kubestellar is:pr commenter:clubanderson updated:>={date_60_days_ago}`
+#    - **Search 3** - Merged PRs authored: `org:kubestellar is:pr is:merged author:clubanderson merged:>={date_60_days_ago}`
+#    - **Search 4** - All open issues in active repos: `org:kubestellar is:issue is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
+#    - **Search 5** - All open PRs in active repos: `org:kubestellar is:pr is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
+#
+# 3. **Analyze Search 2 results** to count unique PRs commented (deduplicate by PR number)
+#
+# 4. **Check metrics** against criteria:
 #    - Help-wanted issues ≥ 2? ✅ / ❌
-#    - Unique PRs commented ≥ 8? (deduplicate PR numbers from merged + open searches) ✅ / ❌
+#    - Unique PRs commented ≥ 8? ✅ / ❌
 #    - Merged PRs ≥ 3? ✅ / ❌
 #
-# 4. Analyze clubanderson's expertise from recent merged PRs:
-#    - CI/CD focus: Many PRs touching `.github/workflows/`, `.prow.yaml`, Docker
-#    - Documentation: PRs in `/docs/`, `*.md` files
-#    - UI/Frontend: PRs in `kubestellar/ui`, translations, UI components
+# 5. **Analyze Search 3 results** to detect clubanderson's expertise:
+#    - Look at file paths in recent merged PRs to identify: CI/CD (workflows, Docker), Docs (*.md files), UI (kubestellar/ui)
 #
-# 5. Generate personalized recommendations:
-#    - **Help-Wanted Suggestions** (top 3): Areas with low activity in docs/ui/ui-plugins where clubanderson could create help-wanted issues based on his CI/CD, docs, or UI expertise
-#    - **PRs Needing Review** (top 3): Open PRs in docs/ui/ui-plugins matching his skills (CI/CD, docs, UI changes)
-#    - **PR Opportunities** (top 3): Recent issues in his active repos where PRs are needed in his domains
+# 6. **Reuse Search 4 & 5 results** to generate recommendations (NO additional searches):
+#    - **Help-Wanted Suggestions**: From Search 4, find 3 issues with `help wanted` label in docs/ui/ui-plugins
+#    - **PRs Needing Review**: From Search 5, find 3 PRs with `review:required` or lacking reviews, matching his expertise
+#    - **PR Opportunities**: From Search 4, find 3 recent issues (last 30 days) without help-wanted label that need PRs in his domains
 #
-# 6. Generate a simple plain-text email with results + recommendations
-# 7. Output the safe-output JSON
+# 7. Generate simple plain-text email with metrics + recommendations
+#
+# 8. Output the safe-output JSON
 #
 # ## Email Format
 #
@@ -1792,33 +1794,35 @@ jobs:
           
           ## Task
           
-          1. Calculate the date 60 days ago from today (YYYY-MM-DD format)
-          2. Run these GitHub searches (org-wide across kubestellar):
-             - Help-wanted issues created: `org:kubestellar is:issue label:"help wanted" author:clubanderson created:>={date_60_days_ago}`
-             - PRs commented on (merged): `org:kubestellar is:pr is:merged commenter:clubanderson updated:>={date_60_days_ago}`
-             - PRs commented on (open): `org:kubestellar is:pr is:open commenter:clubanderson updated:>={date_60_days_ago}`
-             - Merged PRs: `org:kubestellar is:pr is:merged author:clubanderson merged:>={date_60_days_ago}`
-             - Open help-wanted issues: `org:kubestellar is:issue is:open label:"help wanted"`
-             - Open PRs needing review: `org:kubestellar is:pr is:open review:required`
-             - Recent open issues (last 30 days) in active repos: `org:kubestellar is:issue is:open created:>={date_30_days_ago} repo:kubestellar/docs OR repo:kubestellar/ui OR repo:kubestellar/ui-plugins`
+          **Run only 5 searches total, then analyze results for everything else:**
           
-          3. Count metrics and check criteria:
+          1. Calculate dates once: `date_60_days_ago` and `date_30_days_ago`
+          
+          2. Run these 5 searches:
+             - **Search 1** - Help-wanted issues created: `org:kubestellar is:issue label:"help wanted" author:clubanderson created:>={date_60_days_ago}`
+             - **Search 2** - PRs commented (both merged + open): `org:kubestellar is:pr commenter:clubanderson updated:>={date_60_days_ago}`
+             - **Search 3** - Merged PRs authored: `org:kubestellar is:pr is:merged author:clubanderson merged:>={date_60_days_ago}`
+             - **Search 4** - All open issues in active repos: `org:kubestellar is:issue is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
+             - **Search 5** - All open PRs in active repos: `org:kubestellar is:pr is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
+          
+          3. **Analyze Search 2 results** to count unique PRs commented (deduplicate by PR number)
+          
+          4. **Check metrics** against criteria:
              - Help-wanted issues ≥ 2? ✅ / ❌
-             - Unique PRs commented ≥ 8? (deduplicate PR numbers from merged + open searches) ✅ / ❌
+             - Unique PRs commented ≥ 8? ✅ / ❌
              - Merged PRs ≥ 3? ✅ / ❌
           
-          4. Analyze clubanderson's expertise from recent merged PRs:
-             - CI/CD focus: Many PRs touching `.github/workflows/`, `.prow.yaml`, Docker
-             - Documentation: PRs in `/docs/`, `*.md` files
-             - UI/Frontend: PRs in `kubestellar/ui`, translations, UI components
+          5. **Analyze Search 3 results** to detect clubanderson's expertise:
+             - Look at file paths in recent merged PRs to identify: CI/CD (workflows, Docker), Docs (*.md files), UI (kubestellar/ui)
           
-          5. Generate personalized recommendations:
-             - **Help-Wanted Suggestions** (top 3): Areas with low activity in docs/ui/ui-plugins where clubanderson could create help-wanted issues based on his CI/CD, docs, or UI expertise
-             - **PRs Needing Review** (top 3): Open PRs in docs/ui/ui-plugins matching his skills (CI/CD, docs, UI changes)
-             - **PR Opportunities** (top 3): Recent issues in his active repos where PRs are needed in his domains
+          6. **Reuse Search 4 & 5 results** to generate recommendations (NO additional searches):
+             - **Help-Wanted Suggestions**: From Search 4, find 3 issues with `help wanted` label in docs/ui/ui-plugins
+             - **PRs Needing Review**: From Search 5, find 3 PRs with `review:required` or lacking reviews, matching his expertise
+             - **PR Opportunities**: From Search 4, find 3 recent issues (last 30 days) without help-wanted label that need PRs in his domains
           
-          6. Generate a simple plain-text email with results + recommendations
-          7. Output the safe-output JSON
+          7. Generate simple plain-text email with metrics + recommendations
+          
+          8. Output the safe-output JSON
           
           ## Email Format
           
