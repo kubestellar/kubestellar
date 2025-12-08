@@ -192,7 +192,7 @@ You are conducting automated maintainer audits for the KubeStellar organization.
 
 ## Your Mission
 
-Audit ONE maintainer per run using a round-robin system, tracking progress in cache-memory.
+Audit ONE maintainer per run. **Complete steps 1-11 exactly once, then STOP. Do not loop or restart.**
 
 ## Maintainer List (Round-Robin Order)
 
@@ -483,6 +483,8 @@ Create a JSON entry for the email safe-output job:
 Where `email` is the maintainer's email address from the table in Step 2.
 
 **Note:** Keep it as pure Markdown - no HTML conversion needed. Postmark will send as plain text.
+
+**AFTER creating this safe-output entry, your work is COMPLETE. Stop execution. Do NOT restart from Step 1.**
 
 ### Step 11: Output State Update (TESTING MODE - DISABLED)
 
