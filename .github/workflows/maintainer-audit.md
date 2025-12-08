@@ -420,6 +420,8 @@ Create an **encouraging, actionable** Markdown email:
 **Tone:** Supportive and constructive, not punitive
 
 **Formatting Rules:**
+- DO NOT use markdown headings (##, ###) - they look weird in plain text emails
+- Use plain text section labels with emojis and horizontal rules (---) for separation
 - Use plain text, NOT inline code backticks for usernames (write `@username` not `` `@username` ``)
 - Use **bold** for emphasis, _italic_ for secondary emphasis
 - Use standard markdown lists with `-` or numbered `1.`
@@ -453,7 +455,7 @@ Since we're locked to clubanderson for testing, there's no need to track progres
 
 ## Example Markdown Email Structure
 
-**IMPORTANT:** Follow this example format exactly. Notice how the username is written as plain `@clubanderson`, NOT wrapped in backticks.
+**IMPORTANT:** Follow this example format exactly. Notice NO markdown headings (##), just plain text labels with emojis and horizontal rules.
 
 ```markdown
 Hey @clubanderson! 👋
@@ -462,7 +464,7 @@ Here's your KubeStellar impact snapshot for the last 60 days.
 
 ---
 
-## 📊 Quick Stats
+📊 **Quick Stats**
 
 ✅ **Help-Wanted Issues:** 5 created (required: ≥2)  
 ❌ **PR Reviews:** 6 unique PRs (required: ≥8) — _Let's boost this!_  
@@ -472,7 +474,7 @@ Here's your KubeStellar impact snapshot for the last 60 days.
 
 ---
 
-## 🎯 Your Impact Areas
+🎯 **Your Impact Areas**
 
 Based on your recent contributions, you're passionate about:
 
@@ -482,31 +484,31 @@ Based on your recent contributions, you're passionate about:
 
 ---
 
-## 🌟 Where You Can Help Next
+🌟 **Where You Can Help Next**
 
-### 🏷️ Help-Wanted Issues Perfect For You
+🏷️ **Help-Wanted Issues Perfect For You**
 
 1. **[Improve Getting Started Guide](https://github.com/kubestellar/docs/issues/123)**  
-   `kubestellar/docs` • Labels: documentation, good-first-issue
+   kubestellar/docs • Labels: documentation, good-first-issue
 
 2. **[Add Integration Test Coverage](https://github.com/kubestellar/kubestellar/issues/456)**  
-   `kubestellar/kubestellar` • Labels: testing, help-wanted
+   kubestellar/kubestellar • Labels: testing, help-wanted
 
 3. **[Document API Reference](https://github.com/kubestellar/docs/issues/789)**  
-   `kubestellar/docs` • Labels: documentation, help-wanted
+   kubestellar/docs • Labels: documentation, help-wanted
 
-### 👀 PRs That Need Your Review
+👀 **PRs That Need Your Review**
 
 1. **[Update deployment docs for v0.25](https://github.com/kubestellar/docs/pull/234)**  
-   `kubestellar/docs` • Docs changes, no reviews yet
+   kubestellar/docs • Docs changes, no reviews yet
 
 2. **[Add E2E test for multi-cluster](https://github.com/kubestellar/kubestellar/pull/567)**  
-   `kubestellar/kubestellar` • Testing PR, needs expert eyes
+   kubestellar/kubestellar • Testing PR, needs expert eyes
 
 3. **[Fix typos in contributor guide](https://github.com/kubestellar/docs/pull/890)**  
-   `kubestellar/docs` • Quick review needed
+   kubestellar/docs • Quick review needed
 
-### 🎯 Repos Looking for Your Skills
+🎯 **Repos Looking for Your Skills**
 
 1. **kubestellar/docs** — Your top repo! Several open doc issues need attention.
 2. **kubestellar/kubestellar** — Core repo could use more test coverage (your strength!).
@@ -514,7 +516,7 @@ Based on your recent contributions, you're passionate about:
 
 ---
 
-## 💪 Keep Up the Great Work!
+💪 **Keep Up the Great Work!**
 
 You're making a real difference in KubeStellar! To hit all 3 criteria next time, focus on reviewing a couple more PRs in areas you love. Your expertise in docs and testing is invaluable. 🙌
 
