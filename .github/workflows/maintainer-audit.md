@@ -221,9 +221,10 @@ Search once: `org:kubestellar is:pr is:merged author:clubanderson merged:>={date
 - **PRs needing review**: Search once: `org:kubestellar is:pr is:open review:required` (pick top 3 matching expertise)
 
 ### 4. Repo Health (for help-wanted suggestions)
-For clubanderson's active repos, search once per repo:
-- Issues: `org:kubestellar is:issue repo:{repo} created:>={date_30_days_ago}`
-- PRs: `org:kubestellar is:pr repo:{repo} created:>={date_30_days_ago}`
+Use the **existing search results** from steps 1-3 above to identify:
+- Which repos clubanderson is most active in
+- Areas with low recent activity (cold spots)
+- Don't perform additional searches - analyze the data you already have
 
 ## Audit Criteria (Last 60 Days)
 
