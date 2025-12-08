@@ -237,39 +237,22 @@
 #
 # You are conducting automated maintainer audits for the KubeStellar organization.
 #
-# **⚠️ CRITICAL: This is a LINEAR WORKFLOW. Execute steps 1-11 in order ONCE, then STOP. Do NOT restart or loop back to Step 1.**
+# **⚠️ CRITICAL EXECUTION RULES:**
+#
+# 1. **ONE EXECUTION ONLY**: Execute the workflow ONCE. After you complete Step 10, you MUST stop completely.
+# 2. **NO LOOPS**: Do NOT restart from Step 1. Do NOT re-analyze the same user.
+# 3. **LINEAR PROGRESSION**: Steps 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → STOP.
+# 4. **If you find yourself at Step 1 again, STOP IMMEDIATELY** - you've already completed the audit.
 #
 # ## Your Mission
 #
-# Audit ONE maintainer per run. Complete steps 1-11 exactly once, then STOP. After completing Step 10 (Output Safe-Output Entry), your work is done.
+# Audit **clubanderson** (locked for testing). Execute steps 1-11 exactly once. After Step 10 (Output Safe-Output Entry), output the safe-output JSON and STOP. Do not continue. Do not loop back.
 #
-# ## Maintainer List (Round-Robin Order)
+# ## Target Maintainer (TEST MODE - LOCKED)
 #
-# The complete list of maintainers to audit with their email addresses:
+# **clubanderson** (`andy@clubanderson.com`) - Index 0
 #
-# | Index | Username       | Email                      |
-# | ----- | -------------- | -------------------------- |
-# | 0     | clubanderson   | andy@clubanderson.com      |
-# | 1     | mikespreitzer  | mspreitz@us.ibm.com        |
-# | 2     | dumb0002       | Braulio.Dumba@ibm.com      |
-# | 3     | waltforme      | jun.duan@ibm.com           |
-# | 4     | pdettori       | dettori@us.ibm.com         |
-# | 5     | francostellari | stellari@us.ibm.com        |
-# | 6     | kproche        | kproche@us.ibm.com         |
-# | 7     | nupurshivani   | nupurjha.me@gmail.com      |
-# | 8     | onkar717       | onkarwork2234@gmail.com    |
-# | 9     | kunal-511      | yoyokvunal@gmail.com       |
-# | 10    | mavrick-1      | mavrickrishi@gmail.com     |
-# | 11    | gaurab-khanal  | khanalgaurab98@gmail.com   |
-# | 12    | naman9271      | namanjain9271@gmail.com    |
-# | 13    | btwshivam      | shivam200446@gmail.com     |
-# | 14    | rxinui         | rainui.ly@gmail.com        |
-# | 15    | vedansh-5      | vedanshsaini7719@gmail.com |
-# | 16    | sagar2366      | sagarutekar2366@gmail.com  |
-# | 17    | oksaumya       | saumyakr2006@gmail.com     |
-# | 18    | rupam-it       | Mannarupam3@gmail.com      |
-#
-# **Total: 19 maintainers**
+# **For future reference (not used during testing):** The full maintainer list is: clubanderson, mikespreitzer, dumb0002, waltforme, pdettori, francostellari, kproche, nupurshivani, onkar717, kunal-511, mavrick-1, gaurab-khanal, naman9271, btwshivam, rxinui, vedansh-5, sagar2366, oksaumya, rupam-it.
 #
 # ## Audit Criteria (Last 60 Days)
 #
@@ -2188,39 +2171,22 @@ jobs:
           
           You are conducting automated maintainer audits for the KubeStellar organization.
           
-          **⚠️ CRITICAL: This is a LINEAR WORKFLOW. Execute steps 1-11 in order ONCE, then STOP. Do NOT restart or loop back to Step 1.**
+          **⚠️ CRITICAL EXECUTION RULES:**
+          
+          1. **ONE EXECUTION ONLY**: Execute the workflow ONCE. After you complete Step 10, you MUST stop completely.
+          2. **NO LOOPS**: Do NOT restart from Step 1. Do NOT re-analyze the same user.
+          3. **LINEAR PROGRESSION**: Steps 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → STOP.
+          4. **If you find yourself at Step 1 again, STOP IMMEDIATELY** - you've already completed the audit.
           
           ## Your Mission
           
-          Audit ONE maintainer per run. Complete steps 1-11 exactly once, then STOP. After completing Step 10 (Output Safe-Output Entry), your work is done.
+          Audit **clubanderson** (locked for testing). Execute steps 1-11 exactly once. After Step 10 (Output Safe-Output Entry), output the safe-output JSON and STOP. Do not continue. Do not loop back.
           
-          ## Maintainer List (Round-Robin Order)
+          ## Target Maintainer (TEST MODE - LOCKED)
           
-          The complete list of maintainers to audit with their email addresses:
+          **clubanderson** (`andy@clubanderson.com`) - Index 0
           
-          | Index | Username       | Email                      |
-          | ----- | -------------- | -------------------------- |
-          | 0     | clubanderson   | andy@clubanderson.com      |
-          | 1     | mikespreitzer  | mspreitz@us.ibm.com        |
-          | 2     | dumb0002       | Braulio.Dumba@ibm.com      |
-          | 3     | waltforme      | jun.duan@ibm.com           |
-          | 4     | pdettori       | dettori@us.ibm.com         |
-          | 5     | francostellari | stellari@us.ibm.com        |
-          | 6     | kproche        | kproche@us.ibm.com         |
-          | 7     | nupurshivani   | nupurjha.me@gmail.com      |
-          | 8     | onkar717       | onkarwork2234@gmail.com    |
-          | 9     | kunal-511      | yoyokvunal@gmail.com       |
-          | 10    | mavrick-1      | mavrickrishi@gmail.com     |
-          | 11    | gaurab-khanal  | khanalgaurab98@gmail.com   |
-          | 12    | naman9271      | namanjain9271@gmail.com    |
-          | 13    | btwshivam      | shivam200446@gmail.com     |
-          | 14    | rxinui         | rainui.ly@gmail.com        |
-          | 15    | vedansh-5      | vedanshsaini7719@gmail.com |
-          | 16    | sagar2366      | sagarutekar2366@gmail.com  |
-          | 17    | oksaumya       | saumyakr2006@gmail.com     |
-          | 18    | rupam-it       | Mannarupam3@gmail.com      |
-          
-          **Total: 19 maintainers**
+          **For future reference (not used during testing):** The full maintainer list is: clubanderson, mikespreitzer, dumb0002, waltforme, pdettori, francostellari, kproche, nupurshivani, onkar717, kunal-511, mavrick-1, gaurab-khanal, naman9271, btwshivam, rxinui, vedansh-5, sagar2366, oksaumya, rupam-it.
           
           ## Audit Criteria (Last 60 Days)
           
