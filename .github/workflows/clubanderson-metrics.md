@@ -112,17 +112,32 @@ Track 3 simple metrics for clubanderson over the last 60 days and send a pass/fa
 ## Task
 
 1. Calculate the date 60 days ago from today (YYYY-MM-DD format)
-2. Run exactly 3 GitHub searches (org-wide across kubestellar):
+2. Run these GitHub searches (org-wide across kubestellar):
    - Help-wanted issues created: `org:kubestellar is:issue label:"help wanted" author:clubanderson created:>={date_60_days_ago}`
    - PRs commented on (merged): `org:kubestellar is:pr is:merged commenter:clubanderson updated:>={date_60_days_ago}`
    - PRs commented on (open): `org:kubestellar is:pr is:open commenter:clubanderson updated:>={date_60_days_ago}`
    - Merged PRs: `org:kubestellar is:pr is:merged author:clubanderson merged:>={date_60_days_ago}`
-3. Count the results and check against criteria:
+   - Open help-wanted issues: `org:kubestellar is:issue is:open label:"help wanted"`
+   - Open PRs needing review: `org:kubestellar is:pr is:open review:required`
+   - Recent open issues (last 30 days) in active repos: `org:kubestellar is:issue is:open created:>={date_30_days_ago} repo:kubestellar/docs OR repo:kubestellar/ui OR repo:kubestellar/ui-plugins`
+
+3. Count metrics and check criteria:
    - Help-wanted issues ≥ 2? ✅ / ❌
    - Unique PRs commented ≥ 8? (deduplicate PR numbers from merged + open searches) ✅ / ❌
    - Merged PRs ≥ 3? ✅ / ❌
-4. Generate a simple plain-text email with results
-5. Output the safe-output JSON
+
+4. Analyze clubanderson's expertise from recent merged PRs:
+   - CI/CD focus: Many PRs touching `.github/workflows/`, `.prow.yaml`, Docker
+   - Documentation: PRs in `/docs/`, `*.md` files
+   - UI/Frontend: PRs in `kubestellar/ui`, translations, UI components
+
+5. Generate personalized recommendations:
+   - **Help-Wanted Suggestions** (top 3): Areas with low activity in docs/ui/ui-plugins where clubanderson could create help-wanted issues based on his CI/CD, docs, or UI expertise
+   - **PRs Needing Review** (top 3): Open PRs in docs/ui/ui-plugins matching his skills (CI/CD, docs, UI changes)
+   - **PR Opportunities** (top 3): Recent issues in his active repos where PRs are needed in his domains
+
+6. Generate a simple plain-text email with results + recommendations
+7. Output the safe-output JSON
 
 ## Email Format
 
@@ -142,6 +157,23 @@ Here are your KubeStellar metrics for the last 60 days:
 Overall: PASS [3/3] or FAIL [1/3]
 
 [If FAIL: Brief encouragement to focus on the missing criteria]
+
+---
+
+🏷️ Help-Wanted Suggestions for You:
+1. [Specific area] in [repo] - [brief reason based on low activity + your expertise]
+2. [Specific area] in [repo] - [brief reason]
+3. [Specific area] in [repo] - [brief reason]
+
+👀 PRs Needing Your Review:
+1. [PR title + link] - [repo] • [why it matches your skills]
+2. [PR title + link] - [repo] • [why it matches your skills]
+3. [PR title + link] - [repo] • [why it matches your skills]
+
+🔨 PR Opportunities in Your Areas:
+1. [Issue title + link] - [repo] • [why this needs a PR in your domain]
+2. [Issue title + link] - [repo] • [why this needs a PR in your domain]
+3. [Issue title + link] - [repo] • [why this needs a PR in your domain]
 
 ---
 Automated metrics check • {date}
