@@ -43,15 +43,16 @@ That's it, no more text. Wait for the user to respond.
 
 Analyze the user's response and map it to agentic workflows. Ask clarifying questions as needed, such as:
 
-   - What should trigger the workflow (`on:` — e.g., issues, pull requests, schedule, slash command)?
-   - What should the agent do (comment, triage, create PR, fetch API data, etc.)?
-   - ⚠️ If you think the task requires **network access beyond localhost**, explicitly ask about configuring the top-level `network:` allowlist (ecosystems like `node`, `python`, `playwright`, or specific domains).
-   - 💡 If you detect the task requires **browser automation**, suggest the **`playwright`** tool.
+- What should trigger the workflow (`on:` — e.g., issues, pull requests, schedule, slash command)?
+- What should the agent do (comment, triage, create PR, fetch API data, etc.)?
+- ⚠️ If you think the task requires **network access beyond localhost**, explicitly ask about configuring the top-level `network:` allowlist (ecosystems like `node`, `python`, `playwright`, or specific domains).
+- 💡 If you detect the task requires **browser automation**, suggest the **`playwright`** tool.
 
 **Scheduling Best Practices:**
-   - 📅 When creating a **daily scheduled workflow**, pick a random hour.
-   - 🚫 **Avoid weekend scheduling**: For daily workflows, use `cron: "0 <hour> * * 1-5"` to run only on weekdays (Monday-Friday) instead of `* * *` which includes weekends.
-   - Example daily schedule avoiding weekends: `cron: "0 14 * * 1-5"` (2 PM UTC, weekdays only)
+
+- 📅 When creating a **daily scheduled workflow**, pick a random hour.
+- 🚫 **Avoid weekend scheduling**: For daily workflows, use `cron: "0 <hour> * * 1-5"` to run only on weekdays (Monday-Friday) instead of `* * *` which includes weekends.
+- Example daily schedule avoiding weekends: `cron: "0 14 * * 1-5"` (2 PM UTC, weekdays only)
 
 DO NOT ask all these questions at once; instead, engage in a back-and-forth conversation to gather the necessary details.
 
@@ -72,6 +73,7 @@ DO NOT ask all these questions at once; instead, engage in a back-and-forth conv
    ### Correct tool snippets (reference)
 
    **GitHub tool with fine-grained allowances**:
+
    ```yaml
    tools:
      github:
@@ -82,19 +84,21 @@ DO NOT ask all these questions at once; instead, engage in a back-and-forth conv
    ```
 
    **General tools (editing, fetching, searching, bash patterns, Playwright)**:
+
    ```yaml
    tools:
-     edit:        # File editing
-     web-fetch:   # Web content fetching
-     web-search:  # Web search
-     bash:        # Shell commands (whitelist patterns)
+     edit: # File editing
+     web-fetch: # Web content fetching
+     web-search: # Web search
+     bash: # Shell commands (whitelist patterns)
        - "gh label list:*"
        - "gh label view:*"
        - "git status"
-     playwright:  # Browser automation
+     playwright: # Browser automation
    ```
 
    **MCP servers (top-level block)**:
+
    ```yaml
    mcp-servers:
      my-custom-server:
@@ -117,10 +121,9 @@ DO NOT ask all these questions at once; instead, engage in a back-and-forth conv
      - Use sanitized expressions (`${{ needs.activation.outputs.text }}`) instead of raw event text.
 
 6. **Final words**
-
-    - After completing the workflow, inform the user:
-      - The workflow has been created and compiled successfully.
-      - Commit and push the changes to activate it.
+   - After completing the workflow, inform the user:
+     - The workflow has been created and compiled successfully.
+     - Commit and push the changes to activate it.
 
 ## Guidelines
 

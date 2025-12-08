@@ -55,13 +55,13 @@ safe-outputs:
             title: "chore: audit state update for @${{ inputs.username }}"
             body: |
               Automated audit state update.
-              
+
               **Maintainer:** @${{ inputs.username }}
               **Run:** ${{ github.run_number }}
             delete-branch: true
             add-paths: |
               .github/audit-state.json
-    
+
     send-maintainer-email:
       description: "Send maintainer audit report via Postmark"
       runs-on: ubuntu-latest
@@ -98,17 +98,17 @@ safe-outputs:
               const fromEmail = process.env.POSTMARK_FROM_EMAIL;
               const isStaged = process.env.GH_AW_SAFE_OUTPUTS_STAGED === 'true';
               const outputContent = process.env.GH_AW_AGENT_OUTPUT;
-              
+
               if (!postmarkToken || !fromEmail) {
                 core.setFailed('Missing Postmark secrets: POSTMARK_API_TOKEN, POSTMARK_FROM_EMAIL');
                 return;
               }
-              
+
               if (!outputContent) {
                 core.info('No GH_AW_AGENT_OUTPUT environment variable found');
                 return;
               }
-              
+
               let agentOutputData;
               try {
                 const fileContent = fs.readFileSync(outputContent, 'utf8');
@@ -117,21 +117,21 @@ safe-outputs:
                 core.setFailed(`Error reading agent output: ${error instanceof Error ? error.message : String(error)}`);
                 return;
               }
-              
+
               if (!agentOutputData.items || !Array.isArray(agentOutputData.items)) {
                 core.info('No valid items in agent output');
                 return;
               }
-              
+
               const emailItems = agentOutputData.items.filter(item => item.type === 'send_maintainer_email');
-              
+
               if (emailItems.length === 0) {
                 core.info('No send_maintainer_email items found');
                 return;
               }
-              
+
               core.info(`Found ${emailItems.length} email(s) to send`);
-              
+
               for (let i = 0; i < emailItems.length; i++) {
                 const item = emailItems[i];
                 const { subject, markdown_body, username, email } = item;
@@ -198,27 +198,27 @@ Audit ONE maintainer per run using a round-robin system, tracking progress in ca
 
 The complete list of maintainers to audit with their email addresses:
 
-| Index | Username | Email |
-|-------|----------|-------|
-| 0 | clubanderson | andy@clubanderson.com |
-| 1 | mikespreitzer | mspreitz@us.ibm.com |
-| 2 | dumb0002 | Braulio.Dumba@ibm.com |
-| 3 | waltforme | jun.duan@ibm.com |
-| 4 | pdettori | dettori@us.ibm.com |
-| 5 | francostellari | stellari@us.ibm.com |
-| 6 | kproche | kproche@us.ibm.com |
-| 7 | nupurshivani | nupurjha.me@gmail.com |
-| 8 | onkar717 | onkarwork2234@gmail.com |
-| 9 | kunal-511 | yoyokvunal@gmail.com |
-| 10 | mavrick-1 | mavrickrishi@gmail.com |
-| 11 | gaurab-khanal | khanalgaurab98@gmail.com |
-| 12 | naman9271 | namanjain9271@gmail.com |
-| 13 | btwshivam | shivam200446@gmail.com |
-| 14 | rxinui | rainui.ly@gmail.com |
-| 15 | vedansh-5 | vedanshsaini7719@gmail.com |
-| 16 | sagar2366 | sagarutekar2366@gmail.com |
-| 17 | oksaumya | saumyakr2006@gmail.com |
-| 18 | rupam-it | Mannarupam3@gmail.com |
+| Index | Username       | Email                      |
+| ----- | -------------- | -------------------------- |
+| 0     | clubanderson   | andy@clubanderson.com      |
+| 1     | mikespreitzer  | mspreitz@us.ibm.com        |
+| 2     | dumb0002       | Braulio.Dumba@ibm.com      |
+| 3     | waltforme      | jun.duan@ibm.com           |
+| 4     | pdettori       | dettori@us.ibm.com         |
+| 5     | francostellari | stellari@us.ibm.com        |
+| 6     | kproche        | kproche@us.ibm.com         |
+| 7     | nupurshivani   | nupurjha.me@gmail.com      |
+| 8     | onkar717       | onkarwork2234@gmail.com    |
+| 9     | kunal-511      | yoyokvunal@gmail.com       |
+| 10    | mavrick-1      | mavrickrishi@gmail.com     |
+| 11    | gaurab-khanal  | khanalgaurab98@gmail.com   |
+| 12    | naman9271      | namanjain9271@gmail.com    |
+| 13    | btwshivam      | shivam200446@gmail.com     |
+| 14    | rxinui         | rainui.ly@gmail.com        |
+| 15    | vedansh-5      | vedanshsaini7719@gmail.com |
+| 16    | sagar2366      | sagarutekar2366@gmail.com  |
+| 17    | oksaumya       | saumyakr2006@gmail.com     |
+| 18    | rupam-it       | Mannarupam3@gmail.com      |
 
 **Total: 19 maintainers**
 
@@ -227,25 +227,29 @@ The complete list of maintainers to audit with their email addresses:
 Calculate these metrics using GitHub search tools across KubeStellar org repositories:
 
 ### 1. Help-Wanted Issues Created
+
 - **Requirement:** ≥ 2 issues
 - **Search Query:** `org:kubestellar is:issue label:"help wanted" author:{username} created:>={date_60_days_ago}`
 - Use `github.search_code` or `github.search_issues` to count results
 
-### 2. Unique PRs Commented On  
+### 2. Unique PRs Commented On
+
 - **Requirement:** ≥ 8 different PRs
 - **Approach:** Search for PRs where user commented, deduplicate by PR number
-- **Queries:** 
+- **Queries:**
   - Merged: `org:kubestellar is:pr is:merged commenter:{username} updated:>={date_60_days_ago}`
   - Open: `org:kubestellar is:pr is:open commenter:{username} updated:>={date_60_days_ago}`
 - Count unique PR numbers from both searches
 
 ### 3. PRs Merged
+
 - **Requirement:** ≥ 3 merged PRs
 - **Search Query:** `org:kubestellar is:pr is:merged author:{username} merged:>={date_60_days_ago}`
 
 ## KubeStellar Repositories
 
 Scope the search to these repos:
+
 - kubestellar/a2a
 - kubestellar/docs
 - kubestellar/homebrew-kubectl-multi
@@ -299,6 +303,7 @@ For now, ignore the state file and **always audit clubanderson**:
 Store these values and proceed to Step 3.
 
 ### Step 3: Calculate Date Range
+
 Calculate the date 60 days ago from today in YYYY-MM-DD format.
 
 ### Step 4: Analyze Maintainer's Interests
@@ -306,6 +311,7 @@ Calculate the date 60 days ago from today in YYYY-MM-DD format.
 Before gathering metrics, understand what the maintainer likes to work on:
 
 **A. Analyze Past PRs (Last 6 months) - ONE SEARCH ONLY**
+
 - Search ONCE: `org:kubestellar is:pr is:merged author:{username} merged:>={date_180_days_ago}`
 - Examine up to 10-15 recent PRs from the results:
   - Extract file paths changed (look for patterns like `/docs/`, `/src/`, `*_test.*`, `.yaml`, etc.)
@@ -327,10 +333,12 @@ Before gathering metrics, understand what the maintainer likes to work on:
 Use the GitHub MCP tools to search and count:
 
 **A. Help-Wanted Issues Created**
+
 - Search ONCE: `org:kubestellar is:issue label:"help wanted" author:{username} created:>={date_60_days_ago}`
 - Count total results and store the count
 
 **B. Unique PRs Commented On**
+
 - Search merged PRs ONCE: `org:kubestellar is:pr is:merged commenter:{username} updated:>={date_60_days_ago}`
 - Search open PRs ONCE: `org:kubestellar is:pr is:open commenter:{username} updated:>={date_60_days_ago}`
 - Extract PR numbers from both result sets
@@ -338,6 +346,7 @@ Use the GitHub MCP tools to search and count:
 - **Do NOT repeat these searches after getting the results**
 
 **C. Merged PRs Authored**
+
 - Search ONCE: `org:kubestellar is:pr is:merged author:{username} merged:>={date_60_days_ago}`
 - Count total results and store the count
 
@@ -350,6 +359,7 @@ Use the GitHub MCP tools to search and count:
 Based on their interest patterns, find **Top 3** opportunities in each category:
 
 **A. Help-Wanted Issues in Their Favorite Areas**
+
 - Search ONCE across all KubeStellar repos: `org:kubestellar is:issue is:open label:"help wanted"`
 - From the results, filter/rank by:
   - Repos they've contributed to before (higher priority)
@@ -359,6 +369,7 @@ Based on their interest patterns, find **Top 3** opportunities in each category:
 - **Do NOT search again after getting results**
 
 **B. PRs Needing Review in Their Expertise Areas**
+
 - Search ONCE: `org:kubestellar is:pr is:open review:required`
 - From the results, filter/rank by:
   - Repos they're active in
@@ -368,6 +379,7 @@ Based on their interest patterns, find **Top 3** opportunities in each category:
 - **Do NOT search again after getting results**
 
 **C. Repos That Could Use Their Skills**
+
 - Based on their detected focus areas (docs, backend, UI, testing, DevOps):
   - Match to KubeStellar repos that align (e.g., docs contributor → kubestellar/docs)
   - Note recent issues/PRs in those repos needing attention
@@ -378,8 +390,9 @@ Based on their interest patterns, find **Top 3** opportunities in each category:
 ### Step 7: Evaluate Criteria
 
 Compare actual counts against requirements:
+
 - Help-wanted issues: actual >= 2 ? ✅ PASS : ❌ FAIL
-- Unique PRs commented: actual >= 8 ? ✅ PASS : ❌ FAIL  
+- Unique PRs commented: actual >= 8 ? ✅ PASS : ❌ FAIL
 - Merged PRs: actual >= 3 ? ✅ PASS : ❌ FAIL
 
 Overall: PASS if all three criteria pass, otherwise FAIL
@@ -389,6 +402,7 @@ Overall: PASS if all three criteria pass, otherwise FAIL
 Create an **encouraging, actionable** Markdown email:
 
 **Structure:**
+
 1. **Warm greeting** with maintainer's username
 2. **Quick stats summary** (metric results with ✅/❌)
 3. **"Your Impact Areas"** section:
@@ -408,6 +422,7 @@ Create an **encouraging, actionable** Markdown email:
 ### Step 9: Output Safe-Output Entry
 
 Create a JSON entry for the email safe-output job:
+
 ```json
 {
   "type": "send_maintainer_email",
@@ -442,7 +457,7 @@ Here's your KubeStellar impact snapshot for the last 60 days.
 ## 📊 Quick Stats
 
 ✅ **Help-Wanted Issues:** 5 created (required: ≥2)  
-❌ **PR Reviews:** 6 unique PRs (required: ≥8) — *Let's boost this!*  
+❌ **PR Reviews:** 6 unique PRs (required: ≥8) — _Let's boost this!_  
 ✅ **PRs Merged:** 4 merged (required: ≥3)
 
 **Overall:** 2 of 3 criteria met
@@ -452,6 +467,7 @@ Here's your KubeStellar impact snapshot for the last 60 days.
 ## 🎯 Your Impact Areas
 
 Based on your recent contributions, you're passionate about:
+
 - 📝 **Documentation** (60% of your PRs touch `/docs/`)
 - 🧪 **Testing** (noticed several `*_test.go` files)
 - Most active in: **kubestellar/docs**, **kubestellar/kubestellar**
@@ -496,7 +512,7 @@ You're making a real difference in KubeStellar! To hit all 3 criteria next time,
 
 ---
 
-*Automated by GitHub Agentic Workflows • 2025-12-05 20:18 UTC*
+_Automated by GitHub Agentic Workflows • 2025-12-05 20:18 UTC_
 ```
 
 ## Important Notes

@@ -36,7 +36,7 @@ export default function ContributionCallToAction() {
         <div className="mt-8 flex flex-col sm:flex-row gap-6 justify-center items-center">
           {/* Community Meetings Button */}
           <a
-            href="https://github.com/kubestellar/kubestellar/wiki/KubeStellar-community-meetings"
+            href="https://github.com/kubestellar/kubestellar/wiki"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative overflow-hidden inline-flex items-center justify-center px-8 py-4 text-base sm:text-lg font-bold rounded-xl text-white 
