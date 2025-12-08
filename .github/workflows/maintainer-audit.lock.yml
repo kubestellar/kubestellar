@@ -466,6 +466,12 @@
 #
 # **Tone:** Supportive and constructive, not punitive
 #
+# **Formatting Rules:**
+# - Use plain text, NOT inline code backticks for usernames (write `@username` not `` `@username` ``)
+# - Use **bold** for emphasis, _italic_ for secondary emphasis
+# - Use standard markdown lists with `-` or numbered `1.`
+# - Avoid wrapping normal text in backticks unless it's actual code/commands
+#
 # ### Step 9: Output Safe-Output Entry
 #
 # Create a JSON entry for the email safe-output job:
@@ -493,6 +499,8 @@
 # Since we're locked to clubanderson for testing, there's no need to track progress.
 #
 # ## Example Markdown Email Structure
+#
+# **IMPORTANT:** Follow this example format exactly. Notice how the username is written as plain `@clubanderson`, NOT wrapped in backticks.
 #
 # ```markdown
 # Hey @clubanderson! 👋
@@ -2353,6 +2361,12 @@ jobs:
           
           **Tone:** Supportive and constructive, not punitive
           
+          **Formatting Rules:**
+          - Use plain text, NOT inline code backticks for usernames (write `@username` not `` `@username` ``)
+          - Use **bold** for emphasis, _italic_ for secondary emphasis
+          - Use standard markdown lists with `-` or numbered `1.`
+          - Avoid wrapping normal text in backticks unless it's actual code/commands
+          
           ### Step 9: Output Safe-Output Entry
           
           Create a JSON entry for the email safe-output job:
@@ -2380,6 +2394,8 @@ jobs:
           Since we're locked to clubanderson for testing, there's no need to track progress.
           
           ## Example Markdown Email Structure
+          
+          **IMPORTANT:** Follow this example format exactly. Notice how the username is written as plain `@clubanderson`, NOT wrapped in backticks.
           
           ```markdown
           Hey @clubanderson! 👋

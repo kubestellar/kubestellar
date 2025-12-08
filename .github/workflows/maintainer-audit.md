@@ -419,6 +419,12 @@ Create an **encouraging, actionable** Markdown email:
 
 **Tone:** Supportive and constructive, not punitive
 
+**Formatting Rules:**
+- Use plain text, NOT inline code backticks for usernames (write `@username` not `` `@username` ``)
+- Use **bold** for emphasis, _italic_ for secondary emphasis
+- Use standard markdown lists with `-` or numbered `1.`
+- Avoid wrapping normal text in backticks unless it's actual code/commands
+
 ### Step 9: Output Safe-Output Entry
 
 Create a JSON entry for the email safe-output job:
@@ -446,6 +452,8 @@ Skip the state update output entirely. Do NOT create a safe-output entry for `up
 Since we're locked to clubanderson for testing, there's no need to track progress.
 
 ## Example Markdown Email Structure
+
+**IMPORTANT:** Follow this example format exactly. Notice how the username is written as plain `@clubanderson`, NOT wrapped in backticks.
 
 ```markdown
 Hey @clubanderson! 👋
