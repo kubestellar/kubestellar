@@ -154,6 +154,9 @@ gh search issues --owner kubestellar --repo docs --repo ui --repo ui-plugins --s
 Create email with:
 - Pass/fail for each metric
 - Brief recommendations (3 help-wanted issues from search #5)
+  - **IMPORTANT**: Each recommendation MUST include the full GitHub URL
+  - Format: "Title (repo #number) - https://github.com/org/repo/issues/number"
+  - Example: "Fix bug in UI (kubestellar/ui #2275) - https://github.com/kubestellar/ui/issues/2275"
 - Simple plain text format
 
 ## Step 5: Send email
