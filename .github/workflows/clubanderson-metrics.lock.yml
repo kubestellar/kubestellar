@@ -480,6 +480,10 @@
 #
 # ---
 # Automated metrics check • {date}
+#
+# <div style="text-align: center; margin-top: 20px;">
+#   <img src="https://raw.githubusercontent.com/kubestellar/kubestellar/main/docs/overrides/images/logo.svg" alt="KubeStellar" height="30" style="background: transparent;">
+# </div>
 # ```
 #
 # ## Output
@@ -2225,6 +2229,10 @@ jobs:
           
           ---
           Automated metrics check • {date}
+          
+          <div style="text-align: center; margin-top: 20px;">
+            <img src="https://raw.githubusercontent.com/kubestellar/kubestellar/main/docs/overrides/images/logo.svg" alt="KubeStellar" height="30" style="background: transparent;">
+          </div>
           ```
           
           ## Output

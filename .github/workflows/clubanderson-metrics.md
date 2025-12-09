@@ -432,6 +432,10 @@ Overall: PASS [3/3] or FAIL [1/3]
 
 ---
 Automated metrics check • {date}
+
+<div style="text-align: center; margin-top: 20px;">
+  <img src="https://raw.githubusercontent.com/kubestellar/kubestellar/main/docs/overrides/images/logo.svg" alt="KubeStellar" height="30" style="background: transparent;">
+</div>
 ```
 
 ## Output
