@@ -59,7 +59,8 @@ jobs:
           gh search prs \
             --owner kubestellar \
             --author clubanderson \
-            --merged ">=${{ steps.dates.outputs.date_60 }}" \
+            --merged \
+            --merged-at ">=${{ steps.dates.outputs.date_60 }}" \
             --limit 100 \
             --json number,title,url,closedAt,labels \
             --jq '{total_count: length, items: .}' \
