@@ -1,0 +1,45 @@
+name: Run All Maintainer Audits
+
+on:
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  audit-all:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        maintainer:
+          - btwshivam
+          - clubanderson
+          - dumb0002
+          - francostellari
+          - gaurab-khanal
+          - kproche
+          - kunal-511
+          - mavrick-1
+          - mikespreitzer
+          - naman9271
+          - nupurshivani
+          - oksaumya
+          - onkar717
+          - pdettori
+          - rupam-it
+          - rxinui
+          - sagar2366
+          - vedansh-5
+          - waltforme
+    
+    steps:
+      - name: Trigger maintainer audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run clubanderson-metrics.lock.yml \
+            --repo ${{ github.repository }} \
+            --ref ${{ github.ref_name }} \
+            --field maintainer=${{ matrix.maintainer }}
+          
+          echo "✅ Triggered audit for ${{ matrix.maintainer }}"
