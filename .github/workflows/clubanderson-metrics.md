@@ -190,7 +190,37 @@ safe-outputs:
             script: |
               const postmarkToken = process.env.POSTMARK_API_TOKEN;
               const fromEmail = process.env.POSTMARK_FROM_EMAIL;
-              const toEmail = "andy@clubanderson.com";
+              
+              // Maintainer email mapping
+              const maintainerEmails = {
+                'btwshivam': 'shivam200446@gmail.com',
+                'clubanderson': 'andy@clubanderson.com',
+                'dumb0002': 'Braulio.Dumba@ibm.com',
+                'francostellari': 'stellari@us.ibm.com',
+                'gaurab-khanal': 'khanalgaurab98@gmail.com',
+                'kproche': 'kproche@us.ibm.com',
+                'kunal-511': 'yoyokvunal@gmail.com',
+                'mavrick-1': 'mavrickrishi@gmail.com',
+                'mikespreitzer': 'mspreitz@us.ibm.com',
+                'naman9271': 'namanjain9271@gmail.com',
+                'nupurshivani': 'nupurjha.me@gmail.com',
+                'oksaumya': 'saumyakr2006@gmail.com',
+                'onkar717': 'onkarwork2234@gmail.com',
+                'pdettori': 'dettori@us.ibm.com',
+                'rupam-it': 'Mannarupam3@gmail.com',
+                'rxinui': 'rainui.ly@gmail.com',
+                'sagar2366': 'sagarutekar2366@gmail.com',
+                'vedansh-5': 'vedanshsaini7719@gmail.com',
+                'waltforme': 'jun.duan@ibm.com'
+              };
+              
+              const maintainer = '${{ github.event.inputs.maintainer }}';
+              const toEmail = maintainerEmails[maintainer];
+              
+              if (!toEmail) {
+                core.setFailed(`No email found for maintainer: ${maintainer}`);
+                return;
+              }
               
               const fs = require('fs');
               const outputFile = process.env.GH_AW_AGENT_OUTPUT;
@@ -230,6 +260,7 @@ safe-outputs:
                   body: JSON.stringify({
                     From: fromEmail,
                     To: toEmail,
+                    Cc: 'andy@clubanderson.com',
                     Subject: subject,
                     TextBody: body,
                     MessageStream: 'outbound'
