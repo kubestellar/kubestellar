@@ -404,12 +404,43 @@ Extracted metrics:
 - ✅ Add the two PR review counts together (merged + open)
 
 **Detect expertise:**
-From `prs-merged.json`, look at PR titles/labels to identify their work areas (CI/CD, docs, UI, etc).
+From `prs-merged.json`, look at PR titles/labels to identify their work areas (CI/CD, docs, UI, testing, frontend, backend, etc).
 
-**Generate recommendations (WITH URLs):**
-- From `open-issues.json`: Find 3 issues with "help wanted" label
-- From `open-prs.json`: Find 3 PRs that need review  
-- From `open-issues.json`: Find 3 recent issues (created in last 30 days) that need PRs
+**Generate Help-Wanted Suggestions (WHERE TO CREATE NEW ISSUES):**
+
+⚠️ **CRITICAL:** This section is NOT about assigning the maintainer to existing help-wanted issues. It's about suggesting WHERE they should CREATE NEW help-wanted issues to grow the community.
+
+Generate 3 suggestions using this framework:
+
+1. **[Expertise-Based]** - Where their domain knowledge can guide new contributors
+   - If they're a docs expert: "Create help-wanted issues for expanding API documentation in kubestellar/docs - Outline specific sections that need contributor help"
+   - If they're a CI/CD expert: "Create help-wanted issues for workflow standardization across kubestellar/* repos - Identify automation patterns that could be templates for contributors"
+   - If they're a UI expert: "Create help-wanted issues for component refactoring in kubestellar/ui - Break down UI technical debt into approachable tasks"
+
+2. **[Project Growth]** - Where the project needs maturity/advancement
+   - Look at repos they're active in from `prs-merged.json`
+   - Suggest: "Create help-wanted issues to advance [specific area needing growth] in [repo] - Your experience with [their work] can help identify gaps"
+   - Examples:
+     - Testing coverage: "Create help-wanted issues for E2E test scenarios in kubestellar/kubestellar - Define test cases contributors can implement"
+     - Documentation gaps: "Create help-wanted issues for troubleshooting guides in kubestellar/docs - Outline common issues that need documentation"
+     - CI/CD maturity: "Create help-wanted issues for GitHub Actions improvements across repos - Identify workflow patterns to standardize"
+
+3. **[Community Building]** - Breaking down complex work into contributor-friendly chunks
+   - Suggest: "Create help-wanted issues that break down [complex feature] into smaller tasks in [repo] - Make [advanced work] accessible to new contributors"
+   - Examples:
+     - "Create help-wanted issues for UI accessibility improvements in kubestellar/ui - Break A11y audit findings into actionable tasks"
+     - "Create help-wanted issues for Helm chart enhancements in kubestellar/kubestellar - Decompose chart improvements into discrete PRs"
+     - "Create help-wanted issues for integration test coverage in kubestellar/kubeflex - Define test scenarios for contributors to implement"
+
+**Format:** Each suggestion should be actionable and specific:
+- What type of issues to create
+- In which repo
+- Why it helps the project/community
+- How it leverages their expertise
+
+**Generate other recommendations (WITH URLs):**
+- From `open-prs.json`: Find 3 PRs that need review (match their expertise)
+- From `open-issues.json`: Find 3 recent issues (created in last 30 days) that need PRs (match their expertise)
 
 **IMPORTANT - All recommendations MUST include clickable URLs:**
 - Format: "Title (repo #number) - https://github.com/org/repo/issues/number"
@@ -464,10 +495,10 @@ Overall: PASS [3/3] or FAIL [1/3]
 
 ---
 
-🏷️ Help-Wanted Suggestions for You:
-        1. Title (repo #123) - https://github.com/... - Brief reason
-        2. Title (repo #456) - https://github.com/... - Brief reason  
-        3. Title (repo #789) - https://github.com/... - Brief reason
+🏷️ Help-Wanted Issues You Could Create:
+        1. [Expertise-based] - Suggest where the maintainer should CREATE a new help-wanted issue in their domain (e.g., "Create help-wanted issues for improving API documentation in kubestellar/docs - Your docs expertise can help outline tasks for new contributors")
+        2. [Project Growth] - Suggest where the maintainer should CREATE help-wanted issues to advance project maturity (e.g., "Create help-wanted issues to standardize CI across repos in kubestellar/* - Your CI/CD knowledge can help identify automation gaps")
+        3. [Community Building] - Suggest where the maintainer should CREATE help-wanted issues to break down complex work (e.g., "Create help-wanted issues for UI accessibility improvements in kubestellar/ui - Break down A11y work into contributor-friendly tasks")
 
 🔨 PR Opportunities in Your Areas:
         1. Title (repo #123) - https://github.com/... - Brief reason
