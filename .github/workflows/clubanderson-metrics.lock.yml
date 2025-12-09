@@ -300,19 +300,17 @@
 # For EACH maintainer (clubanderson, then kproche):
 #
 # **Calculate metrics:**
-# - **Help-wanted count**: Use `jq '.total_count' file.json` to count items in `help-wanted-created.json` → must be ≥2
-# - **PR reviews count**: 
-#   - Use `jq '.items[].number' file.json` to get PR numbers from `prs-commented-merged.json` 
-#   - Get PR numbers from `prs-commented-open.json`
-#   - Count unique numbers (combine and deduplicate) → must be ≥8
-# - **Merged PRs count**: Use `jq '.total_count' file.json` to count items in `prs-merged.json` → must be ≥3
+# - **Help-wanted count**: Read `help-wanted-created.json` - the file has a `total_count` field at the top
+# - **PR reviews count**: Read both `prs-commented-merged.json` and `prs-commented-open.json` - each has `items` array with PR numbers. Count unique numbers across both files.
+# - **Merged PRs count**: Read `prs-merged.json` - the file has a `total_count` field at the top
 #
-# **IMPORTANT - Use ONLY bash and jq commands:**
-# - ✅ DO: `cat file.json | jq '.items | length'`
-# - ✅ DO: `jq -r '.items[].url' file.json | head -3`
-# - ❌ DO NOT use Python, Node, or any programming languages
-# - ❌ DO NOT use cd, chmod, or other restricted commands
-# - Use simple bash pipes and jq filters
+# **IMPORTANT - Keep it simple:**
+# - ✅ DO: Read files with `cat` and manually count/parse the visible data
+# - ✅ DO: The JSON files are small enough to read entirely
+# - ✅ DO: Look for `"total_count"` field in the JSON output
+# - ✅ DO: Look for `"number"` fields in the items array
+# - ❌ DO NOT use jq, python, node, or complex bash commands
+# - ❌ If you see "Permission denied" - just read the file with `cat` and parse visually
 #
 # **Detect expertise:**
 # From `prs-merged.json`, look at PR titles/labels to identify their work areas (CI/CD, docs, UI, etc).
@@ -1977,19 +1975,17 @@ jobs:
           For EACH maintainer (clubanderson, then kproche):
           
           **Calculate metrics:**
-          - **Help-wanted count**: Use `jq '.total_count' file.json` to count items in `help-wanted-created.json` → must be ≥2
-          - **PR reviews count**: 
-            - Use `jq '.items[].number' file.json` to get PR numbers from `prs-commented-merged.json` 
-            - Get PR numbers from `prs-commented-open.json`
-            - Count unique numbers (combine and deduplicate) → must be ≥8
-          - **Merged PRs count**: Use `jq '.total_count' file.json` to count items in `prs-merged.json` → must be ≥3
+          - **Help-wanted count**: Read `help-wanted-created.json` - the file has a `total_count` field at the top
+          - **PR reviews count**: Read both `prs-commented-merged.json` and `prs-commented-open.json` - each has `items` array with PR numbers. Count unique numbers across both files.
+          - **Merged PRs count**: Read `prs-merged.json` - the file has a `total_count` field at the top
           
-          **IMPORTANT - Use ONLY bash and jq commands:**
-          - ✅ DO: `cat file.json | jq '.items | length'`
-          - ✅ DO: `jq -r '.items[].url' file.json | head -3`
-          - ❌ DO NOT use Python, Node, or any programming languages
-          - ❌ DO NOT use cd, chmod, or other restricted commands
-          - Use simple bash pipes and jq filters
+          **IMPORTANT - Keep it simple:**
+          - ✅ DO: Read files with `cat` and manually count/parse the visible data
+          - ✅ DO: The JSON files are small enough to read entirely
+          - ✅ DO: Look for `"total_count"` field in the JSON output
+          - ✅ DO: Look for `"number"` fields in the items array
+          - ❌ DO NOT use jq, python, node, or complex bash commands
+          - ❌ If you see "Permission denied" - just read the file with `cat` and parse visually
           
           **Detect expertise:**
           From `prs-merged.json`, look at PR titles/labels to identify their work areas (CI/CD, docs, UI, etc).
