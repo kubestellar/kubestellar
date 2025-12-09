@@ -33,52 +33,58 @@ jobs:
         run: |
           mkdir -p /tmp/metrics-data
           
-          # Search 1: Help-wanted issues created
+          # Search 1: Help-wanted issues created (paginate to get all)
           gh search issues \
             --owner kubestellar \
             --label "help wanted" \
             --author clubanderson \
             --created ">=${{ steps.dates.outputs.date_60 }}" \
+            --limit 100 \
             --json number,title,url,createdAt,labels \
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/help-wanted-created.json
           
-          # Search 2: PRs commented on
+          # Search 2: PRs commented/reviewed on (get all with pagination)
+          # Use involves:clubanderson to catch comments, reviews, and authorship
           gh search prs \
             --owner kubestellar \
-            --commenter clubanderson \
+            --involves clubanderson \
             --updated ">=${{ steps.dates.outputs.date_60 }}" \
+            --limit 1000 \
             --json number,title,url,state \
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/prs-commented.json
           
-          # Search 3: Merged PRs authored
+          # Search 3: Merged PRs authored (paginate)
           gh search prs \
             --owner kubestellar \
             --author clubanderson \
             --merged ">=${{ steps.dates.outputs.date_60 }}" \
+            --limit 100 \
             --json number,title,url,closedAt,labels \
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/prs-merged.json
           
-          # Search 4: All open issues in active repos
+          # Search 4: All open issues in active repos (paginate)
           gh search issues \
             --owner kubestellar \
             --repo docs \
             --repo ui \
             --repo ui-plugins \
             --state open \
+            --limit 1000 \
             --json number,title,url,repository,labels,createdAt \
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/open-issues.json
           
-          # Search 5: All open PRs in active repos
+          # Search 5: All open PRs in active repos (paginate)
           gh search prs \
             --owner kubestellar \
             --repo docs \
             --repo ui \
             --repo ui-plugins \
             --state open \
+            --limit 1000 \
             --json number,title,url,repository,labels,createdAt \
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/open-prs.json
