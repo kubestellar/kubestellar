@@ -95,14 +95,19 @@ jobs:
             > /tmp/metrics-data/$username/prs-commented-open.json
           
           # Search 4: Merged PRs authored
+          echo "Searching for PRs merged by $username since ${{ steps.dates.outputs.date_60 }}"
           gh search prs \
             --owner kubestellar \
             --author $username \
             --merged \
             --merged-at ">=${{ steps.dates.outputs.date_60 }}" \
             --limit 100 \
-            --json number,title,url,closedAt,labels \
-            --jq '{total_count: length, items: .}' \
+            --json number,title,url,closedAt,labels > /tmp/prs-merged-raw.json
+          
+          # Manually count and create JSON
+          count=$(jq '. | length' /tmp/prs-merged-raw.json)
+          echo "Found $count merged PRs for $username"
+          jq --argjson count "$count" '{total_count: $count, items: .}' /tmp/prs-merged-raw.json \
             > /tmp/metrics-data/$username/prs-merged.json
           
           # Shared data for all maintainers (put in shared location)
