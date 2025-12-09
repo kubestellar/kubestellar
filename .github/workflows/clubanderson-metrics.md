@@ -138,6 +138,9 @@ tools:
     - "grep *"
     - "head *"
     - "tail *"
+    - "mkdir *"
+    - "ls *"
+    - "echo *"
 
 safe-outputs:
   jobs:
@@ -249,12 +252,19 @@ For each maintainer, these 6 JSON files are available in `/tmp/metrics-data/{use
 For EACH maintainer (clubanderson, then kproche):
 
 **Calculate metrics:**
-- **Help-wanted count**: Count items in `help-wanted-created.json` → must be ≥2
+- **Help-wanted count**: Use `jq '.total_count' file.json` to count items in `help-wanted-created.json` → must be ≥2
 - **PR reviews count**: 
-  - Count unique PR numbers from `prs-commented-merged.json` 
-  - Add unique PR numbers from `prs-commented-open.json`
-  - This is the total PRs they commented/reviewed on → must be ≥8
-- **Merged PRs count**: Count items in `prs-merged.json` → must be ≥3
+  - Use `jq '.items[].number' file.json` to get PR numbers from `prs-commented-merged.json` 
+  - Get PR numbers from `prs-commented-open.json`
+  - Count unique numbers (combine and deduplicate) → must be ≥8
+- **Merged PRs count**: Use `jq '.total_count' file.json` to count items in `prs-merged.json` → must be ≥3
+
+**IMPORTANT - Use ONLY bash and jq commands:**
+- ✅ DO: `cat file.json | jq '.items | length'`
+- ✅ DO: `jq -r '.items[].url' file.json | head -3`
+- ❌ DO NOT use Python, Node, or any programming languages
+- ❌ DO NOT use cd, chmod, or other restricted commands
+- Use simple bash pipes and jq filters
 
 **Detect expertise:**
 From `prs-merged.json`, look at PR titles/labels to identify their work areas (CI/CD, docs, UI, etc).

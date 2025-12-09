@@ -165,6 +165,9 @@
 #     - "grep *"
 #     - "head *"
 #     - "tail *"
+#     - "mkdir *"
+#     - "ls *"
+#     - "echo *"
 #
 # safe-outputs:
 #   jobs:
@@ -297,12 +300,19 @@
 # For EACH maintainer (clubanderson, then kproche):
 #
 # **Calculate metrics:**
-# - **Help-wanted count**: Count items in `help-wanted-created.json` → must be ≥2
+# - **Help-wanted count**: Use `jq '.total_count' file.json` to count items in `help-wanted-created.json` → must be ≥2
 # - **PR reviews count**: 
-#   - Count unique PR numbers from `prs-commented-merged.json` 
-#   - Add unique PR numbers from `prs-commented-open.json`
-#   - This is the total PRs they commented/reviewed on → must be ≥8
-# - **Merged PRs count**: Count items in `prs-merged.json` → must be ≥3
+#   - Use `jq '.items[].number' file.json` to get PR numbers from `prs-commented-merged.json` 
+#   - Get PR numbers from `prs-commented-open.json`
+#   - Count unique numbers (combine and deduplicate) → must be ≥8
+# - **Merged PRs count**: Use `jq '.total_count' file.json` to count items in `prs-merged.json` → must be ≥3
+#
+# **IMPORTANT - Use ONLY bash and jq commands:**
+# - ✅ DO: `cat file.json | jq '.items | length'`
+# - ✅ DO: `jq -r '.items[].url' file.json | head -3`
+# - ❌ DO NOT use Python, Node, or any programming languages
+# - ❌ DO NOT use cd, chmod, or other restricted commands
+# - Use simple bash pipes and jq filters
 #
 # **Detect expertise:**
 # From `prs-merged.json`, look at PR titles/labels to identify their work areas (CI/CD, docs, UI, etc).
@@ -1967,12 +1977,19 @@ jobs:
           For EACH maintainer (clubanderson, then kproche):
           
           **Calculate metrics:**
-          - **Help-wanted count**: Count items in `help-wanted-created.json` → must be ≥2
+          - **Help-wanted count**: Use `jq '.total_count' file.json` to count items in `help-wanted-created.json` → must be ≥2
           - **PR reviews count**: 
-            - Count unique PR numbers from `prs-commented-merged.json` 
-            - Add unique PR numbers from `prs-commented-open.json`
-            - This is the total PRs they commented/reviewed on → must be ≥8
-          - **Merged PRs count**: Count items in `prs-merged.json` → must be ≥3
+            - Use `jq '.items[].number' file.json` to get PR numbers from `prs-commented-merged.json` 
+            - Get PR numbers from `prs-commented-open.json`
+            - Count unique numbers (combine and deduplicate) → must be ≥8
+          - **Merged PRs count**: Use `jq '.total_count' file.json` to count items in `prs-merged.json` → must be ≥3
+          
+          **IMPORTANT - Use ONLY bash and jq commands:**
+          - ✅ DO: `cat file.json | jq '.items | length'`
+          - ✅ DO: `jq -r '.items[].url' file.json | head -3`
+          - ❌ DO NOT use Python, Node, or any programming languages
+          - ❌ DO NOT use cd, chmod, or other restricted commands
+          - Use simple bash pipes and jq filters
           
           **Detect expertise:**
           From `prs-merged.json`, look at PR titles/labels to identify their work areas (CI/CD, docs, UI, etc).
@@ -2260,13 +2277,16 @@ jobs:
         # --allow-tool shell(cat *)
         # --allow-tool shell(cat)
         # --allow-tool shell(date)
+        # --allow-tool shell(echo *)
         # --allow-tool shell(echo)
         # --allow-tool shell(grep *)
         # --allow-tool shell(grep)
         # --allow-tool shell(head *)
         # --allow-tool shell(head)
         # --allow-tool shell(jq *)
+        # --allow-tool shell(ls *)
         # --allow-tool shell(ls)
+        # --allow-tool shell(mkdir *)
         # --allow-tool shell(pwd)
         # --allow-tool shell(sort)
         # --allow-tool shell(tail *)
@@ -2279,7 +2299,7 @@ jobs:
         run: |
           set -o pipefail
           sudo -E awf --env-all --container-workdir "${GITHUB_WORKSPACE}" --mount /tmp:/tmp:rw --mount "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}:rw" --mount /usr/bin/gh:/usr/bin/gh:ro --allow-domains api.enterprise.githubcopilot.com,api.github.com,github.com,raw.githubusercontent.com,registry.npmjs.org --log-level info --proxy-logs-dir /tmp/gh-aw/sandbox/firewall/logs \
-            -- npx -y @github/copilot@0.0.366 --add-dir /tmp/gh-aw/ --log-level all --log-dir /tmp/gh-aw/sandbox/agent/logs/ --add-dir "${GITHUB_WORKSPACE}" --disable-builtin-mcps --allow-tool github --allow-tool safeoutputs --allow-tool 'shell(cat *)' --allow-tool 'shell(cat)' --allow-tool 'shell(date)' --allow-tool 'shell(echo)' --allow-tool 'shell(grep *)' --allow-tool 'shell(grep)' --allow-tool 'shell(head *)' --allow-tool 'shell(head)' --allow-tool 'shell(jq *)' --allow-tool 'shell(ls)' --allow-tool 'shell(pwd)' --allow-tool 'shell(sort)' --allow-tool 'shell(tail *)' --allow-tool 'shell(tail)' --allow-tool 'shell(uniq)' --allow-tool 'shell(wc *)' --allow-tool 'shell(wc)' --allow-tool 'shell(yq)' --prompt "$(cat /tmp/gh-aw/aw-prompts/prompt.txt)" \
+            -- npx -y @github/copilot@0.0.366 --add-dir /tmp/gh-aw/ --log-level all --log-dir /tmp/gh-aw/sandbox/agent/logs/ --add-dir "${GITHUB_WORKSPACE}" --disable-builtin-mcps --allow-tool github --allow-tool safeoutputs --allow-tool 'shell(cat *)' --allow-tool 'shell(cat)' --allow-tool 'shell(date)' --allow-tool 'shell(echo *)' --allow-tool 'shell(echo)' --allow-tool 'shell(grep *)' --allow-tool 'shell(grep)' --allow-tool 'shell(head *)' --allow-tool 'shell(head)' --allow-tool 'shell(jq *)' --allow-tool 'shell(ls *)' --allow-tool 'shell(ls)' --allow-tool 'shell(mkdir *)' --allow-tool 'shell(pwd)' --allow-tool 'shell(sort)' --allow-tool 'shell(tail *)' --allow-tool 'shell(tail)' --allow-tool 'shell(uniq)' --allow-tool 'shell(wc *)' --allow-tool 'shell(wc)' --allow-tool 'shell(yq)' --prompt "$(cat /tmp/gh-aw/aw-prompts/prompt.txt)" \
             2>&1 | tee /tmp/gh-aw/agent-stdio.log
         env:
           COPILOT_AGENT_RUNNER_TYPE: STANDALONE
