@@ -45,11 +45,11 @@ jobs:
             > /tmp/metrics-data/help-wanted-created.json
           
           # Search 2: PRs commented/reviewed on (get all with pagination)
-          # Use separate searches for merged and open PRs with commenter filter
+          # Use commenter filter to get only PRs where user commented (not authored)
           gh search prs \
             --owner kubestellar \
             --commenter clubanderson \
-            --state merged \
+            --merged \
             --updated ">=${{ steps.dates.outputs.date_60 }}" \
             --limit 1000 \
             --json number,title,url,state \
