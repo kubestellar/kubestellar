@@ -107,44 +107,39 @@ safe-outputs:
 
 # Clubanderson Metrics Tracker
 
-Track 3 simple metrics for clubanderson over the last 60 days and send a pass/fail email.
+Your task is to **generate ONE metrics email for clubanderson** and stop. This is a single-pass workflow.
 
-## Task
+## What to do
 
-**Run only 5 searches total, then analyze results for everything else:**
+First, calculate two dates:
+- 60 days ago from today (YYYY-MM-DD)
+- 30 days ago from today (YYYY-MM-DD)
 
-1. Calculate dates once: `date_60_days_ago` and `date_30_days_ago`
+Then run exactly 5 GitHub searches:
+- Help-wanted issues created by clubanderson (60 days): `org:kubestellar is:issue label:"help wanted" author:clubanderson created:>={date_60_days_ago}`
+- PRs clubanderson commented on (60 days): `org:kubestellar is:pr commenter:clubanderson updated:>={date_60_days_ago}`
+- Merged PRs by clubanderson (60 days): `org:kubestellar is:pr is:merged author:clubanderson merged:>={date_60_days_ago}`
+- All open issues in docs/ui/ui-plugins: `org:kubestellar is:issue is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
+- All open PRs in docs/ui/ui-plugins: `org:kubestellar is:pr is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
 
-2. **Run these 5 searches ONCE (do not repeat):**
-   - **Search 1** - Help-wanted issues created: `org:kubestellar is:issue label:"help wanted" author:clubanderson created:>={date_60_days_ago}`
-   - **Search 2** - PRs commented (both merged + open): `org:kubestellar is:pr commenter:clubanderson updated:>={date_60_days_ago}`
-   - **Search 3** - Merged PRs authored: `org:kubestellar is:pr is:merged author:clubanderson merged:>={date_60_days_ago}`
-   - **Search 4** - All open issues in active repos: `org:kubestellar is:issue is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
-   - **Search 5** - All open PRs in active repos: `org:kubestellar is:pr is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
+After running these 5 searches, **stop searching and analyze the results you collected**:
 
-3. **STOP searching. Now analyze the data you have:**
-   - Count Search 1 results for help-wanted issues metric
-   - Count unique PR numbers from Search 2 for PR comments metric
-   - Count Search 3 results for merged PRs metric
+**Metrics (from searches 1-3):**
+- Count help-wanted issues (search 1) → must be ≥2
+- Count unique PR numbers from search 2 → must be ≥8  
+- Count merged PRs (search 3) → must be ≥3
 
-4. **Check metrics** against criteria:
-   - Help-wanted issues ≥ 2? ✅ / ❌
-   - Unique PRs commented ≥ 8? ✅ / ❌
-   - Merged PRs ≥ 3? ✅ / ❌
+**Expertise detection (from search 3 PRs):**
+Look at file paths to identify if clubanderson works on CI/CD (workflows, Docker), docs (*.md), or UI (kubestellar/ui).
 
-5. **Analyze Search 3 results** to detect clubanderson's expertise:
-   - Look at file paths in recent merged PRs to identify: CI/CD (workflows, Docker), Docs (*.md files), UI (kubestellar/ui)
+**Recommendations (from searches 4-5):**
+- Find 3 help-wanted issues from search 4
+- Find 3 PRs needing review from search 5
+- Find 3 recent issues (last 30 days) from search 4 that need PRs
 
-6. **Reuse Search 4 & 5 results** to generate recommendations (NO additional searches):
-   - **Help-Wanted Suggestions**: From Search 4, find 3 issues with `help wanted` label in docs/ui/ui-plugins
-   - **PRs Needing Review**: From Search 5, find 3 PRs with `review:required` or lacking reviews, matching his expertise
-   - **PR Opportunities**: From Search 4, find 3 recent issues (last 30 days) without help-wanted label that need PRs in his domains
+Generate a plain-text email with the metrics (pass/fail) and recommendations, then output the safe-output JSON and stop.
 
-7. Generate simple plain-text email with metrics + recommendations
-
-8. Output the safe-output JSON and **STOP**
-
-**IMPORTANT: After step 2, DO NOT calculate dates again. DO NOT repeat searches. Use the data you already collected.**
+**DO NOT re-run the searches. DO NOT calculate dates again. Just use the data you already have.**
 
 ## Email Format
 
