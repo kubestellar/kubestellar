@@ -284,11 +284,17 @@ Create a plain-text email with:
 - Simple formatting (no markdown headings)
 
 **Output:**
-Use the **send_email** MCP tool to send the metrics email. Call it like this:
+Use the **send_email** MCP tool to send the metrics email. Format the subject like this:
 
+- If PASS: `🚀 KubeStellar Metrics - {username} - ✅ PASS`
+- If FAIL: `🚀 KubeStellar Metrics - {username} - ❌ FAIL`
+
+Example:
 ```
-send_email(subject="KubeStellar Metrics - @{username} - PASS", body="Hey {username},...")
+send_email(subject="🚀 KubeStellar Metrics - clubanderson - ✅ PASS", body="Hey clubanderson,...")
 ```
+
+**Note:** Do NOT use tick marks around the username (no @clubanderson, just clubanderson)
 
 Do NOT print JSON. Do NOT use echo. Use the MCP tool directly.
 
@@ -299,7 +305,9 @@ Do NOT print JSON. Do NOT use echo. Use the MCP tool directly.
 Keep it simple and clear:
 
 ```
-Subject: KubeStellar Metrics - @clubanderson - [PASS/FAIL]
+Subject: 🚀 KubeStellar Metrics - clubanderson - ✅ PASS
+(or)
+Subject: 🚀 KubeStellar Metrics - kproche - ❌ FAIL
 
 Hey clubanderson,
 
