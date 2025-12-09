@@ -72,15 +72,26 @@
 #             > /tmp/metrics-data/help-wanted-created.json
 #
 #           # Search 2: PRs commented/reviewed on (get all with pagination)
-#           # Use involves:clubanderson to catch comments, reviews, and authorship
+#           # Use separate searches for merged and open PRs with commenter filter
 #           gh search prs \
 #             --owner kubestellar \
-#             --involves clubanderson \
+#             --commenter clubanderson \
+#             --state merged \
 #             --updated ">=${{ steps.dates.outputs.date_60 }}" \
 #             --limit 1000 \
 #             --json number,title,url,state \
 #             --jq '{total_count: length, items: .}' \
-#             > /tmp/metrics-data/prs-commented.json
+#             > /tmp/metrics-data/prs-commented-merged.json
+#
+#           gh search prs \
+#             --owner kubestellar \
+#             --commenter clubanderson \
+#             --state open \
+#             --updated ">=${{ steps.dates.outputs.date_60 }}" \
+#             --limit 1000 \
+#             --json number,title,url,state \
+#             --jq '{total_count: length, items: .}' \
+#             > /tmp/metrics-data/prs-commented-open.json
 #
 #           # Search 3: Merged PRs authored (paginate)
 #           gh search prs \
@@ -256,22 +267,22 @@
 # All GitHub search data has been downloaded for you. The following JSON files are available in `/tmp/metrics-data/`:
 #
 # 1. **help-wanted-created.json** - Help-wanted issues created by clubanderson (last 60 days)
-# 2. **prs-commented.json** - PRs clubanderson commented on (last 60 days)  
-# 3. **prs-merged.json** - Merged PRs authored by clubanderson (last 60 days)
-# 4. **open-issues.json** - All open issues in docs/ui/ui-plugins repos
-# 5. **open-prs.json** - All open PRs in docs/ui/ui-plugins repos
+# 2. **prs-commented-merged.json** - Merged PRs clubanderson commented on (last 60 days)  
+# 3. **prs-commented-open.json** - Open PRs clubanderson commented on (last 60 days)
+# 4. **prs-merged.json** - Merged PRs authored by clubanderson (last 60 days)
+# 5. **open-issues.json** - All open issues in docs/ui/ui-plugins repos
+# 6. **open-prs.json** - All open PRs in docs/ui/ui-plugins repos
 #
 # ## Your Task
 #
-# Read these 5 JSON files and analyze the data:
+# Read these 6 JSON files and analyze the data:
 #
 # **Calculate metrics:**
 # - **Help-wanted count**: Count items in `help-wanted-created.json` → must be ≥2
 # - **PR reviews count**: 
-#   - Get all PR numbers from `prs-commented.json`
-#   - Get all PR numbers from `prs-merged.json` (these are PRs you AUTHORED)
-#   - Count PRs that appear in prs-commented but NOT in prs-merged (set difference)
-#   - This gives you PRs you reviewed/commented on but didn't author → must be ≥8
+#   - Count unique PR numbers from `prs-commented-merged.json` 
+#   - Add unique PR numbers from `prs-commented-open.json`
+#   - This is the total PRs you commented/reviewed on → must be ≥8
 # - **Merged PRs count**: Count items in `prs-merged.json` → must be ≥3
 #
 # **Detect expertise:**
@@ -1915,22 +1926,22 @@ jobs:
           All GitHub search data has been downloaded for you. The following JSON files are available in `/tmp/metrics-data/`:
           
           1. **help-wanted-created.json** - Help-wanted issues created by clubanderson (last 60 days)
-          2. **prs-commented.json** - PRs clubanderson commented on (last 60 days)  
-          3. **prs-merged.json** - Merged PRs authored by clubanderson (last 60 days)
-          4. **open-issues.json** - All open issues in docs/ui/ui-plugins repos
-          5. **open-prs.json** - All open PRs in docs/ui/ui-plugins repos
+          2. **prs-commented-merged.json** - Merged PRs clubanderson commented on (last 60 days)  
+          3. **prs-commented-open.json** - Open PRs clubanderson commented on (last 60 days)
+          4. **prs-merged.json** - Merged PRs authored by clubanderson (last 60 days)
+          5. **open-issues.json** - All open issues in docs/ui/ui-plugins repos
+          6. **open-prs.json** - All open PRs in docs/ui/ui-plugins repos
           
           ## Your Task
           
-          Read these 5 JSON files and analyze the data:
+          Read these 6 JSON files and analyze the data:
           
           **Calculate metrics:**
           - **Help-wanted count**: Count items in `help-wanted-created.json` → must be ≥2
           - **PR reviews count**: 
-            - Get all PR numbers from `prs-commented.json`
-            - Get all PR numbers from `prs-merged.json` (these are PRs you AUTHORED)
-            - Count PRs that appear in prs-commented but NOT in prs-merged (set difference)
-            - This gives you PRs you reviewed/commented on but didn't author → must be ≥8
+            - Count unique PR numbers from `prs-commented-merged.json` 
+            - Add unique PR numbers from `prs-commented-open.json`
+            - This is the total PRs you commented/reviewed on → must be ≥8
           - **Merged PRs count**: Count items in `prs-merged.json` → must be ≥3
           
           **Detect expertise:**
@@ -5887,15 +5898,26 @@ jobs:
             > /tmp/metrics-data/help-wanted-created.json
 
           # Search 2: PRs commented/reviewed on (get all with pagination)
-          # Use involves:clubanderson to catch comments, reviews, and authorship
+          # Use separate searches for merged and open PRs with commenter filter
           gh search prs \
             --owner kubestellar \
-            --involves clubanderson \
+            --commenter clubanderson \
+            --state merged \
             --updated ">=${{ steps.dates.outputs.date_60 }}" \
             --limit 1000 \
             --json number,title,url,state \
             --jq '{total_count: length, items: .}' \
-            > /tmp/metrics-data/prs-commented.json
+            > /tmp/metrics-data/prs-commented-merged.json
+
+          gh search prs \
+            --owner kubestellar \
+            --commenter clubanderson \
+            --state open \
+            --updated ">=${{ steps.dates.outputs.date_60 }}" \
+            --limit 1000 \
+            --json number,title,url,state \
+            --jq '{total_count: length, items: .}' \
+            > /tmp/metrics-data/prs-commented-open.json
 
           # Search 3: Merged PRs authored (paginate)
           gh search prs \
