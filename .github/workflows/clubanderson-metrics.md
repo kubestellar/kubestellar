@@ -115,14 +115,17 @@ Track 3 simple metrics for clubanderson over the last 60 days and send a pass/fa
 
 1. Calculate dates once: `date_60_days_ago` and `date_30_days_ago`
 
-2. Run these 5 searches:
+2. **Run these 5 searches ONCE (do not repeat):**
    - **Search 1** - Help-wanted issues created: `org:kubestellar is:issue label:"help wanted" author:clubanderson created:>={date_60_days_ago}`
    - **Search 2** - PRs commented (both merged + open): `org:kubestellar is:pr commenter:clubanderson updated:>={date_60_days_ago}`
    - **Search 3** - Merged PRs authored: `org:kubestellar is:pr is:merged author:clubanderson merged:>={date_60_days_ago}`
    - **Search 4** - All open issues in active repos: `org:kubestellar is:issue is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
    - **Search 5** - All open PRs in active repos: `org:kubestellar is:pr is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
 
-3. **Analyze Search 2 results** to count unique PRs commented (deduplicate by PR number)
+3. **STOP searching. Now analyze the data you have:**
+   - Count Search 1 results for help-wanted issues metric
+   - Count unique PR numbers from Search 2 for PR comments metric
+   - Count Search 3 results for merged PRs metric
 
 4. **Check metrics** against criteria:
    - Help-wanted issues ≥ 2? ✅ / ❌
@@ -139,7 +142,9 @@ Track 3 simple metrics for clubanderson over the last 60 days and send a pass/fa
 
 7. Generate simple plain-text email with metrics + recommendations
 
-8. Output the safe-output JSON
+8. Output the safe-output JSON and **STOP**
+
+**IMPORTANT: After step 2, DO NOT calculate dates again. DO NOT repeat searches. Use the data you already collected.**
 
 ## Email Format
 
