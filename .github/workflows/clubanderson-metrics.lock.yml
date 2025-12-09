@@ -407,28 +407,38 @@
 # cat /tmp/metrics-data/${{ github.event.inputs.maintainer }}/prs-commented-open.json
 # ```
 #
-# **Step 2: Extract metrics from the displayed data**
+# **Step 2: Extract metrics EXACTLY from total_count fields**
 #
-# Look at the JSON output from Step 1 and find:
+# ⚠️ **CRITICAL INSTRUCTION - READ CAREFULLY:**
 #
-# - **Help-wanted count**: In the first JSON, find the number after `"total_count":`. Example: if you see `{"total_count": 11, "items": [...]` then the count is **11**.
-# - **Merged PRs count**: In the second JSON, find the number after `"total_count":`. Example: if you see `{"total_count": 26, "items": [...]` then the count is **26**.
-# - **PR reviews count**: 
-#   1. Look in the third JSON (commented merged) - list all numbers that appear after `"number":` 
-#   2. Look in the fourth JSON (commented open) - list all numbers that appear after `"number":`
-#   3. Combine both lists and count UNIQUE numbers (no duplicates)
+# DO NOT perform any calculations. DO NOT filter. DO NOT modify the numbers.
+# ONLY read the `total_count` field from each JSON file and use it AS-IS.
 #
-# **Example for PR reviews:**
-# - If commented-merged shows: `"number": 100`, `"number": 101`, `"number": 102`
-# - And commented-open shows: `"number": 102`, `"number": 103`
-# - Unique numbers are: 100, 101, 102, 103 = **4 unique PRs**
+# Extract these three numbers:
 #
-# **IMPORTANT:**
-# - ✅ DO: Use `cat` to read the files (you have permission)
-# - ✅ DO: Look at the visible JSON and extract `total_count` manually
-# - ✅ DO: Count unique PR numbers by listing them out
-# - ❌ DO NOT use jq, python, node - they don't work here
-# - ❌ DO NOT try to execute complex commands
+# 1. **Help-wanted count**: Look at the help-wanted-created.json output from Step 1. Find `"total_count": X` and use X directly.
+#    - Example: if you see `{"total_count": 11,` → the count is **11** (not 3, not 12, exactly 11)
+#
+# 2. **Merged PRs count**: Look at the prs-merged.json output from Step 1. Find `"total_count": X` and use X directly.
+#    - Example: if you see `{"total_count": 26,` → the count is **26** (not 60, not 3, exactly 26)
+#
+# 3. **PR reviews count**: 
+#    - Look at prs-commented-merged.json output - find `"total_count": X`
+#    - Look at prs-commented-open.json output - find `"total_count": Y`  
+#    - PR reviews = X + Y (simple addition, no deduplication needed - the data is already unique)
+#    - Example: if merged shows `"total_count": 59` and open shows `"total_count": 9` → **68** total reviews
+#
+# **DO NOT:**
+# - ❌ Count items manually
+# - ❌ Try to deduplicate PR numbers
+# - ❌ Filter or analyze the items array
+# - ❌ Use jq, python, or any processing tools
+# - ❌ Modify the total_count numbers in any way
+#
+# **DO:**
+# - ✅ Find the number after `"total_count":` in the displayed JSON
+# - ✅ Use that exact number in the email
+# - ✅ Add the two PR review counts together (merged + open)
 #
 # **Detect expertise:**
 # From `prs-merged.json`, look at PR titles/labels to identify their work areas (CI/CD, docs, UI, etc).
@@ -2196,28 +2206,38 @@ jobs:
           cat /tmp/metrics-data/${GH_AW_GITHUB_EVENT_INPUTS_MAINTAINER}/prs-commented-open.json
           ```
           
-          **Step 2: Extract metrics from the displayed data**
+          **Step 2: Extract metrics EXACTLY from total_count fields**
           
-          Look at the JSON output from Step 1 and find:
+          ⚠️ **CRITICAL INSTRUCTION - READ CAREFULLY:**
           
-          - **Help-wanted count**: In the first JSON, find the number after `"total_count":`. Example: if you see `{"total_count": 11, "items": [...]` then the count is **11**.
-          - **Merged PRs count**: In the second JSON, find the number after `"total_count":`. Example: if you see `{"total_count": 26, "items": [...]` then the count is **26**.
-          - **PR reviews count**: 
-            1. Look in the third JSON (commented merged) - list all numbers that appear after `"number":` 
-            2. Look in the fourth JSON (commented open) - list all numbers that appear after `"number":`
-            3. Combine both lists and count UNIQUE numbers (no duplicates)
-            
-          **Example for PR reviews:**
-          - If commented-merged shows: `"number": 100`, `"number": 101`, `"number": 102`
-          - And commented-open shows: `"number": 102`, `"number": 103`
-          - Unique numbers are: 100, 101, 102, 103 = **4 unique PRs**
+          DO NOT perform any calculations. DO NOT filter. DO NOT modify the numbers.
+          ONLY read the `total_count` field from each JSON file and use it AS-IS.
           
-          **IMPORTANT:**
-          - ✅ DO: Use `cat` to read the files (you have permission)
-          - ✅ DO: Look at the visible JSON and extract `total_count` manually
-          - ✅ DO: Count unique PR numbers by listing them out
-          - ❌ DO NOT use jq, python, node - they don't work here
-          - ❌ DO NOT try to execute complex commands
+          Extract these three numbers:
+          
+          1. **Help-wanted count**: Look at the help-wanted-created.json output from Step 1. Find `"total_count": X` and use X directly.
+             - Example: if you see `{"total_count": 11,` → the count is **11** (not 3, not 12, exactly 11)
+          
+          2. **Merged PRs count**: Look at the prs-merged.json output from Step 1. Find `"total_count": X` and use X directly.
+             - Example: if you see `{"total_count": 26,` → the count is **26** (not 60, not 3, exactly 26)
+          
+          3. **PR reviews count**: 
+             - Look at prs-commented-merged.json output - find `"total_count": X`
+             - Look at prs-commented-open.json output - find `"total_count": Y`  
+             - PR reviews = X + Y (simple addition, no deduplication needed - the data is already unique)
+             - Example: if merged shows `"total_count": 59` and open shows `"total_count": 9` → **68** total reviews
+          
+          **DO NOT:**
+          - ❌ Count items manually
+          - ❌ Try to deduplicate PR numbers
+          - ❌ Filter or analyze the items array
+          - ❌ Use jq, python, or any processing tools
+          - ❌ Modify the total_count numbers in any way
+          
+          **DO:**
+          - ✅ Find the number after `"total_count":` in the displayed JSON
+          - ✅ Use that exact number in the email
+          - ✅ Add the two PR review counts together (merged + open)
           
           **Detect expertise:**
           From `prs-merged.json`, look at PR titles/labels to identify their work areas (CI/CD, docs, UI, etc).
