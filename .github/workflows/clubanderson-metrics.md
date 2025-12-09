@@ -236,10 +236,13 @@ Create a plain-text email with:
 - Simple formatting (no markdown headings)
 
 **Output:**
-Output ONLY the raw JSON safe-output object. Do NOT wrap it in markdown code fences. Do NOT add any text before or after the JSON.
+Use the **send_email** MCP tool to send the metrics email. Call it like this:
 
-The JSON must be on a single line in this exact format:
-{"type":"send_email","subject":"KubeStellar Metrics - @clubanderson - PASS","body":"Hey clubanderson,..."}
+```
+send_email(subject="KubeStellar Metrics - @clubanderson - PASS", body="Hey clubanderson,...")
+```
+
+Do NOT print JSON. Do NOT use echo. Use the MCP tool directly.
 
 **DO NOT use any GitHub search tools. Only read the pre-downloaded JSON files.**
 
