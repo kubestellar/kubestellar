@@ -101,6 +101,12 @@ steps:
 
 tools:
   bash:
+    - "cat *"
+    - "jq *"
+    - "wc *"
+    - "grep *"
+    - "head *"
+    - "tail *"
 
 safe-outputs:
   jobs:
