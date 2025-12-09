@@ -116,7 +116,7 @@ tools:
 
 safe-outputs:
   jobs:
-    send-email:
+    send_email:
       description: "Send metrics email via Postmark"
       runs-on: ubuntu-latest
       output: "Email sent!"

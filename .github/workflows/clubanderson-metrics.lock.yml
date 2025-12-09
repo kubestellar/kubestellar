@@ -143,7 +143,7 @@
 #
 # safe-outputs:
 #   jobs:
-#     send-email:
+#     send_email:
 #       description: "Send metrics email via Postmark"
 #       runs-on: ubuntu-latest
 #       output: "Email sent!"
@@ -595,7 +595,7 @@ jobs:
         run: |
           mkdir -p /tmp/gh-aw/safeoutputs
           cat > /tmp/gh-aw/safeoutputs/config.json << 'EOF'
-          {"missing_tool":{"max":0},"noop":{"max":1},"send-email":{"description":"Send metrics email via Postmark","inputs":{"body":{"default":null,"description":"Plain text email body","required":true,"type":"string"},"subject":{"default":null,"description":"Email subject","required":true,"type":"string"}},"output":"Email sent!"}}
+          {"missing_tool":{"max":0},"noop":{"max":1},"send_email":{"description":"Send metrics email via Postmark","inputs":{"body":{"default":null,"description":"Plain text email body","required":true,"type":"string"},"subject":{"default":null,"description":"Email subject","required":true,"type":"string"}},"output":"Email sent!"}}
           EOF
           cat > /tmp/gh-aw/safeoutputs/tools.json << 'EOF'
           [
