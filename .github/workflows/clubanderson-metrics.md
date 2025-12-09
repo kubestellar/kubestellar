@@ -28,6 +28,11 @@ on:
           - gaurab-khanal
           - naman9271
           - btwshivam
+          - rxinui
+          - vedansh-5
+          - sagar2366
+          - oksaumya
+          - rupam-it
 
 permissions: read-all
 
@@ -264,6 +269,11 @@ Your task is to **generate ONE metrics email** for the selected maintainer using
 - gaurab-khanal → khanalgaurab98@gmail.com
 - naman9271 → namanjain9271@gmail.com
 - btwshivam → shivam200446@gmail.com
+- rxinui → rainui.ly@gmail.com
+- vedansh-5 → vedanshsaini7719@gmail.com
+- sagar2366 → sagarutekar2366@gmail.com
+- oksaumya → saumyakr2006@gmail.com
+- rupam-it → Mannarupam3@gmail.com
 
 The data files are in `/tmp/metrics-data/${{ github.event.inputs.maintainer }}/`:
 
