@@ -384,8 +384,8 @@ Hey clubanderson,
 
 Here are your KubeStellar metrics for the last 60 days:
 
-✅ Help-Wanted Issues: X created (required: ≥2)
-✅ Merged PRs: Z merged (required: ≥3)
+✅/❌ Help-Wanted Issues: X created (required: ≥2)
+✅/❌ Merged PRs: Z merged (required: ≥3)
 ✅/❌ PR Reviews: Y unique PRs (required: ≥8)
 
 Overall: PASS [3/3] or FAIL [1/3]
