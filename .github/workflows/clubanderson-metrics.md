@@ -57,7 +57,7 @@ jobs:
             --owner kubestellar \
             --author clubanderson \
             --merged ">=${{ steps.dates.outputs.date_60 }}" \
-            --json number,title,url,mergedAt,labels \
+            --json number,title,url,closedAt,labels \
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/prs-merged.json
           
