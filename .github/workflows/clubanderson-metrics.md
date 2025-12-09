@@ -416,29 +416,35 @@ Overall: PASS [3/3] or FAIL [1/3]
 ---
 
 🏷️ Help-Wanted Suggestions for You:
-        1. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [brief reason based on low activity + your expertise]
-        2. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [brief reason]
-        3. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [brief reason]
+        1. Title (repo #123) - https://github.com/... - Brief reason
+        2. Title (repo #456) - https://github.com/... - Brief reason  
+        3. Title (repo #789) - https://github.com/... - Brief reason
 
 🔨 PR Opportunities in Your Areas:
-        1. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
-        2. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
-        3. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
+        1. Title (repo #123) - https://github.com/... - Brief reason
+        2. Title (repo #456) - https://github.com/... - Brief reason
+        3. Title (repo #789) - https://github.com/... - Brief reason
 
 👀 PRs Needing Your Review:
-        1. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
-        2. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
-        3. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
+        1. Title (repo #123) - https://github.com/... - Brief reason
+        2. Title (repo #456) - https://github.com/... - Brief reason
+        3. Title (repo #789) - https://github.com/... - Brief reason
 
-**CRITICAL FORMATTING:** Each numbered recommendation (1., 2., 3.) MUST be indented with EXACTLY 8 spaces. Preserve this indentation in your output.
+**CRITICAL FORMATTING RULES:**
+1. Each numbered item (1., 2., 3.) MUST start with EXACTLY 8 spaces before the number
+2. The format for each line is: "        1. [Title] ([repo] #[number]) - [URL] - [Reason]"
+3. Example: "        1. Fix bug (kubestellar/ui #2275) - https://github.com/kubestellar/ui/issues/2275 - Matches your UI expertise"
+4. Maintain the 8-space indentation EXACTLY as shown - do not use tabs, only spaces
 
 ---
 Automated metrics check • {date}
 
-<div style="text-align: center; margin-top: 20px;">
-  <img src="https://raw.githubusercontent.com/kubestellar/kubestellar/main/docs/overrides/images/logo.svg" alt="KubeStellar" height="30" style="background: transparent;">
-</div>
+&lt;div style="text-align: center; margin-top: 20px;"&gt;
+  &lt;img src="https://raw.githubusercontent.com/kubestellar/kubestellar/main/docs/overrides/images/logo.svg" alt="KubeStellar" height="30" style="background: transparent;"&gt;
+&lt;/div&gt;
 ```
+
+**IMPORTANT:** The logo HTML above uses HTML entities (&lt; and &gt;). In your email output, replace these with actual angle brackets (< and >) so the HTML renders properly.
 
 ## Output
 
