@@ -217,9 +217,9 @@ All GitHub search data has been downloaded for you. The following JSON files are
 Read these 5 JSON files and analyze the data:
 
 **Calculate metrics:**
-- Count items in `help-wanted-created.json` → must be ≥2
-- Count unique PR numbers from `prs-commented.json` → must be ≥8
-- Count items in `prs-merged.json` → must be ≥3
+- **Help-wanted count**: Count items in `help-wanted-created.json` → must be ≥2
+- **PR reviews count**: Count unique PR numbers from `prs-commented.json`, but EXCLUDE any PR numbers that also appear in `prs-merged.json` (those are authored, not reviewed) → must be ≥8
+- **Merged PRs count**: Count items in `prs-merged.json` → must be ≥3
 
 **Detect expertise:**
 From `prs-merged.json`, look at PR titles/labels to identify if clubanderson works on CI/CD, docs, or UI.
@@ -236,7 +236,10 @@ Create a plain-text email with:
 - Simple formatting (no markdown headings)
 
 **Output:**
-Create a safe-output JSON with type "send_email" containing the email subject and body.
+Output ONLY the raw JSON safe-output object. Do NOT wrap it in markdown code fences. Do NOT add any text before or after the JSON.
+
+The JSON must be on a single line in this exact format:
+{"type":"send_email","subject":"KubeStellar Metrics - @clubanderson - PASS","body":"Hey clubanderson,..."}
 
 **DO NOT use any GitHub search tools. Only read the pre-downloaded JSON files.**
 
