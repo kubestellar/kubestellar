@@ -21,6 +21,13 @@ on:
           - waltforme
           - pdettori
           - francostellari
+          - nupurshivani
+          - onkar717
+          - kunal-511
+          - mavrick-1
+          - gaurab-khanal
+          - naman9271
+          - btwshivam
 
 permissions: read-all
 
@@ -250,6 +257,13 @@ Your task is to **generate ONE metrics email** for the selected maintainer using
 - waltforme → jun.duan@ibm.com
 - pdettori → dettori@us.ibm.com
 - francostellari → stellari@us.ibm.com
+- nupurshivani → nupurjha.me@gmail.com
+- onkar717 → onkarwork2234@gmail.com
+- kunal-511 → yoyokvunal@gmail.com
+- mavrick-1 → mavrickrishi@gmail.com
+- gaurab-khanal → khanalgaurab98@gmail.com
+- naman9271 → namanjain9271@gmail.com
+- btwshivam → shivam200446@gmail.com
 
 The data files are in `/tmp/metrics-data/${{ github.event.inputs.maintainer }}/`:
 
