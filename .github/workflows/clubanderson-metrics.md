@@ -510,6 +510,11 @@ Overall: PASS [3/3] or FAIL [1/3]
         2. Title (repo #456) - https://github.com/... - Brief reason
         3. Title (repo #789) - https://github.com/... - Brief reason
 
+🌍 Growing Our User Base - Ideas for You:
+        1. [Social Networks] - Specific suggestion for promoting KubeStellar on LinkedIn, Slack communities, or X/Twitter based on their network (e.g., "Share KubeStellar's multi-cluster capabilities in the #kubernetes channel on CNCF Slack - your recent work on [topic] makes you a great advocate")
+        2. [Professional Network] - Suggestion to introduce KubeStellar at their workplace or to colleagues (e.g., "Introduce KubeStellar to your DevOps team at work - your expertise in [domain] positions you well to demonstrate how it solves [specific pain point]")
+        3. [Content & Advocacy] - Suggestion to create content or speak about KubeStellar (e.g., "Write a blog post about your experience with [specific feature] - your [CI/CD/docs/UI] background makes you uniquely qualified to explain the benefits")
+
 **CRITICAL FORMATTING INSTRUCTIONS - READ CAREFULLY:**
 
 When you generate the email body, each recommendation line MUST be formatted with EXACTLY 8 spaces of indentation.
