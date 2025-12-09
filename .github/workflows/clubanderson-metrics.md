@@ -1,10 +1,10 @@
 ---
 description: |
-  Simple metrics tracker for clubanderson. Checks 3 criteria over last 60 days:
+  Metrics tracker for KubeStellar maintainers. Checks 3 criteria over last 60 days:
   - Help-wanted issues created (≥2)
   - Unique PRs commented on (≥8)
   - Merged PRs authored (≥3)
-  Sends pass/fail email to andy@clubanderson.com
+  Sends reports to clubanderson and kproche
 
 on:
   schedule:
@@ -31,53 +31,60 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_AUDIT_TOKEN }}
         run: |
-          mkdir -p /tmp/metrics-data
+          # Fetch data for BOTH maintainers
+          for username in clubanderson kproche; do
+            echo "Fetching data for $username..."
+            mkdir -p /tmp/metrics-data/$username
+            
+            # Search 1: Help-wanted issues created
+            gh search issues \
+              --owner kubestellar \
+              --label "help wanted" \
+              --author $username \
+              --created ">=${{ steps.dates.outputs.date_60 }}" \
+              --limit 100 \
+              --json number,title,url,createdAt,labels \
+              --jq '{total_count: length, items: .}' \
+              > /tmp/metrics-data/$username/help-wanted-created.json
+            
+            # Search 2: PRs commented/reviewed on (merged)
+            gh search prs \
+              --owner kubestellar \
+              --commenter $username \
+              --merged \
+              --updated ">=${{ steps.dates.outputs.date_60 }}" \
+              --limit 1000 \
+              --json number,title,url,state \
+              --jq '{total_count: length, items: .}' \
+              > /tmp/metrics-data/$username/prs-commented-merged.json
+            
+            # Search 3: PRs commented/reviewed on (open)
+            gh search prs \
+              --owner kubestellar \
+              --commenter $username \
+              --state open \
+              --updated ">=${{ steps.dates.outputs.date_60 }}" \
+              --limit 1000 \
+              --json number,title,url,state \
+              --jq '{total_count: length, items: .}' \
+              > /tmp/metrics-data/$username/prs-commented-open.json
+            
+            # Search 4: Merged PRs authored
+            gh search prs \
+              --owner kubestellar \
+              --author $username \
+              --merged \
+              --merged-at ">=${{ steps.dates.outputs.date_60 }}" \
+              --limit 100 \
+              --json number,title,url,closedAt,labels \
+              --jq '{total_count: length, items: .}' \
+              > /tmp/metrics-data/$username/prs-merged.json
+          done
           
-          # Search 1: Help-wanted issues created (paginate to get all)
-          gh search issues \
-            --owner kubestellar \
-            --label "help wanted" \
-            --author clubanderson \
-            --created ">=${{ steps.dates.outputs.date_60 }}" \
-            --limit 100 \
-            --json number,title,url,createdAt,labels \
-            --jq '{total_count: length, items: .}' \
-            > /tmp/metrics-data/help-wanted-created.json
+          # Shared data for all maintainers (put in shared location)
+          mkdir -p /tmp/metrics-data/shared
           
-          # Search 2: PRs commented/reviewed on (get all with pagination)
-          # Use commenter filter to get only PRs where user commented (not authored)
-          gh search prs \
-            --owner kubestellar \
-            --commenter clubanderson \
-            --merged \
-            --updated ">=${{ steps.dates.outputs.date_60 }}" \
-            --limit 1000 \
-            --json number,title,url,state \
-            --jq '{total_count: length, items: .}' \
-            > /tmp/metrics-data/prs-commented-merged.json
-          
-          gh search prs \
-            --owner kubestellar \
-            --commenter clubanderson \
-            --state open \
-            --updated ">=${{ steps.dates.outputs.date_60 }}" \
-            --limit 1000 \
-            --json number,title,url,state \
-            --jq '{total_count: length, items: .}' \
-            > /tmp/metrics-data/prs-commented-open.json
-          
-          # Search 3: Merged PRs authored (paginate)
-          gh search prs \
-            --owner kubestellar \
-            --author clubanderson \
-            --merged \
-            --merged-at ">=${{ steps.dates.outputs.date_60 }}" \
-            --limit 100 \
-            --json number,title,url,closedAt,labels \
-            --jq '{total_count: length, items: .}' \
-            > /tmp/metrics-data/prs-merged.json
-          
-          # Search 4: All open issues in active repos (paginate)
+          # Search: All open issues in active repos (for recommendations)
           gh search issues \
             --owner kubestellar \
             --repo docs \
@@ -87,9 +94,9 @@ jobs:
             --limit 1000 \
             --json number,title,url,repository,labels,createdAt \
             --jq '{total_count: length, items: .}' \
-            > /tmp/metrics-data/open-issues.json
+            > /tmp/metrics-data/shared/open-issues.json
           
-          # Search 5: All open PRs in active repos (paginate)
+          # Search: All open PRs in active repos (for recommendations)
           gh search prs \
             --owner kubestellar \
             --repo docs \
@@ -99,7 +106,13 @@ jobs:
             --limit 1000 \
             --json number,title,url,repository,labels,createdAt \
             --jq '{total_count: length, items: .}' \
-            > /tmp/metrics-data/open-prs.json
+            > /tmp/metrics-data/shared/open-prs.json
+          
+          # Copy shared files to each maintainer's folder
+          for username in clubanderson kproche; do
+            cp /tmp/metrics-data/shared/open-issues.json /tmp/metrics-data/$username/
+            cp /tmp/metrics-data/shared/open-prs.json /tmp/metrics-data/$username/
+          done
           
           echo "ready=true" >> $GITHUB_OUTPUT
       
@@ -210,52 +223,63 @@ safe-outputs:
               }
 ---
 
-# Clubanderson Metrics Tracker
+# Maintainer Metrics Tracker
 
-Your task is to **generate ONE metrics email for clubanderson** using pre-downloaded GitHub data.
+Your task is to **generate TWO metrics emails** using pre-downloaded GitHub data.
+
+Process these maintainers IN ORDER:
+1. **clubanderson** → andy@clubanderson.com
+2. **kproche** → kproche@us.ibm.com
+
+For EACH maintainer, the data files are in `/tmp/metrics-data/{username}/`:
 
 ## Pre-Downloaded Data Files
 
-All GitHub search data has been downloaded for you. The following JSON files are available in `/tmp/metrics-data/`:
+For each maintainer, these 6 JSON files are available in `/tmp/metrics-data/{username}/`:
 
-1. **help-wanted-created.json** - Help-wanted issues created by clubanderson (last 60 days)
-2. **prs-commented-merged.json** - Merged PRs clubanderson commented on (last 60 days)  
-3. **prs-commented-open.json** - Open PRs clubanderson commented on (last 60 days)
-4. **prs-merged.json** - Merged PRs authored by clubanderson (last 60 days)
+1. **help-wanted-created.json** - Help-wanted issues created by the user (last 60 days)
+2. **prs-commented-merged.json** - Merged PRs the user commented on (last 60 days)  
+3. **prs-commented-open.json** - Open PRs the user commented on (last 60 days)
+4. **prs-merged.json** - Merged PRs authored by the user (last 60 days)
 5. **open-issues.json** - All open issues in docs/ui/ui-plugins repos
 6. **open-prs.json** - All open PRs in docs/ui/ui-plugins repos
 
 ## Your Task
 
-Read these 6 JSON files and analyze the data:
+For EACH maintainer (clubanderson, then kproche):
 
 **Calculate metrics:**
 - **Help-wanted count**: Count items in `help-wanted-created.json` → must be ≥2
 - **PR reviews count**: 
   - Count unique PR numbers from `prs-commented-merged.json` 
   - Add unique PR numbers from `prs-commented-open.json`
-  - This is the total PRs you commented/reviewed on → must be ≥8
+  - This is the total PRs they commented/reviewed on → must be ≥8
 - **Merged PRs count**: Count items in `prs-merged.json` → must be ≥3
 
 **Detect expertise:**
-From `prs-merged.json`, look at PR titles/labels to identify if clubanderson works on CI/CD, docs, or UI.
+From `prs-merged.json`, look at PR titles/labels to identify their work areas (CI/CD, docs, UI, etc).
 
-**Generate recommendations:**
+**Generate recommendations (WITH URLs):**
 - From `open-issues.json`: Find 3 issues with "help wanted" label
 - From `open-prs.json`: Find 3 PRs that need review  
 - From `open-issues.json`: Find 3 recent issues (created in last 30 days) that need PRs
 
+**IMPORTANT - All recommendations MUST include clickable URLs:**
+- Format: "Title (repo #number) - https://github.com/org/repo/issues/number"
+- Example: "Fix UI bug (kubestellar/ui #2275) - https://github.com/kubestellar/ui/issues/2275"
+- The URL field is in the JSON as `url` - use it directly
+
 **Generate email:**
 Create a plain-text email with:
 - Pass/fail for each metric
-- Top 3 recommendations in each category
+- Top 3 recommendations in each category (with URLs!)
 - Simple formatting (no markdown headings)
 
 **Output:**
 Use the **send_email** MCP tool to send the metrics email. Call it like this:
 
 ```
-send_email(subject="KubeStellar Metrics - @clubanderson - PASS", body="Hey clubanderson,...")
+send_email(subject="KubeStellar Metrics - @{username} - PASS", body="Hey {username},...")
 ```
 
 Do NOT print JSON. Do NOT use echo. Use the MCP tool directly.
