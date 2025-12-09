@@ -4,12 +4,23 @@ description: |
   - Help-wanted issues created (≥2)
   - Unique PRs commented on (≥8)
   - Merged PRs authored (≥3)
-  Sends reports to 7 maintainers: clubanderson, kproche, mikespreitzer, dumb0002, waltforme, pdettori, francostellari
+  Run manually for individual maintainers via dispatch dropdown
 
 on:
-  schedule:
-    - cron: "0 14 * * 1" # Mondays at 9am EST (14:00 UTC)
   workflow_dispatch:
+    inputs:
+      maintainer:
+        description: 'Select maintainer to audit'
+        required: true
+        type: choice
+        options:
+          - clubanderson
+          - kproche
+          - mikespreitzer
+          - dumb0002
+          - waltforme
+          - pdettori
+          - francostellari
 
 permissions: read-all
 
@@ -31,54 +42,54 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_AUDIT_TOKEN }}
         run: |
-          # Fetch data for ALL maintainers
-          for username in clubanderson kproche mikespreitzer dumb0002 waltforme pdettori francostellari; do
-            echo "Fetching data for $username..."
-            mkdir -p /tmp/metrics-data/$username
-            
-            # Search 1: Help-wanted issues created
-            gh search issues \
-              --owner kubestellar \
-              --label "help wanted" \
-              --author $username \
-              --created ">=${{ steps.dates.outputs.date_60 }}" \
-              --limit 100 \
-              --json number,title,url,createdAt,labels \
-              --jq '{total_count: length, items: .}' \
-              > /tmp/metrics-data/$username/help-wanted-created.json
-            
-            # Search 2: PRs commented/reviewed on (merged)
-            gh search prs \
-              --owner kubestellar \
-              --commenter $username \
-              --merged \
-              --updated ">=${{ steps.dates.outputs.date_60 }}" \
-              --limit 1000 \
-              --json number,title,url,state \
-              --jq '{total_count: length, items: .}' \
-              > /tmp/metrics-data/$username/prs-commented-merged.json
-            
-            # Search 3: PRs commented/reviewed on (open)
-            gh search prs \
-              --owner kubestellar \
-              --commenter $username \
-              --state open \
-              --updated ">=${{ steps.dates.outputs.date_60 }}" \
-              --limit 1000 \
-              --json number,title,url,state \
-              --jq '{total_count: length, items: .}' \
-              > /tmp/metrics-data/$username/prs-commented-open.json
-            
-            # Search 4: Merged PRs authored
-            gh search prs \
-              --owner kubestellar \
-              --author $username \
-              --merged \
-              --merged-at ">=${{ steps.dates.outputs.date_60 }}" \
-              --limit 100 \
-              --json number,title,url,closedAt,labels \
-              --jq '{total_count: length, items: .}' \
-              > /tmp/metrics-data/$username/prs-merged.json
+          # Fetch data for selected maintainer
+          username="${{ github.event.inputs.maintainer }}"
+          echo "Fetching data for $username..."
+          mkdir -p /tmp/metrics-data/$username
+          
+          # Search 1: Help-wanted issues created
+          gh search issues \
+            --owner kubestellar \
+            --label "help wanted" \
+            --author $username \
+            --created ">=${{ steps.dates.outputs.date_60 }}" \
+            --limit 100 \
+            --json number,title,url,createdAt,labels \
+            --jq '{total_count: length, items: .}' \
+            > /tmp/metrics-data/$username/help-wanted-created.json
+          
+          # Search 2: PRs commented/reviewed on (merged)
+          gh search prs \
+            --owner kubestellar \
+            --commenter $username \
+            --merged \
+            --updated ">=${{ steps.dates.outputs.date_60 }}" \
+            --limit 1000 \
+            --json number,title,url,state \
+            --jq '{total_count: length, items: .}' \
+            > /tmp/metrics-data/$username/prs-commented-merged.json
+          
+          # Search 3: PRs commented/reviewed on (open)
+          gh search prs \
+            --owner kubestellar \
+            --commenter $username \
+            --state open \
+            --updated ">=${{ steps.dates.outputs.date_60 }}" \
+            --limit 1000 \
+            --json number,title,url,state \
+            --jq '{total_count: length, items: .}' \
+            > /tmp/metrics-data/$username/prs-commented-open.json
+          
+          # Search 4: Merged PRs authored
+          gh search prs \
+            --owner kubestellar \
+            --author $username \
+            --merged \
+            --merged-at ">=${{ steps.dates.outputs.date_60 }}" \
+            --limit 100 \
+            --json number,title,url,closedAt,labels \
+            --jq '{total_count: length, items: .}' \
+            > /tmp/metrics-data/$username/prs-merged.json
           done
           
           # Shared data for all maintainers (put in shared location)
@@ -108,11 +119,10 @@ jobs:
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/shared/open-prs.json
           
-          # Copy shared files to each maintainer's folder
-          for username in clubanderson kproche mikespreitzer dumb0002 waltforme pdettori francostellari; do
-            cp /tmp/metrics-data/shared/open-issues.json /tmp/metrics-data/$username/
-            cp /tmp/metrics-data/shared/open-prs.json /tmp/metrics-data/$username/
-          done
+          # Copy shared files to selected maintainer's folder
+          username="${{ github.event.inputs.maintainer }}"
+          cp /tmp/metrics-data/shared/open-issues.json /tmp/metrics-data/$username/
+          cp /tmp/metrics-data/shared/open-prs.json /tmp/metrics-data/$username/
           
           echo "ready=true" >> $GITHUB_OUTPUT
       
@@ -228,18 +238,20 @@ safe-outputs:
 
 # Maintainer Metrics Tracker
 
-Your task is to **generate SEVEN metrics emails** using pre-downloaded GitHub data.
+Your task is to **generate ONE metrics email** for the selected maintainer using pre-downloaded GitHub data.
 
-Process these maintainers IN ORDER:
-1. **clubanderson** → andy@clubanderson.com
-2. **kproche** → kproche@us.ibm.com
-3. **mikespreitzer** → mspreitz@us.ibm.com
-4. **dumb0002** → Braulio.Dumba@ibm.com
-5. **waltforme** → jun.duan@ibm.com
-6. **pdettori** → dettori@us.ibm.com
-7. **francostellari** → stellari@us.ibm.com
+**Selected maintainer:** ${{ github.event.inputs.maintainer }}
 
-For EACH maintainer, the data files are in `/tmp/metrics-data/{username}/`:
+**Email mapping:**
+- clubanderson → andy@clubanderson.com
+- kproche → kproche@us.ibm.com
+- mikespreitzer → mspreitz@us.ibm.com
+- dumb0002 → Braulio.Dumba@ibm.com
+- waltforme → jun.duan@ibm.com
+- pdettori → dettori@us.ibm.com
+- francostellari → stellari@us.ibm.com
+
+The data files are in `/tmp/metrics-data/${{ github.event.inputs.maintainer }}/`:
 
 ## Pre-Downloaded Data Files
 
@@ -254,7 +266,7 @@ For each maintainer, these 6 JSON files are available in `/tmp/metrics-data/{use
 
 ## Your Task
 
-For EACH maintainer (clubanderson, then kproche):
+For the selected maintainer (${{ github.event.inputs.maintainer }}):
 
 **Calculate metrics:**
 - **Help-wanted count**: Read `help-wanted-created.json` - the file has a `total_count` field at the top
