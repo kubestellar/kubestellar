@@ -322,10 +322,21 @@ For each maintainer, these 6 JSON files are available in `/tmp/metrics-data/{use
 
 For the selected maintainer (${{ github.event.inputs.maintainer }}):
 
-**Calculate metrics:**
-- **Help-wanted count**: Read `help-wanted-created.json` - look for `"total_count": X` at the very top of the JSON. Use that number X.
-- **Merged PRs count**: Read `prs-merged.json` - look for `"total_count": Y` at the very top of the JSON. Use that number Y.
-- **PR reviews count**: Read both `prs-commented-merged.json` and `prs-commented-open.json` - combine all PR numbers from BOTH files, then count UNIQUE numbers only (deduplicate).
+**Calculate metrics (READ CAREFULLY):**
+
+First, display the raw data so we can verify:
+```bash
+cat /tmp/metrics-data/$username/help-wanted-created.json | head -20
+cat /tmp/metrics-data/$username/prs-merged.json | head -20
+```
+
+Then calculate:
+- **Help-wanted count**: The first line of `help-wanted-created.json` shows `"total_count": X` - use that X number EXACTLY.
+- **Merged PRs count**: The first line of `prs-merged.json` shows `"total_count": Y` - use that Y number EXACTLY.
+- **PR reviews count**: 
+  1. Get all PR numbers from `prs-commented-merged.json` (look at items[].number)
+  2. Get all PR numbers from `prs-commented-open.json` (look at items[].number)  
+  3. Combine them and count UNIQUE numbers (remove duplicates)
 
 **IMPORTANT - Keep it simple:**
 - ✅ DO: Read files with `cat` and manually count/parse the visible data
