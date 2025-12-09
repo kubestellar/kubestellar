@@ -361,24 +361,39 @@ cat /tmp/metrics-data/${{ github.event.inputs.maintainer }}/prs-commented-open.j
 
 **Step 2: Extract metrics EXACTLY from total_count fields**
 
-⚠️ **CRITICAL INSTRUCTION - READ CAREFULLY:**
+⚠️ **CRITICAL INSTRUCTION - DO NOT SKIP THIS:**
 
-DO NOT perform any calculations. DO NOT filter. DO NOT modify the numbers.
-ONLY read the `total_count` field from each JSON file and use it AS-IS.
+**RULE #1:** ONLY read the exact number after `"total_count":` in the JSON. DO NOT calculate, filter, count items, or modify in any way.
 
-Extract these three numbers:
+**RULE #2:** If you see `{"total_count": 11,` then the metric is **11**. Not 3. Not 12. Not the length of items array. **Exactly 11**.
 
-1. **Help-wanted count**: Look at the help-wanted-created.json output from Step 1. Find `"total_count": X` and use X directly.
-   - Example: if you see `{"total_count": 11,` → the count is **11** (not 3, not 12, exactly 11)
+**RULE #3:** Display the metrics you extracted before generating the email so we can verify they match the JSON.
 
-2. **Merged PRs count**: Look at the prs-merged.json output from Step 1. Find `"total_count": X` and use X directly.
-   - Example: if you see `{"total_count": 26,` → the count is **26** (not 60, not 3, exactly 26)
+Extract these three numbers using ONLY the total_count field:
 
-3. **PR reviews count**: 
-   - Look at prs-commented-merged.json output - find `"total_count": X`
-   - Look at prs-commented-open.json output - find `"total_count": Y`  
-   - PR reviews = X + Y (simple addition, no deduplication needed - the data is already unique)
-   - Example: if merged shows `"total_count": 59` and open shows `"total_count": 9` → **68** total reviews
+1. **Help-wanted count** = `total_count` from help-wanted-created.json
+   - Look for the line: `"total_count": X`
+   - Use X directly (no math, no processing)
+   - Example: `{"total_count": 11,` → metric is **11**
+
+2. **Merged PRs count** = `total_count` from prs-merged.json
+   - Look for the line: `"total_count": X`
+   - Use X directly (no math, no processing)
+   - Example: `{"total_count": 26,` → metric is **26**
+
+3. **PR reviews count** = `total_count` from prs-commented-merged.json + `total_count` from prs-commented-open.json
+   - Find `"total_count": X` in prs-commented-merged.json
+   - Find `"total_count": Y` in prs-commented-open.json
+   - PR reviews = X + Y (simple addition)
+   - Example: if merged has `"total_count": 59` and open has `"total_count": 9` → 59 + 9 = **68**
+
+**Before generating email, display:**
+```
+Extracted metrics:
+- Help-wanted: [number from help-wanted-created.json total_count]
+- Merged PRs: [number from prs-merged.json total_count]  
+- PR Reviews: [merged total_count] + [open total_count] = [sum]
+```
 
 **DO NOT:**
 - ❌ Count items manually
