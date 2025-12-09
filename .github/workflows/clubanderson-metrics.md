@@ -323,9 +323,9 @@ For each maintainer, these 6 JSON files are available in `/tmp/metrics-data/{use
 For the selected maintainer (${{ github.event.inputs.maintainer }}):
 
 **Calculate metrics:**
-- **Help-wanted count**: Read `help-wanted-created.json` - the file has a `total_count` field at the top
-- **Merged PRs count**: Read `prs-merged.json` - the file has a `total_count` field at the top
-- **PR reviews count**: Read both `prs-commented-merged.json` and `prs-commented-open.json` - each has `items` array with PR numbers. Count unique numbers across both files.
+- **Help-wanted count**: Read `help-wanted-created.json` - look for `"total_count": X` at the very top of the JSON. Use that number X.
+- **Merged PRs count**: Read `prs-merged.json` - look for `"total_count": Y` at the very top of the JSON. Use that number Y.
+- **PR reviews count**: Read both `prs-commented-merged.json` and `prs-commented-open.json` - combine all PR numbers from BOTH files, then count UNIQUE numbers only (deduplicate).
 
 **IMPORTANT - Keep it simple:**
 - ✅ DO: Read files with `cat` and manually count/parse the visible data
