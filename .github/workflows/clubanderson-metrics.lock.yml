@@ -61,6 +61,8 @@
 #           - vedansh-5
 #           - waltforme
 #
+# run-name: "Maintainer Metrics Tracker - ${{ inputs.maintainer }}"
+#
 # permissions: read-all
 #
 # jobs:
@@ -539,7 +541,7 @@ permissions: read-all
 concurrency:
   group: "gh-aw-${{ github.workflow }}"
 
-run-name: "Maintainer Metrics Tracker"
+run-name: "Maintainer Metrics Tracker - ${{ inputs.maintainer }}"
 
 jobs:
   activation:

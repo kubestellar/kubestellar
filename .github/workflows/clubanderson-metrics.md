@@ -34,6 +34,8 @@ on:
           - vedansh-5
           - waltforme
 
+run-name: "Maintainer Metrics Tracker - ${{ inputs.maintainer }}"
+
 permissions: read-all
 
 jobs:
