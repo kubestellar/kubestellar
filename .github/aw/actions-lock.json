@@ -5,6 +5,11 @@
       "version": "v4",
       "sha": "34e114876b0b11c390a56381ad16ebd13914f8d5"
     },
+    "actions/download-artifact@v4": {
+      "repo": "actions/download-artifact",
+      "version": "v4",
+      "sha": "d3f86a106a0bac45b974a628896c90dbdf5c8093"
+    },
     "actions/github-script@v7": {
       "repo": "actions/github-script",
       "version": "v7",
@@ -14,6 +19,11 @@
       "repo": "actions/setup-node",
       "version": "v4",
       "sha": "49933ea5288caeca8642d1e84afbd3f7d6820020"
+    },
+    "actions/upload-artifact@v4": {
+      "repo": "actions/upload-artifact",
+      "version": "v4",
+      "sha": "ea165f8d65b6e75b540449e92b4886f43607fa02"
     },
     "peter-evans/create-pull-request@v6": {
       "repo": "peter-evans/create-pull-request",

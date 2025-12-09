@@ -13,12 +13,73 @@ on:
 
 permissions: read-all
 
+jobs:
+  fetch-data:
+    name: Fetch GitHub Data
+    runs-on: ubuntu-latest
+    outputs:
+      data-ready: ${{ steps.fetch.outputs.ready }}
+    steps:
+      - name: Calculate dates
+        id: dates
+        run: |
+          echo "date_60=$(date -d '60 days ago' '+%Y-%m-%d')" >> $GITHUB_OUTPUT
+          echo "date_30=$(date -d '30 days ago' '+%Y-%m-%d')" >> $GITHUB_OUTPUT
+      
+      - name: Fetch all GitHub data
+        id: fetch
+        env:
+          GH_TOKEN: ${{ secrets.GH_AUDIT_TOKEN }}
+        run: |
+          mkdir -p /tmp/metrics-data
+          
+          # Search 1: Help-wanted issues created
+          gh api search/issues \
+            -q "org:kubestellar is:issue label:\"help wanted\" author:clubanderson created:>=${{ steps.dates.outputs.date_60 }}" \
+            --jq '{total_count, items: [.items[] | {number, title, html_url, created_at, labels: [.labels[].name]}]}' \
+            > /tmp/metrics-data/help-wanted-created.json
+          
+          # Search 2: PRs commented on
+          gh api search/issues \
+            -q "org:kubestellar is:pr commenter:clubanderson updated:>=${{ steps.dates.outputs.date_60 }}" \
+            --jq '{total_count, items: [.items[] | {number, title, html_url, state}]}' \
+            > /tmp/metrics-data/prs-commented.json
+          
+          # Search 3: Merged PRs authored
+          gh api search/issues \
+            -q "org:kubestellar is:pr is:merged author:clubanderson merged:>=${{ steps.dates.outputs.date_60 }}" \
+            --jq '{total_count, items: [.items[] | {number, title, html_url, merged_at, labels: [.labels[].name]}]}' \
+            > /tmp/metrics-data/prs-merged.json
+          
+          # Search 4: All open issues in active repos
+          gh api search/issues \
+            -q "org:kubestellar is:issue is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins" \
+            --jq '{total_count, items: [.items[] | {number, title, html_url, repository_url, labels: [.labels[].name], created_at}]}' \
+            > /tmp/metrics-data/open-issues.json
+          
+          # Search 5: All open PRs in active repos
+          gh api search/issues \
+            -q "org:kubestellar is:pr is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins" \
+            --jq '{total_count, items: [.items[] | {number, title, html_url, repository_url, labels: [.labels[].name], created_at}]}' \
+            > /tmp/metrics-data/open-prs.json
+          
+          echo "ready=true" >> $GITHUB_OUTPUT
+      
+      - name: Upload data as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: metrics-data
+          path: /tmp/metrics-data/
+          retention-days: 1
+
+steps:
+  - name: Download metrics data
+    uses: actions/download-artifact@v4
+    with:
+      name: metrics-data
+      path: /tmp/metrics-data/
+
 tools:
-  github:
-    github-token: ${{ secrets.GH_AUDIT_TOKEN }}
-    allowed:
-      - search_issues
-      - search_pull_requests
   bash:
 
 safe-outputs:
@@ -107,39 +168,45 @@ safe-outputs:
 
 # Clubanderson Metrics Tracker
 
-Your task is to **generate ONE metrics email for clubanderson** and stop. This is a single-pass workflow.
+Your task is to **generate ONE metrics email for clubanderson** using pre-downloaded GitHub data.
 
-## What to do
+## Pre-Downloaded Data Files
 
-First, calculate two dates:
-- 60 days ago from today (YYYY-MM-DD)
-- 30 days ago from today (YYYY-MM-DD)
+All GitHub search data has been downloaded for you. The following JSON files are available in `/tmp/metrics-data/`:
 
-Then run exactly 5 GitHub searches:
-- Help-wanted issues created by clubanderson (60 days): `org:kubestellar is:issue label:"help wanted" author:clubanderson created:>={date_60_days_ago}`
-- PRs clubanderson commented on (60 days): `org:kubestellar is:pr commenter:clubanderson updated:>={date_60_days_ago}`
-- Merged PRs by clubanderson (60 days): `org:kubestellar is:pr is:merged author:clubanderson merged:>={date_60_days_ago}`
-- All open issues in docs/ui/ui-plugins: `org:kubestellar is:issue is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
-- All open PRs in docs/ui/ui-plugins: `org:kubestellar is:pr is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
+1. **help-wanted-created.json** - Help-wanted issues created by clubanderson (last 60 days)
+2. **prs-commented.json** - PRs clubanderson commented on (last 60 days)  
+3. **prs-merged.json** - Merged PRs authored by clubanderson (last 60 days)
+4. **open-issues.json** - All open issues in docs/ui/ui-plugins repos
+5. **open-prs.json** - All open PRs in docs/ui/ui-plugins repos
 
-After running these 5 searches, **stop searching and analyze the results you collected**:
+## Your Task
 
-**Metrics (from searches 1-3):**
-- Count help-wanted issues (search 1) → must be ≥2
-- Count unique PR numbers from search 2 → must be ≥8  
-- Count merged PRs (search 3) → must be ≥3
+Read these 5 JSON files and analyze the data:
 
-**Expertise detection (from search 3 PRs):**
-Look at file paths to identify if clubanderson works on CI/CD (workflows, Docker), docs (*.md), or UI (kubestellar/ui).
+**Calculate metrics:**
+- Count items in `help-wanted-created.json` → must be ≥2
+- Count unique PR numbers from `prs-commented.json` → must be ≥8
+- Count items in `prs-merged.json` → must be ≥3
 
-**Recommendations (from searches 4-5):**
-- Find 3 help-wanted issues from search 4
-- Find 3 PRs needing review from search 5
-- Find 3 recent issues (last 30 days) from search 4 that need PRs
+**Detect expertise:**
+From `prs-merged.json`, look at PR titles/labels to identify if clubanderson works on CI/CD, docs, or UI.
 
-Generate a plain-text email with the metrics (pass/fail) and recommendations, then output the safe-output JSON and stop.
+**Generate recommendations:**
+- From `open-issues.json`: Find 3 issues with "help wanted" label
+- From `open-prs.json`: Find 3 PRs that need review  
+- From `open-issues.json`: Find 3 recent issues (created in last 30 days) that need PRs
 
-**DO NOT re-run the searches. DO NOT calculate dates again. Just use the data you already have.**
+**Generate email:**
+Create a plain-text email with:
+- Pass/fail for each metric
+- Top 3 recommendations in each category
+- Simple formatting (no markdown headings)
+
+**Output:**
+Create a safe-output JSON with type "send_email" containing the email subject and body.
+
+**DO NOT use any GitHub search tools. Only read the pre-downloaded JSON files.**
 
 ## Email Format
 

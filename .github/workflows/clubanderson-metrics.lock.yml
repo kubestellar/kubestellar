@@ -40,12 +40,73 @@
 #
 # permissions: read-all
 #
+# jobs:
+#   fetch-data:
+#     name: Fetch GitHub Data
+#     runs-on: ubuntu-latest
+#     outputs:
+#       data-ready: ${{ steps.fetch.outputs.ready }}
+#     steps:
+#       - name: Calculate dates
+#         id: dates
+#         run: |
+#           echo "date_60=$(date -d '60 days ago' '+%Y-%m-%d')" >> $GITHUB_OUTPUT
+#           echo "date_30=$(date -d '30 days ago' '+%Y-%m-%d')" >> $GITHUB_OUTPUT
+#
+#       - name: Fetch all GitHub data
+#         id: fetch
+#         env:
+#           GH_TOKEN: ${{ secrets.GH_AUDIT_TOKEN }}
+#         run: |
+#           mkdir -p /tmp/metrics-data
+#
+#           # Search 1: Help-wanted issues created
+#           gh api search/issues \
+#             -q "org:kubestellar is:issue label:\"help wanted\" author:clubanderson created:>=${{ steps.dates.outputs.date_60 }}" \
+#             --jq '{total_count, items: [.items[] | {number, title, html_url, created_at, labels: [.labels[].name]}]}' \
+#             > /tmp/metrics-data/help-wanted-created.json
+#
+#           # Search 2: PRs commented on
+#           gh api search/issues \
+#             -q "org:kubestellar is:pr commenter:clubanderson updated:>=${{ steps.dates.outputs.date_60 }}" \
+#             --jq '{total_count, items: [.items[] | {number, title, html_url, state}]}' \
+#             > /tmp/metrics-data/prs-commented.json
+#
+#           # Search 3: Merged PRs authored
+#           gh api search/issues \
+#             -q "org:kubestellar is:pr is:merged author:clubanderson merged:>=${{ steps.dates.outputs.date_60 }}" \
+#             --jq '{total_count, items: [.items[] | {number, title, html_url, merged_at, labels: [.labels[].name]}]}' \
+#             > /tmp/metrics-data/prs-merged.json
+#
+#           # Search 4: All open issues in active repos
+#           gh api search/issues \
+#             -q "org:kubestellar is:issue is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins" \
+#             --jq '{total_count, items: [.items[] | {number, title, html_url, repository_url, labels: [.labels[].name], created_at}]}' \
+#             > /tmp/metrics-data/open-issues.json
+#
+#           # Search 5: All open PRs in active repos
+#           gh api search/issues \
+#             -q "org:kubestellar is:pr is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins" \
+#             --jq '{total_count, items: [.items[] | {number, title, html_url, repository_url, labels: [.labels[].name], created_at}]}' \
+#             > /tmp/metrics-data/open-prs.json
+#
+#           echo "ready=true" >> $GITHUB_OUTPUT
+#
+#       - name: Upload data as artifact
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: metrics-data
+#           path: /tmp/metrics-data/
+#           retention-days: 1
+#
+# steps:
+#   - name: Download metrics data
+#     uses: actions/download-artifact@v4
+#     with:
+#       name: metrics-data
+#       path: /tmp/metrics-data/
+#
 # tools:
-#   github:
-#     github-token: ${{ secrets.GH_AUDIT_TOKEN }}
-#     allowed:
-#       - search_issues
-#       - search_pull_requests
 #   bash:
 #
 # safe-outputs:
@@ -139,11 +200,14 @@
 #   agent["agent"]
 #   conclusion["conclusion"]
 #   detection["detection"]
+#   fetch-data["fetch-data"]
 #   send_email["send_email"]
 #   activation --> agent
+#   fetch-data --> agent
 #   agent --> conclusion
 #   activation --> conclusion
 #   agent --> detection
+#   activation --> fetch-data
 #   agent --> send_email
 #   detection --> send_email
 # ```
@@ -152,39 +216,45 @@
 # ```markdown
 # # Clubanderson Metrics Tracker
 #
-# Your task is to **generate ONE metrics email for clubanderson** and stop. This is a single-pass workflow.
+# Your task is to **generate ONE metrics email for clubanderson** using pre-downloaded GitHub data.
 #
-# ## What to do
+# ## Pre-Downloaded Data Files
 #
-# First, calculate two dates:
-# - 60 days ago from today (YYYY-MM-DD)
-# - 30 days ago from today (YYYY-MM-DD)
+# All GitHub search data has been downloaded for you. The following JSON files are available in `/tmp/metrics-data/`:
 #
-# Then run exactly 5 GitHub searches:
-# - Help-wanted issues created by clubanderson (60 days): `org:kubestellar is:issue label:"help wanted" author:clubanderson created:>={date_60_days_ago}`
-# - PRs clubanderson commented on (60 days): `org:kubestellar is:pr commenter:clubanderson updated:>={date_60_days_ago}`
-# - Merged PRs by clubanderson (60 days): `org:kubestellar is:pr is:merged author:clubanderson merged:>={date_60_days_ago}`
-# - All open issues in docs/ui/ui-plugins: `org:kubestellar is:issue is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
-# - All open PRs in docs/ui/ui-plugins: `org:kubestellar is:pr is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
+# 1. **help-wanted-created.json** - Help-wanted issues created by clubanderson (last 60 days)
+# 2. **prs-commented.json** - PRs clubanderson commented on (last 60 days)  
+# 3. **prs-merged.json** - Merged PRs authored by clubanderson (last 60 days)
+# 4. **open-issues.json** - All open issues in docs/ui/ui-plugins repos
+# 5. **open-prs.json** - All open PRs in docs/ui/ui-plugins repos
 #
-# After running these 5 searches, **stop searching and analyze the results you collected**:
+# ## Your Task
 #
-# **Metrics (from searches 1-3):**
-# - Count help-wanted issues (search 1) → must be ≥2
-# - Count unique PR numbers from search 2 → must be ≥8  
-# - Count merged PRs (search 3) → must be ≥3
+# Read these 5 JSON files and analyze the data:
 #
-# **Expertise detection (from search 3 PRs):**
-# Look at file paths to identify if clubanderson works on CI/CD (workflows, Docker), docs (*.md), or UI (kubestellar/ui).
+# **Calculate metrics:**
+# - Count items in `help-wanted-created.json` → must be ≥2
+# - Count unique PR numbers from `prs-commented.json` → must be ≥8
+# - Count items in `prs-merged.json` → must be ≥3
 #
-# **Recommendations (from searches 4-5):**
-# - Find 3 help-wanted issues from search 4
-# - Find 3 PRs needing review from search 5
-# - Find 3 recent issues (last 30 days) from search 4 that need PRs
+# **Detect expertise:**
+# From `prs-merged.json`, look at PR titles/labels to identify if clubanderson works on CI/CD, docs, or UI.
 #
-# Generate a plain-text email with the metrics (pass/fail) and recommendations, then output the safe-output JSON and stop.
+# **Generate recommendations:**
+# - From `open-issues.json`: Find 3 issues with "help wanted" label
+# - From `open-prs.json`: Find 3 PRs that need review  
+# - From `open-issues.json`: Find 3 recent issues (created in last 30 days) that need PRs
 #
-# **DO NOT re-run the searches. DO NOT calculate dates again. Just use the data you already have.**
+# **Generate email:**
+# Create a plain-text email with:
+# - Pass/fail for each metric
+# - Top 3 recommendations in each category
+# - Simple formatting (no markdown headings)
+#
+# **Output:**
+# Create a safe-output JSON with type "send_email" containing the email subject and body.
+#
+# **DO NOT use any GitHub search tools. Only read the pre-downloaded JSON files.**
 #
 # ## Email Format
 #
@@ -364,7 +434,9 @@ jobs:
             });
 
   agent:
-    needs: activation
+    needs:
+      - activation
+      - fetch-data
     runs-on: ubuntu-latest
     permissions: read-all
     concurrency:
@@ -385,6 +457,12 @@ jobs:
         run: |
           mkdir -p /tmp/gh-aw/agent
           echo "Created /tmp/gh-aw/agent directory for agentic workflow temporary files"
+      - name: Download metrics data
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: metrics-data
+          path: /tmp/metrics-data/
+
       - name: Configure Git credentials
         env:
           REPO_NAME: ${{ github.repository }}
@@ -1643,7 +1721,7 @@ jobs:
           
       - name: Setup MCPs
         env:
-          GITHUB_MCP_SERVER_TOKEN: ${{ secrets.GH_AUDIT_TOKEN }}
+          GITHUB_MCP_SERVER_TOKEN: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           GH_AW_SAFE_OUTPUTS: ${{ env.GH_AW_SAFE_OUTPUTS }}
         run: |
           mkdir -p /tmp/gh-aw/mcp-config
@@ -1666,10 +1744,7 @@ jobs:
                   "GITHUB_TOOLSETS=context,repos,issues,pull_requests",
                   "ghcr.io/github/github-mcp-server:v0.24.0"
                 ],
-                "tools": [
-                  "search_issues",
-                  "search_pull_requests"
-                ],
+                "tools": ["*"],
                 "env": {
                   "GITHUB_PERSONAL_ACCESS_TOKEN": "\${GITHUB_MCP_SERVER_TOKEN}"
                 }
@@ -1790,39 +1865,45 @@ jobs:
           cat << 'PROMPT_EOF' | envsubst > "$GH_AW_PROMPT"
           # Clubanderson Metrics Tracker
           
-          Your task is to **generate ONE metrics email for clubanderson** and stop. This is a single-pass workflow.
+          Your task is to **generate ONE metrics email for clubanderson** using pre-downloaded GitHub data.
           
-          ## What to do
+          ## Pre-Downloaded Data Files
           
-          First, calculate two dates:
-          - 60 days ago from today (YYYY-MM-DD)
-          - 30 days ago from today (YYYY-MM-DD)
+          All GitHub search data has been downloaded for you. The following JSON files are available in `/tmp/metrics-data/`:
           
-          Then run exactly 5 GitHub searches:
-          - Help-wanted issues created by clubanderson (60 days): `org:kubestellar is:issue label:"help wanted" author:clubanderson created:>={date_60_days_ago}`
-          - PRs clubanderson commented on (60 days): `org:kubestellar is:pr commenter:clubanderson updated:>={date_60_days_ago}`
-          - Merged PRs by clubanderson (60 days): `org:kubestellar is:pr is:merged author:clubanderson merged:>={date_60_days_ago}`
-          - All open issues in docs/ui/ui-plugins: `org:kubestellar is:issue is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
-          - All open PRs in docs/ui/ui-plugins: `org:kubestellar is:pr is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins`
+          1. **help-wanted-created.json** - Help-wanted issues created by clubanderson (last 60 days)
+          2. **prs-commented.json** - PRs clubanderson commented on (last 60 days)  
+          3. **prs-merged.json** - Merged PRs authored by clubanderson (last 60 days)
+          4. **open-issues.json** - All open issues in docs/ui/ui-plugins repos
+          5. **open-prs.json** - All open PRs in docs/ui/ui-plugins repos
           
-          After running these 5 searches, **stop searching and analyze the results you collected**:
+          ## Your Task
           
-          **Metrics (from searches 1-3):**
-          - Count help-wanted issues (search 1) → must be ≥2
-          - Count unique PR numbers from search 2 → must be ≥8  
-          - Count merged PRs (search 3) → must be ≥3
+          Read these 5 JSON files and analyze the data:
           
-          **Expertise detection (from search 3 PRs):**
-          Look at file paths to identify if clubanderson works on CI/CD (workflows, Docker), docs (*.md), or UI (kubestellar/ui).
+          **Calculate metrics:**
+          - Count items in `help-wanted-created.json` → must be ≥2
+          - Count unique PR numbers from `prs-commented.json` → must be ≥8
+          - Count items in `prs-merged.json` → must be ≥3
           
-          **Recommendations (from searches 4-5):**
-          - Find 3 help-wanted issues from search 4
-          - Find 3 PRs needing review from search 5
-          - Find 3 recent issues (last 30 days) from search 4 that need PRs
+          **Detect expertise:**
+          From `prs-merged.json`, look at PR titles/labels to identify if clubanderson works on CI/CD, docs, or UI.
           
-          Generate a plain-text email with the metrics (pass/fail) and recommendations, then output the safe-output JSON and stop.
+          **Generate recommendations:**
+          - From `open-issues.json`: Find 3 issues with "help wanted" label
+          - From `open-prs.json`: Find 3 PRs that need review  
+          - From `open-issues.json`: Find 3 recent issues (created in last 30 days) that need PRs
           
-          **DO NOT re-run the searches. DO NOT calculate dates again. Just use the data you already have.**
+          **Generate email:**
+          Create a plain-text email with:
+          - Pass/fail for each metric
+          - Top 3 recommendations in each category
+          - Simple formatting (no markdown headings)
+          
+          **Output:**
+          Create a safe-output JSON with type "send_email" containing the email subject and body.
+          
+          **DO NOT use any GitHub search tools. Only read the pre-downloaded JSON files.**
           
           ## Email Format
           
@@ -2075,8 +2156,7 @@ jobs:
       - name: Execute GitHub Copilot CLI
         id: agentic_execution
         # Copilot CLI tool arguments (sorted):
-        # --allow-tool github(search_issues)
-        # --allow-tool github(search_pull_requests)
+        # --allow-tool github
         # --allow-tool safeoutputs
         # --allow-tool shell(cat)
         # --allow-tool shell(date)
@@ -2094,7 +2174,7 @@ jobs:
         run: |
           set -o pipefail
           sudo -E awf --env-all --container-workdir "${GITHUB_WORKSPACE}" --mount /tmp:/tmp:rw --mount "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}:rw" --mount /usr/bin/gh:/usr/bin/gh:ro --allow-domains api.enterprise.githubcopilot.com,api.github.com,github.com,raw.githubusercontent.com,registry.npmjs.org --log-level info --proxy-logs-dir /tmp/gh-aw/sandbox/firewall/logs \
-            -- npx -y @github/copilot@0.0.366 --add-dir /tmp/gh-aw/ --log-level all --log-dir /tmp/gh-aw/sandbox/agent/logs/ --add-dir "${GITHUB_WORKSPACE}" --disable-builtin-mcps --allow-tool 'github(search_issues)' --allow-tool 'github(search_pull_requests)' --allow-tool safeoutputs --allow-tool 'shell(cat)' --allow-tool 'shell(date)' --allow-tool 'shell(echo)' --allow-tool 'shell(grep)' --allow-tool 'shell(head)' --allow-tool 'shell(ls)' --allow-tool 'shell(pwd)' --allow-tool 'shell(sort)' --allow-tool 'shell(tail)' --allow-tool 'shell(uniq)' --allow-tool 'shell(wc)' --allow-tool 'shell(yq)' --prompt "$(cat /tmp/gh-aw/aw-prompts/prompt.txt)" \
+            -- npx -y @github/copilot@0.0.366 --add-dir /tmp/gh-aw/ --log-level all --log-dir /tmp/gh-aw/sandbox/agent/logs/ --add-dir "${GITHUB_WORKSPACE}" --disable-builtin-mcps --allow-tool github --allow-tool safeoutputs --allow-tool 'shell(cat)' --allow-tool 'shell(date)' --allow-tool 'shell(echo)' --allow-tool 'shell(grep)' --allow-tool 'shell(head)' --allow-tool 'shell(ls)' --allow-tool 'shell(pwd)' --allow-tool 'shell(sort)' --allow-tool 'shell(tail)' --allow-tool 'shell(uniq)' --allow-tool 'shell(wc)' --allow-tool 'shell(yq)' --prompt "$(cat /tmp/gh-aw/aw-prompts/prompt.txt)" \
             2>&1 | tee /tmp/gh-aw/agent-stdio.log
         env:
           COPILOT_AGENT_RUNNER_TYPE: STANDALONE
@@ -2103,7 +2183,7 @@ jobs:
           GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
           GH_AW_SAFE_OUTPUTS: ${{ env.GH_AW_SAFE_OUTPUTS }}
           GITHUB_HEAD_REF: ${{ github.head_ref }}
-          GITHUB_MCP_SERVER_TOKEN: ${{ secrets.GH_AUDIT_TOKEN }}
+          GITHUB_MCP_SERVER_TOKEN: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
           GITHUB_STEP_SUMMARY: ${{ env.GITHUB_STEP_SUMMARY }}
           GITHUB_WORKSPACE: ${{ github.workspace }}
@@ -2219,10 +2299,9 @@ jobs:
             }
             await main();
         env:
-          GH_AW_SECRET_NAMES: 'COPILOT_CLI_TOKEN,COPILOT_GITHUB_TOKEN,GH_AUDIT_TOKEN,GH_AW_GITHUB_TOKEN,GITHUB_TOKEN'
+          GH_AW_SECRET_NAMES: 'COPILOT_CLI_TOKEN,COPILOT_GITHUB_TOKEN,GH_AW_GITHUB_TOKEN,GITHUB_TOKEN'
           SECRET_COPILOT_CLI_TOKEN: ${{ secrets.COPILOT_CLI_TOKEN }}
           SECRET_COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
-          SECRET_GH_AUDIT_TOKEN: ${{ secrets.GH_AUDIT_TOKEN }}
           SECRET_GH_AW_GITHUB_TOKEN: ${{ secrets.GH_AW_GITHUB_TOKEN }}
           SECRET_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Safe Outputs
@@ -5720,6 +5799,62 @@ jobs:
           name: threat-detection.log
           path: /tmp/gh-aw/threat-detection/detection.log
           if-no-files-found: ignore
+
+  fetch-data:
+    needs: activation
+    runs-on: ubuntu-latest
+    outputs:
+      data-ready: ${{ steps.fetch.outputs.ready }}
+    steps:
+      - name: Calculate dates
+        id: dates
+        run: |
+          echo "date_60=$(date -d '60 days ago' '+%Y-%m-%d')" >> $GITHUB_OUTPUT
+          echo "date_30=$(date -d '30 days ago' '+%Y-%m-%d')" >> $GITHUB_OUTPUT
+      - name: Fetch all GitHub data
+        id: fetch
+        run: |
+          mkdir -p /tmp/metrics-data
+
+          # Search 1: Help-wanted issues created
+          gh api search/issues \
+            -q "org:kubestellar is:issue label:\"help wanted\" author:clubanderson created:>=${{ steps.dates.outputs.date_60 }}" \
+            --jq '{total_count, items: [.items[] | {number, title, html_url, created_at, labels: [.labels[].name]}]}' \
+            > /tmp/metrics-data/help-wanted-created.json
+
+          # Search 2: PRs commented on
+          gh api search/issues \
+            -q "org:kubestellar is:pr commenter:clubanderson updated:>=${{ steps.dates.outputs.date_60 }}" \
+            --jq '{total_count, items: [.items[] | {number, title, html_url, state}]}' \
+            > /tmp/metrics-data/prs-commented.json
+
+          # Search 3: Merged PRs authored
+          gh api search/issues \
+            -q "org:kubestellar is:pr is:merged author:clubanderson merged:>=${{ steps.dates.outputs.date_60 }}" \
+            --jq '{total_count, items: [.items[] | {number, title, html_url, merged_at, labels: [.labels[].name]}]}' \
+            > /tmp/metrics-data/prs-merged.json
+
+          # Search 4: All open issues in active repos
+          gh api search/issues \
+            -q "org:kubestellar is:issue is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins" \
+            --jq '{total_count, items: [.items[] | {number, title, html_url, repository_url, labels: [.labels[].name], created_at}]}' \
+            > /tmp/metrics-data/open-issues.json
+
+          # Search 5: All open PRs in active repos
+          gh api search/issues \
+            -q "org:kubestellar is:pr is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins" \
+            --jq '{total_count, items: [.items[] | {number, title, html_url, repository_url, labels: [.labels[].name], created_at}]}' \
+            > /tmp/metrics-data/open-prs.json
+
+          echo "ready=true" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GH_AUDIT_TOKEN }}
+      - name: Upload data as artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: metrics-data
+          path: /tmp/metrics-data/
+          retention-days: 1
 
   send_email:
     needs:
