@@ -428,6 +428,8 @@ Overall: PASS [3/3] or FAIL [1/3]
         2. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
         3. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
 
+**CRITICAL FORMATTING:** Each numbered recommendation (1., 2., 3.) MUST be indented with EXACTLY 8 spaces. Preserve this indentation in your output.
+
 ---
 Automated metrics check • {date}
 ```
