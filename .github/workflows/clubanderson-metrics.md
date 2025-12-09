@@ -102,7 +102,6 @@ jobs:
             --json number,title,url,closedAt,labels \
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/$username/prs-merged.json
-          done
           
           # Shared data for all maintainers (put in shared location)
           mkdir -p /tmp/metrics-data/shared
