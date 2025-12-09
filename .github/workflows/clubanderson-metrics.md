@@ -219,7 +219,11 @@ Read these 5 JSON files and analyze the data:
 
 **Calculate metrics:**
 - **Help-wanted count**: Count items in `help-wanted-created.json` → must be ≥2
-- **PR reviews count**: Count unique PR numbers from `prs-commented.json`, but EXCLUDE any PR numbers that also appear in `prs-merged.json` (those are authored, not reviewed) → must be ≥8
+- **PR reviews count**: 
+  - Get all PR numbers from `prs-commented.json`
+  - Get all PR numbers from `prs-merged.json` (these are PRs you AUTHORED)
+  - Count PRs that appear in prs-commented but NOT in prs-merged (set difference)
+  - This gives you PRs you reviewed/commented on but didn't author → must be ≥8
 - **Merged PRs count**: Count items in `prs-merged.json` → must be ≥3
 
 **Detect expertise:**
