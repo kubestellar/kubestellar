@@ -376,12 +376,14 @@ Create a plain-text email with:
 **Output:**
 Use the **send_email** MCP tool to send the metrics email. Format the subject like this:
 
-- If PASS: `🚀 KubeStellar Metrics - {username} - ✅ PASS`
-- If FAIL: `🚀 KubeStellar Metrics - {username} - ❌ FAIL`
+- If PASS: `🚀 KubeStellar Metrics - {username} - {date} - ✅ PASS`
+- If FAIL: `🚀 KubeStellar Metrics - {username} - {date} - ❌ FAIL`
+
+Where {date} is the current date in format "Dec 9, 2025" (use the `date` command: `date '+%b %-d, %Y'`)
 
 Example:
 ```
-send_email(subject="🚀 KubeStellar Metrics - clubanderson - ✅ PASS", body="Hey clubanderson,...")
+send_email(subject="🚀 KubeStellar Metrics - clubanderson - Dec 9, 2025 - ✅ PASS", body="Hey clubanderson,...")
 ```
 
 **Note:** Do NOT use tick marks around the username (no @clubanderson, just clubanderson)
@@ -395,9 +397,9 @@ Do NOT print JSON. Do NOT use echo. Use the MCP tool directly.
 Keep it simple and clear:
 
 ```
-Subject: 🚀 KubeStellar Metrics - clubanderson - ✅ PASS
+Subject: 🚀 KubeStellar Metrics - clubanderson - Dec 9, 2025 - ✅ PASS
 (or)
-Subject: 🚀 KubeStellar Metrics - kproche - ❌ FAIL
+Subject: 🚀 KubeStellar Metrics - kproche - Dec 9, 2025 - ❌ FAIL
 
 Hey clubanderson,
 
