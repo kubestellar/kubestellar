@@ -406,19 +406,19 @@ Overall: PASS [3/3] or FAIL [1/3]
 ---
 
 🏷️ Help-Wanted Suggestions for You:
-        1. [Specific area] in [repo] - [brief reason based on low activity + your expertise] - https://github.com/...
-        2. [Specific area] in [repo] - [brief reason] - https://github.com/...
-        3. [Specific area] in [repo] - [brief reason] - https://github.com/...
+     1. [Specific area] in [repo] - [brief reason based on low activity + your expertise] - https://github.com/...
+     2. [Specific area] in [repo] - [brief reason] - https://github.com/...
+     3. [Specific area] in [repo] - [brief reason] - https://github.com/...
 
 🔨 PR Opportunities in Your Areas:
-        1. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
-        2. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
-        3. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
+     1. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
+     2. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
+     3. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
 
 👀 PRs Needing Your Review:
-        1. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
-        2. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
-        3. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
+     1. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
+     2. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
+     3. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
 
 ---
 Automated metrics check • {date}
