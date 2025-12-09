@@ -387,20 +387,43 @@
 # {"total_count": 4, "items": [...]}
 # ```
 #
-# - **Help-wanted count**: Look for `"total_count":` at the start of `help-wanted-created.json`. Use ONLY that number. DO NOT count items. If you see `"total_count": 4`, the answer is 4.
-# - **Merged PRs count**: Look for `"total_count":` at the start of `prs-merged.json`. Use ONLY that number. DO NOT count items. If you see `"total_count": 26`, the answer is 26.
-# - **PR reviews count**: 
-#   1. Get all PR numbers from `prs-commented-merged.json` (look at items[].number)
-#   2. Get all PR numbers from `prs-commented-open.json` (look at items[].number)  
-#   3. Combine them and count UNIQUE numbers (remove duplicates)
+# **Step 1: Display the raw data for verification**
+# ```bash
+# echo "=== HELP-WANTED DATA ==="
+# cat /tmp/metrics-data/${{ github.event.inputs.maintainer }}/help-wanted-created.json
 #
-# **IMPORTANT - Keep it simple:**
-# - ✅ DO: Read files with `cat` and manually count/parse the visible data
-# - ✅ DO: The JSON files are small enough to read entirely
-# - ✅ DO: Look for `"total_count"` field in the JSON output
-# - ✅ DO: Look for `"number"` fields in the items array
-# - ❌ DO NOT use jq, python, node, or complex bash commands
-# - ❌ If you see "Permission denied" - just read the file with `cat` and parse visually
+# echo "=== MERGED PRS DATA ==="
+# cat /tmp/metrics-data/${{ github.event.inputs.maintainer }}/prs-merged.json
+#
+# echo "=== COMMENTED MERGED PRS DATA ==="
+# cat /tmp/metrics-data/${{ github.event.inputs.maintainer }}/prs-commented-merged.json
+#
+# echo "=== COMMENTED OPEN PRS DATA ==="
+# cat /tmp/metrics-data/${{ github.event.inputs.maintainer }}/prs-commented-open.json
+# ```
+#
+# **Step 2: Extract metrics from the displayed data**
+#
+# Look at the JSON output from Step 1 and find:
+#
+# - **Help-wanted count**: In the first JSON, find the number after `"total_count":`. Example: if you see `{"total_count": 11, "items": [...]` then the count is **11**.
+# - **Merged PRs count**: In the second JSON, find the number after `"total_count":`. Example: if you see `{"total_count": 26, "items": [...]` then the count is **26**.
+# - **PR reviews count**: 
+#   1. Look in the third JSON (commented merged) - list all numbers that appear after `"number":` 
+#   2. Look in the fourth JSON (commented open) - list all numbers that appear after `"number":`
+#   3. Combine both lists and count UNIQUE numbers (no duplicates)
+#
+# **Example for PR reviews:**
+# - If commented-merged shows: `"number": 100`, `"number": 101`, `"number": 102`
+# - And commented-open shows: `"number": 102`, `"number": 103`
+# - Unique numbers are: 100, 101, 102, 103 = **4 unique PRs**
+#
+# **IMPORTANT:**
+# - ✅ DO: Use `cat` to read the files (you have permission)
+# - ✅ DO: Look at the visible JSON and extract `total_count` manually
+# - ✅ DO: Count unique PR numbers by listing them out
+# - ❌ DO NOT use jq, python, node - they don't work here
+# - ❌ DO NOT try to execute complex commands
 #
 # **Detect expertise:**
 # From `prs-merged.json`, look at PR titles/labels to identify their work areas (CI/CD, docs, UI, etc).
@@ -478,18 +501,27 @@
 #         2. Title (repo #456) - https://github.com/... - Brief reason
 #         3. Title (repo #789) - https://github.com/... - Brief reason
 #
-# **CRITICAL FORMATTING RULES:**
-# 1. Each numbered item (1., 2., 3.) MUST start with EXACTLY 8 spaces before the number
-# 2. The format for each line is: "        1. [Title] ([repo] #[number]) - [URL] - [Reason]"
-# 3. Example: "        1. Fix bug (kubestellar/ui #2275) - https://github.com/kubestellar/ui/issues/2275 - Matches your UI expertise"
-# 4. Maintain the 8-space indentation EXACTLY as shown - do not use tabs, only spaces
+# **CRITICAL FORMATTING INSTRUCTIONS - READ CAREFULLY:**
+#
+# When you generate the email body, each recommendation line MUST be formatted with EXACTLY 8 spaces of indentation.
+#
+# **Correct indentation (copy this exactly):**
+# ```
+# 🏷️ Help-Wanted Suggestions for You:
+#         1. Fix UI bug (kubestellar/ui #2275) - https://github.com/kubestellar/ui/issues/2275 - Matches your UI expertise
+#         2. Add docs (kubestellar/docs #123) - https://github.com/kubestellar/docs/issues/123 - Documentation work
+#         3. Improve tests (kubestellar/ui #456) - https://github.com/kubestellar/ui/issues/456 - Testing expertise
+# ```
+#
+# Count the spaces: "        1." = 8 spaces + "1." + space + text
+#
+# **DO NOT:**
+# - ❌ Use tabs
+# - ❌ Use 3 spaces, 5 spaces, or any other number
+# - ✅ Use EXACTLY 8 spaces before each numbered item
 #
 # ---
 # Automated metrics check • {date}
-#
-# &lt;div style="text-align: center; margin-top: 20px;"&gt;
-#   &lt;img src="https://raw.githubusercontent.com/kubestellar/kubestellar/main/docs/overrides/images/logo.svg" alt="KubeStellar" height="30" style="background: transparent;"&gt;
-# &lt;/div&gt;
 # ```
 #
 # **IMPORTANT:** The logo HTML above uses HTML entities (&lt; and &gt;). In your email output, replace these with actual angle brackets (< and >) so the HTML renders properly.
@@ -2144,20 +2176,43 @@ jobs:
           {"total_count": 4, "items": [...]}
           ```
           
-          - **Help-wanted count**: Look for `"total_count":` at the start of `help-wanted-created.json`. Use ONLY that number. DO NOT count items. If you see `"total_count": 4`, the answer is 4.
-          - **Merged PRs count**: Look for `"total_count":` at the start of `prs-merged.json`. Use ONLY that number. DO NOT count items. If you see `"total_count": 26`, the answer is 26.
-          - **PR reviews count**: 
-            1. Get all PR numbers from `prs-commented-merged.json` (look at items[].number)
-            2. Get all PR numbers from `prs-commented-open.json` (look at items[].number)  
-            3. Combine them and count UNIQUE numbers (remove duplicates)
+          **Step 1: Display the raw data for verification**
+          ```bash
+          echo "=== HELP-WANTED DATA ==="
+          cat /tmp/metrics-data/${GH_AW_GITHUB_EVENT_INPUTS_MAINTAINER}/help-wanted-created.json
           
-          **IMPORTANT - Keep it simple:**
-          - ✅ DO: Read files with `cat` and manually count/parse the visible data
-          - ✅ DO: The JSON files are small enough to read entirely
-          - ✅ DO: Look for `"total_count"` field in the JSON output
-          - ✅ DO: Look for `"number"` fields in the items array
-          - ❌ DO NOT use jq, python, node, or complex bash commands
-          - ❌ If you see "Permission denied" - just read the file with `cat` and parse visually
+          echo "=== MERGED PRS DATA ==="
+          cat /tmp/metrics-data/${GH_AW_GITHUB_EVENT_INPUTS_MAINTAINER}/prs-merged.json
+          
+          echo "=== COMMENTED MERGED PRS DATA ==="
+          cat /tmp/metrics-data/${GH_AW_GITHUB_EVENT_INPUTS_MAINTAINER}/prs-commented-merged.json
+          
+          echo "=== COMMENTED OPEN PRS DATA ==="
+          cat /tmp/metrics-data/${GH_AW_GITHUB_EVENT_INPUTS_MAINTAINER}/prs-commented-open.json
+          ```
+          
+          **Step 2: Extract metrics from the displayed data**
+          
+          Look at the JSON output from Step 1 and find:
+          
+          - **Help-wanted count**: In the first JSON, find the number after `"total_count":`. Example: if you see `{"total_count": 11, "items": [...]` then the count is **11**.
+          - **Merged PRs count**: In the second JSON, find the number after `"total_count":`. Example: if you see `{"total_count": 26, "items": [...]` then the count is **26**.
+          - **PR reviews count**: 
+            1. Look in the third JSON (commented merged) - list all numbers that appear after `"number":` 
+            2. Look in the fourth JSON (commented open) - list all numbers that appear after `"number":`
+            3. Combine both lists and count UNIQUE numbers (no duplicates)
+            
+          **Example for PR reviews:**
+          - If commented-merged shows: `"number": 100`, `"number": 101`, `"number": 102`
+          - And commented-open shows: `"number": 102`, `"number": 103`
+          - Unique numbers are: 100, 101, 102, 103 = **4 unique PRs**
+          
+          **IMPORTANT:**
+          - ✅ DO: Use `cat` to read the files (you have permission)
+          - ✅ DO: Look at the visible JSON and extract `total_count` manually
+          - ✅ DO: Count unique PR numbers by listing them out
+          - ❌ DO NOT use jq, python, node - they don't work here
+          - ❌ DO NOT try to execute complex commands
           
           **Detect expertise:**
           From `prs-merged.json`, look at PR titles/labels to identify their work areas (CI/CD, docs, UI, etc).
@@ -2235,18 +2290,27 @@ jobs:
                   2. Title (repo #456) - https://github.com/... - Brief reason
                   3. Title (repo #789) - https://github.com/... - Brief reason
           
-          **CRITICAL FORMATTING RULES:**
-          1. Each numbered item (1., 2., 3.) MUST start with EXACTLY 8 spaces before the number
-          2. The format for each line is: "        1. [Title] ([repo] #[number]) - [URL] - [Reason]"
-          3. Example: "        1. Fix bug (kubestellar/ui #2275) - https://github.com/kubestellar/ui/issues/2275 - Matches your UI expertise"
-          4. Maintain the 8-space indentation EXACTLY as shown - do not use tabs, only spaces
+          **CRITICAL FORMATTING INSTRUCTIONS - READ CAREFULLY:**
+          
+          When you generate the email body, each recommendation line MUST be formatted with EXACTLY 8 spaces of indentation.
+          
+          **Correct indentation (copy this exactly):**
+          ```
+          🏷️ Help-Wanted Suggestions for You:
+                  1. Fix UI bug (kubestellar/ui #2275) - https://github.com/kubestellar/ui/issues/2275 - Matches your UI expertise
+                  2. Add docs (kubestellar/docs #123) - https://github.com/kubestellar/docs/issues/123 - Documentation work
+                  3. Improve tests (kubestellar/ui #456) - https://github.com/kubestellar/ui/issues/456 - Testing expertise
+          ```
+          
+          Count the spaces: "        1." = 8 spaces + "1." + space + text
+          
+          **DO NOT:**
+          - ❌ Use tabs
+          - ❌ Use 3 spaces, 5 spaces, or any other number
+          - ✅ Use EXACTLY 8 spaces before each numbered item
           
           ---
           Automated metrics check • {date}
-          
-          &lt;div style="text-align: center; margin-top: 20px;"&gt;
-            &lt;img src="https://raw.githubusercontent.com/kubestellar/kubestellar/main/docs/overrides/images/logo.svg" alt="KubeStellar" height="30" style="background: transparent;"&gt;
-          &lt;/div&gt;
           ```
           
           **IMPORTANT:** The logo HTML above uses HTML entities (&lt; and &gt;). In your email output, replace these with actual angle brackets (< and >) so the HTML renders properly.
