@@ -61,33 +61,53 @@
 #           mkdir -p /tmp/metrics-data
 #
 #           # Search 1: Help-wanted issues created
-#           gh api search/issues \
-#             -f q="org:kubestellar is:issue label:\"help wanted\" author:clubanderson created:>=${{ steps.dates.outputs.date_60 }}" \
-#             --jq '{total_count, items: [.items[] | {number, title, html_url, created_at, labels: [.labels[].name]}]}' \
+#           gh search issues \
+#             --owner kubestellar \
+#             --label "help wanted" \
+#             --author clubanderson \
+#             --created ">=${{ steps.dates.outputs.date_60 }}" \
+#             --json number,title,url,createdAt,labels \
+#             --jq '{total_count: length, items: .}' \
 #             > /tmp/metrics-data/help-wanted-created.json
 #
 #           # Search 2: PRs commented on
-#           gh api search/issues \
-#             -f q="org:kubestellar is:pr commenter:clubanderson updated:>=${{ steps.dates.outputs.date_60 }}" \
-#             --jq '{total_count, items: [.items[] | {number, title, html_url, state}]}' \
+#           gh search prs \
+#             --owner kubestellar \
+#             --commenter clubanderson \
+#             --updated ">=${{ steps.dates.outputs.date_60 }}" \
+#             --json number,title,url,state \
+#             --jq '{total_count: length, items: .}' \
 #             > /tmp/metrics-data/prs-commented.json
 #
 #           # Search 3: Merged PRs authored
-#           gh api search/issues \
-#             -f q="org:kubestellar is:pr is:merged author:clubanderson merged:>=${{ steps.dates.outputs.date_60 }}" \
-#             --jq '{total_count, items: [.items[] | {number, title, html_url, merged_at, labels: [.labels[].name]}]}' \
+#           gh search prs \
+#             --owner kubestellar \
+#             --author clubanderson \
+#             --merged ">=${{ steps.dates.outputs.date_60 }}" \
+#             --json number,title,url,mergedAt,labels \
+#             --jq '{total_count: length, items: .}' \
 #             > /tmp/metrics-data/prs-merged.json
 #
 #           # Search 4: All open issues in active repos
-#           gh api search/issues \
-#             -f q="org:kubestellar is:issue is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins" \
-#             --jq '{total_count, items: [.items[] | {number, title, html_url, repository_url, labels: [.labels[].name], created_at}]}' \
+#           gh search issues \
+#             --owner kubestellar \
+#             --repo docs \
+#             --repo ui \
+#             --repo ui-plugins \
+#             --state open \
+#             --json number,title,url,repository,labels,createdAt \
+#             --jq '{total_count: length, items: .}' \
 #             > /tmp/metrics-data/open-issues.json
 #
 #           # Search 5: All open PRs in active repos
-#           gh api search/issues \
-#             -f q="org:kubestellar is:pr is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins" \
-#             --jq '{total_count, items: [.items[] | {number, title, html_url, repository_url, labels: [.labels[].name], created_at}]}' \
+#           gh search prs \
+#             --owner kubestellar \
+#             --repo docs \
+#             --repo ui \
+#             --repo ui-plugins \
+#             --state open \
+#             --json number,title,url,repository,labels,createdAt \
+#             --jq '{total_count: length, items: .}' \
 #             > /tmp/metrics-data/open-prs.json
 #
 #           echo "ready=true" >> $GITHUB_OUTPUT
@@ -5817,33 +5837,53 @@ jobs:
           mkdir -p /tmp/metrics-data
 
           # Search 1: Help-wanted issues created
-          gh api search/issues \
-            -f q="org:kubestellar is:issue label:\"help wanted\" author:clubanderson created:>=${{ steps.dates.outputs.date_60 }}" \
-            --jq '{total_count, items: [.items[] | {number, title, html_url, created_at, labels: [.labels[].name]}]}' \
+          gh search issues \
+            --owner kubestellar \
+            --label "help wanted" \
+            --author clubanderson \
+            --created ">=${{ steps.dates.outputs.date_60 }}" \
+            --json number,title,url,createdAt,labels \
+            --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/help-wanted-created.json
 
           # Search 2: PRs commented on
-          gh api search/issues \
-            -f q="org:kubestellar is:pr commenter:clubanderson updated:>=${{ steps.dates.outputs.date_60 }}" \
-            --jq '{total_count, items: [.items[] | {number, title, html_url, state}]}' \
+          gh search prs \
+            --owner kubestellar \
+            --commenter clubanderson \
+            --updated ">=${{ steps.dates.outputs.date_60 }}" \
+            --json number,title,url,state \
+            --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/prs-commented.json
 
           # Search 3: Merged PRs authored
-          gh api search/issues \
-            -f q="org:kubestellar is:pr is:merged author:clubanderson merged:>=${{ steps.dates.outputs.date_60 }}" \
-            --jq '{total_count, items: [.items[] | {number, title, html_url, merged_at, labels: [.labels[].name]}]}' \
+          gh search prs \
+            --owner kubestellar \
+            --author clubanderson \
+            --merged ">=${{ steps.dates.outputs.date_60 }}" \
+            --json number,title,url,mergedAt,labels \
+            --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/prs-merged.json
 
           # Search 4: All open issues in active repos
-          gh api search/issues \
-            -f q="org:kubestellar is:issue is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins" \
-            --jq '{total_count, items: [.items[] | {number, title, html_url, repository_url, labels: [.labels[].name], created_at}]}' \
+          gh search issues \
+            --owner kubestellar \
+            --repo docs \
+            --repo ui \
+            --repo ui-plugins \
+            --state open \
+            --json number,title,url,repository,labels,createdAt \
+            --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/open-issues.json
 
           # Search 5: All open PRs in active repos
-          gh api search/issues \
-            -f q="org:kubestellar is:pr is:open repo:kubestellar/docs repo:kubestellar/ui repo:kubestellar/ui-plugins" \
-            --jq '{total_count, items: [.items[] | {number, title, html_url, repository_url, labels: [.labels[].name], created_at}]}' \
+          gh search prs \
+            --owner kubestellar \
+            --repo docs \
+            --repo ui \
+            --repo ui-plugins \
+            --state open \
+            --json number,title,url,repository,labels,createdAt \
+            --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/open-prs.json
 
           echo "ready=true" >> $GITHUB_OUTPUT
