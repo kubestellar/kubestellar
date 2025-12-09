@@ -14,25 +14,25 @@ on:
         required: true
         type: choice
         options:
+          - btwshivam
           - clubanderson
-          - kproche
-          - mikespreitzer
           - dumb0002
-          - waltforme
-          - pdettori
           - francostellari
-          - nupurshivani
-          - onkar717
+          - gaurab-khanal
+          - kproche
           - kunal-511
           - mavrick-1
-          - gaurab-khanal
+          - mikespreitzer
           - naman9271
-          - btwshivam
-          - rxinui
-          - vedansh-5
-          - sagar2366
+          - nupurshivani
           - oksaumya
+          - onkar717
+          - pdettori
           - rupam-it
+          - rxinui
+          - sagar2366
+          - vedansh-5
+          - waltforme
 
 permissions: read-all
 
@@ -255,25 +255,25 @@ Your task is to **generate ONE metrics email** for the selected maintainer using
 **Selected maintainer:** ${{ github.event.inputs.maintainer }}
 
 **Email mapping:**
+- btwshivam → shivam200446@gmail.com
 - clubanderson → andy@clubanderson.com
-- kproche → kproche@us.ibm.com
-- mikespreitzer → mspreitz@us.ibm.com
 - dumb0002 → Braulio.Dumba@ibm.com
-- waltforme → jun.duan@ibm.com
-- pdettori → dettori@us.ibm.com
 - francostellari → stellari@us.ibm.com
-- nupurshivani → nupurjha.me@gmail.com
-- onkar717 → onkarwork2234@gmail.com
+- gaurab-khanal → khanalgaurab98@gmail.com
+- kproche → kproche@us.ibm.com
 - kunal-511 → yoyokvunal@gmail.com
 - mavrick-1 → mavrickrishi@gmail.com
-- gaurab-khanal → khanalgaurab98@gmail.com
+- mikespreitzer → mspreitz@us.ibm.com
 - naman9271 → namanjain9271@gmail.com
-- btwshivam → shivam200446@gmail.com
-- rxinui → rainui.ly@gmail.com
-- vedansh-5 → vedanshsaini7719@gmail.com
-- sagar2366 → sagarutekar2366@gmail.com
+- nupurshivani → nupurjha.me@gmail.com
 - oksaumya → saumyakr2006@gmail.com
+- onkar717 → onkarwork2234@gmail.com
+- pdettori → dettori@us.ibm.com
 - rupam-it → Mannarupam3@gmail.com
+- rxinui → rainui.ly@gmail.com
+- sagar2366 → sagarutekar2366@gmail.com
+- vedansh-5 → vedanshsaini7719@gmail.com
+- waltforme → jun.duan@ibm.com
 
 The data files are in `/tmp/metrics-data/${{ github.event.inputs.maintainer }}/`:
 
