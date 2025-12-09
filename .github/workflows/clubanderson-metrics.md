@@ -4,11 +4,11 @@ description: |
   - Help-wanted issues created (≥2)
   - Unique PRs commented on (≥8)
   - Merged PRs authored (≥3)
-  Sends reports to clubanderson and kproche
+  Sends reports to 7 maintainers: clubanderson, kproche, mikespreitzer, dumb0002, waltforme, pdettori, francostellari
 
 on:
   schedule:
-    - cron: "0 */6 * * *" # Every 6 hours
+    - cron: "0 14 * * 1" # Mondays at 9am EST (14:00 UTC)
   workflow_dispatch:
 
 permissions: read-all
@@ -31,8 +31,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_AUDIT_TOKEN }}
         run: |
-          # Fetch data for BOTH maintainers
-          for username in clubanderson kproche; do
+          # Fetch data for ALL maintainers
+          for username in clubanderson kproche mikespreitzer dumb0002 waltforme pdettori francostellari; do
             echo "Fetching data for $username..."
             mkdir -p /tmp/metrics-data/$username
             
@@ -109,7 +109,7 @@ jobs:
             > /tmp/metrics-data/shared/open-prs.json
           
           # Copy shared files to each maintainer's folder
-          for username in clubanderson kproche; do
+          for username in clubanderson kproche mikespreitzer dumb0002 waltforme pdettori francostellari; do
             cp /tmp/metrics-data/shared/open-issues.json /tmp/metrics-data/$username/
             cp /tmp/metrics-data/shared/open-prs.json /tmp/metrics-data/$username/
           done
@@ -228,11 +228,16 @@ safe-outputs:
 
 # Maintainer Metrics Tracker
 
-Your task is to **generate TWO metrics emails** using pre-downloaded GitHub data.
+Your task is to **generate SEVEN metrics emails** using pre-downloaded GitHub data.
 
 Process these maintainers IN ORDER:
 1. **clubanderson** → andy@clubanderson.com
 2. **kproche** → kproche@us.ibm.com
+3. **mikespreitzer** → mspreitz@us.ibm.com
+4. **dumb0002** → Braulio.Dumba@ibm.com
+5. **waltforme** → jun.duan@ibm.com
+6. **pdettori** → dettori@us.ibm.com
+7. **francostellari** → stellari@us.ibm.com
 
 For EACH maintainer, the data files are in `/tmp/metrics-data/{username}/`:
 
@@ -324,19 +329,19 @@ Overall: PASS [3/3] or FAIL [1/3]
 ---
 
 🏷️ Help-Wanted Suggestions for You:
-1. [Specific area] in [repo] - [brief reason based on low activity + your expertise]
-2. [Specific area] in [repo] - [brief reason]
-3. [Specific area] in [repo] - [brief reason]
+   1. [Specific area] in [repo] - [brief reason based on low activity + your expertise] - https://github.com/...
+   2. [Specific area] in [repo] - [brief reason] - https://github.com/...
+   3. [Specific area] in [repo] - [brief reason] - https://github.com/...
 
 👀 PRs Needing Your Review:
-1. [PR title + link] - [repo] • [why it matches your skills]
-2. [PR title + link] - [repo] • [why it matches your skills]
-3. [PR title + link] - [repo] • [why it matches your skills]
+   1. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
+   2. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
+   3. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
 
 🔨 PR Opportunities in Your Areas:
-1. [Issue title + link] - [repo] • [why this needs a PR in your domain]
-2. [Issue title + link] - [repo] • [why this needs a PR in your domain]
-3. [Issue title + link] - [repo] • [why this needs a PR in your domain]
+   1. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
+   2. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
+   3. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
 
 ---
 Automated metrics check • {date}
