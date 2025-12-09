@@ -324,8 +324,8 @@ For the selected maintainer (${{ github.event.inputs.maintainer }}):
 
 **Calculate metrics:**
 - **Help-wanted count**: Read `help-wanted-created.json` - the file has a `total_count` field at the top
-- **PR reviews count**: Read both `prs-commented-merged.json` and `prs-commented-open.json` - each has `items` array with PR numbers. Count unique numbers across both files.
 - **Merged PRs count**: Read `prs-merged.json` - the file has a `total_count` field at the top
+- **PR reviews count**: Read both `prs-commented-merged.json` and `prs-commented-open.json` - each has `items` array with PR numbers. Count unique numbers across both files.
 
 **IMPORTANT - Keep it simple:**
 - ✅ DO: Read files with `cat` and manually count/parse the visible data
@@ -385,8 +385,8 @@ Hey clubanderson,
 Here are your KubeStellar metrics for the last 60 days:
 
 ✅ Help-Wanted Issues: X created (required: ≥2)
-✅/❌ PR Reviews: Y unique PRs (required: ≥8)
 ✅ Merged PRs: Z merged (required: ≥3)
+✅/❌ PR Reviews: Y unique PRs (required: ≥8)
 
 Overall: PASS [3/3] or FAIL [1/3]
 
@@ -399,15 +399,15 @@ Overall: PASS [3/3] or FAIL [1/3]
      2. [Specific area] in [repo] - [brief reason] - https://github.com/...
      3. [Specific area] in [repo] - [brief reason] - https://github.com/...
 
-👀 PRs Needing Your Review:
-     1. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
-     2. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
-     3. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
-
 🔨 PR Opportunities in Your Areas:
      1. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
      2. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
      3. [Issue title] ([repo] #XXX) - https://github.com/.../issues/XXX - [why this needs a PR in your domain]
+
+👀 PRs Needing Your Review:
+     1. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
+     2. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
+     3. [PR title] ([repo] #XXX) - https://github.com/.../pull/XXX - [why it matches your skills]
 
 ---
 Automated metrics check • {date}
