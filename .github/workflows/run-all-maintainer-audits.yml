@@ -44,5 +44,5 @@ jobs:
           
           echo "✅ Triggered audit for ${{ matrix.maintainer }}"
           
-          # Wait 10 seconds between triggers
-          sleep 10
+          # Wait 3.5 minutes (210 seconds) between maintainer audits
+          sleep 210
