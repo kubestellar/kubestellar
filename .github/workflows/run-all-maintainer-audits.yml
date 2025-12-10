@@ -33,13 +33,16 @@ jobs:
           - waltforme
     
     steps:
-      - name: Trigger maintainer audit
+      - name: Trigger maintainer audit for ${{ matrix.maintainer }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh workflow run clubanderson-metrics.lock.yml \
+          gh workflow run maintainer-metrics.lock.yml \
             --repo ${{ github.repository }} \
             --ref ${{ github.ref_name }} \
             --field maintainer=${{ matrix.maintainer }}
           
           echo "✅ Triggered audit for ${{ matrix.maintainer }}"
+          
+          # Wait 10 seconds between triggers
+          sleep 10
