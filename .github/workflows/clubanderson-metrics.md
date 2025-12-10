@@ -452,6 +452,16 @@ Create a plain-text email with:
 - Pass/fail for each metric
 - Top 3 recommendations in each category (with URLs!)
 - Simple formatting (no markdown headings)
+- Include the 60-day date range in the opening line
+
+**Calculate date range:**
+```bash
+# Get today's date
+date '+%b %-d, %Y'
+
+# Get date 60 days ago
+date -d '60 days ago' '+%b %-d, %Y'
+```
 
 **Output:**
 Use the **send_email** MCP tool to send the metrics email. Format the subject like this:
@@ -483,7 +493,7 @@ Subject: 🚀 KubeStellar Metrics - kproche - Dec 9, 2025 - ❌ FAIL
 
 Hey clubanderson,
 
-Here are your KubeStellar metrics for the last 60 days:
+Here are your KubeStellar metrics for the last 60 days (Oct 11, 2025 - Dec 10, 2025):
 
 ✅/❌ Help-Wanted Issues: X created (required: ≥2)
 ✅/❌ Merged PRs: Z merged (required: ≥3)
