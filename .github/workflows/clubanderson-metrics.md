@@ -506,24 +506,24 @@ Overall: PASS [3/3] or FAIL [1/3]
 ---
 
 🏷️ Help-Wanted Issues You Could Create:
-        1. [Expertise-based] - Suggest where the maintainer should CREATE a new help-wanted issue in their domain (e.g., "Create help-wanted issues for improving API documentation in kubestellar/docs - Your docs expertise can help outline tasks for new contributors")
-        2. [Project Growth] - Suggest where the maintainer should CREATE help-wanted issues to advance project maturity (e.g., "Create help-wanted issues to standardize CI across repos in kubestellar/* - Your CI/CD knowledge can help identify automation gaps")
-        3. [Community Building] - Suggest where the maintainer should CREATE help-wanted issues to break down complex work (e.g., "Create help-wanted issues for UI accessibility improvements in kubestellar/ui - Break down A11y work into contributor-friendly tasks")
+        - [Expertise-based] - Suggest where the maintainer should CREATE a new help-wanted issue in their domain (e.g., "Create help-wanted issues for improving API documentation in kubestellar/docs - Your docs expertise can help outline tasks for new contributors")
+        - [Project Growth] - Suggest where the maintainer should CREATE help-wanted issues to advance project maturity (e.g., "Create help-wanted issues to standardize CI across repos in kubestellar/* - Your CI/CD knowledge can help identify automation gaps")
+        - [Community Building] - Suggest where the maintainer should CREATE help-wanted issues to break down complex work (e.g., "Create help-wanted issues for UI accessibility improvements in kubestellar/ui - Break down A11y work into contributor-friendly tasks")
 
 🔨 PR Opportunities in Your Areas:
-        1. Title (repo #123) - https://github.com/... - Brief reason
-        2. Title (repo #456) - https://github.com/... - Brief reason
-        3. Title (repo #789) - https://github.com/... - Brief reason
+        - Title (repo #123) - https://github.com/... - Brief reason
+        - Title (repo #456) - https://github.com/... - Brief reason
+        - Title (repo #789) - https://github.com/... - Brief reason
 
 👀 PRs Needing Your Review:
-        1. Title (repo #123) - https://github.com/... - Brief reason
-        2. Title (repo #456) - https://github.com/... - Brief reason
-        3. Title (repo #789) - https://github.com/... - Brief reason
+        - Title (repo #123) - https://github.com/... - Brief reason
+        - Title (repo #456) - https://github.com/... - Brief reason
+        - Title (repo #789) - https://github.com/... - Brief reason
 
 🌍 Growing Our User Base - Ideas for You:
-        1. [Social Networks] - Specific suggestion for promoting KubeStellar on LinkedIn, Slack communities, or X/Twitter based on their network (e.g., "Share KubeStellar's multi-cluster capabilities in the #kubernetes channel on CNCF Slack - your recent work on [topic] makes you a great advocate")
-        2. [Professional Network] - Suggestion to introduce KubeStellar at their workplace or to colleagues (e.g., "Introduce KubeStellar to your DevOps team at work - your expertise in [domain] positions you well to demonstrate how it solves [specific pain point]")
-        3. [Content & Advocacy] - Suggestion to create content or speak about KubeStellar (e.g., "Write a blog post about your experience with [specific feature] - your [CI/CD/docs/UI] background makes you uniquely qualified to explain the benefits")
+        - [Social Networks] - Specific suggestion for promoting KubeStellar on LinkedIn, Slack communities, or X/Twitter based on their network (e.g., "Share KubeStellar's multi-cluster capabilities in the #kubernetes channel on CNCF Slack - your recent work on [topic] makes you a great advocate")
+        - [Professional Network] - Suggestion to introduce KubeStellar at their workplace or to colleagues (e.g., "Introduce KubeStellar to your DevOps team at work - your expertise in [domain] positions you well to demonstrate how it solves [specific pain point]")
+        - [Content & Advocacy] - Suggestion to create content or speak about KubeStellar (e.g., "Write a blog post about your experience with [specific feature] - your [CI/CD/docs/UI] background makes you uniquely qualified to explain the benefits")
 
 **CRITICAL FORMATTING INSTRUCTIONS - READ CAREFULLY:**
 
@@ -532,12 +532,12 @@ When you generate the email body, each recommendation line MUST be formatted wit
 **Correct indentation (copy this exactly):**
 ```
 🏷️ Help-Wanted Suggestions for You:
-        1. Fix UI bug (kubestellar/ui #2275) - https://github.com/kubestellar/ui/issues/2275 - Matches your UI expertise
-        2. Add docs (kubestellar/docs #123) - https://github.com/kubestellar/docs/issues/123 - Documentation work
-        3. Improve tests (kubestellar/ui #456) - https://github.com/kubestellar/ui/issues/456 - Testing expertise
+        - Fix UI bug (kubestellar/ui #2275) - https://github.com/kubestellar/ui/issues/2275 - Matches your UI expertise
+        - Add docs (kubestellar/docs #123) - https://github.com/kubestellar/docs/issues/123 - Documentation work
+        - Improve tests (kubestellar/ui #456) - https://github.com/kubestellar/ui/issues/456 - Testing expertise
 ```
 
-Count the spaces: "        1." = 8 spaces + "1." + space + text
+Count the spaces: "        -" = 8 spaces + "-" + space + text
 
 **DO NOT:**
 - ❌ Use tabs
