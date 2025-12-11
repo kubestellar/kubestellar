@@ -3,6 +3,7 @@
 import { Link as IntlLink } from "@/i18n/navigation";
 import { GridLines, StarField } from "./index";
 import { useTranslations } from "next-intl";
+import { getLocalizedUrl } from "@/lib/url";
 
 export default function ContributionCallToAction() {
   const t = useTranslations("ladderPage.callToAction");
@@ -157,7 +158,7 @@ export default function ContributionCallToAction() {
               {t("joinSlackDescription")}
             </p>
             <a
-              href="https://kubestellar.io/slack"
+              href={getLocalizedUrl("https://kubestellar.io/slack")}
               target="_blank"
               rel="noopener noreferrer"
               className="block text-center text-blue-300 hover:text-blue-200 font-medium"

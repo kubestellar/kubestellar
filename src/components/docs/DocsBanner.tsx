@@ -4,6 +4,7 @@ import { Banner } from 'nextra/components'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { useState, useEffect } from 'react'
+import { getLocalizedUrl } from '@/lib/url'
 
 export function DocsBanner() {
   const { resolvedTheme } = useTheme()
@@ -24,7 +25,7 @@ export function DocsBanner() {
       <span className={isDark ? 'text-gray-200' : 'text-gray-800'}>
         🚀 🚀 🚀 ATTENTION: KubeStellar needs your help - please take our 2-minute survey{' '}
         <Link 
-          href="https://kubestellar.io/survey" 
+          href={getLocalizedUrl("https://kubestellar.io/survey")}
           target="_blank" 
           rel="noopener noreferrer"
           className={isDark 
@@ -32,7 +33,7 @@ export function DocsBanner() {
             : 'text-blue-600 underline hover:text-blue-700 transition-colors font-medium'
           }
         >
-          https://kubestellar.io/survey
+          {getLocalizedUrl("https://kubestellar.io/survey")}
         </Link>
         {' '}🚀 🚀 🚀
       </span>

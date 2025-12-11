@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { GridLines, StarField } from "../index";
 import { useTranslations } from "next-intl";
+import { getLocalizedUrl } from "@/lib/url";
 
 export default function ContactSection() {
   const t = useTranslations("contactSection");
@@ -162,7 +163,7 @@ export default function ContactSection() {
 
             {/* Contact card 2 */}
             <a
-              href="https://kubestellar.io/slack"
+              href={getLocalizedUrl("https://kubestellar.io/slack")}
               target="_blank"
               rel="noopener noreferrer"
               className="block bg-gray-800/50 backdrop-blur-md rounded-xl shadow-sm border border-transparent p-4 sm:p-6 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-purple-500/70 cursor-pointer"

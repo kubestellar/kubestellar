@@ -5,6 +5,7 @@ import Image from "next/image";
 import { GridLines, StarField } from "./index";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { getLocalizedUrl } from "@/lib/url";
 
 export default function Footer() {
   const t = useTranslations("footer");
@@ -151,7 +152,7 @@ export default function Footer() {
               <ul className="space-y-1 sm:space-y-3">
                 <li>
                   <Link
-                    href="https://kubestellar.io/docs"
+                    href={getLocalizedUrl("https://kubestellar.io/docs")}
                     className="text-gray-400 hover:text-white transition-colors duration-200 text-xs sm:text-sm inline-block"
                   >
                     {t("overview")}
@@ -159,7 +160,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="https://kubestellar.io/docs/user-guide-support/user-guide-intro"
+                    href={getLocalizedUrl("https://kubestellar.io/docs/user-guide-support/user-guide-intro")}
                     className="text-gray-400 hover:text-white transition-colors duration-200 text-xs sm:text-sm inline-block"
                   >
                     {t("userGuide")}
@@ -167,7 +168,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="https://kubestellar.io/docs/contribution-guidelines/onboarding-inc"
+                    href={getLocalizedUrl("https://kubestellar.io/docs/contribution-guidelines/onboarding-inc")}
                     className="text-gray-400 hover:text-white transition-colors duration-200 text-xs sm:text-sm inline-block"
                   >
                     {t("onboarding")}
@@ -175,7 +176,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="https://kubestellar.io/docs/contribution-guidelines/release-notes"
+                    href={getLocalizedUrl("https://kubestellar.io/docs/contribution-guidelines/release-notes")}
                     className="text-gray-400 hover:text-white transition-colors duration-200 text-xs sm:text-sm inline-block"
                   >
                     {t("releasesNotes")}

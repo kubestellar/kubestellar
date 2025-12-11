@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useSearchParams, usePathname, useRouter } from 'next/navigation'
 import { VERSIONS, type VersionKey } from '@/config/versions'
+import { getLocalizedUrl } from "@/lib/url";
 
 type DropdownType = "contribute" | "community" | "version" | "language" | "github" | null;
 
@@ -308,7 +309,7 @@ export default function DocsNavbar() {
                 onMouseLeave={handleMouseLeave}
               >
               <a
-                href="https://kubestellar.io/joinus"
+                href={getLocalizedUrl("https://kubestellar.io/joinus")}
                 className={dropdownItemClasses}
               >
                 <svg className="w-5 h-5 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -913,7 +914,7 @@ export default function DocsNavbar() {
             <div className={`text-sm font-medium uppercase px-2 py-1.5 mt-3 tracking-wider ${
               isDark ? 'text-gray-300' : 'text-gray-500'
             }`}>Contribute</div>
-            <a href="https://kubestellar.io/joinus" className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+            <a href={getLocalizedUrl("https://kubestellar.io/joinus")} className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
               isDark
                 ? 'text-gray-300 hover:bg-neutral-800'
                 : 'text-gray-700 hover:bg-gray-100'
