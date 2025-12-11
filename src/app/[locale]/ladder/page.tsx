@@ -24,6 +24,7 @@ export default function MaintainerLadderPage() {
         t("levels.contributor.requirements.2"),
         t("levels.contributor.requirements.3"),
       ],
+      goodStanding: t("levels.contributor.goodStanding"),
       icon: (
         <svg
           className="w-8 h-8"
@@ -43,17 +44,18 @@ export default function MaintainerLadderPage() {
     },
     {
       id: 2,
-      title: t("levels.unpaidIntern.title"),
-      nextLevel: t("levels.unpaidIntern.nextLevel"),
-      description: t("levels.unpaidIntern.description"),
+      title: t("levels.unpaidMentee.title"),
+      nextLevel: t("levels.unpaidMentee.nextLevel"),
+      description: t("levels.unpaidMentee.description"),
       requirements: [
-        t("levels.unpaidIntern.requirements.0"),
-        t("levels.unpaidIntern.requirements.1"),
-        t("levels.unpaidIntern.requirements.2"),
-        t("levels.unpaidIntern.requirements.3"),
-        t("levels.unpaidIntern.requirements.4"),
+        t("levels.unpaidMentee.requirements.0"),
+        t("levels.unpaidMentee.requirements.1"),
+        t("levels.unpaidMentee.requirements.2"),
+        t("levels.unpaidMentee.requirements.3"),
+        t("levels.unpaidMentee.requirements.4"),
       ],
-      timeframe: t("levels.unpaidIntern.timeframe"),
+      goodStanding: t("levels.unpaidMentee.goodStanding"),
+      timeframe: t("levels.unpaidMentee.timeframe"),
       icon: (
         <svg
           className="w-8 h-8"
@@ -73,16 +75,17 @@ export default function MaintainerLadderPage() {
     },
     {
       id: 3,
-      title: t("levels.paidIntern.title"),
-      nextLevel: t("levels.paidIntern.nextLevel"),
-      description: t("levels.paidIntern.description"),
+      title: t("levels.paidMentee.title"),
+      nextLevel: t("levels.paidMentee.nextLevel"),
+      description: t("levels.paidMentee.description"),
       requirements: [
-        t("levels.paidIntern.requirements.0"),
-        t("levels.paidIntern.requirements.1"),
-        t("levels.paidIntern.requirements.2"),
-        t("levels.paidIntern.requirements.3"),
-        t("levels.paidIntern.requirements.4"),
+        t("levels.paidMentee.requirements.0"),
+        t("levels.paidMentee.requirements.1"),
+        t("levels.paidMentee.requirements.2"),
+        t("levels.paidMentee.requirements.3"),
+        t("levels.paidMentee.requirements.4"),
       ],
+      goodStanding: t("levels.paidMentee.goodStanding"),
       icon: (
         <svg
           className="w-8 h-8"
@@ -111,6 +114,7 @@ export default function MaintainerLadderPage() {
         t("levels.mentor.requirements.2"),
         t("levels.mentor.requirements.3"),
       ],
+      goodStanding: t("levels.mentor.goodStanding"),
       icon: (
         <svg
           className="w-8 h-8"
@@ -139,6 +143,7 @@ export default function MaintainerLadderPage() {
         t("levels.maintainer.requirements.2"),
         t("levels.maintainer.requirements.3"),
       ],
+      goodStanding: t("levels.maintainer.goodStanding"),
       icon: (
         <svg
           className="w-8 h-8"
@@ -155,6 +160,36 @@ export default function MaintainerLadderPage() {
         </svg>
       ),
       gradient: "from-red-500 to-red-600",
+    },
+    {
+      id: 6,
+      title: t("levels.ambassador.title"),
+      nextLevel: t("levels.ambassador.nextLevel"),
+      description: t("levels.ambassador.description"),
+      requirements: [
+        t("levels.ambassador.requirements.0"),
+        t("levels.ambassador.requirements.1"),
+        t("levels.ambassador.requirements.2"),
+        t("levels.ambassador.requirements.3"),
+        t("levels.ambassador.requirements.4"),
+      ],
+      goodStanding: t("levels.ambassador.goodStanding"),
+      icon: (
+        <svg
+          className="w-8 h-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
+          />
+        </svg>
+      ),
+      gradient: "from-cyan-500 to-cyan-600",
     },
   ];
 
@@ -277,6 +312,17 @@ export default function MaintainerLadderPage() {
                         </ul>
                       </div>
 
+                      {level.goodStanding && (
+                        <div className="mt-4 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                          <h4 className="text-sm font-semibold text-blue-300 mb-2">
+                            {t("goodStandingLabel")}
+                          </h4>
+                          <p className="text-xs text-gray-300 leading-relaxed">
+                            {level.goodStanding}
+                          </p>
+                        </div>
+                      )}
+
                       {index < levels.length - 1 && (
                         <div className="text-center mt-4">
                           <div className="text-xs text-gray-400">
@@ -357,6 +403,17 @@ export default function MaintainerLadderPage() {
                             ))}
                           </ul>
                         </div>
+
+                        {level.goodStanding && (
+                          <div className="mt-6 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                            <h4 className="text-base font-semibold text-blue-300 mb-2">
+                              {t("goodStandingLabel")}
+                            </h4>
+                            <p className="text-sm text-gray-300 leading-relaxed">
+                              {level.goodStanding}
+                            </p>
+                          </div>
+                        )}
 
                         {index < levels.length - 1 && (
                           <div className="mt-6 pt-4 border-t border-gray-700/50">
