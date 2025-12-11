@@ -44,12 +44,19 @@ export function getLocalizedUrl(url: string): string {
     return url;
   }
   
-  // If it's a kubestellar.io or docs.kubestellar.io URL, replace with current base
-  if (url.includes('://kubestellar.io') || url.includes('://docs.kubestellar.io')) {
-    const baseUrl = getBaseUrl();
-    // Extract the path from the original URL
+  // Parse the URL to check the hostname
+  try {
     const urlObj = new URL(url);
-    return `${baseUrl}${urlObj.pathname}${urlObj.search}${urlObj.hash}`;
+    
+    // If it's a kubestellar.io or docs.kubestellar.io URL, replace with current base
+    if (urlObj.hostname === 'kubestellar.io' || urlObj.hostname === 'docs.kubestellar.io') {
+      const baseUrl = getBaseUrl();
+      return `${baseUrl}${urlObj.pathname}${urlObj.search}${urlObj.hash}`;
+    }
+  } catch (error) {
+    // If URL parsing fails, return the original URL
+    console.error('Failed to parse URL:', url, error);
+    return url;
   }
   
   // Return external URLs unchanged

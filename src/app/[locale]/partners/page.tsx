@@ -10,6 +10,7 @@ import {
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
+import { getLocalizedUrl } from "@/lib/url";
 
 export default function PartnersPage() {
   const t = useTranslations("partnersPage");
