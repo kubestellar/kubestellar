@@ -124,19 +124,27 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 		return fmt.Errorf("object cannot be cast to *unstructured.Unstructured: object: %s", util.RefToRuntimeObj(obj))
 	}
 	wantReturn := status != nil
-	labelKey := util.BindingPolicyLabelSingletonStatusKey
-	if isMultiWEC {
-		labelKey = util.BindingPolicyLabelMultiWECStatusKey
-	}
-	_, haveReturn := unstrObj.GetLabels()[labelKey]
+	labels := unstrObj.GetLabels()
+	_, haveSingleton := labels[util.BindingPolicyLabelSingletonStatusKey]
+	_, haveMultiWEC := labels[util.BindingPolicyLabelMultiWECStatusKey]
 
-	if !(wantReturn || haveReturn) {
+	// check which label to add
+	wantSingleton := wantReturn && !isMultiWEC
+	wantMultiWEC := wantReturn && isMultiWEC
+
+	if !wantReturn && !haveMultiWEC && !haveSingleton {
 		logger.V(5).Info("Workload object neither wants nor has returned status", "objectIdentifier", objectIdentifier)
 		return nil
 	}
 
-	if wantReturn && !haveReturn { // Ensure workload object is labeled as having returned reported state
-		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), true, labelKey)
+	if wantSingleton && !haveSingleton {
+		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), true, util.BindingPolicyLabelSingletonStatusKey)
+		if err != nil {
+			return err
+		}
+	}
+	if wantMultiWEC && !haveMultiWEC {
+		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), true, util.BindingPolicyLabelMultiWECStatusKey)
 		if err != nil {
 			return err
 		}
@@ -162,10 +170,21 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 		}
 		logger.V(5).Info("Updated status of workload object", "objectIdentifier", objectIdentifier)
 	}
-	if haveReturn && !wantReturn {
-		// Need to remove the label alleging that the workload object has returned reported state
-		return c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, labelKey)
+
+	if haveSingleton && !wantSingleton {
+		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, util.BindingPolicyLabelSingletonStatusKey)
+		if err != nil {
+			return err
+		}
 	}
+
+	if haveMultiWEC && !wantMultiWEC {
+		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, util.BindingPolicyLabelMultiWECStatusKey)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
