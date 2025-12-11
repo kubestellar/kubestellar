@@ -7,6 +7,7 @@ import { convertHtmlScriptsToJsxComments } from '@/lib/transformMdx'
 import { MermaidComponent } from '@/lib/Mermaid'
 import { buildPageMapForBranch, makeGitHubHeaders, user, repo, docsPath } from '../page-map'
 import { getBranchForVersion, getDefaultVersion, type VersionKey } from '@/config/versions'
+import EditViewSourceButtons from '@/components/docs/EditViewSourceButtons'
 
 export const dynamic = 'force-dynamic'
 
@@ -335,6 +336,13 @@ export default async function Page(props: PageProps) {
 
   return (
     <Wrapper toc={toc} metadata={metadata} sourceCode={rawJs}>
+      <EditViewSourceButtons
+        filePath={filePath}
+        user={user}
+        repo={repo}
+        branch={branch}
+        docsPath={docsPath}
+      />
       <MDXContent />
     </Wrapper>
   )
