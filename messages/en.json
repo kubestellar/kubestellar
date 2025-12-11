@@ -609,7 +609,7 @@
           "Be active on GitHub and Slack",
           "Informal application or nomination to join the mentee program"
         ],
-        "goodStanding": "Contributors in good standing (meeting their metrics for help-wanted issue creation, PR reviews, and merged PRs) qualify for professional opportunities including references, referrals, and assignment to mentor projects."
+        "goodStanding": "Contributors in good standing (meeting their metrics for help-wanted issue creation, PR reviews, and merged PRs) qualify for professional opportunities including assignment to mentor projects."
       },
       "unpaidMentee": {
         "title": "Unpaid Mentee",
@@ -648,7 +648,7 @@
           "Engage with the community in GitHub and Slack",
           "Approved by core maintainers following a public review process"
         ],
-        "goodStanding": "Mentors in good standing can lead initiatives, represent KubeStellar at conferences, receive speaker support, and have input on project roadmap decisions."
+        "goodStanding": "Mentors in good standing can lead initiatives, represent KubeStellar at conferences, receive speaker support, have input on project roadmap decisions, and are eligible to receive training / exam vouchers from CNCF for successfully completed projects."
       },
       "maintainer": {
         "title": "Maintainer",
@@ -660,7 +660,7 @@
           "≥8 PR reviews or constructive comments every 2 months",
           "≥3 community meeting attendances every 2 months"
         ],
-        "goodStanding": "Maintainers in good standing have full write access, voting rights on project decisions, compensation opportunities, and can serve as official project representatives."
+        "goodStanding": "Maintainers in good standing have full write access, voting rights on project decisions, and can serve as official project representatives."
       },
       "ambassador": {
         "title": "Ambassador",
