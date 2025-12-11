@@ -26,21 +26,30 @@ export default function EditViewSourceButtons({
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return null;
-  }
-
   const isDark = resolvedTheme === "dark";
 
   const fullPath = `${docsPath}${filePath}`;
   const viewUrl = `https://github.com/${user}/${repo}/blob/${branch}/${fullPath}`;
   const editUrl = `https://github.com/${user}/${repo}/edit/${branch}/${fullPath}`;
 
-  const buttonBaseClasses = `inline-flex items-center gap-1.5 px-2 py-1 text-xs rounded-md transition-all duration-200 ${
-    isDark
-      ? "text-gray-400 hover:text-gray-200 hover:bg-neutral-800/50"
-      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100/70"
-  }`;
+  // Separate conditional classes for better maintainability
+  const textColorClasses = isDark
+    ? "text-gray-400 hover:text-gray-200"
+    : "text-gray-600 hover:text-gray-900";
+  const bgColorClasses = isDark
+    ? "hover:bg-neutral-800/50"
+    : "hover:bg-gray-100/70";
+  const buttonBaseClasses = `inline-flex items-center gap-1.5 px-2 py-1 text-xs rounded-md transition-all duration-200 ${textColorClasses} ${bgColorClasses}`;
+
+  // Show a minimal skeleton during hydration to prevent content flash
+  if (!mounted) {
+    return (
+      <div className="flex items-center gap-2 mb-4 not-prose">
+        <div className="inline-flex items-center gap-1.5 px-2 py-1 h-6 w-24 rounded-md bg-gray-200/50 dark:bg-neutral-800/50 animate-pulse" />
+        <div className="inline-flex items-center gap-1.5 px-2 py-1 h-6 w-20 rounded-md bg-gray-200/50 dark:bg-neutral-800/50 animate-pulse" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center gap-2 mb-4 not-prose">
