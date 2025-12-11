@@ -10,6 +10,7 @@ import {
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
+import { getLocalizedUrl } from "../../../lib/url";
 
 export default function PartnersPage() {
   const t = useTranslations("partnersPage");
@@ -460,7 +461,7 @@ export default function PartnersPage() {
                   </Link>
 
                   <a
-                    href="https://kubestellar.io/slack"
+                    href={getLocalizedUrl("https://kubestellar.io/slack")}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-gray-500/30 border border-gray-600/50"
