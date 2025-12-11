@@ -4,10 +4,10 @@ actions/checkout:
   tag: v6.0.0
   tag-url: https://github.com/actions/checkout/tree/v6.0.0
 actions/stale:
-  sha: 5f858e3efba33a5ca4407a664cc011ad407f2008
-  sha-url: https://github.com/actions/stale/commit/5f858e3efba33a5ca4407a664cc011ad407f2008
-  tag: v10.1.0
-  tag-url: https://github.com/actions/stale/tree/v10.1.0
+  sha: 997185467fa4f803885201cee163a9f38240193d
+  sha-url: https://github.com/actions/stale/commit/997185467fa4f803885201cee163a9f38240193d
+  tag: v10.1.1
+  tag-url: https://github.com/actions/stale/tree/v10.1.1
 actions/add-to-project:
   sha: 244f685bbc3b7adfa8466e08b698b5577571133e
   sha-url: https://github.com/actions/add-to-project/commit/244f685bbc3b7adfa8466e08b698b5577571133e
