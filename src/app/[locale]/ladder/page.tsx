@@ -6,6 +6,7 @@ import {
   ContributionCallToAction,
   Navbar,
   Footer,
+  PageActions,
 } from "../../../components/index";
 import { useTranslations } from "next-intl";
 
@@ -196,6 +197,7 @@ export default function MaintainerLadderPage() {
   return (
     <div className="bg-[#0a0a0a] text-white overflow-x-hidden min-h-screen">
       <Navbar />
+      <PageActions position="fixed" />
 
       {/* Full page background with starfield */}
       <div className="fixed inset-0 z-0">

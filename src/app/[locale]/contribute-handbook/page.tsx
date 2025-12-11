@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { Navbar, Footer, StarField, GridLines } from "@/components";
+import { Navbar, Footer, StarField, GridLines, PageActions } from "@/components";
 import { handbookCards, HandbookCard } from "./handbook";
 import { useTranslations } from "next-intl";
 
@@ -104,6 +104,7 @@ export default function CommunityHandbook() {
   return (
     <div className="bg-slate-900 text-white overflow-x-hidden dark">
       <Navbar />
+      <PageActions position="fixed" />
 
       <main className="pt-24 relative overflow-hidden bg-slate-900 text-white">
         {/* Dark base background */}

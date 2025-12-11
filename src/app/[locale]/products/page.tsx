@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Navbar, Footer, GridLines, StarField } from "@/components";
+import { Navbar, Footer, GridLines, StarField, PageActions } from "@/components";
 import { useTranslations } from "next-intl";
 
 interface Product {
@@ -118,6 +118,7 @@ export default function ProductsPage() {
     <div className="bg-[#0a0a0a] text-white overflow-x-hidden min-h-screen">
       {/* Navigation */}
       <Navbar />
+      <PageActions position="fixed" />
 
       {/* Full page background with starfield */}
       <div className="fixed inset-0 z-0">
