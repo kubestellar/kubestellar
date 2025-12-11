@@ -1,8 +1,8 @@
 actions/checkout:
-  sha: 1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
-  sha-url: https://github.com/actions/checkout/commit/1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
-  tag: v6.0.0
-  tag-url: https://github.com/actions/checkout/tree/v6.0.0
+  sha: 8e8c483db84b4bee98b60c0593521ed34d9990e8
+  sha-url: https://github.com/actions/checkout/commit/8e8c483db84b4bee98b60c0593521ed34d9990e8
+  tag: v6.0.1
+  tag-url: https://github.com/actions/checkout/tree/v6.0.1
 actions/stale:
   sha: 5f858e3efba33a5ca4407a664cc011ad407f2008
   sha-url: https://github.com/actions/stale/commit/5f858e3efba33a5ca4407a664cc011ad407f2008
