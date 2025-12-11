@@ -874,13 +874,13 @@ export default function Navbar() {
 
               {/* Mobile menu button */}
               <button
-                className="lg:hidden p-2 rounded focus:outline-none hover:bg-gray-100 dark:hover:bg-gray-700 group cursor-pointer"
+                className="lg:hidden p-2 rounded focus:outline-none bg-white/10 hover:bg-white/20 dark:bg-gray-800/50 dark:hover:bg-gray-700 group cursor-pointer"
                 aria-label={isMenuOpen ? "Close menu" : "Open menu"}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? (
                   <svg
-                    className="w-6 h-6 stroke-black dark:stroke-white transition-all duration-300 group-hover:scale-110 group-hover:rotate-90"
+                    className="w-6 h-6 stroke-white transition-all duration-300 group-hover:scale-110 group-hover:rotate-90"
                     fill="none"
                     viewBox="0 0 24 24"
                   >
@@ -893,7 +893,7 @@ export default function Navbar() {
                   </svg>
                 ) : (
                   <svg
-                    className="w-6 h-6 stroke-black dark:stroke-white transition-all duration-300 group-hover:scale-110"
+                    className="w-6 h-6 stroke-white transition-all duration-300 group-hover:scale-110"
                     fill="none"
                     viewBox="0 0 24 24"
                   >

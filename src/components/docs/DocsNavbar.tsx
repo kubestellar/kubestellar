@@ -711,7 +711,7 @@ export default function DocsNavbar() {
           className={`xl:hidden p-1.5 rounded-md transition-colors cursor-pointer ${
             isDark 
               ? 'text-gray-300 hover:text-gray-100 hover:bg-neutral-800'
-              : 'text-gray-300 hover:text-gray-100 hover:bg-gray-100'
+              : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
           }`}
           aria-label="Toggle menu"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
