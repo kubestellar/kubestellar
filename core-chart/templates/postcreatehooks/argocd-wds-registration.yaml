@@ -38,7 +38,7 @@ spec:
               kind: Secret
               metadata:
                 name: {{"{{.ControlPlaneName}}"}}-cluster
-                namespace: {{$.Release.Namespace}}
+                namespace: argocd
                 labels:
                   argocd.argoproj.io/secret-type: cluster
               type: Opaque
