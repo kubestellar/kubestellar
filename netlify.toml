@@ -18,6 +18,20 @@
   spam_protection = true
 
 # Redirects for short URLs
+
+# Redirect docs.kubestellar.io to kubestellar.io/docs
+[[redirects]]
+  from = "https://docs.kubestellar.io/*"
+  to = "https://kubestellar.io/docs/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://docs.kubestellar.io"
+  to = "https://kubestellar.io/docs"
+  status = 301
+  force = true
+  
 [[redirects]]
   from = "/agenda"
   to = "https://docs.google.com/document/d/1XppfxSOD7AOX1lVVVIPWjpFkrxakfBfVzcybRg17-PM/edit?usp=share_link"
