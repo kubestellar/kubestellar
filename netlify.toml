@@ -20,11 +20,11 @@
 # Redirects for short URLs
 
 # Redirect docs.kubestellar.io to kubestellar.io/docs
-[[redirects]]
-  from = "https://docs.kubestellar.io/*"
-  to = "https://kubestellar.io/docs/:splat"
-  status = 301
-  force = true
+# [[redirects]]
+#   from = "https://docs.kubestellar.io/*"
+#   to = "https://kubestellar.io/docs/:splat"
+#   status = 301
+#   force = true
 
 [[redirects]]
   from = "https://docs.kubestellar.io"
