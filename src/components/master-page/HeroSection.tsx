@@ -300,58 +300,100 @@ export default function HeroSection() {
             </div>
 
             {/* Interactive Action Buttons */}
-            <div
-              className="action-buttons-container flex flex-col sm:flex-row gap-4 animate-btn-float"
-              style={{ animationDelay: "0.8s" }}
-            >
-              <IntlLink
-                href="/quick-installation"
-                className="primary-action-btn group relative overflow-hidden inline-flex items-center justify-center px-8 py-4 text-base sm:text-lg font-bold rounded-xl text-white 
-                          bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 
-                          hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 
-                          transition-all duration-500 transform hover:-translate-y-1 
-                          hover:shadow-xl hover:shadow-blue-500/40 
-                          animate-btn-float"
-              >
-                <span className="relative z-10">{t("buttonInstall")}</span>
-                <svg
-                  className="relative z-10 ml-2 h-5 w-5 transition-all duration-300 group-hover:translate-x-1 group-hover:rotate-12"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-                <div className="btn-shine"></div>
-              </IntlLink>
+            <div className="action-buttons-container space-y-4 animate-btn-float" style={{ animationDelay: "0.8s" }}>
+              {/* Installation Path Heading */}
+              <div className="text-center sm:text-left">
+                <h3 className="text-lg font-semibold text-white mb-2">Choose Your Installation Path</h3>
+                <p className="text-sm text-gray-300">Select the deployment option that fits your needs</p>
+              </div>
 
-              <Link
-                href="/docs"
-                className="secondary-action-btn inline-flex items-center justify-center px-8 py-4 text-base sm:text-lg font-bold rounded-xl text-gray-200 
-                          bg-gray-800/40 hover:bg-gray-800/60 
-                          backdrop-blur-md border border-gray-700/50 hover:border-gray-600/50 
-                          transition-all duration-500 transform hover:-translate-y-1 hover:scale-105 
-                          animate-btn-float"
-                style={{ animationDelay: "0.1s" }}
-              >
-                <svg
-                  className="mr-2 h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              {/* Installation Buttons Row */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                {/* Local Development Button */}
+                <IntlLink
+                  href="/quick-installation"
+                  className="primary-action-btn group relative overflow-hidden inline-flex items-center justify-center px-6 py-4 text-base font-bold rounded-xl text-white 
+                            bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 
+                            hover:from-blue-700 hover:via-blue-800 hover:to-blue-700 
+                            transition-all duration-500 transform hover:-translate-y-1 
+                            hover:shadow-xl hover:shadow-blue-500/40 
+                            animate-btn-float border-2 border-blue-500/50 hover:border-blue-400"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  ></path>
-                </svg>
-                {t("buttonDocs")}
-              </Link>
+                  <span className="relative z-10 flex items-center gap-2">
+                    <span className="text-xl">🚀</span>
+                    <span>Local Dev Install</span>
+                  </span>
+                  <svg
+                    className="relative z-10 ml-2 h-5 w-5 transition-all duration-300 group-hover:translate-x-1"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+                  <div className="btn-shine"></div>
+                </IntlLink>
+
+                {/* AWS EKS Cloud Button */}
+                <Link
+                  href="/docs/getting-started/aws-eks"
+                  className="primary-action-btn group relative overflow-hidden inline-flex items-center justify-center px-6 py-4 text-base font-bold rounded-xl text-white 
+                            bg-gradient-to-r from-orange-600 via-orange-700 to-orange-600 
+                            hover:from-orange-700 hover:via-orange-800 hover:to-orange-700 
+                            transition-all duration-500 transform hover:-translate-y-1 
+                            hover:shadow-xl hover:shadow-orange-500/40 
+                            animate-btn-float border-2 border-orange-500/50 hover:border-orange-400"
+                  style={{ animationDelay: "0.1s" }}
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    <span className="text-xl">☁️</span>
+                    <span>AWS EKS Install</span>
+                  </span>
+                  <svg
+                    className="relative z-10 ml-2 h-5 w-5 transition-all duration-300 group-hover:translate-x-1"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+                  <div className="btn-shine"></div>
+                </Link>
+              </div>
+
+              {/* Explore Docs Button */}
+              <div className="flex justify-center sm:justify-start">
+                <Link
+                  href="/docs"
+                  className="secondary-action-btn inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-lg text-gray-200 
+                            bg-gray-800/40 hover:bg-gray-800/60 
+                            backdrop-blur-md border border-gray-700/50 hover:border-gray-600/50 
+                            transition-all duration-500 transform hover:-translate-y-1 
+                            animate-btn-float"
+                  style={{ animationDelay: "0.2s" }}
+                >
+                  <svg
+                    className="mr-2 h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                    ></path>
+                  </svg>
+                  {t("buttonDocs")}
+                </Link>
+              </div>
             </div>
           </div>
 

@@ -2,6 +2,49 @@
 
 KubeStellar simplifies multi-cluster Kubernetes management, enabling you to deploy and manage workloads across multiple clusters with ease.
 
+## Choose Your Installation Path
+
+Select the installation path that best fits your needs:
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', margin: '2rem 0' }}>
+  <div style={{ border: '2px solid #3b82f6', borderRadius: '12px', padding: '1.5rem', background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.05))' }}>
+    <h3 style={{ marginTop: 0, color: '#3b82f6', fontSize: '1.25rem' }}>🚀 Local Development</h3>
+    <p style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>For testing, learning, and development</p>
+    <ul style={{ fontSize: '0.85rem', lineHeight: '1.6', marginBottom: '1rem' }}>
+      <li>✓ Free to use</li>
+      <li>✓ Quick setup (10-15 minutes)</li>
+      <li>✓ Requirements: Docker, Kind</li>
+      <li>✓ Kubernetes 1.34+</li>
+    </ul>
+    <a href="/quick-installation" style={{ display: 'inline-block', padding: '0.5rem 1rem', background: '#3b82f6', color: 'white', borderRadius: '6px', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500' }}>Start Local Install →</a>
+  </div>
+
+  <div style={{ border: '2px solid #f59e0b', borderRadius: '12px', padding: '1.5rem', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 146, 60, 0.05))' }}>
+    <h3 style={{ marginTop: 0, color: '#f59e0b', fontSize: '1.25rem' }}>☁️ AWS EKS Cloud</h3>
+    <p style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>For production and enterprise deployments</p>
+    <ul style={{ fontSize: '0.85rem', lineHeight: '1.6', marginBottom: '1rem' }}>
+      <li>✓ Production-ready on EKS 1.34</li>
+      <li>✓ Setup time (20-30 minutes)</li>
+      <li>✓ Requirements: AWS Account, eksctl, kubectl, Helm, kflex, clusteradm</li>
+      <li>✓ High scalability & availability</li>
+    </ul>
+    <a href="/docs/getting-started/aws-eks" style={{ display: 'inline-block', padding: '0.5rem 1rem', background: '#f59e0b', color: 'white', borderRadius: '6px', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500' }}>Start AWS Install →</a>
+  </div>
+</div>
+
+### Quick Comparison
+
+| Feature              | Local Development | AWS EKS Cloud        |
+|---------------------|-------------------|----------------------|
+| **Use Case**        | Testing, Learning | Production, Enterprise |
+| **Prerequisites**   | Docker, Kind      | AWS Account (EC2, EKS, IAM, VPC, CloudFormation), eksctl, kubectl, Helm, kflex, clusteradm |
+| **Setup Time**      | 10-15 minutes     | 20-30 minutes        |
+| **Cost**            | Free              | AWS charges apply (~$300-400/month) |
+| **Scalability**     | Limited (local)   | High (cloud-native)  |
+| **Kubernetes Version** | 1.34+          | EKS 1.34             |
+| **Region**          | N/A               | us-east-1 recommended |
+| **Minimum Quotas**  | N/A               | vCPU: 12, Elastic IPs: 4, Target Groups: 5, NLBs: 2 |
+
 ## Quick Navigation
 
 ###  New to KubeStellar?
@@ -11,8 +54,8 @@ Start here to understand what KubeStellar is and how it works:
 - **[Welcome](docs/what-is-kubestellar/welcome)** - Get started with KubeStellar
 - **[Overview](docs/what-is-kubestellar/readme)** - Learn about KubeStellar's architecture and core concepts
 - **[Architecture](docs/what-is-kubestellar/architecture)** - Understand the system design
-- **[Quick Installation](/quick-installation)** - Get up and running in minutes
-- **[AWS EKS Install](/docs/getting-started/aws-eks)** - Production guide for EKS
+- **[Quick Installation](/quick-installation)** - Get up and running in minutes (Local)
+- **[AWS EKS Install](/docs/getting-started/aws-eks)** - Production guide for EKS (Cloud)
 
 ###  Install & Configure
 

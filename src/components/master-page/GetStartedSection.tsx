@@ -64,35 +64,115 @@ export default function GetStartedSection() {
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 lgcustom:grid-cols-3 gap-6 lg:gap-8">
-          {/* Installation Card */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50 w-11/12 max-w-xl mx-auto lgcustom:w-auto lgcustom:max-w-none">
+        {/* Installation Path Section - Two Cards Side by Side */}
+        <div className="mt-8 mb-6 text-center">
+          <h3 className="text-2xl font-bold text-white mb-3">
+            Choose Your{" "}
+            <span className="text-gradient animated-gradient bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">
+              Installation Path
+            </span>
+          </h3>
+          <p className="text-blue-100 text-base max-w-2xl mx-auto">
+            Select the deployment option that best fits your use case
+          </p>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-12">
+          {/* Local Development Installation Card */}
+          <div className="bg-slate-800/50 border-2 border-blue-500/50 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-blue-500/40 hover:border-blue-400 hover:scale-[1.02]">
             <div className="p-6 flex flex-col h-full">
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4">
-                <Icon
-                  path="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
-                  className="h-6 w-6 white"
-                />
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mr-3">
+                  <Icon
+                    path="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+                    className="h-6 w-6 text-blue-400"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">🚀 Local Development</h3>
+                  <span className="text-xs text-blue-300 font-medium">Testing & Learning</span>
+                </div>
               </div>
-              <h3 className="text-base sm:text-lg font-bold mb-2">
-                {t("card1Title")}
-              </h3>
-              <p className="text-sm sm:text-base text-blue-100 mb-4">
-                {t("card1Description")}
+              <p className="text-sm text-blue-100 mb-4">
+                Quick setup for development and testing on your local machine using Docker and Kind
               </p>
-              <div>
-                <Link
-                  href="/quick-installation"
-                  className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600/80 to-blue-700/80 hover:from-blue-600 hover:to-blue-700 rounded-lg sm:px-6 sm:py-3 sm:text-base transition-all duration-200 border border-blue-500/30 mt-7"
-                >
-                  {t("card1Button")}
-                </Link>
-              </div>
+              <ul className="text-sm text-gray-300 mb-4 space-y-2 flex-grow">
+                <li className="flex items-start">
+                  <span className="text-emerald-400 mr-2">✓</span>
+                  <span><strong>Free</strong> - No cloud costs</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-emerald-400 mr-2">✓</span>
+                  <span><strong>10-15 minutes</strong> setup time</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-emerald-400 mr-2">✓</span>
+                  <span>Requires Docker & Kind</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-emerald-400 mr-2">✓</span>
+                  <span>Kubernetes 1.34+</span>
+                </li>
+              </ul>
+              <Link
+                href="/quick-installation"
+                className="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-600/80 to-blue-700/80 hover:from-blue-600 hover:to-blue-700 rounded-lg transition-all duration-200 border border-blue-500/30 mt-auto"
+              >
+                Start Local Install →
+              </Link>
             </div>
           </div>
 
+          {/* AWS EKS Cloud Installation Card */}
+          <div className="bg-slate-800/50 border-2 border-orange-500/50 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-orange-500/40 hover:border-orange-400 hover:scale-[1.02]">
+            <div className="p-6 flex flex-col h-full">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mr-3">
+                  <Icon
+                    path="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+                    className="h-6 w-6 text-orange-400"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">☁️ AWS EKS Cloud</h3>
+                  <span className="text-xs text-orange-300 font-medium">Production & Enterprise</span>
+                </div>
+              </div>
+              <p className="text-sm text-blue-100 mb-4">
+                Production-ready deployment on AWS EKS (Kubernetes 1.34) for scalable, enterprise-grade multi-cluster management
+              </p>
+              <ul className="text-sm text-gray-300 mb-4 space-y-2 flex-grow">
+                <li className="flex items-start">
+                  <span className="text-emerald-400 mr-2">✓</span>
+                  <span><strong>EKS 1.34</strong> with high scalability</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-emerald-400 mr-2">✓</span>
+                  <span><strong>20-30 minutes</strong> setup time</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-emerald-400 mr-2">✓</span>
+                  <span>Tools: kubectl, eksctl, Helm, kflex, clusteradm</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-emerald-400 mr-2">✓</span>
+                  <span>Requires AWS Account (us-east-1)</span>
+                </li>
+              </ul>
+              <Link
+                href="/docs/getting-started/aws-eks"
+                className="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-orange-600/80 to-orange-700/80 hover:from-orange-600 hover:to-orange-700 rounded-lg transition-all duration-200 border border-orange-500/30 mt-auto"
+              >
+                Start AWS Install →
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-12 grid grid-cols-1 lgcustom:grid-cols-2 gap-6 lg:gap-8">
+
           {/* Use Cases & Resources Card */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50 w-11/12 max-w-xl mx-auto lgcustom:w-auto lgcustom:max-w-none">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50">
             <div className="p-6">
               <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4">
                 <svg
@@ -211,7 +291,7 @@ export default function GetStartedSection() {
           </div>
 
           {/* Documentation Card */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50 w-11/12 max-w-xl mx-auto lgcustom:w-auto lgcustom:max-w-none">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50">
             <div className="p-6">
               <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4">
                 <Icon path="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />

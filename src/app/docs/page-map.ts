@@ -89,6 +89,11 @@ type FolderNode = { kind: 'Folder'; name: string; route: string; children: PageM
       { file: 'start-from-ocm.md' },
       { file: 'setup-limitations.md' },
       {
+        'Cloud Installation': [
+          { 'AWS EKS': '/docs/getting-started/aws-eks' }
+        ]
+      },
+      {
         'KubeFlex Hosting cluster': [
           { 'Acquire cluster for KubeFlex Hosting': 'direct/acquire-hosting-cluster.md' },
           { 'Initialize KubeFlex Hosting cluster': 'direct/init-hosting-cluster.md' }
