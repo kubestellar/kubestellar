@@ -2,6 +2,7 @@ import { Layout } from 'nextra-theme-docs'
 import 'nextra-theme-docs/style.css'
 import { DocsNavbar, DocsFooter, DocsBanner } from '@/components/docs/index'
 import { Inter, JetBrains_Mono } from "next/font/google"
+import { Suspense } from 'react'
 import "../globals.css"
 import { buildPageMapForBranch } from './page-map'
 import { getDefaultVersion, getBranchForVersion } from '@/config/versions'
@@ -23,7 +24,11 @@ export const metadata = {
 }
 
 const banner = <DocsBanner />
-const navbar = <DocsNavbar />
+const navbar = (
+  <Suspense fallback={<div style={{ height: '4rem' }} />}>
+    <DocsNavbar />
+  </Suspense>
+)
 const footer = <DocsFooter />
 
 type Props = {
@@ -52,6 +57,10 @@ export default async function DocsLayout({ children }: Props) {
           sidebar={{
             defaultMenuCollapseLevel: 1,
             toggleButton: true
+          }}
+          toc={{
+            float: true,
+            title: "On This Page"
           }}
         >
           {children}

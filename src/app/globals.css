@@ -1929,3 +1929,53 @@ html.dark .ks-doc-figure figcaption {
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari and Opera */
 }
+
+/* Mobile Responsiveness Fixes for Nextra Sidebar and TOC */
+/* 
+ * Note: Using 1024px breakpoint instead of 768px (md) to cover both mobile and tablet devices.
+ * This ensures sidebar and TOC toggles work on tablets where sidebars may not fit comfortably.
+ * The md:hidden class in DocsNavbar hides elements at ≥768px, but CSS at ≤1024px provides
+ * enhanced functionality for tablets between 768px and 1024px.
+ */
+@media (max-width: 1024px) {
+  /* Ensure Nextra's hamburger menu button is visible */
+  .nextra-nav-container button[aria-label="Toggle sidebar"],
+  button.nextra-sidebar-toggle {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Make sidebar accessible on mobile with proper overlay */
+  .nextra-sidebar-container {
+    position: fixed !important;
+    top: calc(var(--nextra-navbar-height, 4rem) + var(--nextra-banner-height, 0px)) !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    z-index: 45 !important;
+    max-width: 20rem !important;
+  }
+
+  /* Show TOC toggle button on mobile */
+  button[aria-label="Toggle table of contents"],
+  .nextra-toc-toggle {
+    display: flex !important;
+    visibility: visible !important;
+  }
+
+  /* Make TOC accessible on mobile with proper positioning */
+  .nextra-toc-container {
+    position: fixed !important;
+    top: calc(var(--nextra-navbar-height, 4rem) + var(--nextra-banner-height, 0px)) !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 45 !important;
+    max-width: 16rem !important;
+  }
+
+  /* Ensure proper backdrop for mobile sidebar */
+  .nextra-sidebar-container ~ div[class*="backdrop"],
+  .nextra-overlay {
+    z-index: 44 !important;
+  }
+}
