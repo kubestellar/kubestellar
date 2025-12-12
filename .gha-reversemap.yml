@@ -19,10 +19,10 @@ titoportas/update-project-fields:
   tag: v0.1.0
   tag-url: https://github.com/titoportas/update-project-fields/tree/v0.1.0
 ScholliYT/Broken-Links-Crawler-Action:
-  sha: b3fb123879e5a6a854d6fda5c33df2d94d41092c
-  sha-url: https://github.com/ScholliYT/Broken-Links-Crawler-Action/commit/b3fb123879e5a6a854d6fda5c33df2d94d41092c
-  tag: v3.3.1
-  tag-url: https://github.com/ScholliYT/Broken-Links-Crawler-Action/tree/v3.3.1
+  sha: 21eab52f98097989d343116dbbd46dc4541b849b
+  sha-url: https://github.com/ScholliYT/Broken-Links-Crawler-Action/commit/21eab52f98097989d343116dbbd46dc4541b849b
+  tag: v3.3.2
+  tag-url: https://github.com/ScholliYT/Broken-Links-Crawler-Action/tree/v3.3.2
 JasonEtco/create-an-issue:
   sha: 1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
   sha-url: https://github.com/JasonEtco/create-an-issue/commit/1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
