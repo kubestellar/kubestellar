@@ -1139,6 +1139,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#note-for-macos-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Note for MacOS users
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#important-shell-variables-for-example-scenarios" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4202,6 +4213,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#note-for-macos-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Note for MacOS users
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#important-shell-variables-for-example-scenarios" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4495,6 +4517,9 @@
 </ol>
 <h3 id="note-for-windows-users">Note for Windows users<a class="headerlink" href="#note-for-windows-users" title="Permanent link">#</a></h3>
 <p>For some users on WSL, use of the setup procedure on this page and/or the demo environment creation script may require running as the user <code>root</code> in Linux. There is a <a href="../knownissue-helm-ghcr/">known issue about this</a>.</p>
+<h3 id="note-for-macos-users">Note for MacOS users<a class="headerlink" href="#note-for-macos-users" title="Permanent link">#</a></h3>
+<p>Running multiple <code>kind</code> clusters on macOS may require increasing Docker Desktop’s memory allocation<br />
+(4–6 GB recommended). Users with 8 GB RAM should avoid running more than 2–3 clusters concurrently or prefer <code>k3d</code> for lower overhead.</p>
 <h3 id="important-shell-variables-for-example-scenarios">Important: Shell Variables for Example Scenarios<a class="headerlink" href="#important-shell-variables-for-example-scenarios" title="Permanent link">#</a></h3>
 <p>After completing the setup, you will need to define several shell variables to run the example scenarios. The meanings of these variables are defined <a href="../example-scenarios/#assumptions-and-variables">at the start of the example scenarios document</a>. What is shown later in this document are the specific values that are correct for the setup procedure described in this guide.</p>
 <p>The key variables you'll need are:</p>
