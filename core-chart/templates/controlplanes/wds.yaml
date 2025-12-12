@@ -11,12 +11,12 @@ spec:
   postCreateHooks:
     - hookName: kubestellar-controller
       vars:
-        APIGroups: '{{ .APIGroups | default "" }}'
+        APIGroups: '{{ .APIGroups }}'
     - hookName: transport-controller
       vars:
         WDSSecretName: admin-kubeconfig
-        WDSkubeconfig: kubeconfig-incluster
+        WDSSecretKey: kubeconfig-incluster
   globalVars:
     ControlPlaneName: {{ .name }}
-    ITSName: '{{ .ITSName | default "" }}'
+    ITSName: '{{ .ITSName }}'
 {{- end }}
