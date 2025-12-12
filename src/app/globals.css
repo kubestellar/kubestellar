@@ -12,8 +12,68 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
+  --separator-color: rgba(0, 0, 0, 0.1);
 }
 
+
+aside[class*="sidebar"] {
+  border-right: 3px solid var(--separator-color);
+}
+
+:root.dark,
+html.dark {
+  /* Separator colors for dark mode */
+  --separator-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Left sidebar panel separator (both left and right sides) */
+.nextra-sidebar-container {
+  border-left: 3px solid var(--separator-color);
+  border-right: 3px solid var(--separator-color);
+}
+
+/* Right TOC sidebar separator (both left and right sides) */
+.nextra-toc {
+  border-left: 3px solid var(--separator-color);
+  border-right: 3px solid var(--separator-color);
+}
+
+/* Dark mode specific */
+html.dark .nextra-sidebar-container {
+  border-left-color: rgba(255, 255, 255, 0.1);
+  border-right-color: rgba(255, 255, 255, 0.1);
+}
+
+html.dark .nextra-toc {
+  border-left-color: rgba(255, 255, 255, 0.1);
+  border-right-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Light mode specific */
+html:not(.dark) .nextra-sidebar-container {
+  border-left-color: rgba(0, 0, 0, 0.1);
+  border-right-color: rgba(0, 0, 0, 0.1);
+}
+
+html:not(.dark) .nextra-toc {
+  border-left-color: rgba(0, 0, 0, 0.1);
+  border-right-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile responsive - remove separators */
+@media (max-width: 1024px) {
+  .nextra-toc {
+    border-left: none;
+    border-right: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .nextra-sidebar-container {
+    border-left: none;
+    border-right: none;
+  }
+}
 :root:not(.dark) {
   /* Light mode colors */
   --background: #ffffff;
