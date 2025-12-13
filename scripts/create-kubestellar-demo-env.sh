@@ -227,9 +227,34 @@ echo -e "\033[33m✔\033[0m OCM hub is ready"
 
 echo -e "\nRegistering cluster 1 and 2 for remote access with KubeStellar Core..."
 
+# Helper function to get the correct bootstrap ServiceAccount name based on clusteradm version
+# clusteradm 0.11.0+ uses "cluster-bootstrap", earlier versions use "agent-registration-bootstrap"
+get_bootstrap_sa_name() {
+    local v="$1"
+
+    if [ -z "$v" ]; then
+        echo "cluster-bootstrap"
+        return
+    fi
+
+    if [ "$(printf '%s\n' 0.11.0 "$v" | sort -V | head -1)" = "0.11.0" ]; then
+        echo "cluster-bootstrap"
+    else
+        echo "agent-registration-bootstrap"
+    fi
+}
+
 : set flags to "" if you have installed KubeStellar on an OpenShift cluster
 flags="--force-internal-endpoint-lookup"
 clusters=(cluster1 cluster2);
+CLUSTERADM_VERSION=$(clusteradm version --short 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
+if [ -z "$CLUSTERADM_VERSION" ]; then
+    CLUSTERADM_VERSION=$(clusteradm version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
+fi
+echo "Detected clusteradm version: ${CLUSTERADM_VERSION:-unknown}"
+
+sa_name=$(get_bootstrap_sa_name "$CLUSTERADM_VERSION")
+echo "Using ServiceAccount: $sa_name"
 if ! joincmd=$(clusteradm --context its1 get token | grep '^clusteradm join')
 then echo -e "\033[0;31mX\033[0m get token failed!\n" >&2; echo "$joincmd" >&2; false
 fi

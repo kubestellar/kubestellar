@@ -147,6 +147,20 @@ kflex ctx
 
 wait-for-cmd 'kubectl --context its1 get ns customization-properties'
 
+get_bootstrap_sa_name() {
+    local clusteradm_version
+    clusteradm_version=$(clusteradm version --short 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+    if [ -z "$clusteradm_version" ]; then
+        echo "agent-registration-bootstrap"
+        return
+    fi
+    if printf '%s\n' "0.11.0" "$clusteradm_version" | sort -C -V 2>/dev/null; then
+        echo "cluster-bootstrap"
+    else
+        echo "agent-registration-bootstrap"
+    fi
+}
+
 :
 : -------------------------------------------------------------------------
 : Create clusters and register with OCM
@@ -161,7 +175,8 @@ function add_wec() {
         (existing)
             joinflags="";;
     esac
-    clusteradm --context its1 get token | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${joinflags}'"}' | sh
+    sa_name=$(get_bootstrap_sa_name)
+    clusteradm --context its1 get token --serviceaccount "$sa_name" | grep '^clusteradm join' | sed "s/<cluster_name>/${cluster}/" | awk '{print $0 " --context '${cluster}' --singleton '${joinflags}'"}' | sh
 }
 
 "${SRC_DIR}/../../../scripts/check_pre_req.sh" --assert --verbose ocm
