@@ -7,9 +7,21 @@
  * while maintaining proper URLs in production.
  */
 export function getBaseUrl(): string {
-  // Server-side: use environment variable or default
+  // Server-side: use environment variable or sensible defaults
   if (typeof window === 'undefined') {
-    return process.env.NEXT_PUBLIC_BASE_URL || 'https://kubestellar.io';
+    // Prefer explicitly configured base URL
+    if (process.env.NEXT_PUBLIC_BASE_URL) {
+      return process.env.NEXT_PUBLIC_BASE_URL;
+    }
+
+    // In local development, match the default Next.js dev URL so
+    // server-rendered markup matches the client during hydration.
+    if (process.env.NODE_ENV === 'development') {
+      return 'http://localhost:3000';
+    }
+
+    // Fallback to production site URL
+    return 'https://kubestellar.io';
   }
   
   // Client-side: detect if we're on a preview deployment
