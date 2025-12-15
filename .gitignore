@@ -30,7 +30,7 @@ local-chart/
 /counts
 
 # Core Chart generated dependencies
-core-chart/Chart.lock
+# core-chart/Chart.lock ignored for easier merges
 core-chart/charts/
 
 # Python local stuff associated with KubeStellar performance tests
