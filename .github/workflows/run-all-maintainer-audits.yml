@@ -2,6 +2,10 @@ name: Run All Maintainer Audits
 
 on:
   workflow_dispatch:
+  schedule:
+    # Run every Monday at 9:00 AM Eastern (14:00 UTC in winter, 13:00 UTC in summer)
+    # Using 14:00 UTC (9 AM EST during winter months)
+    - cron: '0 14 * * 1'
 
 permissions:
   actions: write
