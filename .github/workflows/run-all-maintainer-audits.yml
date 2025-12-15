@@ -8,41 +8,61 @@ permissions: read-all
 jobs:
   audit-all:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 1
-      matrix:
-        maintainer:
-          - btwshivam
-          - clubanderson
-          - dumb0002
-          - francostellari
-          - gaurab-khanal
-          - kproche
-          - kunal-511
-          - mavrick-1
-          - mikespreitzer
-          - naman9271
-          - nupurshivani
-          - oksaumya
-          - onkar717
-          - pdettori
-          - rupam-it
-          - rxinui
-          - sagar2366
-          - vedansh-5
-          - waltforme
     
     steps:
-      - name: Trigger maintainer audit for ${{ matrix.maintainer }}
+      - name: Run audits for all maintainers sequentially
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh workflow run maintainer-metrics.lock.yml \
-            --repo ${{ github.repository }} \
-            --ref ${{ github.ref_name }} \
-            --field maintainer=${{ matrix.maintainer }}
+          # List of all maintainers
+          MAINTAINERS=(
+            "btwshivam"
+            "clubanderson"
+            "dumb0002"
+            "francostellari"
+            "gaurab-khanal"
+            "kproche"
+            "kunal-511"
+            "mavrick-1"
+            "mikespreitzer"
+            "naman9271"
+            "nupurshivani"
+            "oksaumya"
+            "onkar717"
+            "pdettori"
+            "rupam-it"
+            "rxinui"
+            "sagar2366"
+            "vedansh-5"
+            "waltforme"
+          )
           
-          echo "✅ Triggered audit for ${{ matrix.maintainer }}"
+          echo "🚀 Starting sequential maintainer audits for ${#MAINTAINERS[@]} maintainers..."
+          echo "Each audit will wait 3.5 minutes before starting the next one."
+          echo ""
           
-          # Wait 3.5 minutes (210 seconds) between maintainer audits
-          sleep 210
+          for maintainer in "${MAINTAINERS[@]}"; do
+            echo "📧 Triggering audit for: $maintainer"
+            
+            gh workflow run maintainer-metrics.lock.yml \
+              --repo ${{ github.repository }} \
+              --ref ${{ github.ref_name }} \
+              --field maintainer="$maintainer"
+            
+            if [ $? -eq 0 ]; then
+              echo "✅ Successfully triggered audit for $maintainer"
+            else
+              echo "❌ Failed to trigger audit for $maintainer"
+              exit 1
+            fi
+            
+            # Don't sleep after the last maintainer
+            if [ "$maintainer" != "${MAINTAINERS[-1]}" ]; then
+              echo "⏳ Waiting 3.5 minutes before next audit..."
+              sleep 210
+              echo ""
+            fi
+          done
+          
+          echo ""
+          echo "🎉 All maintainer audits have been triggered!"
