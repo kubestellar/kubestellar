@@ -4,8 +4,13 @@ description: Reviews PRs from other repos and updates documentation accordingly
 on:
   issues:
     types: [opened, labeled]
+  issue_comment:
+    types: [created]
   workflow_dispatch:
-if: contains(github.event.issue.labels.*.name, 'doc update')
+  reaction: eyes
+if: |
+  (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'doc update')) ||
+  (github.event_name == 'issue_comment' && contains(github.event.issue.labels.*.name, 'doc update') && contains(github.event.comment.body, '/technical-doc-writer'))
 permissions: read-all
 engine: copilot
 tools:
