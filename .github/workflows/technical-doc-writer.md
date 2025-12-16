@@ -20,6 +20,7 @@ safe-outputs:
   create-pull-request:
   add-comment:
   update-issue:
+    status:
 ---
 
 # Technical Documentation Writer
