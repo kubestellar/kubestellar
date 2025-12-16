@@ -74,8 +74,7 @@ node --version
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/kubestellar/kubestellar.git
-   cd docd
+   git clone https://github.com/kubestellar/docs.git
    ```
 
 2. **Install dependencies:**
