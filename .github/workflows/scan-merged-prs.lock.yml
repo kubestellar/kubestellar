@@ -45,6 +45,8 @@
 # safe-outputs:
 #   create-issue:
 #     max: 50
+#   update-issue:
+#     max: 50
 # ```
 #
 # Job Dependency Graph:
@@ -55,13 +57,17 @@
 #   conclusion["conclusion"]
 #   create_issue["create_issue"]
 #   detection["detection"]
+#   update_issue["update_issue"]
 #   activation --> agent
 #   agent --> conclusion
 #   activation --> conclusion
 #   create_issue --> conclusion
+#   update_issue --> conclusion
 #   agent --> create_issue
 #   detection --> create_issue
 #   agent --> detection
+#   agent --> update_issue
+#   detection --> update_issue
 # ```
 #
 # Original Prompt:
@@ -159,11 +165,24 @@
 # ```
 #
 # **Labels:**
-# - Add the label: `doc update`
+# - **IMPORTANT:** Create the issue WITHOUT labels first
+# - Then use `update-issue` safe-output to add the label `doc update` 
+# - This two-step process ensures the `labeled` event triggers the technical-doc-writer workflow
+# - Example: Create issue → Get issue number → Update that issue to add label
 #
-# ### 4. Avoid Duplicates
+# ### 4. Check for Duplicate Issues
 #
-# Before creating an issue, check if an issue already exists for this PR (search existing issues by PR URL in the body). If a duplicate exists, skip creating a new issue.
+# **CRITICAL:** Before creating ANY issue, you MUST search for duplicates:
+#
+# 1. Search existing issues in `kubestellar/docs` for the PR URL
+# 2. Also search by PR title to catch near-duplicates
+# 3. If ANY matching issue exists (open or closed), skip creating a new issue
+# 4. Report skipped duplicates in your noop message
+#
+# **How to search:**
+# - Use GitHub search: `repo:kubestellar/docs is:issue "PR_URL"` 
+# - Check both open AND closed issues
+# - If found, do NOT create a new issue
 #
 # ## Guidelines
 #
@@ -434,7 +453,7 @@ jobs:
         run: |
           mkdir -p /tmp/gh-aw/safeoutputs
           cat > /tmp/gh-aw/safeoutputs/config.json << 'EOF'
-          {"create_issue":{"max":50},"missing_tool":{"max":0},"noop":{"max":1}}
+          {"create_issue":{"max":50},"missing_tool":{"max":0},"noop":{"max":1},"update_issue":{"max":50}}
           EOF
           cat > /tmp/gh-aw/safeoutputs/tools.json << 'EOF'
           [
@@ -477,6 +496,39 @@ jobs:
                 "type": "object"
               },
               "name": "create_issue"
+            },
+            {
+              "description": "Update an existing GitHub issue's status, title, or body. Use this to modify issue properties after creation. Only the fields you specify will be updated; other fields remain unchanged. CONSTRAINTS: Maximum 50 issue(s) can be updated.",
+              "inputSchema": {
+                "additionalProperties": false,
+                "properties": {
+                  "body": {
+                    "description": "New issue body to replace the existing content. Use Markdown formatting.",
+                    "type": "string"
+                  },
+                  "issue_number": {
+                    "description": "Issue number to update. Required when the workflow target is '*' (any issue).",
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  },
+                  "status": {
+                    "description": "New issue status: 'open' to reopen a closed issue, 'closed' to close an open issue.",
+                    "enum": [
+                      "open",
+                      "closed"
+                    ],
+                    "type": "string"
+                  },
+                  "title": {
+                    "description": "New issue title to replace the existing title.",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "name": "update_issue"
             },
             {
               "description": "Report that a tool or capability needed to complete the task is not available. Use this when you cannot accomplish what was requested because the required functionality is missing or access is restricted.",
@@ -590,6 +642,32 @@ jobs:
                   "maxLength": 65000
                 }
               }
+            },
+            "update_issue": {
+              "defaultMax": 1,
+              "fields": {
+                "body": {
+                  "type": "string",
+                  "sanitize": true,
+                  "maxLength": 65000
+                },
+                "issue_number": {
+                  "issueOrPRNumber": true
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "open",
+                    "closed"
+                  ]
+                },
+                "title": {
+                  "type": "string",
+                  "sanitize": true,
+                  "maxLength": 128
+                }
+              },
+              "customValidation": "requiresOneOf:status,title,body"
             }
           }
           EOF
@@ -1906,11 +1984,24 @@ jobs:
           ```
           
           **Labels:**
-          - Add the label: `doc update`
+          - **IMPORTANT:** Create the issue WITHOUT labels first
+          - Then use `update-issue` safe-output to add the label `doc update` 
+          - This two-step process ensures the `labeled` event triggers the technical-doc-writer workflow
+          - Example: Create issue → Get issue number → Update that issue to add label
           
-          ### 4. Avoid Duplicates
+          ### 4. Check for Duplicate Issues
           
-          Before creating an issue, check if an issue already exists for this PR (search existing issues by PR URL in the body). If a duplicate exists, skip creating a new issue.
+          **CRITICAL:** Before creating ANY issue, you MUST search for duplicates:
+          
+          1. Search existing issues in `kubestellar/docs` for the PR URL
+          2. Also search by PR title to catch near-duplicates
+          3. If ANY matching issue exists (open or closed), skip creating a new issue
+          4. Report skipped duplicates in your noop message
+          
+          **How to search:**
+          - Use GitHub search: `repo:kubestellar/docs is:issue "PR_URL"` 
+          - Check both open AND closed issues
+          - If found, do NOT create a new issue
           
           ## Guidelines
           
@@ -5047,6 +5138,7 @@ jobs:
       - agent
       - activation
       - create_issue
+      - update_issue
     if: (always()) && (needs.agent.result != 'skipped')
     runs-on: ubuntu-slim
     permissions:
@@ -6351,4 +6443,354 @@ jobs:
           name: threat-detection.log
           path: /tmp/gh-aw/threat-detection/detection.log
           if-no-files-found: ignore
+
+  update_issue:
+    needs:
+      - agent
+      - detection
+    if: >
+      ((((!cancelled()) && (needs.agent.result != 'skipped')) && (contains(needs.agent.outputs.output_types, 'update_issue'))) &&
+      (github.event.issue.number)) && (needs.detection.outputs.success == 'true')
+    runs-on: ubuntu-slim
+    permissions:
+      contents: read
+      issues: write
+    timeout-minutes: 10
+    outputs:
+      issue_number: ${{ steps.update_issue.outputs.issue_number }}
+      issue_url: ${{ steps.update_issue.outputs.issue_url }}
+    steps:
+      - name: Download agent output artifact
+        continue-on-error: true
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: agent_output.json
+          path: /tmp/gh-aw/safeoutputs/
+      - name: Setup agent output environment variable
+        run: |
+          mkdir -p /tmp/gh-aw/safeoutputs/
+          find "/tmp/gh-aw/safeoutputs/" -type f -print
+          echo "GH_AW_AGENT_OUTPUT=/tmp/gh-aw/safeoutputs/agent_output.json" >> "$GITHUB_ENV"
+      - name: Update Issue
+        id: update_issue
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        env:
+          GH_AW_AGENT_OUTPUT: ${{ env.GH_AW_AGENT_OUTPUT }}
+          GH_AW_UPDATE_STATUS: false
+          GH_AW_UPDATE_TITLE: false
+          GH_AW_UPDATE_BODY: false
+          GH_AW_WORKFLOW_NAME: "scan-merged-prs"
+          GH_AW_ENGINE_ID: "copilot"
+        with:
+          github-token: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require("fs");
+            const MAX_LOG_CONTENT_LENGTH = 10000;
+            function truncateForLogging(content) {
+              if (content.length <= MAX_LOG_CONTENT_LENGTH) {
+                return content;
+              }
+              return content.substring(0, MAX_LOG_CONTENT_LENGTH) + `\n... (truncated, total length: ${content.length})`;
+            }
+            function loadAgentOutput() {
+              const agentOutputFile = process.env.GH_AW_AGENT_OUTPUT;
+              if (!agentOutputFile) {
+                core.info("No GH_AW_AGENT_OUTPUT environment variable found");
+                return { success: false };
+              }
+              let outputContent;
+              try {
+                outputContent = fs.readFileSync(agentOutputFile, "utf8");
+              } catch (error) {
+                const errorMessage = `Error reading agent output file: ${error instanceof Error ? error.message : String(error)}`;
+                core.error(errorMessage);
+                return { success: false, error: errorMessage };
+              }
+              if (outputContent.trim() === "") {
+                core.info("Agent output content is empty");
+                return { success: false };
+              }
+              core.info(`Agent output content length: ${outputContent.length}`);
+              let validatedOutput;
+              try {
+                validatedOutput = JSON.parse(outputContent);
+              } catch (error) {
+                const errorMessage = `Error parsing agent output JSON: ${error instanceof Error ? error.message : String(error)}`;
+                core.error(errorMessage);
+                core.info(`Failed to parse content:\n${truncateForLogging(outputContent)}`);
+                return { success: false, error: errorMessage };
+              }
+              if (!validatedOutput.items || !Array.isArray(validatedOutput.items)) {
+                core.info("No valid items found in agent output");
+                core.info(`Parsed content: ${truncateForLogging(JSON.stringify(validatedOutput))}`);
+                return { success: false };
+              }
+              return { success: true, items: validatedOutput.items };
+            }
+            async function generateStagedPreview(options) {
+              const { title, description, items, renderItem } = options;
+              let summaryContent = `## 🎭 Staged Mode: ${title} Preview\n\n`;
+              summaryContent += `${description}\n\n`;
+              for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                summaryContent += renderItem(item, i);
+                summaryContent += "---\n\n";
+              }
+              try {
+                await core.summary.addRaw(summaryContent).write();
+                core.info(summaryContent);
+                core.info(`📝 ${title} preview written to step summary`);
+              } catch (error) {
+                core.setFailed(error instanceof Error ? error : String(error));
+              }
+            }
+            function resolveTargetNumber(params) {
+              const { updateTarget, item, numberField, isValidContext, contextNumber, displayName } = params;
+              if (updateTarget === "*") {
+                const explicitNumber = item[numberField];
+                if (explicitNumber) {
+                  const parsed = parseInt(explicitNumber, 10);
+                  if (isNaN(parsed) || parsed <= 0) {
+                    return { success: false, error: `Invalid ${numberField} specified: ${explicitNumber}` };
+                  }
+                  return { success: true, number: parsed };
+                } else {
+                  return { success: false, error: `Target is "*" but no ${numberField} specified in update item` };
+                }
+              } else if (updateTarget && updateTarget !== "triggering") {
+                const parsed = parseInt(updateTarget, 10);
+                if (isNaN(parsed) || parsed <= 0) {
+                  return { success: false, error: `Invalid ${displayName} number in target configuration: ${updateTarget}` };
+                }
+                return { success: true, number: parsed };
+              } else {
+                if (isValidContext && contextNumber) {
+                  return { success: true, number: contextNumber };
+                }
+                return { success: false, error: `Could not determine ${displayName} number` };
+              }
+            }
+            function buildUpdateData(params) {
+              const { item, canUpdateStatus, canUpdateTitle, canUpdateBody, supportsStatus } = params;
+              const updateData = {};
+              let hasUpdates = false;
+              const logMessages = [];
+              if (supportsStatus && canUpdateStatus && item.status !== undefined) {
+                if (item.status === "open" || item.status === "closed") {
+                  updateData.state = item.status;
+                  hasUpdates = true;
+                  logMessages.push(`Will update status to: ${item.status}`);
+                } else {
+                  logMessages.push(`Invalid status value: ${item.status}. Must be 'open' or 'closed'`);
+                }
+              }
+              if (canUpdateTitle && item.title !== undefined) {
+                const trimmedTitle = typeof item.title === "string" ? item.title.trim() : "";
+                if (trimmedTitle.length > 0) {
+                  updateData.title = trimmedTitle;
+                  hasUpdates = true;
+                  logMessages.push(`Will update title to: ${trimmedTitle}`);
+                } else {
+                  logMessages.push("Invalid title value: must be a non-empty string");
+                }
+              }
+              if (canUpdateBody && item.body !== undefined) {
+                if (typeof item.body === "string") {
+                  updateData.body = item.body;
+                  hasUpdates = true;
+                  logMessages.push(`Will update body (length: ${item.body.length})`);
+                } else {
+                  logMessages.push("Invalid body value: must be a string");
+                }
+              }
+              return { hasUpdates, updateData, logMessages };
+            }
+            async function runUpdateWorkflow(config) {
+              const {
+                itemType,
+                displayName,
+                displayNamePlural,
+                numberField,
+                outputNumberKey,
+                outputUrlKey,
+                isValidContext,
+                getContextNumber,
+                supportsStatus,
+                supportsOperation,
+                renderStagedItem,
+                executeUpdate,
+                getSummaryLine,
+              } = config;
+              const isStaged = process.env.GH_AW_SAFE_OUTPUTS_STAGED === "true";
+              const result = loadAgentOutput();
+              if (!result.success) {
+                return;
+              }
+              const updateItems = result.items.filter( item => item.type === itemType);
+              if (updateItems.length === 0) {
+                core.info(`No ${itemType} items found in agent output`);
+                return;
+              }
+              core.info(`Found ${updateItems.length} ${itemType} item(s)`);
+              if (isStaged) {
+                await generateStagedPreview({
+                  title: `Update ${displayNamePlural.charAt(0).toUpperCase() + displayNamePlural.slice(1)}`,
+                  description: `The following ${displayName} updates would be applied if staged mode was disabled:`,
+                  items: updateItems,
+                  renderItem: renderStagedItem,
+                });
+                return;
+              }
+              const updateTarget = process.env.GH_AW_UPDATE_TARGET || "triggering";
+              const canUpdateStatus = process.env.GH_AW_UPDATE_STATUS === "true";
+              const canUpdateTitle = process.env.GH_AW_UPDATE_TITLE === "true";
+              const canUpdateBody = process.env.GH_AW_UPDATE_BODY === "true";
+              core.info(`Update target configuration: ${updateTarget}`);
+              if (supportsStatus) {
+                core.info(`Can update status: ${canUpdateStatus}, title: ${canUpdateTitle}, body: ${canUpdateBody}`);
+              } else {
+                core.info(`Can update title: ${canUpdateTitle}, body: ${canUpdateBody}`);
+              }
+              const contextIsValid = isValidContext(context.eventName, context.payload);
+              const contextNumber = getContextNumber(context.payload);
+              if (updateTarget === "triggering" && !contextIsValid) {
+                core.info(`Target is "triggering" but not running in ${displayName} context, skipping ${displayName} update`);
+                return;
+              }
+              const updatedItems = [];
+              for (let i = 0; i < updateItems.length; i++) {
+                const updateItem = updateItems[i];
+                core.info(`Processing ${itemType} item ${i + 1}/${updateItems.length}`);
+                const targetResult = resolveTargetNumber({
+                  updateTarget,
+                  item: updateItem,
+                  numberField,
+                  isValidContext: contextIsValid,
+                  contextNumber,
+                  displayName,
+                });
+                if (!targetResult.success) {
+                  core.info(targetResult.error);
+                  continue;
+                }
+                const targetNumber = targetResult.number;
+                core.info(`Updating ${displayName} #${targetNumber}`);
+                const { hasUpdates, updateData, logMessages } = buildUpdateData({
+                  item: updateItem,
+                  canUpdateStatus,
+                  canUpdateTitle,
+                  canUpdateBody,
+                  supportsStatus,
+                });
+                for (const msg of logMessages) {
+                  core.info(msg);
+                }
+                if (supportsOperation && canUpdateBody && updateItem.body !== undefined && typeof updateItem.body === "string") {
+                  updateData._operation = updateItem.operation || "replace";
+                  updateData._rawBody = updateItem.body;
+                }
+                if (!hasUpdates) {
+                  core.info("No valid updates to apply for this item");
+                  continue;
+                }
+                try {
+                  const updatedItem = await executeUpdate(github, context, targetNumber, updateData);
+                  core.info(`Updated ${displayName} #${updatedItem.number}: ${updatedItem.html_url}`);
+                  updatedItems.push(updatedItem);
+                  if (i === updateItems.length - 1) {
+                    core.setOutput(outputNumberKey, updatedItem.number);
+                    core.setOutput(outputUrlKey, updatedItem.html_url);
+                  }
+                } catch (error) {
+                  core.error(`✗ Failed to update ${displayName} #${targetNumber}: ${error instanceof Error ? error.message : String(error)}`);
+                  throw error;
+                }
+              }
+              if (updatedItems.length > 0) {
+                let summaryContent = `\n\n## Updated ${displayNamePlural.charAt(0).toUpperCase() + displayNamePlural.slice(1)}\n`;
+                for (const item of updatedItems) {
+                  summaryContent += getSummaryLine(item);
+                }
+                await core.summary.addRaw(summaryContent).write();
+              }
+              core.info(`Successfully updated ${updatedItems.length} ${displayName}(s)`);
+              return updatedItems;
+            }
+            function createRenderStagedItem(config) {
+              const { entityName, numberField, targetLabel, currentTargetText, includeOperation = false } = config;
+              return function renderStagedItem(item, index) {
+                let content = `### ${entityName} Update ${index + 1}\n`;
+                if (item[numberField]) {
+                  content += `**${targetLabel}** #${item[numberField]}\n\n`;
+                } else {
+                  content += `**Target:** ${currentTargetText}\n\n`;
+                }
+                if (item.title !== undefined) {
+                  content += `**New Title:** ${item.title}\n\n`;
+                }
+                if (item.body !== undefined) {
+                  if (includeOperation) {
+                    const operation = item.operation || "append";
+                    content += `**Operation:** ${operation}\n`;
+                    content += `**Body Content:**\n${item.body}\n\n`;
+                  } else {
+                    content += `**New Body:**\n${item.body}\n\n`;
+                  }
+                }
+                if (item.status !== undefined) {
+                  content += `**New Status:** ${item.status}\n\n`;
+                }
+                return content;
+              };
+            }
+            function createGetSummaryLine(config) {
+              const { entityPrefix } = config;
+              return function getSummaryLine(item) {
+                return `- ${entityPrefix} #${item.number}: [${item.title}](${item.html_url})\n`;
+              };
+            }
+            function isIssueContext(eventName, _payload) {
+              return eventName === "issues" || eventName === "issue_comment";
+            }
+            function getIssueNumber(payload) {
+              return payload.issue?.number;
+            }
+            const renderStagedItem = createRenderStagedItem({
+              entityName: "Issue",
+              numberField: "issue_number",
+              targetLabel: "Target Issue:",
+              currentTargetText: "Current issue",
+              includeOperation: false,
+            });
+            async function executeIssueUpdate(github, context, issueNumber, updateData) {
+              const { _operation, _rawBody, ...apiData } = updateData;
+              const { data: issue } = await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                ...apiData,
+              });
+              return issue;
+            }
+            const getSummaryLine = createGetSummaryLine({
+              entityPrefix: "Issue",
+            });
+            async function main() {
+              return await runUpdateWorkflow({
+                itemType: "update_issue",
+                displayName: "issue",
+                displayNamePlural: "issues",
+                numberField: "issue_number",
+                outputNumberKey: "issue_number",
+                outputUrlKey: "issue_url",
+                isValidContext: isIssueContext,
+                getContextNumber: getIssueNumber,
+                supportsStatus: true,
+                supportsOperation: false,
+                renderStagedItem,
+                executeUpdate: executeIssueUpdate,
+                getSummaryLine,
+              });
+            }
+            await main();
 

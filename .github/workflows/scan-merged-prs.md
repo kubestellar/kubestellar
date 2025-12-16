@@ -22,6 +22,8 @@ tools:
 safe-outputs:
   create-issue:
     max: 50
+  update-issue:
+    max: 50
 ---
 
 # Merged PR Scanner for Documentation Updates
@@ -117,11 +119,24 @@ A pull request was recently merged that may require documentation updates.
 ```
 
 **Labels:**
-- Add the label: `doc update`
+- **IMPORTANT:** Create the issue WITHOUT labels first
+- Then use `update-issue` safe-output to add the label `doc update` 
+- This two-step process ensures the `labeled` event triggers the technical-doc-writer workflow
+- Example: Create issue → Get issue number → Update that issue to add label
 
-### 4. Avoid Duplicates
+### 4. Check for Duplicate Issues
 
-Before creating an issue, check if an issue already exists for this PR (search existing issues by PR URL in the body). If a duplicate exists, skip creating a new issue.
+**CRITICAL:** Before creating ANY issue, you MUST search for duplicates:
+
+1. Search existing issues in `kubestellar/docs` for the PR URL
+2. Also search by PR title to catch near-duplicates
+3. If ANY matching issue exists (open or closed), skip creating a new issue
+4. Report skipped duplicates in your noop message
+
+**How to search:**
+- Use GitHub search: `repo:kubestellar/docs is:issue "PR_URL"` 
+- Check both open AND closed issues
+- If found, do NOT create a new issue
 
 ## Guidelines
 
