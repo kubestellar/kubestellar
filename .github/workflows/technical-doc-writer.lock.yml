@@ -30,10 +30,15 @@
 #   issue_comment:
 #     types: [created]
 #   workflow_dispatch:
+#     inputs:
+#       issue_number:
+#         description: "Issue number to process"
+#         required: true
 #   reaction: eyes
 # if: |
 #   (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'doc update')) ||
-#   (github.event_name == 'issue_comment' && contains(github.event.issue.labels.*.name, 'doc update') && contains(github.event.comment.body, '/technical-doc-writer'))
+#   (github.event_name == 'issue_comment' && contains(github.event.issue.labels.*.name, 'doc update') && contains(github.event.comment.body, '/technical-doc-writer')) ||
+#   (github.event_name == 'workflow_dispatch' && github.event.inputs.issue_number != '')
 # permissions: read-all
 # engine: copilot
 # tools:
@@ -88,7 +93,12 @@
 #
 # ## Activation
 #
-# You are activated when an issue is opened or labeled with `doc update` in the `kubestellar/docs` repository.
+# You are activated when:
+# - An issue is opened or labeled with `doc update` in the `kubestellar/docs` repository
+# - Someone comments `/technical-doc-writer` on an issue with the `doc update` label
+# - The workflow is manually triggered with a specific issue number via `workflow_dispatch`
+#
+# When triggered via `workflow_dispatch`, use `${{ github.event.inputs.issue_number }}` to get the issue number to process.
 #
 # ## Your Workflow
 #
@@ -231,7 +241,11 @@ name: "technical-doc-writer"
     types:
     - opened
     - labeled
-  workflow_dispatch: null
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Issue number to process
+        required: true
 
 permissions: read-all
 
@@ -245,7 +259,8 @@ jobs:
     needs: pre_activation
     if: >
       (needs.pre_activation.outputs.activated == 'true') && ((github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'doc update')) ||
-      (github.event_name == 'issue_comment' && contains(github.event.issue.labels.*.name, 'doc update') && contains(github.event.comment.body, '/technical-doc-writer')))
+      (github.event_name == 'issue_comment' && contains(github.event.issue.labels.*.name, 'doc update') && contains(github.event.comment.body, '/technical-doc-writer')) ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.issue_number != ''))
     runs-on: ubuntu-slim
     permissions:
       contents: read
@@ -2921,6 +2936,7 @@ jobs:
         env:
           GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
           GH_AW_SAFE_OUTPUTS: ${{ env.GH_AW_SAFE_OUTPUTS }}
+          GH_AW_GITHUB_EVENT_INPUTS_ISSUE_NUMBER: ${{ github.event.inputs.issue_number }}
         run: |
           PROMPT_DIR="$(dirname "$GH_AW_PROMPT")"
           mkdir -p "$PROMPT_DIR"
@@ -2931,7 +2947,12 @@ jobs:
           
           ## Activation
           
-          You are activated when an issue is opened or labeled with `doc update` in the `kubestellar/docs` repository.
+          You are activated when:
+          - An issue is opened or labeled with `doc update` in the `kubestellar/docs` repository
+          - Someone comments `/technical-doc-writer` on an issue with the `doc update` label
+          - The workflow is manually triggered with a specific issue number via `workflow_dispatch`
+          
+          When triggered via `workflow_dispatch`, use `${GH_AW_GITHUB_EVENT_INPUTS_ISSUE_NUMBER}` to get the issue number to process.
           
           ## Your Workflow
           
@@ -3181,6 +3202,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
+          GH_AW_GITHUB_EVENT_INPUTS_ISSUE_NUMBER: ${{ github.event.inputs.issue_number }}
         with:
           script: |
             const fs = require("fs");
@@ -7573,7 +7595,8 @@ jobs:
   pre_activation:
     if: >
       (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'doc update')) ||
-      (github.event_name == 'issue_comment' && contains(github.event.issue.labels.*.name, 'doc update') && contains(github.event.comment.body, '/technical-doc-writer'))
+      (github.event_name == 'issue_comment' && contains(github.event.issue.labels.*.name, 'doc update') && contains(github.event.comment.body, '/technical-doc-writer')) ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.issue_number != '')
     runs-on: ubuntu-slim
     outputs:
       activated: ${{ steps.check_membership.outputs.is_team_member == 'true' }}

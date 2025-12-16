@@ -7,10 +7,15 @@ on:
   issue_comment:
     types: [created]
   workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Issue number to process"
+        required: true
   reaction: eyes
 if: |
   (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'doc update')) ||
-  (github.event_name == 'issue_comment' && contains(github.event.issue.labels.*.name, 'doc update') && contains(github.event.comment.body, '/technical-doc-writer'))
+  (github.event_name == 'issue_comment' && contains(github.event.issue.labels.*.name, 'doc update') && contains(github.event.comment.body, '/technical-doc-writer')) ||
+  (github.event_name == 'workflow_dispatch' && github.event.inputs.issue_number != '')
 permissions: read-all
 engine: copilot
 tools:
@@ -34,7 +39,12 @@ You are the technical documentation writer agent for the KubeStellar project. Yo
 
 ## Activation
 
-You are activated when an issue is opened or labeled with `doc update` in the `kubestellar/docs` repository.
+You are activated when:
+- An issue is opened or labeled with `doc update` in the `kubestellar/docs` repository
+- Someone comments `/technical-doc-writer` on an issue with the `doc update` label
+- The workflow is manually triggered with a specific issue number via `workflow_dispatch`
+
+When triggered via `workflow_dispatch`, use `${{ github.event.inputs.issue_number }}` to get the issue number to process.
 
 ## Your Workflow
 
