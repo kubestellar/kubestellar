@@ -12,6 +12,8 @@ on:
         default: "1"
 permissions: read-all
 engine: copilot
+env:
+  HOURS_LOOKBACK: ${{ github.event.inputs.hours_lookback || '1' }}
 tools:
   github:
     allowed:
@@ -31,32 +33,31 @@ You scan all repositories in the `kubestellar` organization (except the `docs` r
 
 ## Lookback Window Configuration
 
-**IMPORTANT:** Before starting, determine the lookback hours:
+**IMPORTANT:** The lookback hours are available in the `HOURS_LOOKBACK` environment variable.
 
-1. Check if `github.event.inputs.hours_lookback` exists (manual trigger)
-   - If it exists, use that value
-   - If it doesn't exist or is empty, use 1 (scheduled run)
-
-2. Use this value to calculate the search timestamp
+- Read it with: `echo $HOURS_LOOKBACK`
+- For scheduled runs: defaults to 1 hour
+- For manual runs: uses the user-specified value
 
 **Example:**
-- If `hours_lookback = 8`, search for PRs merged in the last 8 hours
-- If `hours_lookback = 24`, search for PRs merged in the last 24 hours
-- If not provided, default to 1 hour
+- If `HOURS_LOOKBACK=8`, search for PRs merged in the last 8 hours
+- If `HOURS_LOOKBACK=24`, search for PRs merged in the last 24 hours
+- Default: 1 hour
 
 ## Step-by-Step Process
 
 ### 1. Determine Lookback Hours
 
-**Start by checking the input parameter:**
+**Read the lookback hours from the environment variable:**
 
-```
-hours_lookback = github.event.inputs.hours_lookback || 1
-```
+The `HOURS_LOOKBACK` environment variable contains the number of hours to look back:
+- Check the value with: `echo $HOURS_LOOKBACK`
+- This defaults to `1` for scheduled runs
+- For manual runs, it contains the user-specified value
 
 Use this number to calculate the search window. For example:
-- If hours_lookback is 8: Search for merged:>=8 hours ago
-- If hours_lookback is 1: Search for merged:>=1 hour ago
+- If HOURS_LOOKBACK is 8: Search for merged:>=8 hours ago
+- If HOURS_LOOKBACK is 1: Search for merged:>=1 hour ago
 
 ### 2. Search for Recently Merged PRs
 
