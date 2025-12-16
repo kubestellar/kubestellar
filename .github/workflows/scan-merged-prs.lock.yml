@@ -28,6 +28,11 @@
 #   schedule:
 #     - cron: "0 */1 * * *" # Run every hour
 #   workflow_dispatch:
+#     inputs:
+#       hours_lookback:
+#         description: "Number of hours to look back for merged PRs"
+#         required: false
+#         default: "1"
 # permissions: read-all
 # engine: copilot
 # tools:
@@ -64,19 +69,28 @@
 #
 # ## Your Mission
 #
-# Every hour, you scan all repositories in the `kubestellar` organization (except the `docs` repo itself) for pull requests that were merged in the last hour. For each merged PR found, you create a tracking issue in the `kubestellar/docs` repository.
+# You scan all repositories in the `kubestellar` organization (except the `docs` repo itself) for pull requests that were merged within a specified lookback window. For each merged PR found, you create a tracking issue in the `kubestellar/docs` repository.
+#
+# ## Lookback Window
+#
+# - **Scheduled runs**: Look back 1 hour from the current time
+# - **Manual runs**: Use the `hours_lookback` input parameter (default: 1 hour if not specified)
+# - The input value is available as `github.event.inputs.hours_lookback` when manually triggered
 #
 # ## Step-by-Step Process
 #
 # ### 1. Search for Recently Merged PRs
 #
-# Search for merged PRs across the kubestellar organization from the last hour using the GitHub search tool:
+# Determine the lookback window:
+# - If triggered by schedule: 1 hour
+# - If triggered manually: Use the `hours_lookback` input (defaults to 1 if not provided)
 #
+# Calculate the timestamp dynamically. For example, for a 1-hour lookback:
 # ```
 # org:kubestellar is:pr is:merged merged:>=$(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%SZ) -repo:kubestellar/docs
 # ```
 #
-# Calculate the timestamp for "1 hour ago" dynamically based on the current workflow execution time.
+# For other lookback values, adjust the time calculation accordingly (e.g., '6 hours ago', '24 hours ago').
 #
 # ### 2. Analyze Each Merged PR
 #
@@ -165,7 +179,12 @@ name: "scan-merged-prs"
 "on":
   schedule:
   - cron: "0 */1 * * *"
-  workflow_dispatch: null
+  workflow_dispatch:
+    inputs:
+      hours_lookback:
+        default: "1"
+        description: Number of hours to look back for merged PRs
+        required: false
 
 permissions: read-all
 
@@ -1775,19 +1794,28 @@ jobs:
           
           ## Your Mission
           
-          Every hour, you scan all repositories in the `kubestellar` organization (except the `docs` repo itself) for pull requests that were merged in the last hour. For each merged PR found, you create a tracking issue in the `kubestellar/docs` repository.
+          You scan all repositories in the `kubestellar` organization (except the `docs` repo itself) for pull requests that were merged within a specified lookback window. For each merged PR found, you create a tracking issue in the `kubestellar/docs` repository.
+          
+          ## Lookback Window
+          
+          - **Scheduled runs**: Look back 1 hour from the current time
+          - **Manual runs**: Use the `hours_lookback` input parameter (default: 1 hour if not specified)
+          - The input value is available as `github.event.inputs.hours_lookback` when manually triggered
           
           ## Step-by-Step Process
           
           ### 1. Search for Recently Merged PRs
           
-          Search for merged PRs across the kubestellar organization from the last hour using the GitHub search tool:
+          Determine the lookback window:
+          - If triggered by schedule: 1 hour
+          - If triggered manually: Use the `hours_lookback` input (defaults to 1 if not provided)
           
+          Calculate the timestamp dynamically. For example, for a 1-hour lookback:
           ```
           org:kubestellar is:pr is:merged merged:>=$(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%SZ) -repo:kubestellar/docs
           ```
           
-          Calculate the timestamp for "1 hour ago" dynamically based on the current workflow execution time.
+          For other lookback values, adjust the time calculation accordingly (e.g., '6 hours ago', '24 hours ago').
           
           ### 2. Analyze Each Merged PR
           
