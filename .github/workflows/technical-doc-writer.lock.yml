@@ -27,6 +27,7 @@
 # on:
 #   issues:
 #     types: [opened, labeled]
+#   workflow_dispatch:
 # permissions: read-all
 # engine: copilot
 # tools:
@@ -220,6 +221,7 @@ name: "technical-doc-writer"
     types:
     - opened
     - labeled
+  workflow_dispatch: null
 
 permissions: read-all
 

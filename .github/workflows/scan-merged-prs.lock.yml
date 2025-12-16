@@ -27,6 +27,7 @@
 # on:
 #   schedule:
 #     - cron: "0 */1 * * *" # Run every hour
+#   workflow_dispatch:
 # permissions: read-all
 # engine: copilot
 # tools:
@@ -164,6 +165,7 @@ name: "scan-merged-prs"
 "on":
   schedule:
   - cron: "0 */1 * * *"
+  workflow_dispatch: null
 
 permissions: read-all
 

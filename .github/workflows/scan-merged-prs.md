@@ -4,6 +4,7 @@ description: Hourly scan for merged PRs across KubeStellar org repos and create 
 on:
   schedule:
     - cron: "0 */1 * * *" # Run every hour
+  workflow_dispatch:
 permissions: read-all
 engine: copilot
 tools:

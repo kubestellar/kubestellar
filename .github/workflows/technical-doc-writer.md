@@ -4,6 +4,7 @@ description: Reviews PRs from other repos and updates documentation accordingly
 on:
   issues:
     types: [opened, labeled]
+  workflow_dispatch:
 permissions: read-all
 engine: copilot
 tools:
