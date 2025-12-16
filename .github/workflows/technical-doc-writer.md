@@ -5,6 +5,7 @@ on:
   issues:
     types: [opened, labeled]
   workflow_dispatch:
+if: contains(github.event.issue.labels.*.name, 'doc update')
 permissions: read-all
 engine: copilot
 tools:
