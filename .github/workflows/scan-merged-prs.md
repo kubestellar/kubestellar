@@ -21,6 +21,7 @@ tools:
       - get_file_contents
 safe-outputs:
   create-issue:
+    max: 50
 ---
 
 # Merged PR Scanner for Documentation Updates
