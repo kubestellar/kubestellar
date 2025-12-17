@@ -49,8 +49,10 @@ export default async function RootLayout({ children, params }: Props) {
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                const theme = localStorage.getItem('theme') || 'dark';
-                document.documentElement.classList.toggle('dark', theme === 'dark');
+                if (typeof localStorage !== 'undefined') {
+                  const theme = localStorage.getItem('theme') || 'dark';
+                  document.documentElement.classList.toggle('dark', theme === 'dark');
+                }
               } catch (e) {}
             `,
           }}
