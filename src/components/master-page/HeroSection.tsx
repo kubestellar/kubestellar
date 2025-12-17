@@ -300,11 +300,13 @@ export default function HeroSection() {
             </div>
 
             {/* Interactive Action Buttons */}
-            <div className="action-buttons-container space-y-4 animate-btn-float" style={{ animationDelay: "0.8s" }}>
+            <div className="action-buttons-container space-y-5 animate-btn-float" style={{ animationDelay: "0.8s" }}>
               {/* Installation Path Heading */}
               <div className="text-center sm:text-left">
-                <h3 className="text-lg font-semibold text-white mb-2">Choose Your Installation Path</h3>
-                <p className="text-sm text-gray-300">Select the deployment option that fits your needs</p>
+                <h3 className="text-xl font-bold text-white mb-2">
+                  Get Started with <span className="text-gradient animated-gradient bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">KubeStellar</span>
+                </h3>
+                <p className="text-sm text-blue-100/80">Choose your deployment environment</p>
               </div>
 
               {/* Installation Buttons Row */}
@@ -312,58 +314,63 @@ export default function HeroSection() {
                 {/* Local Development Button */}
                 <IntlLink
                   href="/quick-installation"
-                  className="primary-action-btn group relative overflow-hidden inline-flex items-center justify-center px-6 py-4 text-base font-bold rounded-xl text-white 
-                            bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 
-                            hover:from-blue-700 hover:via-blue-800 hover:to-blue-700 
-                            transition-all duration-500 transform hover:-translate-y-1 
-                            hover:shadow-xl hover:shadow-blue-500/40 
-                            animate-btn-float border-2 border-blue-500/50 hover:border-blue-400"
+                  className="group relative overflow-hidden flex items-center justify-between px-5 py-4 rounded-lg text-white 
+                            bg-slate-800/60 backdrop-blur-sm
+                            hover:bg-slate-800/80
+                            transition-all duration-300 transform hover:scale-[1.02]
+                            border border-blue-500/30 hover:border-blue-400/50
+                            hover:shadow-lg hover:shadow-blue-500/20"
                 >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <span className="text-xl">🚀</span>
-                    <span>Local Dev Install</span>
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="text-left">
+                      <div className="text-sm font-semibold text-white">Local Development</div>
+                      <div className="text-xs text-blue-200/70">Docker + Kind • 15 mins</div>
+                    </div>
+                  </div>
                   <svg
-                    className="relative z-10 ml-2 h-5 w-5 transition-all duration-300 group-hover:translate-x-1"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+                    className="w-5 h-5 text-blue-400 transition-transform duration-300 group-hover:translate-x-1 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    ></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                  <div className="btn-shine"></div>
                 </IntlLink>
 
                 {/* AWS EKS Cloud Button */}
                 <Link
                   href="/docs/getting-started/aws-eks"
-                  className="primary-action-btn group relative overflow-hidden inline-flex items-center justify-center px-6 py-4 text-base font-bold rounded-xl text-white 
-                            bg-gradient-to-r from-orange-600 via-orange-700 to-orange-600 
-                            hover:from-orange-700 hover:via-orange-800 hover:to-orange-700 
-                            transition-all duration-500 transform hover:-translate-y-1 
-                            hover:shadow-xl hover:shadow-orange-500/40 
-                            animate-btn-float border-2 border-orange-500/50 hover:border-orange-400"
-                  style={{ animationDelay: "0.1s" }}
+                  className="group relative overflow-hidden flex items-center justify-between px-5 py-4 rounded-lg text-white 
+                            bg-slate-800/60 backdrop-blur-sm
+                            hover:bg-slate-800/80
+                            transition-all duration-300 transform hover:scale-[1.02]
+                            border border-purple-500/30 hover:border-purple-400/50
+                            hover:shadow-lg hover:shadow-purple-500/20"
                 >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <span className="text-xl">☁️</span>
-                    <span>AWS EKS Install</span>
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                      </svg>
+                    </div>
+                    <div className="text-left">
+                      <div className="text-sm font-semibold text-white">AWS EKS Production</div>
+                      <div className="text-xs text-purple-200/70">Enterprise Ready • 30 mins</div>
+                    </div>
+                  </div>
                   <svg
-                    className="relative z-10 ml-2 h-5 w-5 transition-all duration-300 group-hover:translate-x-1"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+                    className="w-5 h-5 text-purple-400 transition-transform duration-300 group-hover:translate-x-1 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    ></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                  <div className="btn-shine"></div>
                 </Link>
               </div>
 
