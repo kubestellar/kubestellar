@@ -65,108 +65,142 @@ export default function GetStartedSection() {
         </div>
 
         {/* Installation Path Section - Two Cards Side by Side */}
-        <div className="mt-8 mb-6 text-center">
-          <h3 className="text-2xl font-bold text-white mb-3">
-            Choose Your{" "}
+        <div className="mt-12 mb-8 text-center">
+          <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+            Select Your{" "}
             <span className="text-gradient animated-gradient bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">
-              Installation Path
+              Deployment Path
             </span>
           </h3>
-          <p className="text-blue-100 text-base max-w-2xl mx-auto">
-            Select the deployment option that best fits your use case
+          <p className="text-blue-100/90 text-base sm:text-lg max-w-2xl mx-auto">
+            Start with local testing or deploy to production infrastructure
           </p>
         </div>
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-12">
           {/* Local Development Installation Card */}
-          <div className="bg-slate-800/50 border-2 border-blue-500/50 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-blue-500/40 hover:border-blue-400 hover:scale-[1.02]">
-            <div className="p-6 flex flex-col h-full">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mr-3">
-                  <Icon
-                    path="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
-                    className="h-6 w-6 text-blue-400"
-                  />
+          <Link
+            href="/quick-installation"
+            className="group bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 rounded-2xl overflow-hidden transition-all duration-300 hover:border-blue-500/60 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1"
+          >
+            <div className="p-8 flex flex-col h-full">
+              {/* Header */}
+              <div className="mb-6">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">🚀 Local Development</h3>
-                  <span className="text-xs text-blue-300 font-medium">Testing & Learning</span>
+                <h3 className="text-xl font-bold text-white mb-1.5">Local Development</h3>
+                <p className="text-sm text-blue-300/80 font-medium">Perfect for testing and learning</p>
+              </div>
+
+              {/* Description */}
+              <p className="text-sm text-gray-300/90 mb-6 leading-relaxed">
+                Get started quickly with a local Kubernetes environment using Docker and Kind. Ideal for development, testing, and exploring KubeStellar features.
+              </p>
+
+              {/* Features Grid */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="flex items-center text-sm text-gray-300">
+                  <svg className="w-4 h-4 text-emerald-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>No cloud costs</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-300">
+                  <svg className="w-4 h-4 text-emerald-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>15 min setup</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-300">
+                  <svg className="w-4 h-4 text-emerald-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>Docker + Kind</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-300">
+                  <svg className="w-4 h-4 text-emerald-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>K8s 1.34+</span>
                 </div>
               </div>
-              <p className="text-sm text-blue-100 mb-4">
-                Quick setup for development and testing on your local machine using Docker and Kind
-              </p>
-              <ul className="text-sm text-gray-300 mb-4 space-y-2 flex-grow">
-                <li className="flex items-start">
-                  <span className="text-emerald-400 mr-2">✓</span>
-                  <span><strong>Free</strong> - No cloud costs</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-emerald-400 mr-2">✓</span>
-                  <span><strong>10-15 minutes</strong> setup time</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-emerald-400 mr-2">✓</span>
-                  <span>Requires Docker & Kind</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-emerald-400 mr-2">✓</span>
-                  <span>Kubernetes 1.34+</span>
-                </li>
-              </ul>
-              <Link
-                href="/quick-installation"
-                className="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-600/80 to-blue-700/80 hover:from-blue-600 hover:to-blue-700 rounded-lg transition-all duration-200 border border-blue-500/30 mt-auto"
-              >
-                Start Local Install →
-              </Link>
+
+              {/* CTA Button */}
+              <div className="mt-auto pt-4 border-t border-slate-700/50">
+                <div className="flex items-center justify-between text-blue-400 group-hover:text-blue-300 transition-colors">
+                  <span className="text-sm font-semibold">Start Local Installation</span>
+                  <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </div>
+              </div>
             </div>
-          </div>
+          </Link>
 
           {/* AWS EKS Cloud Installation Card */}
-          <div className="bg-slate-800/50 border-2 border-orange-500/50 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-orange-500/40 hover:border-orange-400 hover:scale-[1.02]">
-            <div className="p-6 flex flex-col h-full">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mr-3">
-                  <Icon
-                    path="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
-                    className="h-6 w-6 text-orange-400"
-                  />
+          <Link
+            href="/docs/getting-started/aws-eks"
+            className="group bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 rounded-2xl overflow-hidden transition-all duration-300 hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1"
+          >
+            <div className="p-8 flex flex-col h-full">
+              {/* Header */}
+              <div className="mb-6">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/20 mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                  </svg>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">☁️ AWS EKS Cloud</h3>
-                  <span className="text-xs text-orange-300 font-medium">Production & Enterprise</span>
+                <h3 className="text-xl font-bold text-white mb-1.5">AWS EKS Production</h3>
+                <p className="text-sm text-purple-300/80 font-medium">Enterprise-ready deployment</p>
+              </div>
+
+              {/* Description */}
+              <p className="text-sm text-gray-300/90 mb-6 leading-relaxed">
+                Deploy KubeStellar on AWS EKS for production workloads with enterprise-grade scalability and reliability. Full cloud infrastructure automation included.
+              </p>
+
+              {/* Features Grid */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="flex items-center text-sm text-gray-300">
+                  <svg className="w-4 h-4 text-emerald-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>EKS 1.34</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-300">
+                  <svg className="w-4 h-4 text-emerald-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>30 min setup</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-300">
+                  <svg className="w-4 h-4 text-emerald-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>Auto-scaling</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-300">
+                  <svg className="w-4 h-4 text-emerald-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>AWS Account</span>
                 </div>
               </div>
-              <p className="text-sm text-blue-100 mb-4">
-                Production-ready deployment on AWS EKS (Kubernetes 1.34) for scalable, enterprise-grade multi-cluster management
-              </p>
-              <ul className="text-sm text-gray-300 mb-4 space-y-2 flex-grow">
-                <li className="flex items-start">
-                  <span className="text-emerald-400 mr-2">✓</span>
-                  <span><strong>EKS 1.34</strong> with high scalability</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-emerald-400 mr-2">✓</span>
-                  <span><strong>20-30 minutes</strong> setup time</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-emerald-400 mr-2">✓</span>
-                  <span>Tools: kubectl, eksctl, Helm, kflex, clusteradm</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-emerald-400 mr-2">✓</span>
-                  <span>Requires AWS Account (us-east-1)</span>
-                </li>
-              </ul>
-              <Link
-                href="/docs/getting-started/aws-eks"
-                className="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-orange-600/80 to-orange-700/80 hover:from-orange-600 hover:to-orange-700 rounded-lg transition-all duration-200 border border-orange-500/30 mt-auto"
-              >
-                Start AWS Install →
-              </Link>
+
+              {/* CTA Button */}
+              <div className="mt-auto pt-4 border-t border-slate-700/50">
+                <div className="flex items-center justify-between text-purple-400 group-hover:text-purple-300 transition-colors">
+                  <span className="text-sm font-semibold">Start AWS Installation</span>
+                  <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </div>
+              </div>
             </div>
-          </div>
+          </Link>
         </div>
 
         <div className="mt-12 grid grid-cols-1 lgcustom:grid-cols-2 gap-6 lg:gap-8">
