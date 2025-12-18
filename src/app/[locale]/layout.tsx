@@ -6,6 +6,7 @@ import { getMessages } from "next-intl/server";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { locales, type Locale } from "@/i18n/settings";
+import { ThemeProvider } from "next-themes";
 import "../globals.css";
 
 const inter = Inter({
@@ -44,26 +45,14 @@ export default async function RootLayout({ children, params }: Props) {
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                if (typeof localStorage !== 'undefined') {
-                  const theme = localStorage.getItem('theme') || 'dark';
-                  document.documentElement.classList.toggle('dark', theme === 'dark');
-                }
-              } catch (e) {}
-            `,
-          }}
-        />
-      </head>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <NextIntlClientProvider messages={messages}>
+            {children}
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
