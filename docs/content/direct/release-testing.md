@@ -29,7 +29,7 @@ As many of the KubeStellar customers are using OCP, the release tests should be 
 Currently these tests should be initiated manually on a dedicated OCP cluster that is reserved for the release testing process.
 
 TODO: The details on how to setup and run the test
-![""](./images/construction.png){: style="height:100px;width:100px"}
+!["Under Construction"](./images/construction.png){: style="height:100px;width:100px"}
 
 ## Other platforms
 

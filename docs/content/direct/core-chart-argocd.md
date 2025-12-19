@@ -134,14 +134,14 @@ The KubeStellar Core chart can also be used to deploy Argo CD applications as sp
 ```yaml
 argocd:
   applications: # list of Argo CD applications to be create
-    - name: scenario-6 # required, must be unique
-      project: default # default: default
-      repoURL: https://github.com/kubestellar/kubestellar.git
-      targetRevision: HEAD # default: HEAD
-      path: hack/argo/nginx
-      destinationWDS: wds1
-      destinationNamespace: nginx-sa # default: default
-      syncPolicy: auto # default: manual
+  - name: scenario-6 # required, must be unique
+    project: default # default: default
+    repoURL: https://github.com/kubestellar/kubestellar.git
+    targetRevision: HEAD # default: HEAD
+    path: hack/argo/nginx
+    destinationWDS: wds1
+    destinationNamespace: nginx-sa # default: default
+    syncPolicy: auto # default: manual
 ```
 
 Alternatively, the same result can be achieved from Helm CLI by using the followig minimal argument (note that the default values are not explicitely set):
