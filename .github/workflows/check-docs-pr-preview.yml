@@ -46,8 +46,8 @@ jobs:
           if ! PREVIEW_LINE=$(echo "$BODY" | grep -iE '^\s*Preview.*https?://') ; then
             echo "${RED}[ERROR] Docs PR: No preview link found. Please include a line starting with 'Preview' and a valid GitHub Pages URL for your changes.${NC}"
             echo "👉 For instructions on how to create a preview, see:"
-            echo "   https://docs.kubestellar.io/unreleased-development/contribution-guidelines/operations/document-management/#rendering-and-previewing-modifications-to-the-website"
-            echo "   The easier choice is https://docs.kubestellar.io/unreleased-development/contribution-guidelines/operations/document-management/#serving-up-documents-globally-from-a-fork-of-the-repository-via-github"
+            echo "   https://github.com/kubestellar/kubestellar/blob/main/docs/content/contribution-guidelines/operations/document-management.md#rendering-and-previewing-modifications-to-the-website"
+            echo "   The easier choice is https://github.com/kubestellar/kubestellar/blob/main/docs/content/contribution-guidelines/operations/document-management.md#automatically-render-the-website"
             echo "   That requires just two things: prepare the gh-pages branch in your fork, and naming your PR's branch doc-<something>"
             echo
             exit 1
