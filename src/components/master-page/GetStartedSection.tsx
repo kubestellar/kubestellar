@@ -59,19 +59,10 @@ export default function GetStartedSection() {
               Get Started?
             </span>
           </h2>
-          <p className="mt-3 max-w-2xl mx-auto text-lg sm:text-xl text-blue-100">
-            {t("subtitle")}
-          </p>
         </div>
 
         {/* Installation Path Section - Two Cards Side by Side */}
-        <div className="mt-12 mb-8 text-center">
-          <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-            Select Your{" "}
-            <span className="text-gradient animated-gradient bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">
-              Deployment Path
-            </span>
-          </h3>
+        <div className="mt-8 mb-6 text-center">
           <p className="text-blue-100/90 text-base sm:text-lg max-w-2xl mx-auto">
             Start with local testing or deploy to production infrastructure
           </p>
@@ -322,8 +313,12 @@ export default function GetStartedSection() {
             </div>
           </Link>
         </div>
-
-        <div className="mt-12 grid grid-cols-1 lgcustom:grid-cols-2 gap-6 lg:gap-8">
+        <div>
+          <p className="mt-3 max-w-2xl mx-auto text-lg sm:text-xl text-blue-100">
+            {t("subtitle")}
+          </p>
+        </div>
+        <div className="mt-8 grid grid-cols-1 lgcustom:grid-cols-2 gap-6 lg:gap-8">
           {/* Use Cases & Resources Card */}
           <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-purple-500/30 hover:border-purple-500/50">
             <div className="p-6">
