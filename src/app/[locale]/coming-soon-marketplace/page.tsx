@@ -55,7 +55,8 @@ export default function ComingSoonPage() {
                 <span className="text-gradient">See It In Action</span>
               </h2>
               <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                Watch our marketplace demo to get a glimpse of what&apos;s coming
+                Watch our marketplace demo to get a glimpse of what&apos;s
+                coming
               </p>
             </div>
 

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     # Run every Monday at 12:00 PM Eastern (17:00 UTC)
-    - cron: '0 17 * * 1'
+    - cron: "0 17 * * 1"
 
 permissions:
   actions: write
@@ -13,7 +13,7 @@ permissions:
 jobs:
   audit-all:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Run audits for all maintainers sequentially
         env:
@@ -41,11 +41,11 @@ jobs:
             "vedansh-5"
             "waltforme"
           )
-          
+
           echo "🚀 Starting sequential maintainer audits for ${#MAINTAINERS[@]} maintainers..."
           echo "Each audit will wait 3.5 minutes before starting the next one."
           echo ""
-          
+
           for maintainer in "${MAINTAINERS[@]}"; do
             echo "📧 Triggering audit for: $maintainer"
             
@@ -68,6 +68,6 @@ jobs:
               echo ""
             fi
           done
-          
+
           echo ""
           echo "🎉 All maintainer audits have been triggered!"

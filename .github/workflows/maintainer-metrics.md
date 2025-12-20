@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       maintainer:
-        description: 'Select maintainer to audit'
+        description: "Select maintainer to audit"
         required: true
         type: choice
         options:
@@ -50,7 +50,7 @@ jobs:
         run: |
           echo "date_60=$(date -d '60 days ago' '+%Y-%m-%d')" >> $GITHUB_OUTPUT
           echo "date_30=$(date -d '30 days ago' '+%Y-%m-%d')" >> $GITHUB_OUTPUT
-      
+
       - name: Fetch all GitHub data
         id: fetch
         env:
@@ -60,7 +60,7 @@ jobs:
           username="${{ github.event.inputs.maintainer }}"
           echo "Fetching data for $username..."
           mkdir -p /tmp/metrics-data/$username
-          
+
           # Search 1: Help-wanted issues created
           gh search issues \
             --owner kubestellar \
@@ -71,7 +71,7 @@ jobs:
             --json number,title,url,createdAt,labels \
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/$username/help-wanted-created.json
-          
+
           # Search 2: PRs commented/reviewed on (merged)
           gh search prs \
             --owner kubestellar \
@@ -82,7 +82,7 @@ jobs:
             --json number,title,url,state \
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/$username/prs-commented-merged.json
-          
+
           # Search 3: PRs commented/reviewed on (open)
           gh search prs \
             --owner kubestellar \
@@ -93,7 +93,7 @@ jobs:
             --json number,title,url,state \
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/$username/prs-commented-open.json
-          
+
           # Search 4: Merged PRs authored
           echo "Searching for PRs merged by $username since ${{ steps.dates.outputs.date_60 }}"
           gh search prs \
@@ -105,10 +105,10 @@ jobs:
             --json number,title,url,closedAt,labels \
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/$username/prs-merged.json
-          
+
           # Shared data for all maintainers (put in shared location)
           mkdir -p /tmp/metrics-data/shared
-          
+
           # Search: All open issues in active repos (for recommendations)
           gh search issues \
             --owner kubestellar \
@@ -120,7 +120,7 @@ jobs:
             --json number,title,url,repository,labels,createdAt \
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/shared/open-issues.json
-          
+
           # Search: All open PRs in active repos (for recommendations)
           gh search prs \
             --owner kubestellar \
@@ -132,14 +132,14 @@ jobs:
             --json number,title,url,repository,labels,createdAt \
             --jq '{total_count: length, items: .}' \
             > /tmp/metrics-data/shared/open-prs.json
-          
+
           # Copy shared files to selected maintainer's folder
           username="${{ github.event.inputs.maintainer }}"
           cp /tmp/metrics-data/shared/open-issues.json /tmp/metrics-data/$username/
           cp /tmp/metrics-data/shared/open-prs.json /tmp/metrics-data/$username/
-          
+
           echo "ready=true" >> $GITHUB_OUTPUT
-      
+
       - name: Upload data as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -193,7 +193,7 @@ safe-outputs:
             script: |
               const postmarkToken = process.env.POSTMARK_API_TOKEN;
               const fromEmail = process.env.POSTMARK_FROM_EMAIL;
-              
+
               // Maintainer email mapping
               const maintainerEmails = {
                 'btwshivam': 'shivam200446@gmail.com',
@@ -216,38 +216,38 @@ safe-outputs:
                 'vedansh-5': 'vedanshsaini7719@gmail.com',
                 'waltforme': 'jun.duan@ibm.com'
               };
-              
+
               const maintainer = '${{ github.event.inputs.maintainer }}';
               const toEmail = maintainerEmails[maintainer];
-              
+
               if (!toEmail) {
                 core.setFailed(`No email found for maintainer: ${maintainer}`);
                 return;
               }
-              
+
               const fs = require('fs');
               const outputFile = process.env.GH_AW_AGENT_OUTPUT;
-              
+
               if (!postmarkToken || !fromEmail) {
                 core.setFailed('Missing Postmark secrets');
                 return;
               }
-              
+
               if (!outputFile) {
                 core.info('No agent output file found');
                 return;
               }
-              
+
               const fileContent = fs.readFileSync(outputFile, 'utf8');
               const agentOutput = JSON.parse(fileContent);
-              
+
               const emailItems = agentOutput.items?.filter(item => item.type === 'send_email') || [];
-              
+
               if (emailItems.length === 0) {
                 core.info('No email items to send');
                 return;
               }
-              
+
               for (const item of emailItems) {
                 const { subject, body } = item;
                 
@@ -288,6 +288,7 @@ Your task is to **generate ONE metrics email** for the selected maintainer using
 **Selected maintainer:** ${{ github.event.inputs.maintainer }}
 
 **Email mapping:**
+
 - btwshivam → shivam200446@gmail.com
 - clubanderson → andy@clubanderson.com
 - dumb0002 → Braulio.Dumba@ibm.com
@@ -315,7 +316,7 @@ The data files are in `/tmp/metrics-data/${{ github.event.inputs.maintainer }}/`
 For each maintainer, these 6 JSON files are available in `/tmp/metrics-data/{username}/`:
 
 1. **help-wanted-created.json** - Help-wanted issues created by the user (last 60 days)
-2. **prs-commented-merged.json** - Merged PRs the user commented on (last 60 days)  
+2. **prs-commented-merged.json** - Merged PRs the user commented on (last 60 days)
 3. **prs-commented-open.json** - Open PRs the user commented on (last 60 days)
 4. **prs-merged.json** - Merged PRs authored by the user (last 60 days)
 5. **open-issues.json** - All open issues in docs/ui/ui-plugins repos
@@ -328,6 +329,7 @@ For the selected maintainer (${{ github.event.inputs.maintainer }}):
 **Calculate metrics (READ CAREFULLY - DO NOT MISCOUNT):**
 
 First, display the raw data so we can verify:
+
 ```bash
 cat /tmp/metrics-data/$username/help-wanted-created.json
 cat /tmp/metrics-data/$username/prs-merged.json
@@ -336,11 +338,13 @@ cat /tmp/metrics-data/$username/prs-merged.json
 **CRITICAL - Read the total_count field EXACTLY:**
 
 Each JSON file has this structure:
+
 ```json
 {"total_count": 4, "items": [...]}
 ```
 
 **Step 1: Display the raw data for verification**
+
 ```bash
 echo "=== HELP-WANTED DATA ==="
 cat /tmp/metrics-data/${{ github.event.inputs.maintainer }}/help-wanted-created.json
@@ -384,14 +388,16 @@ Extract these three numbers using ONLY the total_count field:
    - Example: if merged has `"total_count": 59` and open has `"total_count": 9` → 59 + 9 = **68**
 
 **Before generating email, display:**
+
 ```
 Extracted metrics:
 - Help-wanted: [number from help-wanted-created.json total_count]
-- Merged PRs: [number from prs-merged.json total_count]  
+- Merged PRs: [number from prs-merged.json total_count]
 - PR Reviews: [merged total_count] + [open total_count] = [sum]
 ```
 
 **DO NOT:**
+
 - ❌ Count items manually
 - ❌ Try to deduplicate PR numbers
 - ❌ Filter or analyze the items array
@@ -399,6 +405,7 @@ Extracted metrics:
 - ❌ Modify the total_count numbers in any way
 
 **DO:**
+
 - ✅ Find the number after `"total_count":` in the displayed JSON
 - ✅ Use that exact number in the email
 - ✅ Add the two PR review counts together (merged + open)
@@ -414,7 +421,7 @@ Generate 3 suggestions using this framework:
 
 1. **[Expertise-Based]** - Where their domain knowledge can guide new contributors
    - If they're a docs expert: "Create help-wanted issues for expanding API documentation in kubestellar/docs - Outline specific sections that need contributor help"
-   - If they're a CI/CD expert: "Create help-wanted issues for workflow standardization across kubestellar/* repos - Identify automation patterns that could be templates for contributors"
+   - If they're a CI/CD expert: "Create help-wanted issues for workflow standardization across kubestellar/\* repos - Identify automation patterns that could be templates for contributors"
    - If they're a UI expert: "Create help-wanted issues for component refactoring in kubestellar/ui - Break down UI technical debt into approachable tasks"
 
 2. **[Project Growth]** - Where the project needs maturity/advancement
@@ -433,28 +440,33 @@ Generate 3 suggestions using this framework:
      - "Create help-wanted issues for integration test coverage in kubestellar/kubeflex - Define test scenarios for contributors to implement"
 
 **Format:** Each suggestion should be actionable and specific:
+
 - What type of issues to create
 - In which repo
 - Why it helps the project/community
 - How it leverages their expertise
 
 **Generate other recommendations (WITH URLs):**
+
 - From `open-prs.json`: Find 3 PRs that need review (match their expertise)
 - From `open-issues.json`: Find 3 recent issues (created in last 30 days) that need PRs (match their expertise)
 
 **IMPORTANT - All recommendations MUST include clickable URLs:**
+
 - Format: "Title (repo #number) - https://github.com/org/repo/issues/number"
 - Example: "Fix UI bug (kubestellar/ui #2275) - https://github.com/kubestellar/ui/issues/2275"
 - The URL field is in the JSON as `url` - use it directly
 
 **Generate email:**
 Create a plain-text email with:
+
 - Pass/fail for each metric
 - Top 3 recommendations in each category (with URLs!)
 - Simple formatting (no markdown headings)
 - Include the 60-day date range in the opening line
 
 **Calculate date range:**
+
 ```bash
 # Get today's date
 date '+%b %-d, %Y'
@@ -472,6 +484,7 @@ Use the **send_email** MCP tool to send the metrics email. Format the subject li
 Where {date} is the current date in format "Dec 9, 2025" (use the `date` command: `date '+%b %-d, %Y'`)
 
 Example:
+
 ```
 send_email(subject="🚀 KubeStellar Metrics - clubanderson - Dec 9, 2025 - ✅ PASS", body="Hey clubanderson,...")
 ```
@@ -531,10 +544,9 @@ When you generate the email body, each recommendation line MUST be formatted wit
 
 **Correct indentation (copy this exactly):**
 ```
-🏷️ Help-Wanted Suggestions for You:
-        - Fix UI bug (kubestellar/ui #2275) - https://github.com/kubestellar/ui/issues/2275 - Matches your UI expertise
-        - Add docs (kubestellar/docs #123) - https://github.com/kubestellar/docs/issues/123 - Documentation work
-        - Improve tests (kubestellar/ui #456) - https://github.com/kubestellar/ui/issues/456 - Testing expertise
+
+🏷️ Help-Wanted Suggestions for You: - Fix UI bug (kubestellar/ui #2275) - https://github.com/kubestellar/ui/issues/2275 - Matches your UI expertise - Add docs (kubestellar/docs #123) - https://github.com/kubestellar/docs/issues/123 - Documentation work - Improve tests (kubestellar/ui #456) - https://github.com/kubestellar/ui/issues/456 - Testing expertise
+
 ```
 
 Count the spaces: "        -" = 8 spaces + "-" + space + text

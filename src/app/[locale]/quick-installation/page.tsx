@@ -15,7 +15,13 @@ import {
   Info,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Navbar, Footer, GridLines, StarField, PageActions } from "@/components/index";
+import {
+  Navbar,
+  Footer,
+  GridLines,
+  StarField,
+  PageActions,
+} from "@/components/index";
 
 // Define platform type for installation
 type Platform = "kind" | "k3d";

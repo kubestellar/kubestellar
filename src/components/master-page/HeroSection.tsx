@@ -300,13 +300,21 @@ export default function HeroSection() {
             </div>
 
             {/* Interactive Action Buttons */}
-            <div className="action-buttons-container space-y-5 animate-btn-float" style={{ animationDelay: "0.8s" }}>
+            <div
+              className="action-buttons-container space-y-5 animate-btn-float"
+              style={{ animationDelay: "0.8s" }}
+            >
               {/* Installation Path Heading */}
               <div className="text-center sm:text-left">
                 <h3 className="text-xl font-bold text-white mb-2">
-                  Get Started with <span className="text-gradient animated-gradient bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">KubeStellar</span>
+                  Get Started with{" "}
+                  <span className="text-gradient animated-gradient bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">
+                    KubeStellar
+                  </span>
                 </h3>
-                <p className="text-sm text-blue-100/80">Choose your deployment environment</p>
+                <p className="text-sm text-blue-100/80">
+                  Choose your deployment environment
+                </p>
               </div>
 
               {/* Installation Buttons Row */}
@@ -323,13 +331,27 @@ export default function HeroSection() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      <svg
+                        className="w-5 h-5 text-blue-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                        />
                       </svg>
                     </div>
                     <div className="text-left">
-                      <div className="text-sm font-semibold text-white">Local Development</div>
-                      <div className="text-xs text-blue-200/70">Docker + Kind • 15 mins</div>
+                      <div className="text-sm font-semibold text-white">
+                        Local Development
+                      </div>
+                      <div className="text-xs text-blue-200/70">
+                        Docker + Kind • 15 mins
+                      </div>
                     </div>
                   </div>
                   <svg
@@ -338,7 +360,12 @@ export default function HeroSection() {
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </IntlLink>
 
@@ -354,13 +381,27 @@ export default function HeroSection() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                      <svg
+                        className="w-5 h-5 text-purple-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+                        />
                       </svg>
                     </div>
                     <div className="text-left">
-                      <div className="text-sm font-semibold text-white">AWS EKS Production</div>
-                      <div className="text-xs text-purple-200/70">Enterprise Ready • 30 mins</div>
+                      <div className="text-sm font-semibold text-white">
+                        AWS EKS Production
+                      </div>
+                      <div className="text-xs text-purple-200/70">
+                        Enterprise Ready • 30 mins
+                      </div>
                     </div>
                   </div>
                   <svg
@@ -369,7 +410,12 @@ export default function HeroSection() {
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </Link>
               </div>

@@ -181,6 +181,7 @@ This documentation website is a **separate repository** from the main KubeStella
 ```
 
 **Important Concepts:**
+
 - ✅ **Content lives in the main KubeStellar repo** (`docs/content/`)
 - ✅ **This repo only contains the website framework** (Next.js + Nextra)
 - ✅ **Content is fetched dynamically** via GitHub API at build time
@@ -237,6 +238,7 @@ The documentation content is **NOT stored in this repository**. Instead, it's dy
 #### Content Location
 
 All documentation content lives in the main KubeStellar repository:
+
 - **Repository**: `https://github.com/kubestellar/kubestellar`
 - **Content Path**: `/docs/content/`
 - **Branches**: Supports multiple branches for versioning (e.g., `main`, `release-0.23.0`)
@@ -276,12 +278,15 @@ To add new documentation pages:
 
 ```typescript
 // In src/app/docs/page-map.ts
-['Install & Configure', [
-  { file: 'pre-reqs.md' },
-  { 'Quick Start': 'getting-started.md' },  // Add this line
-  { file: 'start-from-ocm.md' },
-  // ... rest of the entries
-]]
+[
+  "Install & Configure",
+  [
+    { file: "pre-reqs.md" },
+    { "Quick Start": "getting-started.md" }, // Add this line
+    { file: "start-from-ocm.md" },
+    // ... rest of the entries
+  ],
+];
 ```
 
 #### Adding Nested Sections
@@ -321,17 +326,21 @@ The documentation supports multiple versions through the `versions.ts` config:
 ### Testing Your Changes
 
 1. **Local Development:**
+
    ```sh
    npm run dev
    ```
+
    - Test navigation and page rendering
    - Verify new pages appear in the correct location
    - Check that links work properly
 
 2. **Build Test:**
+
    ```sh
    npm run build
    ```
+
    - Ensure no build errors
    - Verify static generation works
    - Check that all pages are accessible
@@ -367,11 +376,9 @@ MDX allows you to use React components in Markdown:
 ```mdx
 # My Documentation
 
-<Callout type="info">
-  This is an info callout!
-</Callout>
+<Callout type="info">This is an info callout!</Callout>
 
-<Tabs items={['npm', 'yarn', 'pnpm']}>
+<Tabs items={["npm", "yarn", "pnpm"]}>
   <Tabs.Tab>npm install kubestellar</Tabs.Tab>
   <Tabs.Tab>yarn add kubestellar</Tabs.Tab>
   <Tabs.Tab>pnpm add kubestellar</Tabs.Tab>
@@ -379,6 +386,7 @@ MDX allows you to use React components in Markdown:
 ```
 
 Available components:
+
 - `Callout` - For notes, warnings, and tips
 - `Tabs` - For tabbed content
 - `Mermaid` - For diagrams (custom component)
@@ -459,25 +467,27 @@ GITHUB_PAT=ghp_your_token_here    # Alternative name
 ```
 
 **When is GITHUB_TOKEN needed?**
+
 - When fetching content frequently during development
 - To avoid GitHub API rate limiting (60 requests/hour without token, 5000 with token)
 - Not required for basic local development
 
 ### Key Files Summary
 
-| File | Purpose | When to Edit |
-|------|---------|--------------|
-| `src/app/docs/page-map.ts` | Navigation structure | Adding/removing/reorganizing pages |
-| `next.config.ts` | Nextra & Next.js config | Changing Nextra settings, redirects |
-| `src/app/docs/layout.tsx` | Docs page layout | Modifying sidebar, theme, or layout |
-| `mdx-components.js` | MDX component mappings | Adding custom React components to MDX |
-| `src/config/versions.ts` | Version management | Adding new documentation versions |
-| `src/middleware.ts` | Route handling | Changing i18n behavior, route matching |
-| `package.json` | Dependencies & scripts | Adding new packages or commands |
+| File                       | Purpose                 | When to Edit                           |
+| -------------------------- | ----------------------- | -------------------------------------- |
+| `src/app/docs/page-map.ts` | Navigation structure    | Adding/removing/reorganizing pages     |
+| `next.config.ts`           | Nextra & Next.js config | Changing Nextra settings, redirects    |
+| `src/app/docs/layout.tsx`  | Docs page layout        | Modifying sidebar, theme, or layout    |
+| `mdx-components.js`        | MDX component mappings  | Adding custom React components to MDX  |
+| `src/config/versions.ts`   | Version management      | Adding new documentation versions      |
+| `src/middleware.ts`        | Route handling          | Changing i18n behavior, route matching |
+| `package.json`             | Dependencies & scripts  | Adding new packages or commands        |
 
 ### Debugging Tips
 
 **Problem: Page not showing up**
+
 ```sh
 # Check if file exists in main repo
 curl https://api.github.com/repos/kubestellar/kubestellar/contents/docs/content/your-file.md
@@ -491,6 +501,7 @@ npm run dev
 ```
 
 **Problem: Build fails**
+
 ```sh
 # Check TypeScript errors
 npm run type-check
@@ -503,6 +514,7 @@ npm run build 2>&1 | tee build.log
 ```
 
 **Problem: Styling issues**
+
 ```sh
 # Check Tailwind classes
 npm run build

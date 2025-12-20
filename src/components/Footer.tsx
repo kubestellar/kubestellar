@@ -160,7 +160,9 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href={getLocalizedUrl("https://kubestellar.io/docs/user-guide-support/user-guide-intro")}
+                    href={getLocalizedUrl(
+                      "https://kubestellar.io/docs/user-guide-support/user-guide-intro"
+                    )}
                     className="text-gray-400 hover:text-white transition-colors duration-200 text-xs sm:text-sm inline-block"
                   >
                     {t("userGuide")}
@@ -168,7 +170,9 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href={getLocalizedUrl("https://kubestellar.io/docs/contribution-guidelines/onboarding-inc")}
+                    href={getLocalizedUrl(
+                      "https://kubestellar.io/docs/contribution-guidelines/onboarding-inc"
+                    )}
                     className="text-gray-400 hover:text-white transition-colors duration-200 text-xs sm:text-sm inline-block"
                   >
                     {t("onboarding")}
@@ -176,7 +180,9 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href={getLocalizedUrl("https://kubestellar.io/docs/contribution-guidelines/release-notes")}
+                    href={getLocalizedUrl(
+                      "https://kubestellar.io/docs/contribution-guidelines/release-notes"
+                    )}
                     className="text-gray-400 hover:text-white transition-colors duration-200 text-xs sm:text-sm inline-block"
                   >
                     {t("releasesNotes")}

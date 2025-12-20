@@ -64,19 +64,19 @@ export default function Navbar() {
             menu.style.opacity = "1";
             menu.style.visibility = "visible";
             setIsDropdownOpen(true);
-            
+
             // Reset all dropdown states first
             setIsContributeOpen(false);
             setIsCommunityOpen(false);
             setIsGithubOpen(false);
-            
+
             // Track which dropdown is open
-            const dropdownName = container.getAttribute('data-dropdown');
-            if (dropdownName === 'contribute') {
+            const dropdownName = container.getAttribute("data-dropdown");
+            if (dropdownName === "contribute") {
               setIsContributeOpen(true);
-            } else if (dropdownName === 'community') {
+            } else if (dropdownName === "community") {
               setIsCommunityOpen(true);
-            } else if (dropdownName === 'github') {
+            } else if (dropdownName === "github") {
               setIsGithubOpen(true);
             }
           };
@@ -477,7 +477,10 @@ export default function Navbar() {
                 </div>
 
                 {/* Contribute Dropdown */}
-                <div className="relative group after:content-[''] after:absolute after:top-full after:left-0 after:right-0 after:h-2 after:bg-transparent" data-dropdown="contribute">
+                <div
+                  className="relative group after:content-[''] after:absolute after:top-full after:left-0 after:right-0 after:h-2 after:bg-transparent"
+                  data-dropdown="contribute"
+                >
                   <button
                     type="button"
                     className="text-sm font-medium text-gray-300 hover:text-emerald-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-emerald-500/10 hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-100 transform nav-link-hover cursor-pointer"
@@ -644,7 +647,10 @@ export default function Navbar() {
                   </div>
                 </div>
                 {/* Community Dropdown */}
-                <div className="relative group after:content-[''] after:absolute after:top-full after:left-0 after:right-0 after:h-2 after:bg-transparent" data-dropdown="community">
+                <div
+                  className="relative group after:content-[''] after:absolute after:top-full after:left-0 after:right-0 after:h-2 after:bg-transparent"
+                  data-dropdown="community"
+                >
                   <button
                     type="button"
                     className="text-sm font-medium text-gray-300 hover:text-cyan-400 transition-all duration-300 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-cyan-500/10 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-100 transform nav-link-hover cursor-pointer"
@@ -776,7 +782,10 @@ export default function Navbar() {
               </div>
 
               {/* GitHub Dropdown */}
-              <div className="hidden lg:flex relative group" data-dropdown="github">
+              <div
+                className="hidden lg:flex relative group"
+                data-dropdown="github"
+              >
                 <button
                   data-dropdown-button
                   className="hidden lg:flex text-sm font-medium text-gray-300 hover:text-green-400 transition-all duration-300 items-center space-x-1 px-3 py-2 rounded-lg hover:bg-green-500/10 hover:shadow-lg hover:shadow-green-500/20 hover:scale-100 transform nav-link-hover"

@@ -15,7 +15,6 @@
   --separator-color: rgba(0, 0, 0, 0.1);
 }
 
-
 aside[class*="sidebar"] {
   border-right: 3px solid var(--separator-color);
 }
@@ -2009,7 +2008,9 @@ html.dark .ks-doc-figure figcaption {
   /* Make sidebar accessible on mobile with proper overlay */
   .nextra-sidebar-container {
     position: fixed !important;
-    top: calc(var(--nextra-navbar-height, 4rem) + var(--nextra-banner-height, 0px)) !important;
+    top: calc(
+      var(--nextra-navbar-height, 4rem) + var(--nextra-banner-height, 0px)
+    ) !important;
     left: 0 !important;
     bottom: 0 !important;
     z-index: 45 !important;
@@ -2026,7 +2027,9 @@ html.dark .ks-doc-figure figcaption {
   /* Make TOC accessible on mobile with proper positioning */
   .nextra-toc-container {
     position: fixed !important;
-    top: calc(var(--nextra-navbar-height, 4rem) + var(--nextra-banner-height, 0px)) !important;
+    top: calc(
+      var(--nextra-navbar-height, 4rem) + var(--nextra-banner-height, 0px)
+    ) !important;
     right: 0 !important;
     bottom: 0 !important;
     z-index: 45 !important;

@@ -2,7 +2,13 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { Navbar, Footer, StarField, GridLines, PageActions } from "@/components";
+import {
+  Navbar,
+  Footer,
+  StarField,
+  GridLines,
+  PageActions,
+} from "@/components";
 import { handbookCards, HandbookCard } from "./handbook";
 import { useTranslations } from "next-intl";
 

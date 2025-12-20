@@ -43,6 +43,7 @@ You scan all repositories in the `kubestellar` organization (except the `docs` r
 - For manual runs: uses the user-specified value
 
 **Example:**
+
 - If `HOURS_LOOKBACK=8`, search for PRs merged in the last 8 hours
 - If `HOURS_LOOKBACK=24`, search for PRs merged in the last 24 hours
 - Default: 1 hour
@@ -54,11 +55,13 @@ You scan all repositories in the `kubestellar` organization (except the `docs` r
 **Read the lookback hours from the environment variable:**
 
 The `HOURS_LOOKBACK` environment variable contains the number of hours to look back:
+
 - Check the value with: `echo $HOURS_LOOKBACK`
 - This defaults to `1` for scheduled runs
 - For manual runs, it contains the user-specified value
 
 Use this number to calculate the search window. For example:
+
 - If HOURS_LOOKBACK is 8: Search for merged:>=8 hours ago
 - If HOURS_LOOKBACK is 1: Search for merged:>=1 hour ago
 
@@ -77,6 +80,7 @@ Where `{CALCULATED_TIMESTAMP}` is calculated as: current time minus `hours_lookb
 ### 3. Analyze Each Merged PR
 
 For each merged PR discovered:
+
 - Extract the PR title, number, URL, and repository name
 - Fetch the PR description/body
 - Review the files changed in the PR to understand the scope of changes
@@ -87,28 +91,34 @@ For each merged PR discovered:
 For each merged PR, create an issue in `kubestellar/docs` with:
 
 **Title Format:**
+
 ```
 [Doc Update] <Original PR Title>
 ```
 
 **Issue Body:**
+
 ```markdown
 ## 📝 Documentation Update Needed
 
 A pull request was recently merged that may require documentation updates.
 
 ### Source PR
+
 - **Repository:** <repo-name>
 - **PR:** <PR URL>
 - **Merged:** <merge timestamp>
 
 ### PR Summary
+
 <Brief 2-3 sentence summary of what changed>
 
 ### Changes Overview
+
 <Bulleted list of key changes from the PR that impact documentation>
 
 ### Files Changed
+
 <List of files changed with counts: X files changed, Y additions, Z deletions>
 
 ---
@@ -119,8 +129,9 @@ A pull request was recently merged that may require documentation updates.
 ```
 
 **Labels:**
+
 - **IMPORTANT:** Create the issue WITHOUT labels first
-- Then use `update-issue` safe-output to add the label `doc update` 
+- Then use `update-issue` safe-output to add the label `doc update`
 - This two-step process ensures the `labeled` event triggers the technical-doc-writer workflow
 - Example: Create issue → Get issue number → Update that issue to add label
 
@@ -134,7 +145,8 @@ A pull request was recently merged that may require documentation updates.
 4. Report skipped duplicates in your noop message
 
 **How to search:**
-- Use GitHub search: `repo:kubestellar/docs is:issue "PR_URL"` 
+
+- Use GitHub search: `repo:kubestellar/docs is:issue "PR_URL"`
 - Check both open AND closed issues
 - If found, do NOT create a new issue
 
@@ -149,6 +161,7 @@ A pull request was recently merged that may require documentation updates.
 ## Error Handling
 
 If you encounter rate limits or API errors:
+
 - Log the error clearly
 - Continue processing remaining PRs if possible
 - Report a summary of successes and failures at the end

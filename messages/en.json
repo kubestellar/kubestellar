@@ -109,7 +109,7 @@
     "titleSpan": "KubeStellar",
     "subtitle": "A multi-cluster Kubernetes orchestration platform that simplifies how organizations manage distributed workloads across multiple Kubernetes clusters.",
     "card1Title": "Single Control Plane",
-    "card1Description": "Work with Kubernetes objects in their native format without wrapping or bundling. Store and manage workload definitions centrally through Workload Definition Spaces (WDSes) and efficiently manage cluster inventory through Inventory and Transport Spaces (ITSes).",
+    "card1Description": "Work with Kubernetes objects in their native format without wrapping or bundling. Store and manage workload definitions centrally through Workload Definition Spaces (WDS) and efficiently manage cluster inventory through Inventory and Transport Spaces (ITS).",
     "card2Title": "Intelligent Workload Placement",
     "card2Description": "Use label-based selection and binding policies to specify what workloads run where. Support for standard Kubernetes resources, Custom Resources (CRDs), Helm charts, and out-of-tree workload types with automatic synchronization to keep workloads in sync across clusters.",
     "card3Title": "Policy-Driven Management",

@@ -2,7 +2,13 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Navbar, Footer, GridLines, StarField, PageActions } from "@/components";
+import {
+  Navbar,
+  Footer,
+  GridLines,
+  StarField,
+  PageActions,
+} from "@/components";
 import { useTranslations } from "next-intl";
 
 interface Product {
