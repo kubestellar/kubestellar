@@ -783,7 +783,7 @@ jobs:
           mkdir -p /tmp/gh-aw/agent
           echo "Created /tmp/gh-aw/agent directory for agentic workflow temporary files"
       - name: Download metrics data
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
         with:
           name: metrics-data
           path: /tmp/metrics-data/
@@ -6423,7 +6423,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_AUDIT_TOKEN }}
       - name: Upload data as artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
           name: metrics-data
           path: /tmp/metrics-data/
@@ -6449,7 +6449,7 @@ jobs:
           find "/tmp/gh-aw/safe-jobs/" -type f -print
           echo "GH_AW_AGENT_OUTPUT=/tmp/gh-aw/safe-jobs/agent_output.json" >> "$GITHUB_ENV"
       - name: Send via Postmark
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           POSTMARK_API_TOKEN: ${{ secrets.POSTMARK_API_TOKEN }}
           POSTMARK_FROM_EMAIL: ${{ secrets.POSTMARK_FROM_EMAIL }}
