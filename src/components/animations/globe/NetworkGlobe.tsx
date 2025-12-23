@@ -34,6 +34,7 @@ const NetworkGlobe = ({ isLoaded = true }: NetworkGlobeProps) => {
   const gridLinesRef = useRef<THREE.Group>(null);
   const centralNodeRef = useRef<THREE.Group>(null);
   const dataFlowsRef = useRef<THREE.Group>(null);
+  const rotatingContentRef = useRef<THREE.Group>(null);
 
   // Animation state for data flows
   const [activeFlows, setActiveFlows] = useState<number[]>([]);
@@ -189,6 +190,13 @@ const NetworkGlobe = ({ isLoaded = true }: NetworkGlobeProps) => {
       gridLinesRef.current.rotation.z = Math.cos(time * 0.08) * 0.03;
     }
 
+    // Rotate clusters and data flows to match globe rotation
+    if (rotatingContentRef.current) {
+      rotatingContentRef.current.rotation.y = time * 0.1; // Match globe speed
+      rotatingContentRef.current.rotation.x = Math.sin(time * 0.15) * 0.08;
+      rotatingContentRef.current.rotation.z = Math.cos(time * 0.08) * 0.03;
+    }
+
     // Animate central node with slower rotation to match globe
     if (centralNodeRef.current) {
       centralNodeRef.current.rotation.y = time * 0.15; // Reduced from 0.4 to 0.15
@@ -328,81 +336,83 @@ const NetworkGlobe = ({ isLoaded = true }: NetworkGlobeProps) => {
         </Billboard>
       </group>
 
-      {/* Clusters with staggered appearance */}
-      {clusters.map((cluster, idx) => (
-        <group
-          key={idx}
-          scale={animationProgress > idx * 0.15 ? animationProgress : 0}
-          position={[
-            cluster.position[0] * animationProgress,
-            cluster.position[1] * animationProgress,
-            cluster.position[2] * animationProgress,
-          ]}
-        >
-          <Cluster
-            position={[0, 0, 0]}
-            name={cluster.name}
-            nodeCount={cluster.nodeCount}
-            radius={cluster.radius}
-            color={cluster.color}
-            description={cluster.description}
-          />
-        </group>
-      ))}
-
-      {/* Data flow connections */}
-      <group ref={dataFlowsRef}>
-        {dataFlows.map((flow, idx) => (
-          <Line
+      <group ref={rotatingContentRef}>
+        {/* Clusters with staggered appearance */}
+        {clusters.map((cluster, idx) => (
+          <group
             key={idx}
-            points={flow.path}
-            color={
-              activeFlows.includes(idx)
-                ? flow.type === "workload"
-                  ? COLORS.success
-                  : flow.type === "deploy"
-                    ? COLORS.accent1
-                    : flow.type === "control"
-                      ? COLORS.secondary
-                      : COLORS.highlight
-                : COLORS.primary
-            }
-            lineWidth={1.5}
-            transparent
-            opacity={
-              (activeFlows.includes(idx) ? 0.8 : 0.1) * animationProgress
-            }
-            dashed
-            dashSize={0.1}
-            gapSize={0.1}
-          />
+            scale={animationProgress > idx * 0.15 ? animationProgress : 0}
+            position={[
+              cluster.position[0] * animationProgress,
+              cluster.position[1] * animationProgress,
+              cluster.position[2] * animationProgress,
+            ]}
+          >
+            <Cluster
+              position={[0, 0, 0]}
+              name={cluster.name}
+              nodeCount={cluster.nodeCount}
+              radius={cluster.radius}
+              color={cluster.color}
+              description={cluster.description}
+            />
+          </group>
         ))}
-      </group>
 
-      {/* Data packets traveling along active connections */}
-      {isLoaded &&
-        animationProgress > 0.7 &&
-        dataFlows.map(
-          (flow, idx) =>
-            activeFlows.includes(idx) && (
-              <DataPacket
-                key={idx}
-                path={flow.path}
-                speed={1 + Math.random()}
-                color={
-                  flow.type === "workload"
+        {/* Data flow connections */}
+        <group ref={dataFlowsRef}>
+          {dataFlows.map((flow, idx) => (
+            <Line
+              key={idx}
+              points={flow.path}
+              color={
+                activeFlows.includes(idx)
+                  ? flow.type === "workload"
                     ? COLORS.success
                     : flow.type === "deploy"
                       ? COLORS.accent1
                       : flow.type === "control"
                         ? COLORS.secondary
-                        : idx % 2 === 0
-                          ? COLORS.highlight
-                          : COLORS.primary
-                }
-              />
-            )
-        )}
+                        : COLORS.highlight
+                  : COLORS.primary
+              }
+              lineWidth={1.5}
+              transparent
+              opacity={
+                (activeFlows.includes(idx) ? 0.8 : 0.1) * animationProgress
+              }
+              dashed
+              dashSize={0.1}
+              gapSize={0.1}
+            />
+          ))}
+        </group>
+
+        {/* Data packets traveling along active connections */}
+        {isLoaded &&
+          animationProgress > 0.7 &&
+          dataFlows.map(
+            (flow, idx) =>
+              activeFlows.includes(idx) && (
+                <DataPacket
+                  key={idx}
+                  path={flow.path}
+                  speed={1 + Math.random()}
+                  color={
+                    flow.type === "workload"
+                      ? COLORS.success
+                      : flow.type === "deploy"
+                        ? COLORS.accent1
+                        : flow.type === "control"
+                          ? COLORS.secondary
+                          : idx % 2 === 0
+                            ? COLORS.highlight
+                            : COLORS.primary
+                  }
+                />
+              )
+          )}
+      </group>
     </group>
   );
 };
