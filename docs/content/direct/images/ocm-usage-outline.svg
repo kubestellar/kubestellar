@@ -16,12 +16,12 @@
         }
         @media (prefers-color-scheme: dark) {
             :root {
-                --color-primary: #f0f0f0;
-                --bg-primary: #0d1117;
-                --bg-secondary: #161b22;
-                --bg-tertiary: #21262d;
-                --bg-green-light: #1a2e1a;
-                --bg-green-dark: #2e4a2e;
+                --color-primary: #4db8ff;
+                --bg-primary: rgb(255, 255, 255);
+                --bg-secondary: #f5f5f5;
+                --bg-tertiary: #f8f8f8;
+                --bg-green-light: #e8f0e8;
+                --bg-green-dark: #d5e8d4;
                 --stroke-orange: #ffcc80;
                 --stroke-red: #ff8080;
                 --stroke-green: #b3e6b3;
