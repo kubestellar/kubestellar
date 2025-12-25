@@ -9,23 +9,23 @@ One of the technologies underlying KubeStellar is KubeFlex, a kubernetes-based p
 
 KubeFlex is a flexible framework that supports various kinds of control planes, such as:
 
-- k8s: a basic Kubernetes API Server with a subset of kube controllers.
+- *k8s*: a basic Kubernetes API Server with a subset of kube controllers.
   The control plane in this context does not execute workloads, such as pods,
   because the controllers associated with these objects are not activated.
   This environment is referred to as ‘denatured’ because it lacks the typical
   characteristics and functionalities of a standard Kubernetes cluster
   It uses about 350 MB of memory per instance with a shared Postgres Database Backend.
 
-- vcluster: a virtual cluster that runs on the hosting cluster,
+- *vcluster*: a virtual cluster that runs on the hosting cluster,
   based on the [vCluster Project](https://www.vcluster.com). This type of control
   plane can run pods using worker nodes of the hosting cluster.
 
-- host: the KubeFlex hosting cluster, which is exposed as a control plane.
+- *host*: the KubeFlex hosting cluster, which is exposed as a control plane.
 
-- external: an external cluster that is imported as a control plane (this
+- *external*: an external cluster that is imported as a control plane (this
   is in the roadmap but not yet implemented)
 
-- ocm: a control plane that uses the
+- *ocm*: a control plane that uses the
   [multicluster-controlplane project](https://github.com/open-cluster-management-io/multicluster-controlplane)
   for managing multiple clusters.
 

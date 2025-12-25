@@ -16,7 +16,7 @@
 [![](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubestellar)](https://artifacthub.io/packages/search?repo=kubestellar)
 [![](https://api.scorecard.dev/projects/github.com/kubestellar/kubestellar/badge)](https://scorecard.dev/viewer/?uri=github.com/kubestellar/kubestellar)
 <a href="https://cloud-native.slack.com/archives/C097094RZ3M">
-<img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
+    <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
 </a>
 
 **KubeStellar** is a Cloud Native Computing Foundation (CNCF) Sandbox project that simplifies the deployment and configuration of applications across multiple Kubernetes clusters. It provides a seamless experience akin to using a single cluster, and it integrates with the tools you're already familiar with, eliminating the need to modify existing resources.
@@ -51,13 +51,9 @@ We ❤️ our contributors! If you're interested in helping us out, please head 
 
 There are several ways to communicate with us:
 
-Instantly get access to our documents and meeting invites [http://kubestellar.io/joinus](http://kubestellar.io/joinus)
+Instantly get access to our documents and meeting invites [http://kubestellar.io/joinus](http://kubestellar.io/joinus).
 
 - The [`#kubestellar-dev` channel](https://cloud-native.slack.com/archives/C097094RZ3M) in the [CNCF Slack workspace](https://communityinviter.com/apps/cloud-native/cncf)
-  There are several ways to communicate with us:
-
-Instantly get access to our documents and meeting invites http://kubestellar.io/joinus
-
 - Our mailing lists:
     - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
     - [kubestellar-users](https://groups.google.com/g/kubestellar-users) for discussions among users and potential users
