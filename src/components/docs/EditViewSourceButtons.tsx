@@ -2,8 +2,7 @@
 
 import React from "react";
 import { useTheme } from "next-themes";
-import { Eye, Pencil, Bug } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { Eye, Pencil} from "lucide-react";
 
 interface EditViewSourceButtonsProps {
   filePath?: string;
@@ -22,7 +21,6 @@ export default function EditViewSourceButtons({
 }: EditViewSourceButtonsProps) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
-  const pathname = usePathname();
 
   React.useEffect(() => {
     setMounted(true);
@@ -30,19 +28,12 @@ export default function EditViewSourceButtons({
 
   const isDark = resolvedTheme === "dark";
 
-  // Determine the issue repository
-  const issueRepo = filePath ? repo : "docs";
   
   // Generate URLs
   const fullPath = filePath ? `${docsPath}${filePath}` : null;
   const viewUrl = fullPath ? `https://github.com/${user}/${repo}/blob/${branch}/${fullPath}` : null;
   const editUrl = fullPath ? `https://github.com/${user}/${repo}/edit/${branch}/${fullPath}` : null;
-  
-  // Generate issue URL with pre-filled title and body
-  const pageTitle = pathname ? pathname.split('/').filter(Boolean).pop()?.replace(/-/g, ' ') : 'page';
-  const issueTitle = encodeURIComponent(`Issue with page: ${pageTitle}`);
-  const issueBody = encodeURIComponent(`Page URL: ${typeof window !== 'undefined' ? window.location.href : pathname}\n\n**Describe the issue:**\n\n`);
-  const issueUrl = `https://github.com/${user}/${issueRepo}/issues/new?title=${issueTitle}&body=${issueBody}`;
+
 
   // Separate conditional classes for better maintainability
   const textColorClasses = isDark
@@ -96,17 +87,6 @@ export default function EditViewSourceButtons({
           <span className="font-medium">Edit page</span>
         </a>
       )}
-      <a
-        href={issueUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={buttonBaseClasses}
-        title="Report an issue with this page"
-        aria-label="Report an issue with this page"
-      >
-        <Bug className="w-3.5 h-3.5" />
-        <span className="font-medium">Open issue</span>
-      </a>
     </div>
   );
 }
