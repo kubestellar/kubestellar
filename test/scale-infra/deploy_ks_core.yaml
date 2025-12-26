@@ -102,33 +102,30 @@
              kflex ctx wds1
 
     - name: Get the token to register managed clusters
-      shell: clusteradm --context kscore get token | grep '^clusteradm join'
+      shell: |
+        set -euo pipefail
+
+        clusteradm_version=$(clusteradm version --short 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
+
+        if [ -z "$clusteradm_version" ]; then
+          clusteradm_version=$(clusteradm version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
+        fi
+
+        if [ -z "$clusteradm_version" ]; then
+          sa_name="cluster-bootstrap"
+        elif [ "$(printf '%s\n' 0.11.0 "$clusteradm_version" | sort -V | head -n1)" = "0.11.0" ]; then
+          sa_name="cluster-bootstrap"
+        else
+          sa_name="agent-registration-bootstrap"
+        fi
+
+        echo "Using ServiceAccount: $sa_name"
+
+        clusteradm --context kscore get token --serviceaccount "$sa_name" | grep '^clusteradm join' || true
       register: wec_join_command
-      until: "wec_join_command is not failed"
+      until: wec_join_command.stdout is search('^clusteradm join')
       retries: 5
       delay: 15
-             
-    -  name: write wec_join_command to file
-       ansible.builtin.copy:
-         content: "{{ wec_join_command.stdout }}"
-         dest:  /tmp/wec_join_command
-    
-    - name: Copy join command to local file (Ansible control node)
-      ansible.builtin.fetch:
-        src: /tmp/wec_join_command
-        dest: .data/{{ region }}_{{ vpc_name }}/
-        flat: yes
-
-    - name: Set the current kubeconfig context to the KubeFlex hosting cluster
-      shell: |
-             alias k="kubectl"
-             k config use-context kscore
-
-    - name: Fetch kubeconfig file
-      ansible.builtin.fetch:
-        src: $HOME/.kube/config
-        dest: .data/{{ region }}_{{ vpc_name }}/admin.conf
-        flat: yes
 
     - name: Protect admin.conf file
       delegate_to: localhost
@@ -136,7 +133,7 @@
       ansible.builtin.file:
         mode: o-rwx
         path: .data/{{ region }}_{{ vpc_name }}/admin.conf
-    
+
     - name: Make admin.conf use public server address
       delegate_to: localhost
       become: no
