@@ -1,4 +1,11 @@
-<!-- Note that this repo has two readme files, with content that is as nearly identical as is practical: `/README.md` and `/docs/content/readme.md` -->
+<!--
+Note: This repo has two README files with nearly identical content:
+- /README.md
+- /docs/content/readme.md
+
+If you update shared content in one, please make the same change in the other so they stay in sync.
+-->
+
 
 <img alt="KubeStellar Logo" width="500px" align="left" src="../KubeStellar-with-Logo.png" />
 
@@ -51,7 +58,7 @@ We ❤️ our contributors! If you're interested in helping us out, please head 
 
 There are several ways to communicate with us:
 
-Instantly get access to our documents and meeting invites [http://kubestellar.io/joinus](http://kubestellar.io/joinus).
+- Instantly get access to our documents and meeting invites [http://kubestellar.io/joinus](http://kubestellar.io/joinus)
 
 - The [`#kubestellar-dev` channel](https://cloud-native.slack.com/archives/C097094RZ3M) in the [CNCF Slack workspace](https://communityinviter.com/apps/cloud-native/cncf)
 - Our mailing lists:

@@ -1,4 +1,11 @@
-<!-- Note that this repo has two readme files, with content that is as nearly identical as is practical: `/README.md` and `/docs/content/readme.md` -->
+<!--
+Note: This repo has two README files with nearly identical content:
+- /README.md
+- /docs/content/readme.md
+
+If you update shared content in one, please make the same change in the other so they stay in sync.
+-->
+
 
 <img alt="" width="500px" align="left" src="KubeStellar-with-Logo.png" />
 
@@ -60,7 +67,7 @@ Have a look at what we are working on next, see our [Roadmap](docs/content/direc
 
 There are several ways to communicate with us:
 
-Instantly get access to our documents and meeting invites at http://kubestellar.io/joinus
+- Instantly get access to our documents and meeting invites at http://kubestellar.io/joinus
 
 - The [`#kubestellar-dev` channel](https://cloud-native.slack.com/archives/C097094RZ3M) in the [CNCF Slack workspace](https://communityinviter.com/apps/cloud-native/cncf)
 - Our mailing lists:
@@ -73,8 +80,8 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 - Browse the [shared Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing) to share design docs, notes, etc.
     - Members of the [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list can view this drive
 - Follow us on:
-   - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
-   - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
+    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
+    - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
 
 
 <div>
