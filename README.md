@@ -7,7 +7,7 @@ If you update shared content in one, please make the same change in the other so
 -->
 
 
-<img alt="" width="500px" align="left" src="KubeStellar-with-Logo.png" />
+<img alt="KubeStellar Logo" width="500px" align="left" src="KubeStellar-with-Logo.png" />
 
 <br/>
 <br/>
@@ -21,11 +21,11 @@ If you update shared content in one, please make the same change in the other so
 [![](https://www.bestpractices.dev/projects/8266/badge)](https://www.bestpractices.dev/projects/8266)
 [![](https://api.scorecard.dev/projects/github.com/kubestellar/kubestellar/badge)](https://scorecard.dev/viewer/?uri=github.com/kubestellar/kubestellar)
 [![](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubestellar)](https://artifacthub.io/packages/search?repo=kubestellar)
-<a href="https://cloud-native.slack.com/archives/C097094RZ3M"> 
+<a href="https://cloud-native.slack.com/archives/C097094RZ3M">
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
-  </a>
+</a>
 <a href="https://deepwiki.com/kubestellar/kubestellar">
-  <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
+    <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
 </a>
 
 **KubeStellar** is a Cloud Native Computing Foundation (CNCF) Sandbox project that simplifies the deployment and configuration of applications across multiple Kubernetes clusters. It provides a seamless experience akin to using a single cluster, and it integrates with the tools you're already familiar with, eliminating the need to modify existing resources.
