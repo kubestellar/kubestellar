@@ -139,7 +139,7 @@ export default function Navbar() {
           "https://api.github.com/repos/kubestellar/kubestellar"
         );
         if (!response.ok) {
-          throw new Error("Network reposone was not okay");
+          throw new Error("Network response was not okay");
         }
         const data = await response.json();
         const formatNumber = (num: number): string => {
