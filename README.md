@@ -32,9 +32,7 @@ If you update shared content in one, please make the same change in the other so
 
 KubeStellar is particularly beneficial if you're currently deploying in a single cluster and are looking to expand to multiple clusters, or if you're already using multiple clusters and are seeking a more streamlined developer experience.
 
-
 ![KubeStellar High Level View](docs/content/images/kubestellar-high-level.png)
-
 
 The use of multiple clusters offers several advantages, including:
 
