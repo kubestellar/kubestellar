@@ -1,6 +1,6 @@
 import { Layout } from 'nextra-theme-docs'
 import 'nextra-theme-docs/style.css'
-import { DocsNavbar, DocsFooter, DocsBanner, DirectRouteHighlighter } from '@/components/docs/index'
+import { DocsNavbar, DocsFooter, DocsBanner } from '@/components/docs/index'
 import { Inter, JetBrains_Mono } from "next/font/google"
 import { Suspense } from 'react'
 import { ThemeProvider } from "next-themes"
@@ -43,7 +43,7 @@ export default async function DocsLayout({ children }: Props) {
   const branch = getBranchForVersion(defaultVersion)
   
   // Build page map for the default version
-  const { pageMap, directRouteMap } = await buildPageMapForBranch(branch)
+  const { pageMap } = await buildPageMapForBranch(branch)
   
   return (
     <html lang="en" suppressHydrationWarning>
@@ -65,7 +65,6 @@ export default async function DocsLayout({ children }: Props) {
               title: "On This Page"
             }}
           >
-            <DirectRouteHighlighter directRouteMap={directRouteMap || {}} />
             {children}
           </Layout>
         </ThemeProvider>

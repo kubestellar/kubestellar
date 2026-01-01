@@ -84,7 +84,7 @@ type FolderNode = { kind: 'Folder'; name: string; route: string; children: PageM
       { file: 'release-notes.md' }
     ]],
     ['Install & Configure', [
-      { file: 'get-started.md' },  
+      // { file: 'get-started.md' },  
       { file: 'pre-reqs.md' },
       { file: 'start-from-ocm.md' },
       { file: 'setup-limitations.md' },
@@ -346,14 +346,5 @@ type FolderNode = { kind: 'Folder'; name: string; route: string; children: PageM
   // normalizePageMap has compatible types now; remove stale suppressor
   const pageMap = normalizePageMap(_pageMap)
 
-  // Build a map of direct routes to their canonical category routes
-  const directRouteMap: Record<string, string> = {}
-  for (const { alias, fp } of aliases) {
-    if (DIRECT_ROOT && fp.startsWith(`${DIRECT_ROOT}/`)) {
-      const fileName = fp.split('/').pop()!.replace(/\.(md|mdx)$/i, '')
-      directRouteMap[`/docs/direct/${fileName}`] = `/docs/${alias}`
-    }
-  }
-
-  return { pageMap, routeMap, filePaths: allDocFiles, branch, directRouteMap }
+  return { pageMap, routeMap, filePaths: allDocFiles, branch }
 }
