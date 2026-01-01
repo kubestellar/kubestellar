@@ -213,80 +213,78 @@ This documentation site is built using **Nextra**, a powerful Next.js-based docu
    - Sets up the sidebar with page map and repository links
    - Enables dark mode and collapsible sidebar sections
 
-3. **`src/app/docs/page-map.ts`** - Dynamic page map builder that:
-   - Fetches documentation files from the main KubeStellar GitHub repository
-   - Constructs navigation structure dynamically based on GitHub content
-   - Supports multiple branches/versions of documentation
-   - Filters and organizes content into logical categories
+3. **`src/app/docs/page-map.ts`** - Navigation structure builder that:
+   - Defines the documentation navigation structure in `NAV_STRUCTURE`
+   - Reads documentation files from the local `/docs/content/` directory
+   - Constructs hierarchical navigation from the defined structure
    - Generates routes for each documentation page
+   - Creates a mapping between file paths and URL routes
 
 4. **`src/app/docs/[...slug]/page.tsx`** - Dynamic page renderer that:
-   - Fetches MDX content from GitHub on-demand
+   - Reads MDX content from the local `/docs/content/` directory
    - Compiles and evaluates MDX with custom components
-   - Supports version switching via query parameters
-   - Handles Mermaid diagrams and other custom components
+   - Processes Jekyll-style includes and template variables
+   - Supports Mermaid diagrams and custom components
+   - Handles image path resolution and markdown transformations
 
 5. **`mdx-components.js`** - Component mapping file that:
    - Exports MDX components from Nextra theme
    - Allows customization of how markdown elements render
    - Enables adding custom React components to MDX files
 
-### How to Add Documentation from the Main KubeStellar Repository
+### How to Add Documentation
 
-The documentation content is **NOT stored in this repository**. Instead, it's dynamically fetched from the main KubeStellar repository at build time and runtime.
+The documentation content is stored directly in this repository in the `/docs/content/` directory.
 
 #### Content Location
 
-All documentation content lives in the main KubeStellar repository:
+All documentation content lives in this repository:
 
-- **Repository**: `https://github.com/kubestellar/kubestellar`
+- **Repository**: `https://github.com/kubestellar/docs`
 - **Content Path**: `/docs/content/`
-- **Branches**: Supports multiple branches for versioning (e.g., `main`, `release-0.23.0`)
+- **Format**: Markdown (`.md`) files with support for MDX features
 
-#### How Content is Fetched
+#### Navigation Structure
 
-The `buildPageMapForBranch()` function in `page-map.ts`:
-
-1. Makes API calls to GitHub to fetch the repository tree
-2. Filters for `.md` and `.mdx` files in the `docs/content/` directory
-3. Organizes files according to the `CATEGORY_MAPPINGS` structure
-4. Creates navigation entries and routes for each file
-5. Caches results for performance
+The navigation is defined in `src/app/docs/page-map.ts` in the `NAV_STRUCTURE` constant. This defines how documentation pages are organized and displayed in the sidebar.
 
 #### Adding New Content
 
 To add new documentation pages:
 
-1. **In the Main KubeStellar Repository:**
-   - Add your `.md` or `.mdx` file to `/docs/content/` directory
-   - Organize it in an appropriate subdirectory
-   - Use standard Markdown or MDX syntax
-   - Commit and push to the desired branch
+1. **Create Your Documentation File:**
+   - Add your `.md` file to the appropriate subdirectory in `/docs/content/`
+   - Use standard Markdown syntax
+   - You can use Jekyll-style includes: `{% include "path/to/file.md" %}`
+   - You can use template variables: `{{ config.variable_name }}`
 
-2. **In This Docs Repository:**
-   - Update `src/app/docs/page-map.ts`
-   - Find the appropriate category in `CATEGORY_MAPPINGS`
+2. **Update the Navigation:**
+   - Edit `src/app/docs/page-map.ts`
+   - Find the appropriate section in `NAV_STRUCTURE`
    - Add an entry for your new file:
      ```typescript
-     { file: 'your-new-file.md' }
-     // or with custom title
-     { 'Custom Title': 'your-new-file.md' }
+     { 'Page Title': 'path/to/your-file.md' }
      ```
-   - The file path is relative to `docs/content/` in the main repo
+   - The file path is relative to `/docs/content/`
+
+3. **Preview Your Changes:**
+   ```bash
+   npm run dev
+   ```
+   Navigate to `http://localhost:3000/docs/your-route` to see your page
 
 #### Example: Adding a New Getting Started Guide
 
 ```typescript
-// In src/app/docs/page-map.ts
-[
-  "Install & Configure",
-  [
-    { file: "pre-reqs.md" },
-    { "Quick Start": "getting-started.md" }, // Add this line
-    { file: "start-from-ocm.md" },
+// In src/app/docs/page-map.ts, within NAV_STRUCTURE
+{
+  title: 'User Guide',
+  items: [
+    { 'Quick Start': 'direct/get-started.md' },
+    { 'Your New Guide': 'direct/new-guide.md' }, // Add this line
     // ... rest of the entries
-  ],
-];
+  ]
+}
 ```
 
 #### Adding Nested Sections
@@ -295,9 +293,17 @@ For hierarchical navigation:
 
 ```typescript
 {
-  'Section Name': [
+  'Parent Section': [
     { 'Subsection 1': 'path/to/file1.md' },
     { 'Subsection 2': 'path/to/file2.md' },
+    {
+      'Nested Section': [
+        { 'Deep Page': 'path/to/deep/file.md' }
+      ]
+    }
+  ]
+}
+```
     {
       'Nested Section': [
         { 'Deep File': 'path/to/nested/file.md' }

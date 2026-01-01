@@ -56,7 +56,12 @@ This repository includes comprehensive documentation such as:
 
 ## Local Development
 
-This documentation site is built with [Next.js](https://nextjs.org/), providing a modern, performant documentation experience.
+This documentation site is built with [Nextra](https://nextra.site/) — a Next.js-based static site generator optimized for documentation. The site uses:
+
+- **Nextra** - Documentation framework with MDX support
+- **Next.js 15** - React framework for production
+- **Tailwind CSS** - Utility-first styling
+- **TypeScript** - Type-safe development
 
 ### Prerequisites
 
