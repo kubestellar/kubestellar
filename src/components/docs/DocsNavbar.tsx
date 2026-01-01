@@ -4,12 +4,12 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
-import { useSearchParams, usePathname, useRouter } from 'next/navigation'
-import { VERSIONS, type VersionKey } from '@/config/versions'
+// import { useSearchParams, usePathname, useRouter } from 'next/navigation'
+import { VERSIONS } from '@/config/versions'
 import { getLocalizedUrl } from "@/lib/url";
 import { useMenu, setMenu } from 'nextra-theme-docs'
 
-type DropdownType = "contribute" | "community" | "version" | "language" | "github" | null;
+type DropdownType = "contribute" | "community" | "language" | "github" | null;
 
 export default function DocsNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,10 +38,11 @@ export default function DocsNavbar() {
     watchers: "0",
   });
 
-  const searchParams = useSearchParams()
-  const pathname = usePathname()
-  const router = useRouter()
-  const currentVersion = (searchParams.get('version') as VersionKey) || Object.keys(VERSIONS)[0]
+  // const searchParams = useSearchParams()
+  // const pathname = usePathname()
+  // const router = useRouter()
+  // Use the first (and only) version label from config
+  const currentVersionLabel = Object.values(VERSIONS)[0]?.label || 'latest'
 
   useEffect(() => {
     setMounted(true);
@@ -175,13 +176,6 @@ export default function DocsNavbar() {
       performSearchAPI(query);
     }, 300);
   };
-
-  const handleVersionChange = (version: VersionKey) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('version', version)
-    router.push(`${pathname}?${params.toString()}`)
-    setOpenDropdown(null)
-  }
 
   if (!mounted) {
     return null;
@@ -472,72 +466,17 @@ export default function DocsNavbar() {
 
           <div className="relative hidden xl:flex w-px h-5 bg-gray-300 dark:bg-neutral-700 mx-1" />
 
-          <div 
-            className="relative"
-            onMouseEnter={() => handleMouseEnter ("version")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <button
-              className={`text-xs font-mono transition-colors px-2 py-1.5 rounded-md flex items-center gap-1.5 cursor-pointer ${
+          {/* Version badge - simplified since docs are now local */}
+          <div className="relative">
+            <span
+              className={`text-xs font-mono px-2 py-1.5 rounded-md ${
                 isDark 
-                  ? 'text-gray-300 hover:text-gray-100 hover:bg-neutral-800'
-                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'text-gray-400 bg-neutral-800/50'
+                  : 'text-gray-600 bg-gray-100'
               }`}
-              aria-haspopup="true"
-              aria-expanded={openDropdown === "version"}
             >
-              <span>{currentVersion}</span>
-              <svg
-                className={`w-3 h-3 transition-transform duration-200 ${openDropdown === "version" ? "rotate-180" : ""}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {openDropdown === "version" && (
-              <div
-                className={`absolute right-0 mt-1 w-44 rounded-md shadow-xl py-1 border z-50 ${
-                  isDark 
-                    ? 'bg-neutral-900 border-neutral-800'
-                    : 'bg-white border-gray-200 '
-                }`}
-                onMouseEnter={handleDropdownMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
-                {Object.entries(VERSIONS).map(([key, value]) => (
-                  <button
-                    key={key}
-                    onClick={() => handleVersionChange(key as VersionKey)}
-                    className={`w-full text-left px-3 py-2 text-sm transition-colors ${
-                      currentVersion === key
-                        ? isDark
-                          ? 'bg-neutral-800 text-white'
-                          : 'bg-gray-100 text-gray-900'
-                        : isDark
-                          ? 'text-gray-300 hover:bg-neutral-800'
-                          : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    {value.label}
-                  </button>
-                ))}
-                <hr className={isDark ? 'my-1 border-neutral-800' : 'my-1 border-gray-200'} />
-                <a
-                  href="https://github.com/kubestellar/kubestellar/tags"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`block px-3 py-2 text-sm transition-colors ${
-                    isDark
-                      ? 'text-gray-300 hover:bg-neutral-800'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  All versions →
-                </a>
-              </div>
-            )}
+              {currentVersionLabel}
+            </span>
           </div>
 
           <div 
@@ -1037,63 +976,22 @@ export default function DocsNavbar() {
               Partners
             </Link>
 
+            {/* Version display - simplified since docs are local */}
             <div className={`md:hidden pt-3 border-t mt-3 ${
               isDark ? 'border-neutral-800' : 'border-gray-200'
             }`}>
-              <button
-                onClick={() => setOpenDropdown(openDropdown === 'version' ? null : 'version')}
-                className={`md:hidden w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors ${
+              <div
+                className={`flex items-center px-3 py-2 text-sm ${
                   isDark
-                    ? 'text-gray-300 hover:bg-neutral-800'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'text-gray-400'
+                    : 'text-gray-600'
                 }`}
               >
-                <div className="flex items-center">
-                  <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                  </svg>
-                  <span>Version: {currentVersion}</span>
-                </div>
-                <svg 
-                  className={`w-4 h-4 transition-transform ${openDropdown === 'version' ? 'rotate-180' : ''}`}
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                 </svg>
-              </button>
-              
-              {openDropdown === 'version' && (
-                <div className="md:hidden mt-1 space-y-1 pl-4">
-                  {Object.entries(VERSIONS).map(([key, value]) => (
-                    <button
-                      key={key}
-                      onClick={() => {
-                        handleVersionChange(key as VersionKey);
-                        setOpenDropdown(null);
-                      }}
-                      className={`w-full text-left flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
-                        currentVersion === key
-                          ? isDark
-                            ? 'bg-neutral-800 text-white font-medium'
-                            : 'bg-gray-100 text-gray-900 font-medium'
-                          : isDark
-                            ? 'text-gray-300 hover:bg-neutral-800'
-                            : 'text-gray-700 hover:bg-gray-100'
-                      }`}
-                    >
-                      {currentVersion === key && (
-                        <svg className="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                      {currentVersion !== key && <span className="w-4 mr-3"></span>}
-                      {value.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+                <span>Version: {currentVersionLabel}</span>
+              </div>
             </div>
 
             <div className={`pt-3 border-t mt-3 ${

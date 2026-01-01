@@ -15,7 +15,7 @@ interface EditViewSourceButtonsProps {
 export default function EditViewSourceButtons({
   filePath,
   user = "kubestellar",
-  repo = "kubestellar",
+  repo = "docs",  
   branch = "main",
   docsPath = "docs/content/",
 }: EditViewSourceButtonsProps) {

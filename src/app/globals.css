@@ -292,6 +292,73 @@ html.dark .ks-doc-figure figcaption {
   }
 }
 
+/* Contributors grid styles */
+.contributors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+  padding: 1rem;
+}
+
+.contributor-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: rgba(128, 128, 128, 0.1);
+}
+
+.contributor-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.contributor-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 0.5rem;
+  object-fit: cover;
+}
+
+.contributor-card span {
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+html.dark .contributor-card {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+html.dark .contributor-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+html:not(.dark) .contributor-card {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+html:not(.dark) .contributor-card:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+  .contributors-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+  
+  .contributor-card img {
+    width: 60px;
+    height: 60px;
+  }
+}
+
 /* Custom Tailwind utilities */
 .text-gradient {
   background: linear-gradient(to right, rgb(147, 51, 234), rgb(59, 130, 246));

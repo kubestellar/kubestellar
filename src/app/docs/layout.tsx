@@ -5,8 +5,7 @@ import { Inter, JetBrains_Mono } from "next/font/google"
 import { Suspense } from 'react'
 import { ThemeProvider } from "next-themes"
 import "../globals.css"
-import { buildPageMapForBranch } from './page-map'
-import { getDefaultVersion, getBranchForVersion } from '@/config/versions'
+import { buildPageMap } from './page-map'
 
 const inter = Inter({
   variable: "--font-inter",
@@ -37,13 +36,8 @@ type Props = {
 }
 
 export default async function DocsLayout({ children }: Props) {
-  // Always use default version for initial layout
-  // The page component will handle version-specific content
-  const defaultVersion = getDefaultVersion()
-  const branch = getBranchForVersion(defaultVersion)
-  
-  // Build page map for the default version
-  const { pageMap } = await buildPageMapForBranch(branch)
+  // Build page map from local docs
+  const { pageMap } = buildPageMap()
   
   return (
     <html lang="en" suppressHydrationWarning>
@@ -53,7 +47,7 @@ export default async function DocsLayout({ children }: Props) {
             banner={banner}
             navbar={navbar}
             pageMap={pageMap}
-            docsRepositoryBase="https://github.com/kubestellar/kubestellar/edit/main/docs/content"
+            docsRepositoryBase="https://github.com/kubestellar/docs/edit/main/docs/content"
             footer={footer}
             darkMode={true}
             sidebar={{

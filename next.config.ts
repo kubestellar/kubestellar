@@ -18,6 +18,15 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["@/components"],
   },
   pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
+  async rewrites() {
+    return [
+      {
+        // Serve docs images from docs/content folder
+        source: "/docs-images/:path*",
+        destination: "/api/docs-image/:path*",
+      },
+    ];
+  },
   async redirects() {
     return [
       {
