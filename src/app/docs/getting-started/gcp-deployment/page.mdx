@@ -66,25 +66,31 @@ A comprehensive step-by-step guide to deploy KubeStellar on Google Cloud Platfor
 
 ### Cluster Layout
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         GCP Project                          │
-│                                                              │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │           KubeFlex Cluster (Core)                  │    │
-│  │  ┌──────────────┐  ┌──────────────┐               │    │
-│  │  │    ITS1      │  │    WDS1      │               │    │
-│  │  │  (OCM Hub)   │  │ (Workload    │               │    │
-│  │  │              │  │  Deployment  │               │    │
-│  │  └──────────────┘  └──────────────┘               │    │
-│  └────────────────────────────────────────────────────┘    │
-│                                                              │
-│  ┌──────────────────┐        ┌──────────────────┐          │
-│  │   Cluster1 (WEC) │        │   Cluster2 (WEC) │          │
-│  │                  │        │                  │          │
-│  │  Edge Location 1 │        │  Edge Location 2 │          │
-│  └──────────────────┘        └──────────────────┘          │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph gcp[" GCP Project "]
+        subgraph kubeflex[" KubeFlex Cluster - Control Plane "]
+            direction LR
+            its1[" ITS1<br/>OCM Hub "]
+            wds1[" WDS1<br/>Workload<br/>Deployment "]
+        end
+        
+        cluster1[" Cluster1<br/>WEC<br/>Edge Location 1 "]
+        cluster2[" Cluster2<br/>WEC<br/>Edge Location 2 "]
+    end
+    
+    its1 -->|Register & Monitor| cluster1
+    its1 -->|Register & Monitor| cluster2
+    wds1 -->|Deploy Workloads| cluster1
+    wds1 -->|Deploy Workloads| cluster2
+    
+    classDef gcpStyle fill:#1a1a1a,stroke:#4a9eff,stroke-width:3px,color:#ffffff
+    classDef coreStyle fill:#0d47a1,stroke:#42a5f5,stroke-width:2px,color:#ffffff
+    classDef wecStyle fill:#1b5e20,stroke:#66bb6a,stroke-width:2px,color:#ffffff
+    
+    class gcp gcpStyle
+    class kubeflex,its1,wds1 coreStyle
+    class cluster1,cluster2 wecStyle
 ```
 
 ### Components
