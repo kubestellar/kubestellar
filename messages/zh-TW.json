@@ -33,7 +33,7 @@
     "gettingStarted": "開始使用",
     "installationPage": "安裝頁面",
     "ladder": "階梯",
-    "products": "產品",
+    "products": "專案",
     "contributeHandbook": "貢獻手冊",
     "resources": "資源",
     "playground": "遊樂場",
@@ -74,7 +74,7 @@
     "joinIn": "加入我們",
     "contributeHandbook": "貢獻手冊",
     "quickInstallation": "快速安裝",
-    "products": "產品",
+    "products": "專案",
     "security": "安全性",
     "community": "社群",
     "getInvolved": "參與其中",
@@ -164,7 +164,7 @@
     "card2Description": "探索多叢集工作負載管理功能並與社群建立聯繫。",
     "card2Button1": "加入 Slack",
     "card2Button2": "GitHub",
-    "card2Button3": "產品",
+    "card2Button3": "專案",
     "card2Button4": "手冊",
     "card3Title": "探索文件",
     "card3Description": "全面的指南、教學和 API 參考，協助您掌握 KubeStellar 的功能。",
@@ -301,7 +301,11 @@
         "backContent": {
           "title": "基於範本的自訂",
           "description": "為不同叢集自訂工作負載設定，同時維持單一真實來源。",
-          "features": ["支援範本擴充", "叢集特定自訂", "基於屬性的設定"]
+          "features": [
+            "支援範本擴充",
+            "叢集特定自訂",
+            "基於屬性的設定"
+          ]
         }
       }
     }
@@ -549,7 +553,7 @@
   },
   "productsPage": {
     "title": "我們的",
-    "titleSpan": "產品",
+    "titleSpan": "專案",
     "subtitle": "探索我們的工具和平台套件，增強 KubeStellar 生態系統並賦能多叢集 Kubernetes 管理。",
     "repoButton": "儲存庫",
     "websiteButton": "網站",
