@@ -309,6 +309,52 @@ export default function ContactSection() {
                 </div>
               </div>
             </a>
+             {/* Contact card 5 - YouTube */}
+            <a
+              href="https://www.youtube.com/@kubestellar"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-gray-800/50 backdrop-blur-md rounded-xl shadow-sm border border-gray-700/50 p-4 sm:p-6 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-blue-500/50 cursor-pointer"
+            >
+              <div className="flex items-center">
+                <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-black-600 flex items-center justify-center shadow-lg">
+                  <svg
+                  className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,0,0,0.8)]"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  >
+                    <path
+                      className="transition-colors duration-300 text-red-500 group-hover:text-[#FF0000]"
+                      d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-3 sm:ml-5">
+                  <h3 className="text-base sm:text-lg font-medium text-white">
+                    {t("card5Title")}
+                  </h3>
+                  <p className="text-gray-300 mt-1 text-sm sm:text-base">
+                    {t("card5Description")}
+                  </p>
+                  <p className="text-blue-400 mt-1 text-xs sm:text-sm inline-flex items-center">
+                    {t("card5Link")}
+                    <svg
+                      className="ml-1 w-3 h-3 sm:w-4 sm:h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                  </p>
+                </div>
+              </div>
+            </a>
           </div>
 
           {/* Right side: Contact form */}

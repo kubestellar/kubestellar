@@ -434,6 +434,25 @@ export default function GetStartedSection() {
                     {t("card2Button4")}
                   </Link>
                 </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Link
+                    href="https://www.youtube.com/@kubestellar"
+                    className="flex items-center justify-center px-3 py-2.5 rounded-lg bg-gradient-to-r from-blue-600/80 to-blue-700/80 hover:from-blue-600 hover:to-blue-700 text-white text-sm font-medium transition-all duration-200 border border-blue-500/30"
+                  >
+                    <svg
+                      className="h-4 w-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        className="transition-colors duration-300 text-white-400 group-hover:text-[#FF0000]"
+                        d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+                      />
+                      </svg>
+                    {t("card2Button5")}
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
