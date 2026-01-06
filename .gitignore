@@ -49,3 +49,10 @@ core-chart/charts/
 *.dylib
 *.jar
 *.class
+# Additional binary artifacts (Fix for LFX OSPS-QA-05.01)
+*.test
+*.out
+*.o
+*.a
+*.pyc
+__pycache__/
