@@ -1,6 +1,13 @@
-<!-- Note that this repo has two readme files, with content that is as nearly identical as is practical: `/README.md` and `/docs/content/readme.md` -->
+<!--
+Note: This repo has two README files with nearly identical content:
+- /README.md
+- /docs/content/readme.md
 
-<img alt="" width="500px" align="left" src="KubeStellar-with-Logo.png" />
+If you update shared content in one, please make the same change in the other so they stay in sync.
+-->
+
+
+<img alt="KubeStellar Logo" width="500px" align="left" src="KubeStellar-with-Logo.png" />
 
 <br/>
 <br/>
@@ -14,20 +21,18 @@
 [![](https://www.bestpractices.dev/projects/8266/badge)](https://www.bestpractices.dev/projects/8266)
 [![](https://api.scorecard.dev/projects/github.com/kubestellar/kubestellar/badge)](https://scorecard.dev/viewer/?uri=github.com/kubestellar/kubestellar)
 [![](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubestellar)](https://artifacthub.io/packages/search?repo=kubestellar)
-<a href="https://cloud-native.slack.com/archives/C097094RZ3M"> 
+<a href="https://cloud-native.slack.com/archives/C097094RZ3M">
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
-  </a>
+</a>
 <a href="https://deepwiki.com/kubestellar/kubestellar">
-  <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
+    <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
 </a>
 
 **KubeStellar** is a Cloud Native Computing Foundation (CNCF) Sandbox project that simplifies the deployment and configuration of applications across multiple Kubernetes clusters. It provides a seamless experience akin to using a single cluster, and it integrates with the tools you're already familiar with, eliminating the need to modify existing resources.
 
 KubeStellar is particularly beneficial if you're currently deploying in a single cluster and are looking to expand to multiple clusters, or if you're already using multiple clusters and are seeking a more streamlined developer experience.
 
-
 ![KubeStellar High Level View](docs/content/images/kubestellar-high-level.png)
-
 
 The use of multiple clusters offers several advantages, including:
 
@@ -60,7 +65,7 @@ Have a look at what we are working on next, see our [Roadmap](docs/content/direc
 
 There are several ways to communicate with us:
 
-Instantly get access to our documents and meeting invites at http://kubestellar.io/joinus
+- Instantly get access to our documents and meeting invites at http://kubestellar.io/joinus
 
 - The [`#kubestellar-dev` channel](https://cloud-native.slack.com/archives/C097094RZ3M) in the [CNCF Slack workspace](https://communityinviter.com/apps/cloud-native/cncf)
 - Our mailing lists:
@@ -73,9 +78,8 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 - Browse the [shared Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing) to share design docs, notes, etc.
     - Members of the [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list can view this drive
 - Follow us on:
-   - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
-   - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
-
+    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
+    - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
 
 <div>
 <h2><font size="6"><img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Red%20Heart.png" alt="Red Heart" width="40" height="40" /> Contributors </font></h2>
