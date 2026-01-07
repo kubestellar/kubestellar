@@ -39,10 +39,10 @@ actions/setup-go:
   tag: v6.1.0
   tag-url: https://github.com/actions/setup-go/tree/v6.1.0
 anchore/sbom-action/download-syft:
-  sha: 43a17d6e7add2b5535efe4dcae9952337c479a93
-  sha-url: https://github.com/anchore/sbom-action/commit/43a17d6e7add2b5535efe4dcae9952337c479a93
-  tag: v0.20.11
-  tag-url: https://github.com/anchore/sbom-action/tree/v0.20.11
+  sha: a930d0ac434e3182448fe678398ba5713717112a
+  sha-url: https://github.com/anchore/sbom-action/commit/a930d0ac434e3182448fe678398ba5713717112a
+  tag: v0.21.0
+  tag-url: https://github.com/anchore/sbom-action/tree/v0.21.0
 goreleaser/goreleaser-action:
   sha: e435ccd777264be153ace6237001ef4d979d3a7a
   sha-url: https://github.com/goreleaser/goreleaser-action/commit/e435ccd777264be153ace6237001ef4d979d3a7a
@@ -84,15 +84,15 @@ technote-space/assign-author:
   tag: v1.6.2
   tag-url: https://github.com/technote-space/assign-author/tree/v1.6.2
 rojopolis/spellcheck-github-actions:
-  sha: 16d0338a5a3b5e3111a078029fb9a07a8125053d
-  sha-url: https://github.com/rojopolis/spellcheck-github-actions/commit/16d0338a5a3b5e3111a078029fb9a07a8125053d
-  tag: 0.55.0
-  tag-url: https://github.com/rojopolis/spellcheck-github-actions/tree/0.55.0
+  sha: cebe06444da3ac5e9d3146f5f02a0e2a236f7488
+  sha-url: https://github.com/rojopolis/spellcheck-github-actions/commit/cebe06444da3ac5e9d3146f5f02a0e2a236f7488
+  tag: 0.56.0
+  tag-url: https://github.com/rojopolis/spellcheck-github-actions/tree/0.56.0
 actions/upload-artifact:
-  sha: 330a01c490aca151604b8cf639adc76d48f6c5d4
-  sha-url: https://github.com/actions/upload-artifact/commit/330a01c490aca151604b8cf639adc76d48f6c5d4
-  tag: v5.0.0
-  tag-url: https://github.com/actions/upload-artifact/tree/v5.0.0
+  sha: b7c566a772e6b6bfb58ed0dc250532a479d7789f
+  sha-url: https://github.com/actions/upload-artifact/commit/b7c566a772e6b6bfb58ed0dc250532a479d7789f
+  tag: v6.0.0
+  tag-url: https://github.com/actions/upload-artifact/tree/v6.0.0
 actions/github-script:
   sha: ed597411d8f924073f98dfc5c65a23a2325f34cd
   sha-url: https://github.com/actions/github-script/commit/ed597411d8f924073f98dfc5c65a23a2325f34cd
