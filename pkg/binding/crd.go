@@ -119,13 +119,13 @@ func (c *Controller) includedToWatch(r APIResource) bool {
 		return false
 	}
 	gr := schema.GroupResource{
-	Group:    r.groupVersion.Group,
-	Resource: r.resource.Name,
- }
+	  Group:    r.groupVersion.Group,
+	  Resource: r.resource.Name,
+  }
 
- if isExcludedGroupResource(gr) {
-	 return false
- }
+  if isExcludedGroupResource(gr) {
+	  return false
+  }
 
 	return true
 }

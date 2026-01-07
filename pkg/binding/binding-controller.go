@@ -422,13 +422,13 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 		logger.V(1).Info("Working on APIResourceList", "groupVersion", list.GroupVersion, "numResources", len(list.APIResources))
 		for _, resource := range list.APIResources {
 			gr := schema.GroupResource{
-		Group:    gv.Group,
-		Resource: resource.Name,
-	  }
+		    Group:    gv.Group,
+		    Resource: resource.Name,
+	    }
 
-	  if isExcludedGroupResource(gr) {
-		  continue
-	  }
+	    if isExcludedGroupResource(gr) {
+		    continue
+	    }
 			informable := verbsSupportInformers(resource.Verbs)
 			if informable {
 				gvr := gv.WithResource(resource.Name)
