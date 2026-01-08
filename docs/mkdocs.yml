@@ -126,7 +126,7 @@ nav:
 
 theme:
   font:
-    text: 'SapceMono'
+    text: 'Space Mono'
     code: 'Roboto Mono'
   name: material
   icon:
