@@ -21,3 +21,4 @@ Pygments>=2.16,<3.0
 
 # Include Markdown Plugin
 mkdocs-include-markdown-plugin>=7.1.2,<8.0
+mkdocs-redirects>=1.2.0,<2.0
