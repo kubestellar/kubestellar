@@ -1,4 +1,70 @@
 {
+  "heroSection": {
+    "line1": "マルチクラスター",
+    "line2": "Kubernetes",
+    "line3": "オーケストレーション",
+    "subtitle": "クラウドネイティブ・オーケストレーションの未来を体験してください。KubeStellar は、AI 駆動の自動化とリアルタイムのインテリジェンスにより、マルチクラスター管理を革新します。",
+    "terminalTitle": "kubestellar-control-center",
+    "terminalStatus": "準備完了",
+    "terminalCommandL1": "bash <(curl -s \\",
+    "terminalCommandL2": "  https://raw.githubusercontent.com/kubestellar/ \\",
+    "terminalCommandL3": "  kubestellar/refs/tags/v0.27.2/scripts/ \\",
+    "terminalCommandL4": "  create-kubestellar-demo-env.sh) --platform kind",
+    "terminalOutputInfo": "情報",
+    "terminalOutputInfoText": "KubeStellar デモ環境をインストール中...",
+    "terminalOutputSetup": "セットアップ",
+    "terminalOutputSetupText": "kind クラスターを作成中: kubeflex, cluster1, cluster2",
+    "terminalOutputInstall": "インストール",
+    "terminalOutputInstallText": "KubeFlex コントロールプレーンをデプロイ中",
+    "terminalOutputConfig": "設定",
+    "terminalOutputConfigText": "Open Cluster Management を設定中",
+    "terminalOutputSuccess": "完了",
+    "terminalOutputSuccessText": "KubeStellar デモ環境の準備が完了しました！",
+    "buttonInstall": "KubeStellar をインストール",
+    "buttonDocs": "ドキュメントを見る"
+  },
+  "footer": {
+    "description": "多様なインフラストラクチャ全体で分散ワークロード管理を簡素化する、マルチクラスター Kubernetes オーケストレーションプラットフォーム。",
+    "docs": "ドキュメント",
+    "overview": "概要",
+    "userGuide": "ユーザーガイド",
+    "onboarding": "オンボーディング",
+    "releasesNotes": "リリースノート",
+    "gettingStarted": "はじめに",
+    "installationPage": "インストールページ",
+    "ladder": "ラダー",
+    "products": "製品",
+    "contributeHandbook": "コントリビューターハンドブック",
+    "resources": "リソース",
+    "playground": "プレイグラウンド",
+    "programs": "プログラム",
+    "partners": "パートナー",
+    "blog": "ブログ",
+    "product": "プロダクト",
+    "features": "機能",
+    "useCases": "ユースケース",
+    "pricing": "価格",
+    "roadmap": "ロードマップ",
+    "documentation": "ドキュメント",
+    "tutorials": "チュートリアル",
+    "community": "コミュニティ",
+    "company": "会社情報",
+    "about": "概要",
+    "team": "チーム",
+    "careers": "採用情報",
+    "contact": "お問い合わせ",
+    "stayUpdated": "最新情報を受け取る",
+    "emailPlaceholder": "メールアドレス",
+    "subscribe": "購読する",
+    "subscribed": "購読しました！",
+    "privacyNotice": "お客様のプライバシーを尊重します。スパムは送信しません。",
+    "copyright": "© 2025 KubeStellar. All rights reserved. Apache 2.0 ライセンス",
+    "privacyPolicy": "プライバシーポリシー",
+    "termsOfService": "利用規約",
+    "cookiePolicy": "Cookie ポリシー",
+    "madeWithLove": "KubeStellar チームが ❤️ を込めて開発しました",
+    "backToTop": "トップへ戻る"
+  },
   "navigation": {
     "docs": "ドキュメント",
     "blog": "ブログ",
@@ -36,5 +102,803 @@
     "mobileUseCases": "ユースケース",
     "mobileGetStarted": "始める",
     "mobileContact": "お問い合わせ"
+  },
+  "aboutSection": {
+    "title": "KubeStellar とは",
+    "titleSpan": "",
+    "subtitle": "複数の Kubernetes クラスターにまたがる分散ワークロードの管理を簡素化する、マルチクラスター Kubernetes オーケストレーションプラットフォームです。",
+    "card1Title": "単一のコントロールプレーン",
+    "card1Description": "ラッピングやバンドルを行わず、Kubernetes オブジェクトをネイティブ形式のまま操作できます。Workload Definition Spaces（WDS）を通じてワークロード定義を一元管理し、Inventory and Transport Spaces（ITS）を利用してクラスターインベントリを効率的に管理します。",
+    "card2Title": "インテリジェントなワークロード配置",
+    "card2Description": "ラベルベースのセレクションと BindingPolicy を使用して、どのワークロードをどこで実行するかを指定できます。標準 Kubernetes リソース、カスタムリソース（CRD）、Helm チャート、外部ワークロードタイプをサポートし、自動同期によりクラスター間で一貫性を維持します。",
+    "card3Title": "ポリシー駆動の管理",
+    "card3Description": "BindingPolicy システムを通じて包括的なガバナンスを実現します。個々のクラスター監視のためのシングルトンステータス管理や、統合ステータスの集約を行い、障害発生時には自動復旧機能付きのカスタム変換を適用できます。",
+    "learnMore": "詳細を見る"
+  },
+  "contactSection": {
+    "title": "お問い合わせ",
+    "titleSpan": "",
+    "subtitle": "KubeStellar についてご質問がありますか？私たちがお手伝いします！",
+    "card1Title": "メールサポート",
+    "card1Description": "チームから直接サポートを受けることができます",
+    "card1Link": "support@kubestellar.io",
+    "card2Title": "コミュニティチャット",
+    "card2Description": "Slack ワークスペースに参加してリアルタイムでサポートを受けましょう",
+    "card2Link": "Slack に参加",
+    "card3Title": "GitHub",
+    "card3Description": "コントリビュート、Issue の報告、またはソースコードの閲覧ができます",
+    "card3Link": "リポジトリを見る",
+    "card4Title": "LinkedIn",
+    "card4Description": "プロフェッショナルコミュニティとつながりましょう",
+    "card4Link": "フォローする",
+    "card5Title": "YouTube",
+    "card5Description": "KubeStellar の YouTube チャンネルで、ミーティング録画、サポート、情報動画をご覧ください",
+    "card5Link": "KubeStellar YouTube",
+    "formTitle": "メッセージを送信",
+    "formName": "お名前 *",
+    "formNamePlaceholder": "お名前（フルネーム）",
+    "formEmail": "メールアドレス *",
+    "formEmailPlaceholder": "you@example.com",
+    "formSubject": "件名 *",
+    "formSubjectPlaceholder": "件名を選択",
+    "formSubjectOption1": "一般的なお問い合わせ",
+    "formSubjectOption2": "技術サポート",
+    "formSubjectOption3": "パートナーシップ",
+    "formSubjectOption4": "ドキュメントへのフィードバック",
+    "formSubjectOption5": "エンタープライズ向けソリューション",
+    "formSubjectOption6": "その他",
+    "formMessage": "メッセージ *",
+    "formMessagePlaceholder": "ご利用ケースや、ご要望についてお聞かせください...",
+    "formPrivacy": "私は",
+    "formPrivacyLink": "プライバシーポリシー",
+    "formPrivacyCont": "に同意し、KubeStellar チームからの連絡を受け取ることに同意します。",
+    "formSubmit": "送信",
+    "formSubmitting": "送信中...",
+    "formSuccess": "メールは KubeStellar の開発メーリングリストに送信されます。送信を完了するために、メールクライアントをご確認ください。"
+  },
+  "getStartedSection": {
+    "title": "始める準備はできましたか？",
+    "subtitle": "成長を続ける KubeStellar のユーザーおよびコントリビューターコミュニティに参加しましょう。",
+    "card1Title": "クイックインストール",
+    "card1Description": "自動的な前提条件チェックとステップバイステップのデプロイ手順を備えた、シンプルなインストールガイドを使って、数分で KubeStellar を起動できます。",
+    "card1Button": "クイックインストールを開始",
+    "card2Title": "ユースケースとコミュニティを探索",
+    "card2Description": "マルチクラスターのワークロード管理機能を発見し、コミュニティとつながりましょう。",
+    "card2Button1": "Slack に参加",
+    "card2Button2": "GitHub",
+    "card2Button3": "プロジェクト",
+    "card2Button4": "ハンドブック",
+    "card2Button5": "YouTube",
+    "card3Title": "ドキュメントを探索",
+    "card3Description": "KubeStellar の機能を習得するための、包括的なガイド、チュートリアル、API リファレンスをご覧ください。",
+    "card3Link1": "はじめに",
+    "card3Link2": "アーキテクチャ",
+    "card3Link3": "API リファレンス"
+  },
+  "howToUseSection": {
+    "title": "使い方",
+    "titleSpan": "KubeStellar",
+    "subtitle": "以下の 5 つの簡単なステップに従って、KubeStellar のマルチクラスターオーケストレーションを始めましょう",
+    "step1Title": "環境をセットアップ",
+    "step1Description": "必要なツールをインストールし、コアコンポーネントを初期化します",
+    "step1DescriptionDesktop": "必要なツールをインストールし、KubeFlex ホスティングクラスター、ITS、WDS、WECs を含むコアコンポーネントを初期化します。",
+    "step1CodeComment": "# 必要なツールをインストール",
+    "step1Tool1": "kubectl",
+    "step1Tool2": "helm",
+    "step1Tool3": "docker",
+    "step1Tool4": "kind/k3d",
+    "step1Tool5": "KubeFlex",
+    "step1Tool6": "Open Cluster Management (OCM) CLI",
+    "step2Title": "クラスターの登録とラベル付け",
+    "step2Description": "WEC を登録し、ターゲティング用のラベルを適用します",
+    "step2DescriptionDesktop": "OCM を使用して WEC を ITS に登録し、クラスターにターゲティング用のラベルを適用し、安全な接続を確立します。",
+    "step2CodeComment": "# クラスターのラベル付け例",
+    "step2Command": "kubectl label managedcluster",
+    "step2Cluster": "cluster1",
+    "step2Label1": "location-group=edge",
+    "step2Label2": "name=cluster1",
+    "step3Title": "ワークロード配置の定義",
+    "step3Description": "デプロイメントルールを指定するための BindingPolicy オブジェクトを作成します",
+    "step3DescriptionDesktop": "どのクラスターにワークロードを配置し、どのワークロードを配布するかを指定するために BindingPolicy オブジェクトを作成します。",
+    "step3ApiVersion": "control.kubestellar.io/v1alpha1",
+    "step3Kind": "BindingPolicy",
+    "step3MetadataName": "example-policy",
+    "step3SpecClusterSelectors": "clusterSelectors",
+    "step3MatchLabels": "matchLabels",
+    "step3LocationGroup": "location-group: edge",
+    "step4Title": "ワークロードのデプロイ",
+    "step4Description": "Kubernetes ネイティブ形式でワークロードをデプロイします",
+    "step4DescriptionDesktop": "kubectl apply、Helm チャート、ArgoCD、またはカスタムリソースを使用して、Kubernetes ネイティブ形式でワークロードをデプロイします。",
+    "step4ApiVersion": "apps/v1",
+    "step4Kind": "Deployment",
+    "step4MetadataName": "example-app",
+    "step4Labels": "labels",
+    "step4AppName": "app.kubernetes.io/name: myapp",
+    "step4Spec": "spec",
+    "step4Replicas": "replicas",
+    "step4ReplicasValue": "3",
+    "step5Title": "監視と管理",
+    "step5Description": "デプロイ状態を監視し、ワークロードの健全性を管理します",
+    "step5DescriptionDesktop": "クラスター間のデプロイ状態を監視し、ワークロードの健全性を確認し、ステータス情報を収集してポリシー遵守を管理します。",
+    "step5Tag1": "ステータス収集",
+    "step5Tag2": "ヘルスモニタリング",
+    "step5Tag3": "ポリシー管理",
+    "step5Command1Comment": "# クラスター間のデプロイ状態を確認",
+    "step5Command2Comment": "# ワークロードの配置を確認",
+    "step5Command3Comment": "# リソース使用状況を監視"
+  },
+  "useCasesSection": {
+    "title": "ユース",
+    "titleSpan": "ケース",
+    "subtitle": "組織が KubeStellar をどのように活用してマルチクラスターの課題を解決しているかをご紹介します。",
+    "learnMore": "詳細を見る",
+    "cases": {
+      "edge": {
+        "title": "エッジコンピューティング",
+        "description": "エッジ環境全体にアプリケーションを集中管理でデプロイします。分散インフラを持つ小売、製造、通信業界に最適です。",
+        "backContent": {
+          "title": "宣言的マルチクラスター・ワークロード管理",
+          "description": "ラッピングやバンドルを行わず、Kubernetes ネイティブオブジェクトを使用して複数クラスターにワークロードをデプロイ・管理します。",
+          "features": [
+            "Kubernetes ネイティブオブジェクトを複数クラスターにデプロイ",
+            "ラベルベースのクラスター選択によるワークロード配置",
+            "Workload Definition Spaces（WDS）による集中管理"
+          ]
+        }
+      },
+      "compliance": {
+        "title": "マルチリージョン・コンプライアンス",
+        "description": "地域ごとのコンプライアンス要件を満たしたアプリケーションをデプロイし、データ常駐性と規制遵守を確保します。",
+        "backContent": {
+          "title": "カスタムリソース配布",
+          "description": "適切な同期とライフサイクル管理を維持しながら、カスタムリソース（CRD）を複数クラスターに配布・管理します。",
+          "features": [
+            "外部ワークロードタイプのサポート",
+            "CRD の自動同期",
+            "柔軟な RBAC 設定"
+          ]
+        }
+      },
+      "hybrid": {
+        "title": "ハイブリッド / マルチクラウド",
+        "description": "統一されたポリシーと一貫した操作体験により、複数のクラウドプロバイダーやオンプレミス環境間でワークロードをシームレスに管理します。",
+        "backContent": {
+          "title": "高可用なマルチクラスター運用",
+          "description": "コントロールプレーン障害やネットワーク問題が発生しても、信頼性の高いワークロード管理を維持します。",
+          "features": [
+            "複数スペースによる耐障害アーキテクチャ",
+            "障害後の自動復旧",
+            "クラスター間の状態同期"
+          ]
+        }
+      },
+      "dr": {
+        "title": "ディザスタリカバリ",
+        "description": "異なるリージョンにある複数クラスター間で、ワークロードの自動レプリケーションとフェイルオーバーを実現します。",
+        "backContent": {
+          "title": "高度なステータス管理",
+          "description": "個別および集約されたステータスレポートを使用して、複数クラスターのワークロード状態を監視・管理します。",
+          "features": [
+            "個別クラスター向けシングルトンステータスレポート",
+            "クラスター全体の統合ステータス集約",
+            "OCM Status アドオンによるリアルタイム更新"
+          ]
+        }
+      },
+      "multitenant": {
+        "title": "マルチテナント分離",
+        "description": "集中管理を維持しながら、チームや顧客ごとに分離された環境を構築します。SaaS プロバイダーや大企業に最適です。",
+        "backContent": {
+          "title": "Helm チャート配布",
+          "description": "チャートのメタデータとリリース情報を維持しながら、複数クラスターに Helm チャートをデプロイ・管理します。",
+          "features": [
+            "Helm チャートのネイティブサポート",
+            "クラスター間で一貫したリリース管理",
+            "ラベルベースのチャート配布"
+          ]
+        }
+      },
+      "performance": {
+        "title": "パフォーマンス最適化",
+        "description": "ユーザーやデータソースに近い場所へワークロードを配置し、レイテンシを削減してグローバルなユーザー体験を向上させます。",
+        "backContent": {
+          "title": "テンプレートベースのカスタマイズ",
+          "description": "単一の信頼できる情報源を維持しながら、クラスターごとにワークロード設定をカスタマイズします。",
+          "features": [
+            "テンプレート展開のサポート",
+            "クラスター固有のカスタマイズ",
+            "プロパティベースの設定"
+          ]
+        }
+      }
+    }
+  },
+  "communityHandbook": {
+    "title": "コントリビューター",
+    "titleSpan": "ハンドブック",
+    "learnMore": "詳細を見る",
+    "cards": {
+      "onboarding": {
+        "title": "オンボーディング",
+        "description": "KubeStellar GitHub 組織のオンボーディングおよびオフボーディングポリシー。コミュニティへの参加方法を学びます。"
+      },
+      "codeOfConduct": {
+        "title": "行動規範",
+        "description": "すべての人が安心して貢献し、成長できる包括的で歓迎されるコミュニティを作るための取り組みです。"
+      },
+      "guidelines": {
+        "title": "ガイドライン",
+        "description": "KubeStellar プロジェクトへ貢献するためのベストプラクティス。高品質な貢献のための重要な指針です。"
+      },
+      "license": {
+        "title": "ライセンス",
+        "description": "KubeStellar は Apache 2.0 ライセンスのもとで提供されています。オープンソースライセンスの条件について学びます。"
+      },
+      "governance": {
+        "title": "ガバナンス",
+        "description": "KubeStellar プロジェクトの運営体制と意思決定プロセスについて理解します。"
+      },
+      "testing": {
+        "title": "テスト",
+        "description": "貢献内容をテストするための手順とガイドライン。すべての変更に品質と信頼性を確保します。"
+      },
+      "packaging": {
+        "title": "パッケージング",
+        "description": "KubeStellar コンポーネントのパッケージングおよび配布方法。ビルドとデプロイのプロセスを学びます。"
+      },
+      "docsManagement": {
+        "title": "ドキュメント管理概要",
+        "description": "ドキュメントがどのように管理・更新されているかの概要。包括的なドキュメントワークフローです。"
+      },
+      "testingWebsitePRs": {
+        "title": "Web サイト PR のテスト",
+        "description": "KubeStellar Web サイトのプルリクエストをテストする方法。Web 変更の品質保証を行います。"
+      },
+      "releaseProcess": {
+        "title": "リリースプロセス",
+        "description": "KubeStellar の新しいリリースを作成・公開するためのプロセス。リリースライフサイクル全体を管理します。"
+      },
+      "releaseTesting": {
+        "title": "リリーステスト",
+        "description": "公開前に新しいリリースをテストおよび検証する方法。包括的なリリース検証プロセスです。"
+      },
+      "signoffSigning": {
+        "title": "サインオフと貢献の署名",
+        "description": "貢献に対するサインオフ要件。法的遵守および貢献の検証を行います。"
+      }
+    }
+  },
+  "programDetailsPage": {
+    "benefits": "特典",
+    "description": "説明",
+    "overview": "概要",
+    "eligibility": "応募資格",
+    "timeline": "タイムライン",
+    "structure": "プログラム構成",
+    "howToApply": "応募方法",
+    "resources": "参考資料"
+  },
+  "quickInstallationPage": {
+    "title": "クイックインストールガイド",
+    "subtitle": "この簡潔なインストールガイドを使って、KubeStellar をすぐに起動できます。以下の前提条件とインストール手順に従ってください。",
+    "prerequisitesTitle": "前提条件",
+    "prerequisitesSubtitle": "利用ケースに応じて必要なツールをインストールしてください",
+    "coreTitle": "主要な前提条件",
+    "coreDescription": "KubeStellar を使用するために必須のツール",
+    "coreDocker": "Docker",
+    "coreDockerDesc": "コンテナ実行環境プラットフォーム",
+    "coreKubectl": "kubectl",
+    "coreKubectlDesc": "Kubernetes のコマンドラインツール",
+    "coreKubeflex": "KubeFlex",
+    "coreKubeflexDesc": "マルチクラスター管理の中核コンポーネント",
+    "coreOcm": "OCM CLI",
+    "coreOcmDesc": "Open Cluster Management のコマンドラインインターフェース",
+    "coreHelm": "Helm",
+    "coreHelmDesc": "Kubernetes 用パッケージマネージャー",
+    "additionalTitle": "追加の前提条件",
+    "additionalDescription": "KubeStellar のサンプルを実行するための追加ツール",
+    "additionalKind": "kind",
+    "additionalKindDesc": "Docker 上で動作するローカル Kubernetes クラスター",
+    "additionalK3d": "k3d",
+    "additionalK3dDesc": "Docker 上で k3s を実行する軽量ラッパー",
+    "additionalArgo": "Argo CD CLI",
+    "additionalArgoDesc": "Kubernetes 用 GitOps 継続的デリバリーツール",
+    "buildTitle": "ビルド用前提条件",
+    "buildDescription": "KubeStellar をソースからビルドするために必要なツール",
+    "buildMake": "Make",
+    "buildMakeDesc": "ビルド自動化ツール",
+    "buildGo": "Go",
+    "buildGoDesc": "KubeStellar を構築するためのプログラミング言語",
+    "buildKo": "ko",
+    "buildKoDesc": "Go アプリケーション用コンテナイメージビルダー",
+    "prerequisitesInstall": "インストール:",
+    "prerequisitesVerify": "確認:",
+    "prerequisitesButton": "詳細なインストールガイドを見る",
+    "autoCheckTitle": "前提条件の自動チェック",
+    "autoCheckSubtitle": "このスクリプトを使用して、必要なツールがすべて揃っているかを自動的に確認できます",
+    "autoCheckRun": "前提条件チェックを実行:",
+    "autoCheckAboutTitle": "前提条件チェック用スクリプトについて",
+    "autoCheckAbout1": "\"curl-to-bash\" 形式で使用できる自己完結型スクリプト",
+    "autoCheckAbout2": "which コマンドを使用して $PATH 内の前提条件を確認",
+    "autoCheckAbout3": "存在する前提条件のバージョンとパス情報を表示",
+    "autoCheckAbout4": "不足している前提条件のインストール方法を表示",
+    "autoCheckReleaseTitle": "特定のリリース向け",
+    "autoCheckReleaseDesc": "特定の KubeStellar リリースの前提条件を確認する場合は、main ブランチではなく該当リリースのスクリプトを使用してください。",
+    "autoCheckReleaseTip": "ヒント: インストールを進める前にこのチェックを実行し、環境が正しく設定されていることを確認してください。",
+    "installTitle": "KubeStellar のインストール",
+    "installSubtitle": "プラットフォームを選択し、インストールスクリプトを実行してください",
+    "installPlatform": "プラットフォームを選択:",
+    "installKind": "kind",
+    "installKindDesc": "Docker 上の Kubernetes",
+    "installK3d": "k3d",
+    "installK3dDesc": "軽量 Kubernetes",
+    "installScriptTitle": "インストールスクリプト:",
+    "installProcessTitle": "インストール手順",
+    "installProcess1": "ローカル {platform} クラスターを作成",
+    "installProcess2": "KubeStellar の主要コンポーネントをインストール",
+    "installProcess3": "マルチクラスター管理機能をセットアップ",
+    "installProcess4": "ワークロード配布を設定",
+    "installNextTitle": "次のステップ",
+    "installNext1": "インストールを確認",
+    "installNext2": "KubeStellar の状態を確認",
+    "installNext3": "",
+    "installNext3Link": "ドキュメント",
+    "installNext3Suffix": "でサンプルや高度な使い方を確認してください",
+    "faqTitle": "よくある質問",
+    "faqSubtitle": "KubeStellar のインストールと設定に関する一般的な質問",
+    "faq1Q": "主要・追加・ビルド前提条件の違いは何ですか？",
+    "faq1A": "主要な前提条件は KubeStellar を使用するために必須です。追加の前提条件はサンプルやデモの実行に必要です。ビルド前提条件は、ソースからビルドする場合のみ必要です。",
+    "faq2Q": "前提条件がすべてインストールされているか自動で確認できますか？",
+    "faq2A": "はい。自動前提条件チェック用スクリプトを使用してください: 'curl -fsSL https://raw.githubusercontent.com/kubestellar/kubestellar/refs/heads/main/scripts/check_pre_req.sh | bash'。不足しているツールのインストール方法も案内されます。",
+    "faq3Q": "すべての前提条件をインストールする必要がありますか？",
+    "faq3A": "基本的な利用には主要な前提条件のみで十分です。サンプルを実行する場合は追加の前提条件を、開発やビルドを行う場合はビルド前提条件をインストールしてください。",
+    "faq4Q": "既存の Kubernetes クラスターでも KubeStellar を使用できますか？",
+    "faq4A": "はい。既存の Kubernetes クラスターを管理できます。ローカル開発用クラスターと本番クラスターを統合して管理することも可能です。",
+    "faq5Q": "最小システム要件は何ですか？",
+    "faq5A": "最低 4GB の RAM と 2 CPU コアが必要です。Docker (v20.0+)、kubectl (v1.27+)、および kind (v0.20+) または k3d が必要です。"
+  },
+  "programsPage": {
+    "title": "私たちの",
+    "titleSpan": "ミッションに参加",
+    "subtitle": "KubeStellar に貢献し、オープンソース開発でキャリアを成長させるための有意義な機会を見つけましょう。",
+    "paid": "有給プログラム",
+    "unpaid": "無給インターンシップ",
+    "programs": {
+      "gsoc": {
+        "name": "GSoC",
+        "fullName": "Google Summer of Code",
+        "description": "Google の代表的なオープンソースプログラムで、コーディングスキルを飛躍的に向上させましょう",
+        "sections": {
+          "benefits": "実践的な経験を積み、経験豊富なメンターから学び、オープンソースコミュニティの一員となり、プログラムを無事に完了すると奨学金（スティペンド）を受け取ることができます。",
+          "description": "Google Summer of Code は、より多くの学生開発者をオープンソースソフトウェア開発に参加させることを目的としたグローバルプログラムです。学生は休暇期間中に、オープンソース組織と共に 3 か月間のプログラミングプロジェクトに取り組みます。",
+          "overview": "KubeStellar はメンター組織として参加しています。プロジェクトのアイデア、メンター、そして学びながら貢献できる温かいコミュニティを提供します。",
+          "eligibility": "参加者は 18 歳以上で、学生またはオープンソースソフトウェア開発の初心者である必要があります。詳細な条件については、公式 GSoC ウェブサイトをご確認ください。",
+          "timeline": "プログラムは通常 5 月から 8 月にかけて実施されます。応募期間、コミュニティボンディング、コーディング期間などの重要な日程があります。公式なスケジュールは GSoC ウェブサイトをご確認ください。",
+          "structure": "採択された参加者は、KubeStellar の 1 名以上のメンターの指導のもとでプロジェクトに取り組みます。中間評価と最終評価があります。",
+          "howToApply": "学生は応募期間中に Google Summer of Code の公式ウェブサイトから応募できます。事前にコミュニティへ参加し、KubeStellar に貢献することをおすすめします。",
+          "resources": [
+            { "name": "GSoC 公式サイト" },
+            { "name": "KubeStellar GitHub" }
+          ]
+        }
+      },
+      "esoc": {
+        "name": "ESoC",
+        "fullName": "European Summer of Code",
+        "description": "ヨーロッパの才能ある開発者をオープンソース開発で支援",
+        "sections": {
+          "benefits": "実際のプロジェクトに取り組み、奨学金を受け取り、オープンソースコミュニティとつながる絶好の機会です。",
+          "description": "European Summer of Code は、ヨーロッパの学生や新卒者を対象としたプログラムで、オープンソースプロジェクトに貢献する機会を提供します。",
+          "overview": "KubeStellar は ESoC 参加者のメンタリングを行い、成長を支援するための挑戦的なプロジェクトと手厚いサポートを提供します。",
+          "eligibility": "ヨーロッパ在住の学生および新卒者が対象です。詳細な条件については、公式 ESoC ウェブサイトをご確認ください。",
+          "timeline": "プログラムは通常、夏季に実施されます。具体的な日程や締切は ESoC の公式サイトをご参照ください。",
+          "structure": "参加者は、定期的なミーティングやフィードバックを通じて、KubeStellar のメンターと密接に連携しながら、事前に定義されたプロジェクトに取り組みます。",
+          "howToApply": "応募は European Summer of Code の公式ポータルから行ってください。",
+          "resources": [
+            { "name": "ESoC 公式サイト（リンク未提供）" },
+            { "name": "KubeStellar GitHub" }
+          ]
+        }
+      },
+      "ifos": {
+        "name": "IFoS",
+        "fullName": "Interns for Open Source",
+        "description": "KubeStellar と共にオープンソースへの第一歩を踏み出そう",
+        "sections": {
+          "benefits": "無給プログラムではありますが、修了者には修了証明書と推薦状が発行され、GSoC や LFX などの将来の有給メンタープログラムへの優先的な選考機会が与えられます。",
+          "description": "Interns for Open Source（IFoS）は、KubeStellar が提供する独自の無給インターンプログラムです。オープンソースに情熱を持ち、最先端のプロジェクトで実践的な経験を積みたい方を対象としています。",
+          "overview": "この 3 か月間のプログラムは、KubeStellar コミュニティへの直接的な入り口となります。参加者は意義のあるプロジェクトに取り組み、コア開発者からメンタリングを受けます。",
+          "eligibility": "Kubernetes、マルチクラスターオーケストレーション、オープンソースに強い関心を持つ方であれば、どなたでも応募できます。Go やコンテナ技術の基礎知識があると望ましいです。",
+          "timeline": "IFoS は通年プログラムです。応募は随時受け付けており、開始時期はプロジェクトの状況や応募者のスケジュールに応じて決定されます。",
+          "structure": "インターンはメンターとペアになり、開発チームの一員として活動します。プログラムは柔軟で、フルタイム・パートタイムのどちらでも参加可能です。",
+          "howToApply": "履歴書と志望動機をコミュニティ用メールアドレスへ送付してください。また、GitHub リポジトリへの貢献を事前に始めることを推奨します。",
+          "resources": [
+            { "name": "KubeStellar GitHub" },
+            { "name": "KubeStellar コミュニティページ" }
+          ]
+        }
+      },
+      "lfx": {
+        "name": "LFX",
+        "fullName": "LFX Mentorship",
+        "description": "Linux Foundation のメンタープログラムでオープンソースの道を加速",
+        "sections": {
+          "benefits": "奨学金を受け取り、最先端技術の実践経験を積み、プロフェッショナルネットワークを広げ、履歴書を強化できます。",
+          "description": "Linux Foundation が運営する LFX Mentorship は、オープンソースへの貢献を目指す開発者のための構造化されたリモート学習プログラムです。経験豊富なメンターと共に実プロジェクトに取り組みます。",
+          "overview": "KubeStellar は LFX Mentorship プログラムの参加組織です。ロードマップ上で重要なプロジェクトを提供し、参加者が大きなインパクトを与えられる機会を用意しています。",
+          "eligibility": "本プログラムはあらゆるバックグラウンドの開発者に開かれています。具体的な要件はプロジェクトごとに異なるため、LFX Mentorship プラットフォームをご確認ください。",
+          "timeline": "LFX Mentorship は通常、春・夏・秋の期間に実施され、各期間は約 12 週間です。",
+          "structure": "参加者は KubeStellar のメンターと 1 対 1 で協力し、プロジェクトに貢献しながらコミュニティ活動にも参加します。",
+          "howToApply": "応募は LFX Mentorship プラットフォームから行います。KubeStellar のプロジェクトを探して応募してください。",
+          "resources": [
+            { "name": "LFX Mentorship プラットフォーム" },
+            { "name": "KubeStellar GitHub" }
+          ]
+        }
+      }
+    }
+  },
+  "productsPage": {
+    "title": "私たちの",
+    "titleSpan": "プロジェクト",
+    "subtitle": "KubeStellar エコシステムを強化し、マルチクラスター Kubernetes 管理を実現するツールとプラットフォームのスイートをご紹介します。",
+    "repoButton": "リポジトリ",
+    "websiteButton": "ウェブサイト",
+    "watchDemoButton": "デモを見る",
+    "products": {
+      "kubestellar": {
+        "name": "KubeStellar",
+        "fullName": "KubeStellar",
+        "description": "多様なインフラ環境における分散ワークロード管理を簡素化する、マルチクラスター Kubernetes オーケストレーションプラットフォームです。統合されたコントロールプレーン、インテリジェントなワークロード配置、ポリシー駆動のガバナンスを提供し、自動スケーリング、リソース最適化、クラウドプロバイダー間のシームレスな統合を実現します。"
+      },
+      "kubestellarUI": {
+        "name": "KubeStellar UI",
+        "fullName": "KubeStellar UI",
+        "description": "直感的なダッシュボード、リアルタイム監視、包括的な操作機能を備えた、マルチクラスター Kubernetes オーケストレーション管理用の強力な Web ベースのインターフェースです。高度な可視化ツール、カスタマイズ可能なワークスペース、インテリジェントなアラートにより、マルチクラスター運用を最適化します。"
+      },
+      "kubeflex": {
+        "name": "KubeFlex",
+        "fullName": "KubeFlex",
+        "description": "マルチクラスターオーケストレーションとワークロード分散のための包括的なツールとリソースを提供する、柔軟な Kubernetes 管理プラットフォームです。異種環境における動的なクラスターのプロビジョニング、自動スケーリング、インテリジェントなリソース割り当てを可能にし、ポリシー駆動の自動化によって複雑なデプロイシナリオを簡素化します。"
+      },
+      "a2a": {
+        "name": "A2A",
+        "fullName": "A2A",
+        "description": "KubeStellar エコシステム内でシームレスな接続を実現する、アプリケーション間通信プラットフォームです。分散マイクロサービス間の安全なデータ交換とリアルタイム通信を可能にし、高度なルーティング、ロードバランシング、サービスディスカバリー機能を提供します。"
+      },
+      "kubectlMulti": {
+        "name": "kubectl-multi",
+        "fullName": "kubectl-multi",
+        "description": "KubeStellar によるマルチクラスター操作のための包括的な kubectl プラグインです。KubeStellar が管理するすべてのクラスターで kubectl をシームレスに拡張し、ワークフローステージングクラスター（WDS）を除外しながら、統合されたビューと操作を提供します。複数のクラスターに対して同時にコマンドを実行し、結果をインテリジェントに集約できます。"
+      },
+      "galaxyMarketplace": {
+        "name": "Galaxy Marketplace",
+        "fullName": "KS Galaxy Marketplace",
+        "description": "KubeStellar の拡張機能、プラグイン、コミュニティ提供のツールや統合を集約した中央マーケットプレイスです。サードパーティコンポーネントを発見、インストール、管理することで、マルチクラスターオーケストレーション機能を強化できます。自動互換性チェック、バージョン管理、既存の KubeStellar デプロイメントとのシームレスな統合を備えています。"
+      }
+    }
+  },
+  "ladderPage": {
+    "title": "貢献",
+    "titleSpan": "ラダー",
+    "subtitle": "KubeStellar コミュニティにおける、初回コントリビューターから信頼されるメンテナーまでの透明で実力主義の成長パス",
+    "requirementsLabel": "要件：",
+    "goodStandingLabel": "良好なステータスでの機会：",
+    "nextLevelLabel": "次のレベル：",
+    "levels": {
+      "contributor": {
+        "title": "コントリビューター",
+        "nextLevel": "無給メンティー",
+        "description": "KubeStellar コミュニティでの旅を始めましょう",
+        "requirements": [
+          "最低 3 件の貢献（バグ報告、ドキュメント、またはコード PR）",
+          "長期的な参加への意欲と熱意を示すこと",
+          "GitHub と Slack で積極的に活動すること",
+          "メンタープログラム参加のための非公式な応募または推薦"
+        ],
+        "goodStanding": "良好なステータスにあるコントリビューター（Help Wanted Issue 作成、PR レビュー、PR マージの指標を満たす場合）は、メンタープロジェクトへのアサインなどの専門的な機会を得ることができます。"
+      },
+      "unpaidMentee": {
+        "title": "無給メンティー",
+        "nextLevel": "有給メンティー",
+        "description": "コミットメントとスキルを示すための 12 週間の取り組み",
+        "timeframe": "12 週間",
+        "requirements": [
+          "少なくとも 6 件の「Help Wanted」Issue を作成すること",
+          "少なくとも 20 件の PR をマージ（最初の 6 週間で 8 件）",
+          "週次チームミーティングに参加、または要約を提出すること",
+          "メンターと協力して作業すること",
+          "メンターからの推薦を受けること"
+        ],
+        "goodStanding": "良好なステータスの無給メンティーは、修了証明書、推薦状を受け取り、GSoC や LFX などの有給メンタープログラムへの優先的な検討対象となります。"
+      },
+      "paidMentee": {
+        "title": "有給メンティー",
+        "nextLevel": "メンター",
+        "description": "報酬と責任を伴う、認められたコントリビューター",
+        "requirements": [
+          "少なくとも 1 回の 12 週間の有給メンタープログラムを完了すること",
+          "新しいメンティーまたはコントリビューターを少なくとも 1 名オンボードし、支援すること",
+          "3 件以上の PR レビューを提出すること",
+          "PR または Issue に対して 5 件以上の有益なコメントを行うこと",
+          "コミュニティコールで発表、または共同発表を行うこと"
+        ],
+        "goodStanding": "良好なステータスの有給メンティーは、職業的な推薦、キャリアメンタリング、プロジェクトを主導したり他者をメンターする機会を得られます。"
+      },
+      "mentor": {
+        "title": "メンター",
+        "nextLevel": "メンテナー",
+        "description": "次世代のコントリビューターを導き、支援する役割",
+        "requirements": [
+          "1 つ以上の主要分野において技術的リーダーシップを示すこと",
+          "継続的な貢献活動を維持すること",
+          "GitHub および Slack でコミュニティと積極的に関わること",
+          "公開レビューを経てコアメンテナーから承認を受けること"
+        ],
+        "goodStanding": "良好なステータスのメンターは、イニシアチブの主導、カンファレンスでの KubeStellar 代表、スピーカー支援、ロードマップ決定への参加、CNCF によるトレーニング／試験バウチャーの受領資格を得ることができます。"
+      },
+      "maintainer": {
+        "title": "メンテナー",
+        "nextLevel": "アンバサダー",
+        "description": "プロジェクト全体の責任を担う信頼されたリーダー",
+        "requirements": [
+          "2 か月ごとに 2 件以上の「Help Wanted」Issue",
+          "2 か月ごとに 3 件以上の PR マージ",
+          "2 か月ごとに 8 件以上の PR レビューまたは建設的なコメント",
+          "2 か月ごとに 3 回以上のコミュニティミーティング参加"
+        ],
+        "goodStanding": "良好なステータスのメンテナーは、完全な書き込み権限、プロジェクト決定における投票権を持ち、公式なプロジェクト代表として活動できます。"
+      },
+      "ambassador": {
+        "title": "アンバサダー",
+        "nextLevel": "ステラ・アドボケイト",
+        "description": "KubeStellar の普及を推進し、支援する役割",
+        "requirements": [
+          "ブログ、プレゼンテーション、SNS を通じて KubeStellar を積極的に発信すること",
+          "ミートアップ、カンファレンス、コミュニティイベントで KubeStellar を代表すること",
+          "KubeStellar に関する教育コンテンツ（チュートリアル、動画、デモ）を作成すること",
+          "ユーザーと関わり、フィードバックを収集し普及を支援すること",
+          "メンテナーレベルの活動（Issue、PR、コミュニティ参加）を維持すること"
+        ],
+        "goodStanding": "良好なステータスのアンバサダーは、登壇機会、ブログの共同執筆、新機能への早期アクセス、プロモーション支援の対象となります。"
+      }
+    },
+    "activityRequirements": {
+      "title": "メンテナーの活動要件",
+      "subtitle": "メンテナーは以下の 2 か月ごとの最低貢献要件を満たす必要があります：",
+      "table": {
+        "metric": "指標",
+        "requirement": "要件（2 か月ごと）",
+        "helpWantedIssues": "「Help Wanted」Issue",
+        "helpWantedIssuesValue": "2 件以上",
+        "prsMerged": "マージされた PR",
+        "prsMergedValue": "3 件以上",
+        "prReviews": "PR レビューまたは建設的なコメント",
+        "prReviewsValue": "8 件以上",
+        "meetingAttendance": "コミュニティミーティング参加",
+        "meetingAttendanceValue": "3 回以上"
+      }
+    },
+    "callToAction": {
+      "title": "あなたの旅を始める準備はできましたか？",
+      "subtitle": "KubeStellar コミュニティに参加し、今日からメンテナーラダーを登り始めましょう",
+      "communityMeetingsButton": "コミュニティミーティング",
+      "viewIssuesButton": "オープン Issue を見る",
+      "exploreCodeTitle": "コードを探る",
+      "exploreCodeDescription": "コードベースを閲覧し、プロジェクトに貢献しましょう",
+      "viewRepositoryLink": "リポジトリを見る →",
+      "joinSlackTitle": "Slack に参加",
+      "joinSlackDescription": "リアルタイムの議論のためにコミュニティとつながる",
+      "joinCommunityLink": "コミュニティに参加 →",
+      "learnGuideTitle": "ガイドを学ぶ",
+      "learnGuideDescription": "包括的な貢献ハンドブックを読む",
+      "viewHandbookLink": "ハンドブックを見る →"
+    }
+  },
+  "partnersPage": {
+    "title": "私たちの",
+    "titleSpan": "パートナー",
+    "subtitle": "マルチクラスター Kubernetes オーケストレーションを強化するため、主要なオープンソースプロジェクトと協力しています",
+    "learnMore": "詳細を見る",
+    "partners": {
+      "argocd": {
+        "description": "Kubernetes 向けの宣言型 GitOps 継続的デリバリーツールで、アプリケーションのデプロイとライフサイクル管理を自動化します。"
+      },
+      "fluxcd": {
+        "description": "強力な GitOps 機能を備え、Git リポジトリからの自動デプロイを可能にする Kubernetes 向けのプログレッシブデリバリーツールです。"
+      },
+      "kyverno": {
+        "description": "宣言型ポリシーを使用して設定の検証、変更、生成を行う Kubernetes ネイティブのポリシー管理ソリューションです。"
+      },
+      "mvi": {
+        "description": "分散した Kubernetes 環境全体にわたる包括的な監視と分析を提供するマルチクラスター可視化・インサイトプラットフォームです。"
+      },
+      "openziti": {
+        "description": "分散アプリケーションに安全な接続性を提供する、ゼロトラスト型ネットワークオーバーレイおよびエッジアプリケーションプラットフォームです。"
+      },
+      "turbonomic": {
+        "description": "AI 駆動の自動化により、アプリケーションのパフォーマンスを確保しつつインフラコストを最適化するアプリケーションリソース管理プラットフォームです。"
+      }
+    },
+    "whyPartner": {
+      "title": "なぜ私たちと提携するのか",
+      "subtitle": "革新的なパートナーエコシステムに参加し、マルチクラスター Kubernetes 管理の未来を共に形作りましょう",
+      "benefits": [
+        {
+          "title": "イノベーション",
+          "description": "最先端のマルチクラスターオーケストレーションソリューションを共同で開発"
+        },
+        {
+          "title": "コミュニティ",
+          "description": "クラウドネイティブ開発者や組織による活発なエコシステムとつながる"
+        },
+        {
+          "title": "卓越性",
+          "description": "Kubernetes オーケストレーションにおける業界標準とベストプラクティスを推進"
+        }
+      ]
+    },
+    "partnershipOpportunities": {
+      "title": "パートナーになる",
+      "subtitle": "KubeStellar と協力し、マルチクラスター Kubernetes オーケストレーションの革新を推進し、クラウドネイティブエコシステムでの影響力を拡大しましょう。",
+      "description": "私たちのパートナーシッププログラムは、マルチクラスター Kubernetes 管理の簡素化というビジョンを共有するテクノロジープロバイダー、クラウドプラットフォーム、サービスインテグレーターとの協業を促進するために設計されています。共に、企業が分散ワークロードをシームレスに管理できる包括的なソリューションを提供します。",
+      "features": [
+        "技術統合サポートおよびエンジニアリングリソース",
+        "共同の Go-To-Market 施策および共同マーケティング機会",
+        "成長中のクラウドネイティブ実践者コミュニティへのアクセス",
+        "パートナーページおよびドキュメントでの優先掲載",
+        "共同プロダクト開発およびロードマップへの意見反映",
+        "優先サポートおよび専任パートナー担当者"
+      ],
+      "contactButton": "お問い合わせ"
+    }
+  },
+  "comingSoonPage": {
+    "title": "近日",
+    "titleSpan": "公開予定",
+    "subtitle": "KubeStellar コミュニティのために、素晴らしい機能を開発中です",
+    "description": "このエキサイティングな新機能は現在開発中です。私たちのチームは、マルチクラスター Kubernetes オーケストレーション体験をさらに向上させる特別な体験を構築しています。",
+    "statusBadge": "開発中",
+    "cta": {
+      "title": "今すぐ KubeStellar を探索",
+      "subtitle": "公開までの間に、KubeStellar で今すぐできることをご覧ください",
+      "documentsButton": "ドキュメントを見る",
+      "documentsDescription": "包括的なガイドと API リファレンス",
+      "documentsAction": "ドキュメントを探索",
+      "quickStartButton": "クイックスタートガイド",
+      "quickStartDescription": "数分でセットアップ",
+      "quickStartAction": "インストールを開始",
+      "communityButton": "コミュニティに参加",
+      "communityDescription": "開発者やコントリビューターとつながる",
+      "communityAction": "GitHub に参加",
+      "handbookButton": "ハンドブック",
+      "ladderButton": "ラダー",
+      "programsButton": "プログラム",
+      "partnersButton": "パートナー"
+    }
+  },
+  "marketplace": {
+    "hero": {
+      "title": "KubeStellar Galaxy",
+      "titleSuffix": "マーケットプレイス",
+      "subtitle": "強力なプラグインやツールで KubeStellar のデプロイを拡張。無料のコミュニティプロジェクトからエンタープライズ向けソリューションまで。",
+      "stats": {
+        "pluginsAvailable": "利用可能なプラグイン",
+        "freePlugins": "無料プラグイン",
+        "totalDownloads": "総ダウンロード数"
+      }
+    },
+    "featured": {
+      "title": "注目",
+      "titleSuffix": "＆ 人気",
+      "subtitle": "評価が高く、最もダウンロードされているプラグインを発見"
+    },
+    "browse": {
+      "title": "すべてのプラグインを閲覧",
+      "subtitle": "KubeStellar のデプロイを拡張する最適なツールを見つけましょう",
+      "searchPlaceholder": "プラグインを検索...",
+      "categoryFilter": "すべて",
+      "pricingFilter": {
+        "all": "すべての料金",
+        "free": "無料",
+        "monthly": "月額",
+        "oneTime": "一括"
+      },
+      "showing": "表示中",
+      "of": "/",
+      "plugins": "プラグイン",
+      "noResults": {
+        "title": "プラグインが見つかりません",
+        "subtitle": "検索条件やフィルターを調整してください"
+      },
+      "pagination": {
+        "previous": "前へ",
+        "next": "次へ"
+      }
+    },
+    "plugin": {
+      "badge": {
+        "free": "無料"
+      },
+      "version": "v",
+      "by": "作成者",
+      "rating": "/5.0",
+      "downloads": "ダウンロード",
+      "free": "無料",
+      "monthly": "/月",
+      "oneTime": "一括",
+      "viewDetails": "詳細を見る",
+      "backToMarketplace": "マーケットプレイスに戻る",
+      "installPlugin": "プラグインをインストール",
+      "payAndInstall": "支払いしてインストール",
+      "github": "GitHub",
+      "about": "このプラグインについて",
+      "keyFeatures": "主な機能",
+      "requirements": "要件",
+      "compatibility": "互換性",
+      "maintainers": "メンテナー",
+      "tags": "タグ",
+      "links": "リンク",
+      "documentation": "ドキュメント",
+      "githubRepository": "GitHub リポジトリ",
+      "officialWebsite": "公式サイト",
+      "notFound": {
+        "title": "プラグインが見つかりません"
+      }
+    },
+    "payment": {
+      "title": "支払いを完了",
+      "subtitle": "{name} を購入して開始",
+      "details": {
+        "plugin": "プラグイン",
+        "licenseType": "ライセンス種別",
+        "total": "合計"
+      },
+      "form": {
+        "cardNumber": "カード番号",
+        "cardPlaceholder": "1234 5678 9012 3456",
+        "expiry": "有効期限",
+        "expiryPlaceholder": "MM/YY",
+        "cvv": "CVV",
+        "cvvPlaceholder": "123",
+        "cancel": "キャンセル",
+        "payNow": "今すぐ支払う",
+        "processing": "処理中...",
+        "secureNote": "🔒 KubeStellar ゲートウェイによる安全な支払い"
+      },
+      "success": {
+        "title": "支払いが完了しました！",
+        "subtitle": "インストールを開始しています..."
+      }
+    },
+    "maintainers": {
+      "andy": "Andy Anderson",
+      "mike": "Mike Spreitzer"
+    },
+    "installation": {
+      "installing": "{name} をインストール中",
+      "pleaseWait": "しばらくお待ちください...",
+      "success": {
+        "title": "インストール完了！",
+        "subtitle": "{name} が KubeStellar にインストールされました。",
+        "commandTitle": "開始するには次のコマンドを実行してください:",
+        "close": "閉じる"
+      }
+    },
+    "categories": {
+      "all": "すべて",
+      "cliTools": "CLI ツール",
+      "synchronization": "同期",
+      "security": "セキュリティ",
+      "observability": "可観測性",
+      "visualization": "可視化",
+      "developmentTools": "開発ツール",
+      "backupRecovery": "バックアップ & リカバリ",
+      "resourceManagement": "リソース管理",
+      "governance": "ガバナンス",
+      "networking": "ネットワーク",
+      "gitops": "GitOps",
+      "costManagement": "コスト管理"
+    }
   }
 }
