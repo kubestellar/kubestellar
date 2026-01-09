@@ -50,7 +50,7 @@ export default function ProductsPage() {
     {
       id: "kubeflex",
       logo: "/products/kubeflex.png",
-      website: "https://kflex.kubestellar.io",
+      website: "https://kubestellar.io/docs/what-is-kubestellar/related/kubeflex",
       repository: "https://github.com/kubestellar/kubeflex",
       name: t("products.kubeflex.name"),
       fullName: t("products.kubeflex.fullName"),
@@ -59,7 +59,7 @@ export default function ProductsPage() {
     {
       id: "a2a",
       logo: "/products/a2a.png",
-      website: "https://a2a.kubestellar.io",
+      website: "https://kubestellar.github.io/a2a/",
       repository: "https://github.com/kubestellar/a2a",
       name: t("products.a2a.name"),
       fullName: t("products.a2a.fullName"),
