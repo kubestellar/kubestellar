@@ -1,6 +1,9 @@
 approvers:
   - clubanderson
-  - KPRoche
-  - btwshivam
-  - oksaumya
-  - naman9271
+  - pdettori
+  - MikeSpreitzer
+
+reviewers:
+  - clubanderson
+  - pdettori
+  - MikeSpreitzer
