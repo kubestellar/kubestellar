@@ -94,7 +94,7 @@ actions/upload-artifact:
   tag: v6.0.0
   tag-url: https://github.com/actions/upload-artifact/tree/v6.0.0
 actions/github-script:
-  sha: ed597411d8f924073f98dfc5c65a23a2325f34cd
-  sha-url: https://github.com/actions/github-script/commit/ed597411d8f924073f98dfc5c65a23a2325f34cd
-  tag: v8
-  tag-url: https://github.com/actions/github-script/tree/v8
+  sha: 60a0d83039c74a4aee543508d2ffcb1c3799cdea
+  sha-url: https://github.com/actions/github-script/commit/60a0d83039c74a4aee543508d2ffcb1c3799cdea
+  tag: v7.0.1
+  tag-url: https://github.com/actions/github-script/tree/v7.0.1
