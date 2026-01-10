@@ -84,6 +84,39 @@ Open a Pull Request (PR) from your branch to the main repository.
   ```
 
 ---
+### 8. Open a Pull Request
+
+Open a Pull Request (PR) from your branch to the main repository.
+
+#### PR Description
+
+- Provide a summary of what you changed (maximum 2 lines).
+- Reference related issues, e.g.:
+  ```
+  Fixes #123
+  ```
+
+---
+
+## Contribution Guidelines
+
+- **Write Clearly:** Use concise language and proper formatting.
+- **Stay Consistent:** Maintain the existing structure and style.
+- **Respect Internationalization Standards:** Avoid pushing raw UI strings directly; always use i18n references.
+- **Be Respectful:** Review our Code of Conduct before contributing.
+
+### Caution With AI-Generated Code
+
+> AI tools (like GitHub Copilot or ChatGPT) are helpful but **not always context-aware**.  
+> **Please DO NOT blindly copy-paste AI-generated code.**
+
+Before committing:
+
+- Double-check if the code aligns with our project’s architecture.
+- Test thoroughly to ensure it doesn’t break existing functionality.
+- Refactor and adapt it as per the codebase standards.
+
+---
 
 ## Contribution Guidelines
 
