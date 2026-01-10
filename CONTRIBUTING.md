@@ -34,6 +34,20 @@ As a new contributor, we encourage you to start with issues labeled as **[good f
 
 We also have a subset of issues we've labeled **[help wanted!](https://github.com/kubestellar/kubestellar/labels/help%20wanted)**
 
+This repository uses labels to track the triage status of issues.
+
+#### Default State
+- All newly opened issues start with the `need-triage` label.
+- This indicates the issue has not yet been reviewed by maintainers.
+
+#### Accepting Triage
+- Once an issue has been reviewed and accepted
+- maintainer can comment:
+/triage-accepted
+- This will:
+- Remove the `need-triage` label
+- Add the `triage-accepted` label
+
 Your assistance in improving documentation is highly valued, regardless of your level of experience with the project.
 
 To claim an issue that you are interested in, assign it to yourself by leaving a comment "/assign". You may also remove yourself from an issue with "/unassign" in a comment.
@@ -49,6 +63,7 @@ KubeStellar uses Prow and GitHub bots to help manage issues and pull requests th
 - `/unassign` - Remove your assignment  
 - `/good-first-issue` - Add the "good first issue" label  
 - `/help-wanted` - Add the "help wanted" label  
+- `/triage-accepted` - Accept the issue as reviewed and accepted 
 
 **Pull Request Review Commands:**  
 - `/lgtm` - Indicate "looks good to me" (cannot be used on your own PR)  
