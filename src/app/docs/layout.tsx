@@ -1,6 +1,5 @@
-import { Layout } from 'nextra-theme-docs'
-import 'nextra-theme-docs/style.css'
 import { DocsNavbar, DocsFooter, DocsBanner } from '@/components/docs/index'
+import { DocsProvider } from '@/components/docs/DocsProvider'
 import { Inter, JetBrains_Mono } from "next/font/google"
 import { Suspense } from 'react'
 import { ThemeProvider } from "next-themes"
@@ -23,44 +22,30 @@ export const metadata = {
   description: 'Official documentation for KubeStellar - Multi-cluster orchestration platform',
 }
 
-const banner = <DocsBanner />
-const navbar = (
-  <Suspense fallback={<div style={{ height: '4rem' }} />}>
-    <DocsNavbar />
-  </Suspense>
-)
-const footer = <DocsFooter />
-
 type Props = {
   children: React.ReactNode
 }
 
 export default async function DocsLayout({ children }: Props) {
   // Build page map from local docs
-  const { pageMap } = buildPageMap()
+  buildPageMap();
   
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <Layout
-            banner={banner}
-            navbar={navbar}
-            pageMap={pageMap}
-            docsRepositoryBase="https://github.com/kubestellar/docs/edit/main/docs/content"
-            footer={footer}
-            darkMode={true}
-            sidebar={{
-              defaultMenuCollapseLevel: 1,
-              toggleButton: true
-            }}
-            toc={{
-              float: true,
-              title: "On This Page"
-            }}
-          >
-            {children}
-          </Layout>
+          <DocsProvider>
+            <div className="flex flex-col min-h-screen">
+              <DocsBanner />
+              <Suspense fallback={<div className="h-16" />}>
+                <DocsNavbar />
+              </Suspense>
+              <main className="flex-1">
+                {children}
+              </main>
+              <DocsFooter />
+            </div>
+          </DocsProvider>
         </ThemeProvider>
       </body>
     </html>

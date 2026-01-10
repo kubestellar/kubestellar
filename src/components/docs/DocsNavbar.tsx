@@ -7,14 +7,12 @@ import { useTheme } from "next-themes";
 // import { useSearchParams, usePathname, useRouter } from 'next/navigation'
 import { VERSIONS } from '@/config/versions'
 import { getLocalizedUrl } from "@/lib/url";
-import { useMenu, setMenu } from 'nextra-theme-docs'
 
 type DropdownType = "contribute" | "community" | "language" | "github" | null;
 
 export default function DocsNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
-  const menuOpen = useMenu();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchResults, setSearchResults] = useState<Array<{
@@ -200,7 +198,7 @@ export default function DocsNavbar() {
   }`;
 
   return (
-    <div className="nextra-nav-container sticky top-0 z-20 w-full bg-transparent">
+    <div className="nextra-nav-container sticky top-0 z-30 w-full bg-transparent">
       <div className={`nextra-nav-container-blur pointer-events-none absolute z-[-1] h-full w-full shadow-sm border-b ${
         isDark 
           ? 'bg-[#111] border-neutral-800' 
@@ -649,20 +647,6 @@ export default function DocsNavbar() {
           </svg>
         </button>
 
-        {/* Sidebar toggle button for mobile - integrates with Nextra */}
-        <button
-          className={`md:hidden p-1.5 rounded-md transition-colors cursor-pointer ${
-            isDark 
-              ? 'text-gray-300 hover:text-gray-100 hover:bg-neutral-800'
-              : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-          }`}
-          aria-label="Toggle sidebar"
-          onClick={() => setMenu(!menuOpen)}
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
-          </svg>
-        </button>
 
         <button
           className={`xl:hidden p-1.5 rounded-md transition-colors cursor-pointer ${
