@@ -13,38 +13,42 @@ on:
   # Allow manual trigger
   workflow_dispatch:
 
-# Required permissions for scorecard
-permissions:
-  security-events: write  # Upload SARIF results
-  id-token: write         # For badge generation
-  contents: read
-  actions: read
+# Minimal default permissions - job-level permissions are set below
+permissions: read-all
 
 jobs:
   analysis:
     name: Scorecard analysis
     runs-on: ubuntu-latest
+    permissions:
+      # Needed for Code Scanning upload
+      security-events: write
+      # Needed for GitHub OIDC token if publish_results is true
+      id-token: write
+      # Required for repo access
+      contents: read
+      actions: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
 
       - name: Run analysis
-        uses: ossf/scorecard-action@v2.4.0
+        uses: ossf/scorecard-action@4eaacf0543bb3f2c246792bd56e8cdeffafb205a # v2.4.3
         with:
           results_file: results.sarif
           results_format: sarif
           publish_results: true
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: SARIF file
           path: results.sarif
           retention-days: 5
 
       - name: Upload to code-scanning
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@45c373516f557556c15d420e3f5e0aa3d64366bc # v3.31.9
         with:
           sarif_file: results.sarif
