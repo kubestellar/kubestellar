@@ -1,0 +1,59 @@
+# Container Image Vulnerability Scanning with Trivy
+# Scans container images for known vulnerabilities
+name: Container Image Scanning
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Dockerfile*'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/image-scanning.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'Dockerfile*'
+      - 'go.mod'
+      - 'go.sum'
+  schedule:
+    # Weekly scan
+    - cron: '0 8 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  build-and-scan:
+    name: Build and scan image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: |
+          docker build -t local/image:${{ github.sha }} .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'local/image:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
