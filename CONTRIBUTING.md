@@ -59,23 +59,6 @@ KubeStellar uses Prow and GitHub bots to help manage issues and pull requests th
 
 These commands make it easier for contributors and maintainers to manage the workflow without needing special repository permissions.
 
-## Issue Triage
-
-### Enhancement Request Response Policy
-
-To meet OpenSSF Best Practices requirements, all enhancement requests (issues labeled with `enhancement`) must receive a response from a project maintainer within **14 days** of submission.
-
-#### Maintainer Response Options
-
-When triaging an enhancement request, maintainers should respond with one of:
-
-1. **Acknowledgment**: "Thanks for the suggestion! We'll review this for future consideration."
-2. **Not Planned**: "Thank you for this idea. This doesn't align with our current roadmap, but we welcome community PRs."
-3. **Need More Info**: "Thank you. Could you provide more details about [specific aspect]?"
-4. **Duplicate**: "This is similar to #[issue-number]. Please follow that issue."
-
-Project OWNERS (listed in [OWNERS](./OWNERS)) are responsible for triage. Any maintainer can respond to enhancement requests.
-
 ### Committing
 We encourage all contributors to adopt [best practices in git commit management](https://hackmd.io/q22nrXjERBeIGb-fqwrUSg) to facilitate efficient reviews and retrospective analysis. Note: that document was written for projects where some of the contributors are doing merges into the main branch, but in KubeStellar we have GitHub doing that for us. For the kubestellar repository, this is controlled by [Prow](https://docs.prow.k8s.io/); for the other repositories in the kubestellar organization we use the GitHub mechanisms directly.
 
