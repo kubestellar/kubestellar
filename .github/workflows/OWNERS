@@ -1,9 +1,0 @@
-filters:
-  ".\\e2e-ci-ppc64le.yml":
-    approvers:
-      - MikeSpreitzer
-      - ezrasilvera
-      - pdettori
-      - clubanderson
-      - dumb0002
-      - waltforme
