@@ -2,36 +2,14 @@ name: Greetings
 
 on:
   pull_request_target:
-    # No need on most types
     types: [opened, reopened]
   issues:
-    # No need on most types
     types: [opened, reopened]
 
 permissions:
   contents: read
 
 jobs:
-  greeting:
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      pull-requests: write
-    steps:
-      - uses: actions/first-interaction@1c4688942c71f71d4f5502a26ea67c331730fa4d
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          issue_message: |
-            Thank you for contributing your first Issue to KubeStellar. We are delighted to have you in our Universe!
-
-            👋 Hi there!
-
-            To assign yourself to this issue, please use the slash command:
-            ```
-            /assign
-            ```
-
-            This will automatically assign the issue to you via our Prow bot. You can also use `/unassign` to remove yourself from an issue.
-
-            Thank you for your interest in contributing to KubeStellar! 🚀
-          pr_message: "Thank you for submitting your first Pull Request to KubeStellar. We are delighted to have you in our Universe!"
+  greet:
+    uses: kubestellar/infra/.github/workflows/reusable-greetings.yml@main
+    secrets: inherit

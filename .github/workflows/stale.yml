@@ -7,33 +7,5 @@ on:
 
 jobs:
   stale:
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-    steps:
-      - uses: actions/stale@997185467fa4f803885201cee163a9f38240193d
-        with:
-          # Issues: mark after 90 days of inactivity, close after 90 more days
-          days-before-issue-stale: 90
-          days-before-issue-close: 90
-          stale-issue-label: lifecycle/stale
-          stale-pr-label: lifecycle/stale
-          stale-issue-message: >-
-            This issue has been automatically marked as stale because it has not had recent activity.
-            It will be closed in 90 days if no further activity occurs. If this is still relevant,
-            please add a comment to keep it open.
-          close-issue-message: >-
-            Closing this issue due to prolonged inactivity after being marked as stale. If this remains
-            an active concern, feel free to reopen or create a new issue with updated details.
-          close-issue-label: lifecycle/auto-closed
-          # PRs: disable stale for PRs (start conservatively)
-          days-before-pr-stale: -1
-          days-before-pr-close: -1
-
-          # Exemptions and behavior
-          exempt-issue-labels: >-
-            security,bug,enhancement,good first issue,help wanted,hacktober-fest,
-            lifecycle/frozen
-          exempt-pr-labels: >-
-            security,lifecycle/frozen
-          exempt-all-assignees: true
+    uses: kubestellar/infra/.github/workflows/reusable-stale.yml@main
+    secrets: inherit
