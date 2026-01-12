@@ -5,17 +5,6 @@ on:
     types: [opened, edited, reopened, synchronize]
 
 jobs:
-  verify-pr:
-    name: verify PR contents
-    # Skip verification for dependabot PRs - they use different title conventions
-    if: github.actor != 'dependabot[bot]'
-    permissions:
-      checks: write
-      pull-requests: read
-    runs-on: ubuntu-latest
-    steps:
-    - name: Verifier action
-      id: verifier
-      uses: kubernetes-sigs/kubebuilder-release-tools@v0.4.3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+  verify:
+    uses: kubestellar/infra/.github/workflows/reusable-pr-verifier.yml@main
+    secrets: inherit

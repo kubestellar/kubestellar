@@ -4,25 +4,10 @@ on:
   pull_request:
     types: [closed]
 
+permissions:
+  contents: read
+
 jobs:
   feedback:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      issues: write
-      contents: read
-
-    steps:
-      - name: Comment feedback request
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            🎉 Thank you for your contribution! Your PR has been successfully merged.
-
-            We’d love to hear your thoughts to help improve KubeStellar.
-            Please take a moment to fill out our short feedback survey:
-
-            https://kubestellar.io/survey
+    uses: kubestellar/infra/.github/workflows/reusable-feedback.yml@main
+    secrets: inherit

@@ -1,41 +1,13 @@
-name: Add Help Wanted or Good First Issue Labels
+name: Add Help Wanted Labels
 
 on:
   issue_comment:
     types: [created]
 
 permissions:
-  issues: write
+  contents: read
 
 jobs:
-  label-on-comment:
-    if: github.event.comment.body == '/help-wanted' || github.event.comment.body == '/good-first-issue'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Add label based on comment
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const comment = context.payload.comment.body.trim().toLowerCase();
-            const issue_number = context.payload.issue.number;
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-
-            let label = null;
-            if (comment === '/help-wanted') {
-              label = 'help wanted';
-            } else if (comment === '/good-first-issue') {
-              label = 'good first issue';
-            }
-
-            if (label) {
-              await github.rest.issues.addLabels({
-                owner,
-                repo,
-                issue_number,
-                labels: [label],
-              });
-              console.log(`Added label: ${label}`);
-            } else {
-              console.log('No matching label to apply.');
-            }
+  label:
+    uses: kubestellar/infra/.github/workflows/reusable-add-help-wanted.yml@main
+    secrets: inherit
