@@ -137,6 +137,19 @@ Before committing:
 - Refactor and adapt it as per the codebase standards.
 
 ---
+## CI Workflow Notes
+
+### OSSF Scorecard
+The OSSF Scorecard workflow requires permissions to be defined at the job level.
+Workflow-level permissions are not supported and may cause CI failures due to
+OSSF Scorecard web application requirements.
+
+### Image Scanning
+The image scanning workflow supports repositories with multiple Dockerfiles
+using a matrix strategy. Dockerfile paths must be correctly configured to
+ensure all container images are scanned successfully.
+
+---
 
 ## Contribution Commands Guide
 
