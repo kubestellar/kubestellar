@@ -8,6 +8,12 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+permissions:
+  security-events: write
+  contents: read
+  actions: read
+  id-token: write
+
 jobs:
   analysis:
     uses: kubestellar/infra/.github/workflows/reusable-scorecard.yml@main
