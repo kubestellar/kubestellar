@@ -250,7 +250,7 @@ run_verify_mapusage() {
         done
     done
     if [ "$failed" == true ]; then
-        _exit_with_error $ERR_VERIFY_FAIL "Action reference problems found; see https://docs.kubestellar.io/unreleased-development/contribution-guidelines/contributing-inc/#github-action-reference-discipline"
+        _exit_with_error $ERR_VERIFY_FAIL "Action reference problems found; see https://kubestellar.github.io/kubestellar/unreleased-development/contribution-guidelines/contributing-inc/#github-action-reference-discipline"
     fi
 }
 
