@@ -1,11 +1,11 @@
-name: Add Help Wanted Labels
+name: Add Help Wanted Label
 
 on:
-  issue_comment:
-    types: [created]
+  issues:
+    types: [labeled]
 
 permissions:
-  contents: read
+  issues: write
 
 jobs:
   label:
