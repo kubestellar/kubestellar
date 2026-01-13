@@ -461,7 +461,12 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
         echo -n -e "  - Status addon controller: pod=${COLOR_INFO}$status_pod${COLOR_NONE}, ns=${COLOR_INFO}$status_ns${COLOR_NONE}, version=${COLOR_INFO}$status_version${COLOR_NONE}, status="
         echostatus "$status_status"
         if [ -n "${cp_kubeconfig[cp_n]}" ]; then
-            ocm_version=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl get deploy -n open-cluster-management cluster-manager -o jsonpath={.spec.template.spec.containers[0].image} | cut -d: -f2)
+            ocm_version=""
+            # Fix for Issue #2724: Check if namespace exists to prevent crash
+            if KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl get ns open-cluster-management > /dev/null 2>&1; then
+                ocm_version=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl get deploy -n open-cluster-management cluster-manager -o jsonpath={.spec.template.spec.containers[0].image} 2>/dev/null | cut -d: -f2 || true)
+            fi
+
             if [ -n "$ocm_version" ]; then
                 echo -e "  - Open-cluster-manager: version=${COLOR_INFO}$ocm_version${COLOR_NONE}"
             else
@@ -607,7 +612,7 @@ for j in "${!cp_pch[@]}" ; do
         done; }
         if [[ -z "$clisting" ]] && [[ -z "$nlisting" ]]; then
             ndests=$(jq length <<<$dests <<<0)
-	    ncobjs=$(jq length <<<$cobjs <<<0)
+            ncobjs=$(jq length <<<$cobjs <<<0)
             nnobjs=$(jq length <<<$nobjs <<<0)
             [ "$ndests" = 0 ] && colord=$COLOR_WARNING || colord=$COLOR_INFO
             [ "$ncobjs" = 0 ] && colorc=$COLOR_WARNING || colorc=$COLOR_INFO
