@@ -1,0 +1,14 @@
+name: Stale Issues
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Daily at midnight UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  stale:
+    uses: kubestellar/infra/.github/workflows/reusable-stale.yml@main
+    secrets: inherit
