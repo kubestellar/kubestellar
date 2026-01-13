@@ -1,28 +1,21 @@
-# Container Image Vulnerability Scanning with Trivy
-# Scans container images for known vulnerabilities
-name: Container Image Scanning
+name: Image Scanning
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - '*.Dockerfile'
-      - 'core.Dockerfile'
       - 'go.mod'
       - 'go.sum'
       - '.github/workflows/image-scanning.yml'
   pull_request:
-    branches:
-      - main
+    branches: [main]
     paths:
       - '*.Dockerfile'
-      - 'core.Dockerfile'
       - 'go.mod'
       - 'go.sum'
   schedule:
-    # Weekly scan
-    - cron: '0 8 * * 0'
+    - cron: '0 8 * * 0'  # Weekly scan on Sunday
   workflow_dispatch:
 
 permissions:
@@ -34,28 +27,8 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  build-and-scan:
-    name: Build and scan image
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-
-      - name: Build image
-        run: |
-          docker build -f core.Dockerfile -t local/image:${{ github.sha }} .
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
-        with:
-          image-ref: 'local/image:${{ github.sha }}'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH'
-          ignore-unfixed: true
-
-      - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@45c373516f557556c15d420e3f5e0aa3d64366bc # v3.31.9
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
+  scan:
+    uses: kubestellar/infra/.github/workflows/reusable-image-scanning.yml@main
+    secrets: inherit
+    with:
+      dockerfile: 'core.Dockerfile'
