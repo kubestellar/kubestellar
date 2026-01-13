@@ -112,3 +112,5 @@ There are several ways to communicate with us:
 <br>The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/legal/trademark-usage">Trademark Usage page</a>.
 <br>© 2022-2025. The KubeStellar Authors.
 
+
+<!-- CI Test: 2026-01-13T03:01:52Z -->
