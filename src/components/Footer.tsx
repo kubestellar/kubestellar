@@ -161,7 +161,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href={getLocalizedUrl(
-                      "https://kubestellar.io/docs/user-guide-support/user-guide-intro"
+                      "https://kubestellar.io/docs/user-guide/guide-overview"
                     )}
                     className="text-gray-400 hover:text-white transition-colors duration-200 text-xs sm:text-sm inline-block"
                   >
@@ -181,7 +181,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href={getLocalizedUrl(
-                      "https://kubestellar.io/docs/contribution-guidelines/release-notes"
+                      "https://kubestellar.io/docs/what-is-kubestellar/release-notes"
                     )}
                     className="text-gray-400 hover:text-white transition-colors duration-200 text-xs sm:text-sm inline-block"
                   >

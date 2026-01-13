@@ -242,7 +242,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/docs/user-guide-support/user-guide-intro"
+                    href="/docs/user-guide/guide-overview"
                     className={`text-xs sm:text-sm transition-colors duration-200 inline-block ${
                       isDark
                         ? 'text-gray-400 hover:text-white'
@@ -266,7 +266,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/docs/contribution-guidelines/release-notes"
+                    href="/docs/what-is-kubestellar/release-notes"
                     className={`text-xs sm:text-sm transition-colors duration-200 inline-block ${
                       isDark
                         ? 'text-gray-400 hover:text-white'
