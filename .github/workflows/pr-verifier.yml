@@ -1,8 +1,12 @@
-name: pr-verifier
+name: PR Verifier
 
 on:
   pull_request_target:
-    types: [opened, edited, reopened, synchronize]
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  checks: write
+  pull-requests: read
 
 jobs:
   verify:
