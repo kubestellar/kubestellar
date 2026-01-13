@@ -153,6 +153,11 @@ const NAV_STRUCTURE: Array<{ title: string; items: NavItem[] }> = [
         ]
       },
       {
+        'CI/CD': [
+          { 'GitHub Actions': 'contribution-guidelines/operations/github-actions.md' }
+        ]
+      },
+      {
         'Security': [
           { 'Policy': 'contribution-guidelines/security/security-inc.md' },
           { 'Contacts': 'contribution-guidelines/security/security_contacts-inc.md' }
