@@ -11,9 +11,8 @@ export default function HeroSection() {
   const [copied, setCopied] = useState(false);
 
   const installScript = `bash <(curl -s \\
-  https://raw.githubusercontent.com/kubestellar/ \\
-  kubestellar/refs/tags/v0.27.2/scripts/ \\
-  create-kubestellar-demo-env.sh) --platform kind`;
+  https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v0.27.2/scripts/create-kubestellar-demo-env.sh) \\
+  --platform kind`;
 
   const handleCopy = async () => {
     try {
@@ -225,13 +224,10 @@ export default function HeroSection() {
                         <div className="typing-text text-blue-300 leading-relaxed text-xs sm:text-sm">
                           <div>bash &lt;(curl -s \</div>
                           <div className="ml-4">
-                            https://raw.githubusercontent.com/kubestellar/ \
+                            https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v0.27.2/scripts/create-kubestellar-demo-env.sh) \
                           </div>
                           <div className="ml-4">
-                            kubestellar/refs/tags/v0.27.2/scripts/ \
-                          </div>
-                          <div className="ml-4">
-                            create-kubestellar-demo-env.sh) --platform kind
+                            --platform kind
                           </div>
                         </div>
                       </div>
