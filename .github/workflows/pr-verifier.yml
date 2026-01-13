@@ -1,0 +1,14 @@
+name: PR Verifier
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  checks: write
+  pull-requests: read
+
+jobs:
+  verify:
+    uses: kubestellar/infra/.github/workflows/reusable-pr-verifier.yml@main
+    secrets: inherit
