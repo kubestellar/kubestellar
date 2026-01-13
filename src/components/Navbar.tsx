@@ -877,7 +877,7 @@ export default function Navbar() {
                       <path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z" />
                       <path d="M8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
                     </svg>
-                    Create Issue
+                    {t("githubCreateIssue")}
                   </a>
                 </div>
               </div>
@@ -1381,7 +1381,7 @@ export default function Navbar() {
                         <path d="M8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
                       </svg>
                       <span className="text-sm font-medium text-gray-300">
-                        Create Issue
+                        {t("githubCreateIssue")}
                       </span>
                     </div>
                   </a>

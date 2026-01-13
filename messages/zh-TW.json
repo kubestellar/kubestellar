@@ -98,6 +98,7 @@
     "githubStar": "星標",
     "githubFork": "分支",
     "githubWatch": "關注",
+    "githubCreateIssue": "建立 Issue",
     "mobileAbout": "關於",
     "mobileHowItWorks": "運作方式",
     "mobileUseCases": "使用案例",
@@ -301,11 +302,7 @@
         "backContent": {
           "title": "基於範本的自訂",
           "description": "為不同叢集自訂工作負載設定，同時維持單一真實來源。",
-          "features": [
-            "支援範本擴充",
-            "叢集特定自訂",
-            "基於屬性的設定"
-          ]
+          "features": ["支援範本擴充", "叢集特定自訂", "基於屬性的設定"]
         }
       }
     }
