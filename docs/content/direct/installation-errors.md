@@ -65,3 +65,22 @@ The resolution in the [kind known issue](https://kind.sigs.k8s.io/docs/user/know
    ```sh
    sudo sysctl -p /etc/sysctl.d/99-sysctl.conf
    ```
+
+# Go version mismatch during image build
+
+## Symptoms
+
+Container image builds fail with errors indicating an unsupported or invalid Go version,
+even though the project builds successfully in other environments.
+
+## Cause
+
+KubeStellar requires **Go 1.24 or newer** as specified in `go.mod`.
+Earlier versions of the `core.Dockerfile` used Go 1.19, which caused
+image build failures when the Go version requirement increased.
+
+## Solution
+
+Ensure that container image builds use Go 1.24 or newer.
+This is handled by the updated `core.Dockerfile`, which now uses
+a Go 1.24 base image.
