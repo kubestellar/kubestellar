@@ -1,0 +1,13 @@
+name: Add Help Wanted Label
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    uses: kubestellar/infra/.github/workflows/reusable-add-help-wanted.yml@main
+    secrets: inherit
