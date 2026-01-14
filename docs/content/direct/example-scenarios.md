@@ -115,6 +115,8 @@ kubectl --context "$wds_context" delete ns nginx
 kubectl --context "$wds_context" delete bindingpolicies nginx-bpolicy
 ```
 
+For an example using the `wantMultiWECReportedState` feature for multi-cluster status aggregation, see [Multi-WEC Aggregated Status](multi-wec-aggregated-status.md).
+
 ## Scenario 2: Out-of-Tree Workload
 
 This scenario is like the previous one but involves a workload whose
