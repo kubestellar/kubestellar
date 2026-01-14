@@ -87,8 +87,8 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Clone source docs
-        if: steps.check-branch.outputs.exists != 'true'
+      - name: Clone source docs (non-kubestellar projects only)
+        if: steps.check-branch.outputs.exists != 'true' && steps.vars.outputs.project != 'kubestellar'
         run: |
           echo "Cloning ${{ steps.vars.outputs.source_repo }} at ${{ steps.vars.outputs.source_branch }}..."
           git clone --branch "${{ steps.vars.outputs.source_branch }}" --depth 1 \
@@ -99,20 +99,19 @@ jobs:
         run: |
           git checkout -b "${{ steps.branch.outputs.name }}"
 
-          # Copy docs based on project
           PROJECT="${{ steps.vars.outputs.project }}"
+
+          # KubeStellar docs already live in this repo - just create branch, no copy needed
+          if [ "$PROJECT" = "kubestellar" ]; then
+            echo "KubeStellar docs live in this repo - creating version branch from current main"
+            echo "No content copy needed"
+            exit 0
+          fi
+
+          # For other projects, copy docs from source repo
           echo "Copying docs for project: $PROJECT"
 
           case "$PROJECT" in
-            kubestellar)
-              if [ -d "/tmp/source/docs/content" ]; then
-                rm -rf docs/content/direct/*
-                cp -r /tmp/source/docs/content/* docs/content/direct/
-                echo "Copied KubeStellar docs from docs/content/"
-              else
-                echo "Warning: /tmp/source/docs/content not found"
-              fi
-              ;;
             a2a)
               rm -rf docs/content/a2a/*
               if [ -d "/tmp/source/docs-site/docs" ]; then
