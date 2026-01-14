@@ -340,7 +340,8 @@ const NAV_STRUCTURE: Array<{ title: string; items: NavItem[] }> = [
     items: [
       { 'A2A Documentation': '/docs/a2a/overview/introduction' },
       { 'KubeFlex Documentation': '/docs/kubeflex/overview/introduction' },
-      { 'Multi Plugin Documentation': '/docs/multi-plugin/overview/introduction' }
+      { 'Multi Plugin Documentation': '/docs/multi-plugin/overview/introduction' },
+      { 'kubectl-claude': 'direct/claude-code.md' }
     ]
   }
 ]
