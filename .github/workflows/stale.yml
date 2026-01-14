@@ -12,3 +12,5 @@ jobs:
   stale:
     uses: kubestellar/infra/.github/workflows/reusable-stale.yml@main
     secrets: inherit
+    with:
+      exempt_labels: 'security,bug,enhancement,good first issue,help wanted,hacktober-fest,lifecycle/frozen,stale-exempt'
