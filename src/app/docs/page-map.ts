@@ -442,8 +442,8 @@ export function buildPageMap(projectId: ProjectId = 'kubestellar') {
         children
       }
 
-      // Set theme for first category to be expanded
-      if (category.title === 'Welcome' || category.title === 'What is KubeStellar?' || category.title === 'Overview') {
+      // Set theme for first category and Related Projects to be expanded
+      if (category.title === 'Welcome' || category.title === 'What is KubeStellar?' || category.title === 'Overview' || category.title === 'Related Projects') {
         folderNode.theme = { collapsed: false }
       }
 

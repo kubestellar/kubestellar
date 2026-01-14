@@ -82,6 +82,19 @@
   force = true
 
 # Redirect a2a.kubestellar.io to kubestellar.io/docs/a2a
+# Handle old URL structure with /en/ prefix
+[[redirects]]
+  from = "https://a2a.kubestellar.io/en/*"
+  to = "https://kubestellar.io/docs/a2a/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://a2a.kubestellar.io/en"
+  to = "https://kubestellar.io/docs/a2a"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "https://a2a.kubestellar.io/*"
   to = "https://kubestellar.io/docs/a2a/:splat"
@@ -95,6 +108,19 @@
   force = true
 
 # Redirect kubeflex.kubestellar.io to kubestellar.io/docs/kubeflex
+# Handle old URL structure with /en/ prefix
+[[redirects]]
+  from = "https://kubeflex.kubestellar.io/en/*"
+  to = "https://kubestellar.io/docs/kubeflex/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://kubeflex.kubestellar.io/en"
+  to = "https://kubestellar.io/docs/kubeflex"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "https://kubeflex.kubestellar.io/*"
   to = "https://kubestellar.io/docs/kubeflex/:splat"
@@ -106,7 +132,51 @@
   to = "https://kubestellar.io/docs/kubeflex"
   status = 301
   force = true
-  
+
+# Redirect multi.kubestellar.io to kubestellar.io/docs/multi-plugin
+[[redirects]]
+  from = "https://multi.kubestellar.io/*"
+  to = "https://kubestellar.io/docs/multi-plugin/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://multi.kubestellar.io"
+  to = "https://kubestellar.io/docs/multi-plugin"
+  status = 301
+  force = true
+
+# Redirect project root pages to first content page
+[[redirects]]
+  from = "/docs/a2a"
+  to = "/docs/a2a/overview/introduction"
+  status = 302
+
+[[redirects]]
+  from = "/docs/a2a/"
+  to = "/docs/a2a/overview/introduction"
+  status = 302
+
+[[redirects]]
+  from = "/docs/kubeflex"
+  to = "/docs/kubeflex/overview/introduction"
+  status = 302
+
+[[redirects]]
+  from = "/docs/kubeflex/"
+  to = "/docs/kubeflex/overview/introduction"
+  status = 302
+
+[[redirects]]
+  from = "/docs/multi-plugin"
+  to = "/docs/multi-plugin/overview/introduction"
+  status = 302
+
+[[redirects]]
+  from = "/docs/multi-plugin/"
+  to = "/docs/multi-plugin/overview/introduction"
+  status = 302
+
 [[redirects]]
   from = "/agenda"
   to = "https://docs.google.com/document/d/1XppfxSOD7AOX1lVVVIPWjpFkrxakfBfVzcybRg17-PM/edit?usp=share_link"
