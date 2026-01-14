@@ -13,9 +13,7 @@
 export const CURRENT_VERSION = "0.29.0"
 
 // Netlify site name for branch deploys
-// Note: Branch deploys must be enabled in Netlify dashboard:
-// Site Settings > Build & Deploy > Branches > Branch deploys: All
-export const NETLIFY_SITE_NAME = "ks"
+export const NETLIFY_SITE_NAME = "kubestellar-docs"
 
 // Production URL for latest version
 export const PRODUCTION_URL = "https://kubestellar.io"
@@ -174,11 +172,10 @@ export function getVersionUrl(versionKey: VersionKey, pathname: string = "/docs"
     return `${PRODUCTION_URL}${pathname}`
   }
 
-  // For older versions, use the GitHub Pages legacy site
-  // This provides immediate access to all historical versions
-  // TODO: Switch to Netlify branch deploys once enabled in dashboard
-  const versionNumber = versionKey.toString()
-  return `https://kubestellar.github.io/kubestellar/release-${versionNumber}/`
+  // Other versions use Netlify branch deploys
+  // Netlify converts branch names: docs/0.28.0 -> docs-0-28-0
+  const branchSlug = version.branch.replace(/\//g, '-').replace(/\./g, '-')
+  return `https://${branchSlug}--${NETLIFY_SITE_NAME}.netlify.app${pathname}`
 }
 
 // Check if a version has been migrated (branch exists)
