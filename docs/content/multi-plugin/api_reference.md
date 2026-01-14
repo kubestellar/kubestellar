@@ -435,4 +435,4 @@ func buildHeader(resourceType string, allNamespaces, showLabels bool) string {
 }
 ```
 
-This API reference provides a comprehensive overview of the kubectl-multi codebase. For usage examples, see the [Usage Guide](usage.md), and for architectural details, see the [Architecture Guide](architecture.md).
+This API reference provides a comprehensive overview of the kubectl-multi codebase. For usage examples, see the [Usage Guide](usage_guide.md), and for architectural details, see the [Architecture Guide](architecture_guide.md).
