@@ -21,7 +21,7 @@ jobs:
         with:
           name: pr-info
           path: pr-info
-          run-id: ${{ github.event.workflow_run.id }}
+          run_id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get PR number
@@ -42,9 +42,11 @@ jobs:
 
       - name: Get changed files and post comment
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
         with:
           script: |
-            const prNumber = parseInt('${{ steps.pr.outputs.number }}');
+            const prNumber = parseInt(process.env.PR_NUMBER, 10);
             const previewUrl = `https://deploy-preview-${prNumber}--kubestellar-docs.netlify.app`;
 
             // Get changed files
