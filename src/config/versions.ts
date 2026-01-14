@@ -24,6 +24,7 @@ export interface VersionInfo {
   branch: string
   isDefault: boolean
   externalUrl?: string
+  isDev?: boolean // marks development/unreleased versions
 }
 
 // Project configuration
@@ -42,6 +43,12 @@ const KUBESTELLAR_VERSIONS: Record<string, VersionInfo> = {
     label: "v0.29.0 (Latest)",
     branch: "main",
     isDefault: true,
+  },
+  main: {
+    label: "main (dev)",
+    branch: "main",
+    isDefault: false,
+    isDev: true,
   },
   "0.28.0": {
     label: "v0.28.0",
@@ -128,6 +135,12 @@ const A2A_VERSIONS: Record<string, VersionInfo> = {
     branch: "main",
     isDefault: true,
   },
+  main: {
+    label: "main (dev)",
+    branch: "main",
+    isDefault: false,
+    isDev: true,
+  },
 }
 
 // kubeflex versions
@@ -136,6 +149,12 @@ const KUBEFLEX_VERSIONS: Record<string, VersionInfo> = {
     label: "v0.9.3 (Latest)",
     branch: "main",
     isDefault: true,
+  },
+  main: {
+    label: "main (dev)",
+    branch: "main",
+    isDefault: false,
+    isDev: true,
   },
   "0.8.0": {
     label: "v0.8.0",
@@ -155,6 +174,12 @@ const MULTI_PLUGIN_VERSIONS: Record<string, VersionInfo> = {
     label: "v0.1.0 (Latest)",
     branch: "main",
     isDefault: true,
+  },
+  main: {
+    label: "main (dev)",
+    branch: "main",
+    isDefault: false,
+    isDev: true,
   },
 }
 
