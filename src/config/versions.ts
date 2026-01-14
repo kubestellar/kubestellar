@@ -133,7 +133,7 @@ const A2A_VERSIONS: Record<string, VersionInfo> = {
 // kubeflex versions
 const KUBEFLEX_VERSIONS: Record<string, VersionInfo> = {
   latest: {
-    label: "v0.8.0 (Latest)",
+    label: "v0.9.3 (Latest)",
     branch: "main",
     isDefault: true,
   },
@@ -170,7 +170,7 @@ export const PROJECTS: Record<ProjectId, ProjectConfig> = {
     id: "kubeflex",
     name: "KubeFlex",
     basePath: "kubeflex",
-    currentVersion: "0.8.0",
+    currentVersion: "0.9.3",
     contentPath: "docs/content/kubeflex",
     versions: KUBEFLEX_VERSIONS,
   },

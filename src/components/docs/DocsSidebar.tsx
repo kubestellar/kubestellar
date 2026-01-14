@@ -15,6 +15,7 @@ interface MenuItem {
   children?: MenuItem[];
   frontMatter?: Record<string, unknown>;
   kind?: string;
+  theme?: { collapsed?: boolean };
 }
 
 interface DocsSidebarProps {
@@ -153,15 +154,18 @@ export function DocsSidebar({ pageMap, className }: DocsSidebarProps) {
       return false;
     }
     
-    // Collapse all folders except those in the active path
+    // Collapse all folders except those in the active path or with theme.collapsed: false
     function collapseAll(items: MenuItem[], parentKey: string = '') {
       for (const item of items) {
         const itemKey = parentKey ? `${parentKey}-${item.name}` : item.name;
         const hasChildren = item.children && item.children.length > 0;
-        
+
         if (hasChildren) {
-          // Collapse this folder if it's not in the path to active item
-          if (!pathToActive.has(itemKey)) {
+          // Check if item has theme.collapsed explicitly set to false
+          const shouldStayExpanded = item.theme?.collapsed === false;
+
+          // Collapse this folder if it's not in the path to active item and not forced expanded
+          if (!pathToActive.has(itemKey) && !shouldStayExpanded) {
             newCollapsed.add(itemKey);
           }
           // Recursively check children
