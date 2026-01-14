@@ -33,11 +33,16 @@ export default function Navbar() {
         );
 
         if (menu) {
-          const showMenu = () => {
+          // Helper to clear pending hide timeout
+          const clearHideTimeout = () => {
             if (timeoutRef.current) {
               clearTimeout(timeoutRef.current);
               timeoutRef.current = null;
             }
+          };
+
+          const showMenu = () => {
+            clearHideTimeout();
 
             // Close all other dropdowns including language switcher
             dropdownContainers.forEach(otherContainer => {
@@ -96,12 +101,16 @@ export default function Navbar() {
           container.addEventListener("mouseenter", showMenu);
           container.addEventListener("mouseleave", hideMenu);
 
-          menu.addEventListener("mouseenter", () => {
-            if (timeoutRef.current) {
-              clearTimeout(timeoutRef.current);
-              timeoutRef.current = null;
-            }
-          });
+          // Clear timeout when hovering the dropdown button/trigger
+          // This fixes the issue where moving from menu back to button closes the menu
+          const button = container.querySelector<HTMLElement>(
+            "[data-dropdown-button]"
+          );
+          if (button) {
+            button.addEventListener("mouseenter", clearHideTimeout);
+          }
+
+          menu.addEventListener("mouseenter", clearHideTimeout);
 
           menu.addEventListener("mouseleave", hideMenu);
         }
