@@ -14,7 +14,7 @@ export const CURRENT_VERSION = "0.29.0"
 
 // Netlify site name for branch deploys
 // Enable branch deploys: Netlify Dashboard > Site Settings > Build & Deploy > Branches > All
-export const NETLIFY_SITE_NAME = "ks"
+export const NETLIFY_SITE_NAME = "kubestellar-docs"
 
 // Production URL for latest version
 export const PRODUCTION_URL = "https://kubestellar.io"
