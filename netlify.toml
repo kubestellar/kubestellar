@@ -134,6 +134,19 @@
   force = true
 
 # Redirect multi.kubestellar.io to kubestellar.io/docs/multi-plugin
+# Handle old URL structure with /en/ prefix
+[[redirects]]
+  from = "https://multi.kubestellar.io/en/*"
+  to = "https://kubestellar.io/docs/multi-plugin/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://multi.kubestellar.io/en"
+  to = "https://kubestellar.io/docs/multi-plugin"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "https://multi.kubestellar.io/*"
   to = "https://kubestellar.io/docs/multi-plugin/:splat"
