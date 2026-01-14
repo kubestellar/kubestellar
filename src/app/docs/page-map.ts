@@ -275,6 +275,13 @@ const NAV_STRUCTURE: Array<{ title: string; items: NavItem[] }> = [
         ]
       }
     ]
+  },
+  {
+    title: 'Related Projects',
+    items: [
+      { 'A2A Documentation': '/docs/a2a/overview/introduction' },
+      { 'KubeFlex Documentation': '/docs/kubeflex/overview/introduction' }
+    ]
   }
 ]
 
@@ -321,9 +328,9 @@ export function buildPageMap(projectId: ProjectId = 'kubestellar') {
         const value = (item as Record<string, string | NavItem[]>)[title]
 
         if (typeof value === 'string') {
-          // It's a file path
-          if (value.startsWith('http')) {
-            // External link
+          // It's a file path or link
+          if (value.startsWith('http') || value.startsWith('/')) {
+            // External link or absolute internal link
             nodes.push({ kind: 'MdxPage', name: title, route: value })
             meta[title] = title
           } else if (allDocFiles.includes(value)) {
