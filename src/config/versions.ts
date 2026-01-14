@@ -16,7 +16,7 @@ export const NETLIFY_SITE_NAME = "kubestellar-docs"
 export const PRODUCTION_URL = "https://kubestellar.io"
 
 // Project identifiers
-export type ProjectId = "kubestellar" | "a2a" | "kubeflex"
+export type ProjectId = "kubestellar" | "a2a" | "kubeflex" | "multi-plugin"
 
 // Version info structure
 export interface VersionInfo {
@@ -139,6 +139,15 @@ const KUBEFLEX_VERSIONS: Record<string, VersionInfo> = {
   },
 }
 
+// multi-plugin versions
+const MULTI_PLUGIN_VERSIONS: Record<string, VersionInfo> = {
+  latest: {
+    label: "v0.1.0 (Latest)",
+    branch: "main",
+    isDefault: true,
+  },
+}
+
 // All projects configuration
 export const PROJECTS: Record<ProjectId, ProjectConfig> = {
   kubestellar: {
@@ -165,6 +174,14 @@ export const PROJECTS: Record<ProjectId, ProjectConfig> = {
     contentPath: "docs/content/kubeflex",
     versions: KUBEFLEX_VERSIONS,
   },
+  "multi-plugin": {
+    id: "multi-plugin",
+    name: "Multi Plugin",
+    basePath: "multi-plugin",
+    currentVersion: "0.1.0",
+    contentPath: "docs/content/multi-plugin",
+    versions: MULTI_PLUGIN_VERSIONS,
+  },
 }
 
 // Get project from URL pathname
@@ -174,6 +191,9 @@ export function getProjectFromPath(pathname: string): ProjectConfig {
   }
   if (pathname.startsWith("/docs/kubeflex")) {
     return PROJECTS.kubeflex
+  }
+  if (pathname.startsWith("/docs/multi-plugin")) {
+    return PROJECTS["multi-plugin"]
   }
   return PROJECTS.kubestellar
 }

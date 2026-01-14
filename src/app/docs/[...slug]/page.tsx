@@ -15,6 +15,7 @@ function getProjectFromSlug(slug: string[]): ProjectId {
   if (slug.length > 0) {
     if (slug[0] === 'a2a') return 'a2a'
     if (slug[0] === 'kubeflex') return 'kubeflex'
+    if (slug[0] === 'multi-plugin') return 'multi-plugin'
   }
   return 'kubestellar'
 }
@@ -497,6 +498,14 @@ export async function generateStaticParams() {
   for (const route of Object.keys(kubeflexMap.routeMap)) {
     if (route !== '') {
       allParams.push({ slug: ['kubeflex', ...route.split('/')] })
+    }
+  }
+
+  // Multi-Plugin routes (prefixed with 'multi-plugin')
+  const multiPluginMap = buildPageMap('multi-plugin')
+  for (const route of Object.keys(multiPluginMap.routeMap)) {
+    if (route !== '') {
+      allParams.push({ slug: ['multi-plugin', ...route.split('/')] })
     }
   }
 

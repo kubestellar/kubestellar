@@ -14,6 +14,8 @@ export function getContentPath(projectId: ProjectId): string {
       return path.join(process.cwd(), 'docs', 'content', 'a2a')
     case 'kubeflex':
       return path.join(process.cwd(), 'docs', 'content', 'kubeflex')
+    case 'multi-plugin':
+      return path.join(process.cwd(), 'docs', 'content', 'multi-plugin')
     default:
       return docsContentPath
   }
@@ -26,6 +28,8 @@ export function getBasePath(projectId: ProjectId): string {
       return 'docs/a2a'
     case 'kubeflex':
       return 'docs/kubeflex'
+    case 'multi-plugin':
+      return 'docs/multi-plugin'
     default:
       return 'docs'
   }
@@ -97,6 +101,37 @@ const NAV_STRUCTURE_A2A: Array<{ title: string; items: NavItem[] }> = [
     title: 'Contributing',
     items: [
       { 'Contributing': 'CONTRIBUTING.md' },
+    ]
+  }
+]
+
+// Multi Plugin Navigation Structure
+const NAV_STRUCTURE_MULTI_PLUGIN: Array<{ title: string; items: NavItem[] }> = [
+  {
+    title: 'Overview',
+    items: [
+      { 'Introduction': 'readme.md' },
+      { 'Architecture': 'architecture_guide.md' },
+    ]
+  },
+  {
+    title: 'Getting Started',
+    items: [
+      { 'Installation': 'installation_guide.md' },
+      { 'Installation (Windows)': 'installation_guide_windows.md' },
+      { 'Usage Guide': 'usage_guide.md' },
+    ]
+  },
+  {
+    title: 'Reference',
+    items: [
+      { 'API Reference': 'api_reference.md' },
+    ]
+  },
+  {
+    title: 'Development',
+    items: [
+      { 'Development Guide': 'development_guide.md' },
     ]
   }
 ]
@@ -280,7 +315,8 @@ const NAV_STRUCTURE: Array<{ title: string; items: NavItem[] }> = [
     title: 'Related Projects',
     items: [
       { 'A2A Documentation': '/docs/a2a/overview/introduction' },
-      { 'KubeFlex Documentation': '/docs/kubeflex/overview/introduction' }
+      { 'KubeFlex Documentation': '/docs/kubeflex/overview/introduction' },
+      { 'Multi Plugin Documentation': '/docs/multi-plugin/overview/introduction' }
     ]
   }
 ]
@@ -292,6 +328,8 @@ function getNavStructure(projectId: ProjectId): Array<{ title: string; items: Na
       return NAV_STRUCTURE_A2A
     case 'kubeflex':
       return NAV_STRUCTURE_KUBEFLEX
+    case 'multi-plugin':
+      return NAV_STRUCTURE_MULTI_PLUGIN
     default:
       return NAV_STRUCTURE
   }
