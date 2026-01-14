@@ -5,7 +5,7 @@
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=kubestellar_kubeflex&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=kubestellar_kubeflex)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/kubestellar/kubeflex)
 
-# ![Logo](./images/kubeflex-logo.png) KubeFlex
+# KubeFlex
 
 A flexible and scalable platform for running Kubernetes control plane APIs with multi-tenancy support.
 
