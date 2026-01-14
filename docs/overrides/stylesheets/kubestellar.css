@@ -134,6 +134,20 @@ dl.crd-meta {
     border-top: 1px solid #ccc;
 }
 
+.custom-announcement {
+    position: sticky;
+    top: 0;
+    background: var(--md-primary-fg-color);
+    color: var(--md-primary-bg-color);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    z-index: 1;
+  }
+  
+  .custom-announcement.hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+  }  
+
 .property {
     margin-bottom: 1em;
 }
