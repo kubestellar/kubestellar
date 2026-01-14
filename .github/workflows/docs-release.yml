@@ -1,0 +1,20 @@
+name: Trigger Docs Update
+
+on:
+  release:
+    types: [published]
+
+# No GITHUB_TOKEN permissions needed - uses WORKFLOW_SYNC_TOKEN secret
+permissions: {}
+
+jobs:
+  trigger-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger docs repo
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_SYNC_TOKEN }}
+        run: |
+          gh api repos/kubestellar/docs/dispatches \
+            -f event_type=create-version-branch \
+            -f client_payload="{\"project\":\"kubestellar\",\"version\":\"${{ github.event.release.tag_name }}\",\"source_repo\":\"${{ github.repository }}\",\"source_branch\":\"${{ github.event.release.target_commitish }}\"}"
