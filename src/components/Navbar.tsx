@@ -33,11 +33,16 @@ export default function Navbar() {
         );
 
         if (menu) {
-          const showMenu = () => {
+          // Helper to clear pending hide timeout
+          const clearHideTimeout = () => {
             if (timeoutRef.current) {
               clearTimeout(timeoutRef.current);
               timeoutRef.current = null;
             }
+          };
+
+          const showMenu = () => {
+            clearHideTimeout();
 
             // Close all other dropdowns including language switcher
             dropdownContainers.forEach(otherContainer => {
@@ -102,20 +107,10 @@ export default function Navbar() {
             "[data-dropdown-button]"
           );
           if (button) {
-            button.addEventListener("mouseenter", () => {
-              if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-              }
-            });
+            button.addEventListener("mouseenter", clearHideTimeout);
           }
 
-          menu.addEventListener("mouseenter", () => {
-            if (timeoutRef.current) {
-              clearTimeout(timeoutRef.current);
-              timeoutRef.current = null;
-            }
-          });
+          menu.addEventListener("mouseenter", clearHideTimeout);
 
           menu.addEventListener("mouseleave", hideMenu);
         }
