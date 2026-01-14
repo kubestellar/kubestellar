@@ -38,13 +38,13 @@ jobs:
 
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
 
-          PR_AUTHOR=$(gh pr view $PR_NUMBER --json author --jq '.author.login')
+          PR_AUTHOR=$(gh pr view $PR_NUMBER --repo kubestellar/docs --json author --jq '.author.login')
           if [[ "$PR_AUTHOR" != *"copilot"* ]]; then
             echo "skip=true" >> $GITHUB_OUTPUT
             exit 0
           fi
 
-          PR_TITLE=$(gh pr view $PR_NUMBER --json title --jq '.title')
+          PR_TITLE=$(gh pr view $PR_NUMBER --repo kubestellar/docs --json title --jq '.title')
           # Case-insensitive matching for "link" in title
           PR_TITLE_LOWER=${PR_TITLE,,}
           if [[ "$PR_TITLE_LOWER" != *"link"* ]]; then
@@ -63,7 +63,7 @@ jobs:
           PR_NUMBER="${{ steps.pr-info.outputs.pr_number }}"
 
           for i in {1..30}; do
-            CHECKS=$(gh pr checks $PR_NUMBER 2>&1 || true)
+            CHECKS=$(gh pr checks $PR_NUMBER --repo kubestellar/docs 2>&1 || true)
             if echo "$CHECKS" | grep -q "netlify.*deploy-preview.*pass"; then
               echo "preview_url=https://deploy-preview-${PR_NUMBER}--kubestellar-docs.netlify.app" >> $GITHUB_OUTPUT
               echo "ready=true" >> $GITHUB_OUTPUT
@@ -83,17 +83,17 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER="${{ steps.pr-info.outputs.pr_number }}"
-          PR_BODY=$(gh pr view $PR_NUMBER --json body --jq '.body // ""')
-          COMMITS=$(gh pr view $PR_NUMBER --json commits --jq '.commits[].messageHeadline // ""')
+          PR_BODY=$(gh pr view $PR_NUMBER --repo kubestellar/docs --json body --jq '.body // ""')
+          COMMITS=$(gh pr view $PR_NUMBER --repo kubestellar/docs --json commits --jq '.commits[].messageHeadline // ""')
 
           ISSUE_NUMBERS=$(echo "$PR_BODY $COMMITS" | grep -oE '#[0-9]+' | tr -d '#' | sort -u | tr '\n' ' ')
 
           BROKEN_URLS=""
           for issue_num in $ISSUE_NUMBERS; do
             [ -z "$issue_num" ] && continue
-            ISSUE_BODY=$(gh issue view $issue_num --json body --jq '.body' 2>/dev/null || true)
+            ISSUE_BODY=$(gh issue view $issue_num --repo kubestellar/docs --json body --jq '.body' 2>/dev/null || true)
             # Extract all URLs from the issue (not just the first one)
-            URLS=$(echo "$ISSUE_BODY" | grep -oE 'https://kubestellar\.io/docs/[^ )\]">,;!?:]+' | tr '\n' ' ' || true)
+            URLS=$(echo "$ISSUE_BODY" | grep -oE 'https://kubestellar\.io/docs/[^ )\]">,;!?:+&]+' | tr '\n' ' ' || true)
             [ -n "$URLS" ] && BROKEN_URLS="$BROKEN_URLS $URLS"
           done
           echo "broken_urls=$BROKEN_URLS" >> $GITHUB_OUTPUT
@@ -130,9 +130,9 @@ jobs:
           GH_TOKEN: ${{ secrets.WORKFLOW_SYNC_TOKEN }}
         run: |
           PR_NUMBER="${{ steps.pr-info.outputs.pr_number }}"
-          gh pr ready $PR_NUMBER 2>/dev/null || true
+          gh pr ready $PR_NUMBER --repo kubestellar/docs 2>/dev/null || true
           # Use --admin to bypass DCO requirement since Copilot doesn't sign commits
-          gh pr merge $PR_NUMBER --squash --admin --body "Auto-merged: Copilot link fix verified"
+          gh pr merge $PR_NUMBER --repo kubestellar/docs --squash --admin --body "Auto-merged: Copilot link fix verified"
           echo "✅ Merged PR #$PR_NUMBER"
 
       - name: Comment if failed
@@ -140,4 +140,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr comment ${{ steps.pr-info.outputs.pr_number }} --body "⚠️ Auto-merge blocked: Links not fully fixed in preview."
+          gh pr comment ${{ steps.pr-info.outputs.pr_number }} --repo kubestellar/docs --body "⚠️ Auto-merge blocked: Links not fully fixed in preview."
