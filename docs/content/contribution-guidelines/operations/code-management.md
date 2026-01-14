@@ -148,6 +148,15 @@ Complete the Related issue field by inserting the issue number preceded by the #
 Decide whether this is a draft PR or if it's ready for review, and select the option you want by expanding on the Create Pull Request button.
 Assign a label to the PR from the available list of labels (a drop down list on the right side of the web page)
 
-Kubestellar CI pipeline:
+## Kubestellar CI pipeline
 
-Prow (https://docs.prow.k8s.io/docs/overview/)
+### Prow CI jobs
+
+Kubestellar Prow CI jobs run inside containerized environments.
+Required tooling such as Python is provided by the container image
+itself, rather than being downloaded dynamically during job execution
+(e.g., Python 3.14). This improves CI reliability and consistency.
+
+See: https://docs.prow.k8s.io/docs/overview/
+
+
