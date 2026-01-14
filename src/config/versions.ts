@@ -1,29 +1,45 @@
-// Versions config - docs are now stored locally in this repository
-// Version information is kept for display purposes only
+// Multi-project versions config
+// Supports KubeStellar, a2a, and kubeflex with independent versioning
 //
 // Versioning Strategy:
-// - Docs are stored in this repository
-// - Branch naming convention: docs/{version} (e.g., docs/0.29.0, docs/0.28.0)
-// - The main branch always contains the latest version
-// - To add a new version:
-//   1. Create a new branch named docs/{version} from main
-//   2. Add the version to VERSIONS below
-//   3. Update CURRENT_VERSION if it's the latest
-
-export const CURRENT_VERSION = "0.29.0"
+// - Each project has its own version scheme
+// - Branch naming convention:
+//   - KubeStellar: main (latest), docs/{version} (e.g., docs/0.28.0)
+//   - a2a: main (latest), docs/a2a/{version} (e.g., docs/a2a/0.1.0)
+//   - kubeflex: main (latest), docs/kubeflex/{version} (e.g., docs/kubeflex/0.8.0)
+// - The main branch always contains the latest version for all projects
 
 // Netlify site name for branch deploys
-// Enable branch deploys: Netlify Dashboard > Site Settings > Build & Deploy > Branches > All
 export const NETLIFY_SITE_NAME = "kubestellar-docs"
 
 // Production URL for latest version
 export const PRODUCTION_URL = "https://kubestellar.io"
 
-// Available versions - branch name is derived from version key
-// Branch naming: main for latest, docs/{version} for specific versions
-export const VERSIONS = {
+// Project identifiers
+export type ProjectId = "kubestellar" | "a2a" | "kubeflex"
+
+// Version info structure
+export interface VersionInfo {
+  label: string
+  branch: string
+  isDefault: boolean
+  externalUrl?: string
+}
+
+// Project configuration
+export interface ProjectConfig {
+  id: ProjectId
+  name: string
+  basePath: string // '' for kubestellar, 'a2a' for a2a, etc.
+  currentVersion: string
+  contentPath: string
+  versions: Record<string, VersionInfo>
+}
+
+// KubeStellar versions (existing)
+const KUBESTELLAR_VERSIONS: Record<string, VersionInfo> = {
   latest: {
-    label: `v${CURRENT_VERSION} (Latest)`,
+    label: "v0.29.0 (Latest)",
     branch: "main",
     isDefault: true,
   },
@@ -103,16 +119,83 @@ export const VERSIONS = {
     isDefault: false,
     externalUrl: "https://kubestellar.github.io/kubestellar",
   },
-} as const
-
-export type VersionKey = keyof typeof VERSIONS
-
-export interface VersionInfo {
-  label: string
-  branch: string
-  isDefault: boolean
-  externalUrl?: string
 }
+
+// a2a versions
+const A2A_VERSIONS: Record<string, VersionInfo> = {
+  latest: {
+    label: "v0.1.0 (Latest)",
+    branch: "main",
+    isDefault: true,
+  },
+}
+
+// kubeflex versions
+const KUBEFLEX_VERSIONS: Record<string, VersionInfo> = {
+  latest: {
+    label: "v0.8.0 (Latest)",
+    branch: "main",
+    isDefault: true,
+  },
+}
+
+// All projects configuration
+export const PROJECTS: Record<ProjectId, ProjectConfig> = {
+  kubestellar: {
+    id: "kubestellar",
+    name: "KubeStellar",
+    basePath: "",
+    currentVersion: "0.29.0",
+    contentPath: "docs/content",
+    versions: KUBESTELLAR_VERSIONS,
+  },
+  a2a: {
+    id: "a2a",
+    name: "A2A",
+    basePath: "a2a",
+    currentVersion: "0.1.0",
+    contentPath: "docs/content/a2a",
+    versions: A2A_VERSIONS,
+  },
+  kubeflex: {
+    id: "kubeflex",
+    name: "KubeFlex",
+    basePath: "kubeflex",
+    currentVersion: "0.8.0",
+    contentPath: "docs/content/kubeflex",
+    versions: KUBEFLEX_VERSIONS,
+  },
+}
+
+// Get project from URL pathname
+export function getProjectFromPath(pathname: string): ProjectConfig {
+  if (pathname.startsWith("/docs/a2a")) {
+    return PROJECTS.a2a
+  }
+  if (pathname.startsWith("/docs/kubeflex")) {
+    return PROJECTS.kubeflex
+  }
+  return PROJECTS.kubestellar
+}
+
+// Get project by ID
+export function getProject(projectId: ProjectId): ProjectConfig {
+  return PROJECTS[projectId]
+}
+
+// Get all projects
+export function getAllProjects(): ProjectConfig[] {
+  return Object.values(PROJECTS)
+}
+
+// ============================================
+// Backwards-compatible exports for KubeStellar
+// ============================================
+
+export const CURRENT_VERSION = PROJECTS.kubestellar.currentVersion
+export const VERSIONS = KUBESTELLAR_VERSIONS
+
+export type VersionKey = keyof typeof KUBESTELLAR_VERSIONS
 
 export function getDefaultVersion(): VersionKey {
   return "latest"
@@ -123,7 +206,7 @@ export function getCurrentVersion(): string {
 }
 
 export function getBranchForVersion(version: VersionKey): string {
-  return VERSIONS[version]?.branch ?? "main"
+  return KUBESTELLAR_VERSIONS[version]?.branch ?? "main"
 }
 
 export function getVersionFromBranch(branch: string): VersionKey | null {
@@ -132,7 +215,7 @@ export function getVersionFromBranch(branch: string): VersionKey | null {
   if (match) {
     const versionNum = match[1]
     // Find version entry with matching branch
-    for (const [key, value] of Object.entries(VERSIONS)) {
+    for (const [key, value] of Object.entries(KUBESTELLAR_VERSIONS)) {
       if (value.branch === branch || key === versionNum) {
         return key as VersionKey
       }
@@ -148,7 +231,7 @@ export function getVersionFromBranch(branch: string): VersionKey | null {
 }
 
 export function getAllVersions(): Array<{ key: VersionKey } & VersionInfo> {
-  return Object.entries(VERSIONS).map(([key, value]) => ({
+  return Object.entries(KUBESTELLAR_VERSIONS).map(([key, value]) => ({
     key: key as VersionKey,
     ...value,
   }))
@@ -159,12 +242,21 @@ export function isVersionBranch(branch: string): boolean {
   return branch === "main" || branch.startsWith("docs/")
 }
 
-// Get the URL for a specific version
-export function getVersionUrl(versionKey: VersionKey, pathname: string = "/docs"): string {
-  const version = VERSIONS[versionKey]
+// Get the URL for a specific version (project-aware)
+export function getVersionUrl(
+  versionKey: string,
+  pathname: string = "/docs",
+  projectId: ProjectId = "kubestellar"
+): string {
+  const project = PROJECTS[projectId]
+  const version = project.versions[versionKey]
+
+  if (!version) {
+    return `${PRODUCTION_URL}${pathname}`
+  }
 
   // If it has an external URL (like legacy), use that
-  if ('externalUrl' in version && version.externalUrl) {
+  if ("externalUrl" in version && version.externalUrl) {
     return version.externalUrl
   }
 
@@ -175,19 +267,34 @@ export function getVersionUrl(versionKey: VersionKey, pathname: string = "/docs"
 
   // Other versions use Netlify branch deploys
   // Netlify converts branch names: docs/0.28.0 -> docs-0-28-0
-  const branchSlug = version.branch.replace(/\//g, '-').replace(/\./g, '-')
+  const branchSlug = version.branch.replace(/\//g, "-").replace(/\./g, "-")
   return `https://${branchSlug}--${NETLIFY_SITE_NAME}.netlify.app${pathname}`
 }
 
+// Get versions for a specific project
+export function getProjectVersions(
+  projectId: ProjectId
+): Array<{ key: string } & VersionInfo> {
+  const project = PROJECTS[projectId]
+  return Object.entries(project.versions).map(([key, value]) => ({
+    key,
+    ...value,
+  }))
+}
+
 // Check if a version has been migrated (branch exists)
-export function isVersionMigrated(versionKey: VersionKey): boolean {
+export function isVersionMigrated(
+  versionKey: string,
+  projectId: ProjectId = "kubestellar"
+): boolean {
+  const project = PROJECTS[projectId]
+
   // Latest is always available
   if (versionKey === "latest") return true
 
   // Legacy links externally, so it's "available"
   if (versionKey === "legacy") return true
 
-  // For other versions, assume they exist if in the VERSIONS list
-  // In practice, you might want to check if the branch actually exists
-  return versionKey in VERSIONS
+  // For other versions, assume they exist if in the versions list
+  return versionKey in project.versions
 }

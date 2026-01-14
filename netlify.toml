@@ -80,6 +80,32 @@
   to = "https://kubestellar.io/docs"
   status = 301
   force = true
+
+# Redirect a2a.kubestellar.io to kubestellar.io/docs/a2a
+[[redirects]]
+  from = "https://a2a.kubestellar.io/*"
+  to = "https://kubestellar.io/docs/a2a/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://a2a.kubestellar.io"
+  to = "https://kubestellar.io/docs/a2a"
+  status = 301
+  force = true
+
+# Redirect kubeflex.kubestellar.io to kubestellar.io/docs/kubeflex
+[[redirects]]
+  from = "https://kubeflex.kubestellar.io/*"
+  to = "https://kubestellar.io/docs/kubeflex/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://kubeflex.kubestellar.io"
+  to = "https://kubestellar.io/docs/kubeflex"
+  status = 301
+  force = true
   
 [[redirects]]
   from = "/agenda"

@@ -4,10 +4,9 @@ import { useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import {
-  CURRENT_VERSION,
-  getAllVersions,
+  getProjectFromPath,
+  getProjectVersions,
   getVersionUrl,
-  type VersionKey,
 } from '@/config/versions';
 
 interface VersionSelectorProps {
@@ -22,11 +21,18 @@ export function VersionSelector({ className = '', isMobile = false }: VersionSel
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
-  // Get all versions
-  const versions = getAllVersions();
+  // Detect current project from URL
+  const currentProject = getProjectFromPath(pathname);
+  const projectId = currentProject.id;
 
-  // Current version label (from the default/latest version)
-  const currentVersionLabel = `v${CURRENT_VERSION}`;
+  // Get versions for the current project
+  const versions = getProjectVersions(projectId);
+
+  // Current version label
+  const currentVersionLabel = `v${currentProject.currentVersion}`;
+
+  // Show project name for non-KubeStellar projects
+  const showProjectName = projectId !== 'kubestellar';
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -52,11 +58,11 @@ export function VersionSelector({ className = '', isMobile = false }: VersionSel
     return () => document.removeEventListener('keydown', handleEscape);
   }, []);
 
-  const handleVersionChange = (versionKey: VersionKey) => {
+  const handleVersionChange = (versionKey: string) => {
     setIsOpen(false);
 
-    // Get the URL for the selected version
-    const url = getVersionUrl(versionKey, pathname);
+    // Get the URL for the selected version (project-aware)
+    const url = getVersionUrl(versionKey, pathname, projectId);
 
     // Navigate to the new version
     window.location.href = url;
@@ -78,6 +84,7 @@ export function VersionSelector({ className = '', isMobile = false }: VersionSel
             <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
             </svg>
+            {showProjectName && <span className="font-medium mr-1">{currentProject.name}:</span>}
             Version: {currentVersionLabel}
           </span>
           <svg
@@ -92,8 +99,9 @@ export function VersionSelector({ className = '', isMobile = false }: VersionSel
 
         {isOpen && (
           <div className="mt-1 ml-7 space-y-1">
-            {versions.map(({ key, label }) => {
+            {versions.map(({ key, label, externalUrl }) => {
               const isCurrentVersion = key === 'latest';
+              const isExternal = !!externalUrl;
               return (
                 <button
                   key={key}
@@ -109,7 +117,7 @@ export function VersionSelector({ className = '', isMobile = false }: VersionSel
                   }`}
                 >
                   {label}
-                  {key === 'legacy' && (
+                  {isExternal && (
                     <svg className="w-3 h-3 ml-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
@@ -135,8 +143,9 @@ export function VersionSelector({ className = '', isMobile = false }: VersionSel
         }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        aria-label="Select documentation version"
+        aria-label={`Select ${currentProject.name} documentation version`}
       >
+        {showProjectName && <span className="font-semibold">{currentProject.name}</span>}
         <span>{currentVersionLabel}</span>
         <svg
           className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
@@ -156,12 +165,12 @@ export function VersionSelector({ className = '', isMobile = false }: VersionSel
               : 'bg-white border-gray-200'
           }`}
           role="listbox"
-          aria-label="Documentation versions"
+          aria-label={`${currentProject.name} documentation versions`}
         >
           <div className="py-1">
-            {versions.map(({ key, label }) => {
+            {versions.map(({ key, label, externalUrl }) => {
               const isCurrentVersion = key === 'latest';
-              const isExternal = key === 'legacy';
+              const isExternal = !!externalUrl;
 
               return (
                 <button
