@@ -1,6 +1,6 @@
 // Versions config - docs are now stored locally in this repository
 // Version information is kept for display purposes only
-// 
+//
 // Versioning Strategy:
 // - Docs are stored in this repository
 // - Branch naming convention: docs/{version} (e.g., docs/0.29.0, docs/0.28.0)
@@ -12,6 +12,12 @@
 
 export const CURRENT_VERSION = "0.29.0"
 
+// Netlify site name for branch deploys
+export const NETLIFY_SITE_NAME = "kubestellar-docs"
+
+// Production URL for latest version
+export const PRODUCTION_URL = "https://kubestellar.io"
+
 // Available versions - branch name is derived from version key
 // Branch naming: main for latest, docs/{version} for specific versions
 export const VERSIONS = {
@@ -20,12 +26,82 @@ export const VERSIONS = {
     branch: "main",
     isDefault: true,
   },
-  // Example of how to add older versions:
-  // "0.28.0": {
-  //   label: "v0.28.0",
-  //   branch: "docs/0.28.0",
-  //   isDefault: false,
-  // },
+  "0.28.0": {
+    label: "v0.28.0",
+    branch: "docs/0.28.0",
+    isDefault: false,
+  },
+  "0.27.2": {
+    label: "v0.27.2",
+    branch: "docs/0.27.2",
+    isDefault: false,
+  },
+  "0.27.1": {
+    label: "v0.27.1",
+    branch: "docs/0.27.1",
+    isDefault: false,
+  },
+  "0.27.0": {
+    label: "v0.27.0",
+    branch: "docs/0.27.0",
+    isDefault: false,
+  },
+  "0.26.0": {
+    label: "v0.26.0",
+    branch: "docs/0.26.0",
+    isDefault: false,
+  },
+  "0.25.1": {
+    label: "v0.25.1",
+    branch: "docs/0.25.1",
+    isDefault: false,
+  },
+  "0.25.0": {
+    label: "v0.25.0",
+    branch: "docs/0.25.0",
+    isDefault: false,
+  },
+  "0.24.0": {
+    label: "v0.24.0",
+    branch: "docs/0.24.0",
+    isDefault: false,
+  },
+  "0.23.1": {
+    label: "v0.23.1",
+    branch: "docs/0.23.1",
+    isDefault: false,
+  },
+  "0.23.0": {
+    label: "v0.23.0",
+    branch: "docs/0.23.0",
+    isDefault: false,
+  },
+  "0.22.0": {
+    label: "v0.22.0",
+    branch: "docs/0.22.0",
+    isDefault: false,
+  },
+  "0.21.2": {
+    label: "v0.21.2",
+    branch: "docs/0.21.2",
+    isDefault: false,
+  },
+  "0.21.1": {
+    label: "v0.21.1",
+    branch: "docs/0.21.1",
+    isDefault: false,
+  },
+  "0.21.0": {
+    label: "v0.21.0",
+    branch: "docs/0.21.0",
+    isDefault: false,
+  },
+  legacy: {
+    label: "Older Versions",
+    branch: "legacy",
+    isDefault: false,
+    externalUrl: "https://kubestellar.github.io/kubestellar",
+  },
 } as const
 
 export type VersionKey = keyof typeof VERSIONS
@@ -34,6 +110,7 @@ export interface VersionInfo {
   label: string
   branch: string
   isDefault: boolean
+  externalUrl?: string
 }
 
 export function getDefaultVersion(): VersionKey {
@@ -60,12 +137,12 @@ export function getVersionFromBranch(branch: string): VersionKey | null {
       }
     }
   }
-  
+
   // Check for main branch
   if (branch === "main" || branch === "master") {
     return "latest"
   }
-  
+
   return null
 }
 
@@ -79,4 +156,37 @@ export function getAllVersions(): Array<{ key: VersionKey } & VersionInfo> {
 // Helper to validate if a branch name follows version convention
 export function isVersionBranch(branch: string): boolean {
   return branch === "main" || branch.startsWith("docs/")
+}
+
+// Get the URL for a specific version
+export function getVersionUrl(versionKey: VersionKey, pathname: string = "/docs"): string {
+  const version = VERSIONS[versionKey]
+
+  // If it has an external URL (like legacy), use that
+  if ('externalUrl' in version && version.externalUrl) {
+    return version.externalUrl
+  }
+
+  // Latest version uses production URL
+  if (versionKey === "latest" || version.isDefault) {
+    return `${PRODUCTION_URL}${pathname}`
+  }
+
+  // Other versions use Netlify branch deploys
+  // Netlify converts branch names: docs/0.28.0 -> docs-0-28-0
+  const branchSlug = version.branch.replace(/\//g, '-').replace(/\./g, '-')
+  return `https://${branchSlug}--${NETLIFY_SITE_NAME}.netlify.app${pathname}`
+}
+
+// Check if a version has been migrated (branch exists)
+export function isVersionMigrated(versionKey: VersionKey): boolean {
+  // Latest is always available
+  if (versionKey === "latest") return true
+
+  // Legacy links externally, so it's "available"
+  if (versionKey === "legacy") return true
+
+  // For other versions, assume they exist if in the VERSIONS list
+  // In practice, you might want to check if the branch actually exists
+  return versionKey in VERSIONS
 }

@@ -6,6 +6,7 @@ import { useMDXComponents as getMDXComponents } from '../../../../mdx-components
 import { convertHtmlScriptsToJsxComments } from '@/lib/transformMdx'
 import { MermaidComponent } from '@/lib/Mermaid'
 import { buildPageMap, docsContentPath } from '../page-map'
+import { CURRENT_VERSION } from '@/config/versions'
 import fs from 'fs'
 import path from 'path'
 
@@ -233,11 +234,16 @@ function sanitizeHtmlForMdx(content: string): string {
 
 // Replace template variables with actual values
 function replaceTemplateVariables(content: string): string {
+  // Use CURRENT_VERSION from config to support versioned documentation
+  // When a version branch is created, CURRENT_VERSION is updated to that version
+  const versionBranch = CURRENT_VERSION === '0.29.0' ? 'main' : `release-${CURRENT_VERSION}`
+  const versionTag = CURRENT_VERSION === '0.29.0' ? 'latest' : `v${CURRENT_VERSION}`
+
   const vars: Record<string, string> = {
-    'config.ks_branch': 'main',
-    'config.ks_tag': 'latest',
-    'config.ks_latest_release': '0.29.0',
-    'config.ks_latest_regular_release': '0.29.0',
+    'config.ks_branch': versionBranch,
+    'config.ks_tag': versionTag,
+    'config.ks_latest_release': CURRENT_VERSION,
+    'config.ks_latest_regular_release': CURRENT_VERSION,
     'config.docs_url': 'https://docs.kubestellar.io',
     'config.repo_url': 'https://github.com/kubestellar/kubestellar',
     'config.site_url': 'https://docs.kubestellar.io'

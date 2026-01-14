@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 // import { useSearchParams, usePathname, useRouter } from 'next/navigation'
 import { VERSIONS } from '@/config/versions'
 import { getLocalizedUrl } from "@/lib/url";
+import { VersionSelector } from './VersionSelector';
 
 type DropdownType = "contribute" | "community" | "language" | "github" | null;
 
@@ -39,8 +40,8 @@ export default function DocsNavbar() {
   // const searchParams = useSearchParams()
   // const pathname = usePathname()
   // const router = useRouter()
-  // Use the first (and only) version label from config
-  const currentVersionLabel = Object.values(VERSIONS)[0]?.label || 'latest'
+  // Note: Version label is now handled by VersionSelector component
+  void VERSIONS; // Keep import for reference
 
   useEffect(() => {
     setMounted(true);
@@ -466,18 +467,8 @@ export default function DocsNavbar() {
 
           <div className="relative hidden xl:flex w-px h-5 bg-gray-300 dark:bg-neutral-700 mx-1" />
 
-          {/* Version badge - simplified since docs are now local */}
-          <div className="relative">
-            <span
-              className={`text-xs font-mono px-2 py-1.5 rounded-md ${
-                isDark 
-                  ? 'text-gray-400 bg-neutral-800/50'
-                  : 'text-gray-600 bg-gray-100'
-              }`}
-            >
-              {currentVersionLabel}
-            </span>
-          </div>
+          {/* Version selector dropdown */}
+          <VersionSelector />
 
           <div 
             className="relative hidden lg:flex  "
@@ -971,22 +962,11 @@ export default function DocsNavbar() {
               Partners
             </Link>
 
-            {/* Version display - simplified since docs are local */}
+            {/* Version selector - mobile */}
             <div className={`md:hidden pt-3 border-t mt-3 ${
               isDark ? 'border-neutral-800' : 'border-gray-200'
             }`}>
-              <div
-                className={`flex items-center px-3 py-2 text-sm ${
-                  isDark
-                    ? 'text-gray-400'
-                    : 'text-gray-600'
-                }`}
-              >
-                <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                </svg>
-                <span>Version: {currentVersionLabel}</span>
-              </div>
+              <VersionSelector isMobile={true} />
             </div>
 
             <div className={`pt-3 border-t mt-3 ${

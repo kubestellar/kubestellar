@@ -12,6 +12,55 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Enable branch deploys for documentation versioning
+# Version branches follow the pattern: docs/{version}
+# Netlify will create deploy previews at: https://docs-X-Y-Z--kubestellar-docs.netlify.app
+[context.branch-deploy]
+  command = "npm run build"
+
+# Deploy contexts for version branches
+[context."docs/0.28.0"]
+  command = "npm run build"
+
+[context."docs/0.27.2"]
+  command = "npm run build"
+
+[context."docs/0.27.1"]
+  command = "npm run build"
+
+[context."docs/0.27.0"]
+  command = "npm run build"
+
+[context."docs/0.26.0"]
+  command = "npm run build"
+
+[context."docs/0.25.1"]
+  command = "npm run build"
+
+[context."docs/0.25.0"]
+  command = "npm run build"
+
+[context."docs/0.24.0"]
+  command = "npm run build"
+
+[context."docs/0.23.1"]
+  command = "npm run build"
+
+[context."docs/0.23.0"]
+  command = "npm run build"
+
+[context."docs/0.22.0"]
+  command = "npm run build"
+
+[context."docs/0.21.2"]
+  command = "npm run build"
+
+[context."docs/0.21.1"]
+  command = "npm run build"
+
+[context."docs/0.21.0"]
+  command = "npm run build"
+
 # Forms configuration
 [forms]
   # Enable spam filtering
