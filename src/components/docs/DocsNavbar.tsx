@@ -50,7 +50,7 @@ export default function DocsNavbar() {
     const fetchGithubStats = async () => {
       try {
         const response = await fetch(
-          "https://api.github.com/repos/kubestellar/kubestellar"
+          "https://api.github.com/repos/kubestellar/docs"
         );
         if (!response.ok) {
           throw new Error("Network response was not okay");
@@ -531,7 +531,7 @@ export default function DocsNavbar() {
                 onMouseLeave={handleMouseLeave}
               >
               <a
-                href="https://github.com/kubestellar/kubestellar"
+                href="https://github.com/kubestellar/docs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`flex items-center justify-between px-3 py-2 text-sm transition-colors ${
@@ -553,7 +553,7 @@ export default function DocsNavbar() {
                 </span>
               </a>
               <a
-                href="https://github.com/kubestellar/kubestellar/fork"
+                href="https://github.com/kubestellar/docs/fork"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`flex items-center justify-between px-3 py-2 text-sm transition-colors ${
@@ -575,7 +575,7 @@ export default function DocsNavbar() {
                 </span>
               </a>
               <a
-                href="https://github.com/kubestellar/kubestellar/watchers"
+                href="https://github.com/kubestellar/docs/watchers"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`flex items-center justify-between px-3 py-2 text-sm transition-colors ${
@@ -993,7 +993,7 @@ export default function DocsNavbar() {
               isDark ? 'border-neutral-800' : 'border-gray-200'
             }`}>
               <a
-                href="https://github.com/kubestellar/kubestellar"
+                href="https://github.com/kubestellar/docs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
