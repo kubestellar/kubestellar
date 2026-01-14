@@ -1,4 +1,4 @@
-name: Preview Links
+name: Preview Links - Collect
 
 on:
   pull_request:
@@ -8,108 +8,20 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
-  post-preview-links:
+  collect-pr-info:
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for Netlify deploy
-        uses: jakepartusch/wait-for-netlify-action@f1e137043864b9ab9034ae3a5adc1c108e3f1a48  # v1.4
-        id: netlify
+      - name: Save PR number
+        run: |
+          mkdir -p pr-info
+          echo "${{ github.event.pull_request.number }}" > pr-info/pr_number
+          echo "Saved PR number: ${{ github.event.pull_request.number }}"
+
+      - name: Upload PR info
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
-          site_name: kubestellar-docs
-          max_timeout: 300
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get changed files and post comment
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
-        with:
-          script: |
-            const prNumber = context.payload.pull_request.number;
-            const previewUrl = `https://deploy-preview-${prNumber}--kubestellar-docs.netlify.app`;
-
-            // Get changed files
-            const { data: files } = await github.rest.pulls.listFiles({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-              per_page: 100
-            });
-
-            // Filter for markdown files in docs/content and convert to URLs
-            const docFiles = files
-              .filter(f => f.filename.startsWith('docs/content/') && f.filename.endsWith('.md'))
-              .map(f => {
-                // Convert: docs/content/path/to/file.md -> /docs/path/to/file/
-                const urlPath = f.filename
-                  .replace('docs/content/', '/docs/')
-                  .replace('.md', '/');
-                return {
-                  file: f.filename,
-                  url: `${previewUrl}${urlPath}`,
-                  status: f.status
-                };
-              });
-
-            if (docFiles.length === 0) {
-              console.log('No doc files changed');
-              return;
-            }
-
-            // Build comment body
-            const statusEmoji = {
-              added: '✨',
-              modified: '📝',
-              removed: '🗑️',
-              renamed: '📛'
-            };
-
-            let body = `## 📖 Preview Links\n\n`;
-            body += `The following documentation pages were changed in this PR:\n\n`;
-            body += `| Status | Page | Preview Link |\n`;
-            body += `|--------|------|-------------|\n`;
-
-            for (const doc of docFiles) {
-              const emoji = statusEmoji[doc.status] || '📄';
-              const pageName = doc.file.split('/').pop().replace('.md', '');
-              if (doc.status === 'removed') {
-                body += `| ${emoji} ${doc.status} | \`${pageName}\` | *(deleted)* |\n`;
-              } else {
-                body += `| ${emoji} ${doc.status} | \`${pageName}\` | [View preview](${doc.url}) |\n`;
-              }
-            }
-
-            body += `\n---\n`;
-            body += `🔗 [Full preview site](${previewUrl})\n`;
-
-            // Find existing comment to update
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber
-            });
-
-            const botComment = comments.find(c =>
-              c.user.type === 'Bot' &&
-              c.body.includes('## 📖 Preview Links')
-            );
-
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: body
-              });
-              console.log('Updated existing comment');
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                body: body
-              });
-              console.log('Created new comment');
-            }
+          name: pr-info
+          path: pr-info/
+          retention-days: 1
