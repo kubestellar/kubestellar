@@ -50,7 +50,7 @@ export default function DocsNavbar() {
     const fetchGithubStats = async () => {
       try {
         const response = await fetch(
-          "https://api.github.com/repos/kubestellar/docs"
+          "https://api.github.com/repos/kubestellar/kubestellar"
         );
         if (!response.ok) {
           throw new Error("Network response was not okay");
