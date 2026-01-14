@@ -102,6 +102,14 @@ const NAV_STRUCTURE_A2A: Array<{ title: string; items: NavItem[] }> = [
     items: [
       { 'Contributing': 'CONTRIBUTING.md' },
     ]
+  },
+  {
+    title: 'Related Projects',
+    items: [
+      { 'KubeStellar Documentation': '/docs/what-is-kubestellar/overview' },
+      { 'KubeFlex Documentation': '/docs/kubeflex/overview/introduction' },
+      { 'Multi Plugin Documentation': '/docs/multi-plugin/overview/introduction' }
+    ]
   }
 ]
 
@@ -132,6 +140,14 @@ const NAV_STRUCTURE_MULTI_PLUGIN: Array<{ title: string; items: NavItem[] }> = [
     title: 'Development',
     items: [
       { 'Development Guide': 'development_guide.md' },
+    ]
+  },
+  {
+    title: 'Related Projects',
+    items: [
+      { 'KubeStellar Documentation': '/docs/what-is-kubestellar/overview' },
+      { 'A2A Documentation': '/docs/a2a/overview/introduction' },
+      { 'KubeFlex Documentation': '/docs/kubeflex/overview/introduction' }
     ]
   }
 ]
@@ -165,6 +181,14 @@ const NAV_STRUCTURE_KUBEFLEX: Array<{ title: string; items: NavItem[] }> = [
     title: 'Community',
     items: [
       { 'Contributors': 'contributors.md' },
+    ]
+  },
+  {
+    title: 'Related Projects',
+    items: [
+      { 'KubeStellar Documentation': '/docs/what-is-kubestellar/overview' },
+      { 'A2A Documentation': '/docs/a2a/overview/introduction' },
+      { 'Multi Plugin Documentation': '/docs/multi-plugin/overview/introduction' }
     ]
   }
 ]
