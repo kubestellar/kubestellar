@@ -21,7 +21,13 @@
     "terminalOutputSuccess": "完了",
     "terminalOutputSuccessText": "KubeStellar デモ環境の準備が完了しました！",
     "buttonInstall": "KubeStellar をインストール",
-    "buttonDocs": "ドキュメントを見る"
+    "buttonDocs": "ドキュメントを見る",
+    "getStartedWith": "始めましょう",
+    "chooseEnvironment": "デプロイ環境を選択",
+    "localDevelopment": "ローカル開発",
+    "localDevelopmentTime": "Docker + Kind • 15 分",
+    "awsEksProduction": "AWS EKS 本番環境",
+    "awsEksProductionTime": "エンタープライズ対応 • 30 分"
   },
   "footer": {
     "description": "多様なインフラストラクチャ全体で分散ワークロード管理を簡素化する、マルチクラスター Kubernetes オーケストレーションプラットフォーム。",
@@ -69,6 +75,7 @@
     "docs": "ドキュメント",
     "blog": "ブログ",
     "playground": "プレイグラウンド",
+    "marketplace": "マーケットプレイス",
     "contribute": "貢献する",
     "joinIn": "参加する",
     "contributeHandbook": "貢献ハンドブック",
@@ -158,8 +165,30 @@
     "formSuccess": "メールは KubeStellar の開発メーリングリストに送信されます。送信を完了するために、メールクライアントをご確認ください。"
   },
   "getStartedSection": {
-    "title": "始める準備はできましたか？",
+    "title": "始める準備は",
+    "titleSpan": "できましたか？",
+    "installSubtitle": "ローカルテストから始めるか、本番インフラにデプロイ",
     "subtitle": "成長を続ける KubeStellar のユーザーおよびコントリビューターコミュニティに参加しましょう。",
+    "localDev": {
+      "title": "ローカル開発",
+      "subtitle": "テストと学習に最適",
+      "description": "Docker と Kind を使用して、ローカル Kubernetes 環境ですぐに始められます。開発、テスト、KubeStellar の機能探索に最適です。",
+      "noCloudCosts": "クラウド費用なし",
+      "setupTime": "15 分でセットアップ",
+      "dockerKind": "Docker + Kind",
+      "k8sVersion": "K8s 1.34+",
+      "cta": "ローカルインストールを開始"
+    },
+    "awsEks": {
+      "title": "AWS EKS 本番環境",
+      "subtitle": "エンタープライズ対応デプロイ",
+      "description": "AWS EKS に KubeStellar をデプロイし、エンタープライズグレードのスケーラビリティと信頼性を備えた本番ワークロードを実行。クラウドインフラの自動化を完全サポート。",
+      "eksVersion": "EKS 1.34",
+      "setupTime": "30 分でセットアップ",
+      "autoScaling": "オートスケーリング",
+      "awsAccount": "AWS アカウント",
+      "cta": "AWS インストールを開始"
+    },
     "card1Title": "クイックインストール",
     "card1Description": "自動的な前提条件チェックとステップバイステップのデプロイ手順を備えた、シンプルなインストールガイドを使って、数分で KubeStellar を起動できます。",
     "card1Button": "クイックインストールを開始",
@@ -226,7 +255,8 @@
     "step5Tag3": "ポリシー管理",
     "step5Command1Comment": "# クラスター間のデプロイ状態を確認",
     "step5Command2Comment": "# ワークロードの配置を確認",
-    "step5Command3Comment": "# リソース使用状況を監視"
+    "step5Command3Comment": "# リソース使用状況を監視",
+    "showMoreSteps": "さらにステップを表示"
   },
   "useCasesSection": {
     "title": "ユース",
@@ -478,8 +508,12 @@
           "structure": "採択された参加者は、KubeStellar の 1 名以上のメンターの指導のもとでプロジェクトに取り組みます。中間評価と最終評価があります。",
           "howToApply": "学生は応募期間中に Google Summer of Code の公式ウェブサイトから応募できます。事前にコミュニティへ参加し、KubeStellar に貢献することをおすすめします。",
           "resources": [
-            { "name": "GSoC 公式サイト" },
-            { "name": "KubeStellar GitHub" }
+            {
+              "name": "GSoC 公式サイト"
+            },
+            {
+              "name": "KubeStellar GitHub"
+            }
           ]
         }
       },
@@ -496,8 +530,12 @@
           "structure": "参加者は、定期的なミーティングやフィードバックを通じて、KubeStellar のメンターと密接に連携しながら、事前に定義されたプロジェクトに取り組みます。",
           "howToApply": "応募は European Summer of Code の公式ポータルから行ってください。",
           "resources": [
-            { "name": "ESoC 公式サイト（リンク未提供）" },
-            { "name": "KubeStellar GitHub" }
+            {
+              "name": "ESoC 公式サイト（リンク未提供）"
+            },
+            {
+              "name": "KubeStellar GitHub"
+            }
           ]
         }
       },
@@ -514,8 +552,12 @@
           "structure": "インターンはメンターとペアになり、開発チームの一員として活動します。プログラムは柔軟で、フルタイム・パートタイムのどちらでも参加可能です。",
           "howToApply": "履歴書と志望動機をコミュニティ用メールアドレスへ送付してください。また、GitHub リポジトリへの貢献を事前に始めることを推奨します。",
           "resources": [
-            { "name": "KubeStellar GitHub" },
-            { "name": "KubeStellar コミュニティページ" }
+            {
+              "name": "KubeStellar GitHub"
+            },
+            {
+              "name": "KubeStellar コミュニティページ"
+            }
           ]
         }
       },
@@ -532,8 +574,12 @@
           "structure": "参加者は KubeStellar のメンターと 1 対 1 で協力し、プロジェクトに貢献しながらコミュニティ活動にも参加します。",
           "howToApply": "応募は LFX Mentorship プラットフォームから行います。KubeStellar のプロジェクトを探して応募してください。",
           "resources": [
-            { "name": "LFX Mentorship プラットフォーム" },
-            { "name": "KubeStellar GitHub" }
+            {
+              "name": "LFX Mentorship プラットフォーム"
+            },
+            {
+              "name": "KubeStellar GitHub"
+            }
           ]
         }
       }
@@ -586,6 +632,8 @@
     "requirementsLabel": "要件：",
     "goodStandingLabel": "良好なステータスでの機会：",
     "nextLevelLabel": "次のレベル：",
+    "statsQuestion": "貢献ラダーはどのように監査されていますか？",
+    "viewStats": "リアルタイム統計を見る",
     "levels": {
       "contributor": {
         "title": "コントリビューター",
@@ -760,6 +808,8 @@
     "subtitle": "KubeStellar コミュニティのために、素晴らしい機能を開発中です",
     "description": "このエキサイティングな新機能は現在開発中です。私たちのチームは、マルチクラスター Kubernetes オーケストレーション体験をさらに向上させる特別な体験を構築しています。",
     "statusBadge": "開発中",
+    "demoTitle": "実際に見てみましょう",
+    "demoSubtitle": "マーケットプレイスのデモを見て、これから何が来るかをご覧ください",
     "cta": {
       "title": "今すぐ KubeStellar を探索",
       "subtitle": "公開までの間に、KubeStellar で今すぐできることをご覧ください",

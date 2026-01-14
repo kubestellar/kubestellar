@@ -303,13 +303,13 @@ export default function HeroSection() {
               {/* Installation Path Heading */}
               <div className="text-center sm:text-left">
                 <h3 className="text-xl font-bold text-white mb-2">
-                  Get Started with{" "}
+                  {t("getStartedWith")}{" "}
                   <span className="text-gradient animated-gradient bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">
                     KubeStellar
                   </span>
                 </h3>
                 <p className="text-sm text-blue-100/80">
-                  Choose your deployment environment
+                  {t("chooseEnvironment")}
                 </p>
               </div>
 
@@ -343,10 +343,10 @@ export default function HeroSection() {
                     </div>
                     <div className="text-left">
                       <div className="text-sm font-semibold text-white">
-                        Local Development
+                        {t("localDevelopment")}
                       </div>
                       <div className="text-xs text-blue-200/70">
-                        Docker + Kind • 15 mins
+                        {t("localDevelopmentTime")}
                       </div>
                     </div>
                   </div>
@@ -393,10 +393,10 @@ export default function HeroSection() {
                     </div>
                     <div className="text-left">
                       <div className="text-sm font-semibold text-white">
-                        AWS EKS Production
+                        {t("awsEksProduction")}
                       </div>
                       <div className="text-xs text-purple-200/70">
-                        Enterprise Ready • 30 mins
+                        {t("awsEksProductionTime")}
                       </div>
                     </div>
                   </div>

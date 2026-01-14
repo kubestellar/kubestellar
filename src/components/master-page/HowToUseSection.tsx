@@ -213,7 +213,7 @@ export default function HowToUseSection() {
                   onClick={() => setShowAllSteps(true)}
                   className="pointer-events-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-2 animate-bounce-slow"
                 >
-                  <span>Show More Steps</span>
+                  <span>{t("showMoreSteps")}</span>
                   <svg
                     className="w-5 h-5"
                     fill="none"
@@ -494,7 +494,7 @@ export default function HowToUseSection() {
                   onClick={() => setShowAllSteps(true)}
                   className="pointer-events-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg shadow-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-3 border border-purple-400/30 animate-bounce-slow"
                 >
-                  <span className="text-lg">Show More Steps</span>
+                  <span className="text-lg">{t("showMoreSteps")}</span>
                   <svg
                     className="w-6 h-6"
                     fill="none"

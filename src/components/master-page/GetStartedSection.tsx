@@ -54,9 +54,9 @@ export default function GetStartedSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-white sm:text-[2.4rem]">
-            Ready to{" "}
+            {t("title")}{" "}
             <span className="text-gradient animated-gradient bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600">
-              Get Started?
+              {t("titleSpan")}
             </span>
           </h2>
         </div>
@@ -64,7 +64,7 @@ export default function GetStartedSection() {
         {/* Installation Path Section - Two Cards Side by Side */}
         <div className="mt-8 mb-6 text-center">
           <p className="text-blue-100/90 text-base sm:text-lg max-w-2xl mx-auto">
-            Start with local testing or deploy to production infrastructure
+            {t("installSubtitle")}
           </p>
         </div>
 
@@ -93,18 +93,16 @@ export default function GetStartedSection() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-white mb-1.5">
-                  Local Development
+                  {t("localDev.title")}
                 </h3>
                 <p className="text-sm text-blue-300/80 font-medium">
-                  Perfect for testing and learning
+                  {t("localDev.subtitle")}
                 </p>
               </div>
 
               {/* Description */}
               <p className="text-sm text-gray-300/90 mb-6 leading-relaxed">
-                Get started quickly with a local Kubernetes environment using
-                Docker and Kind. Ideal for development, testing, and exploring
-                KubeStellar features.
+                {t("localDev.description")}
               </p>
 
               {/* Features Grid */}
@@ -121,7 +119,7 @@ export default function GetStartedSection() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>No cloud costs</span>
+                  <span>{t("localDev.noCloudCosts")}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-300">
                   <svg
@@ -135,7 +133,7 @@ export default function GetStartedSection() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>15 min setup</span>
+                  <span>{t("localDev.setupTime")}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-300">
                   <svg
@@ -149,7 +147,7 @@ export default function GetStartedSection() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>Docker + Kind</span>
+                  <span>{t("localDev.dockerKind")}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-300">
                   <svg
@@ -163,7 +161,7 @@ export default function GetStartedSection() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>K8s 1.34+</span>
+                  <span>{t("localDev.k8sVersion")}</span>
                 </div>
               </div>
 
@@ -171,7 +169,7 @@ export default function GetStartedSection() {
               <div className="mt-auto pt-4 border-t border-slate-700/50">
                 <div className="flex items-center justify-between text-blue-400 group-hover:text-blue-300 transition-colors">
                   <span className="text-sm font-semibold">
-                    Start Local Installation
+                    {t("localDev.cta")}
                   </span>
                   <svg
                     className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"
@@ -215,18 +213,16 @@ export default function GetStartedSection() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-white mb-1.5">
-                  AWS EKS Production
+                  {t("awsEks.title")}
                 </h3>
                 <p className="text-sm text-purple-300/80 font-medium">
-                  Enterprise-ready deployment
+                  {t("awsEks.subtitle")}
                 </p>
               </div>
 
               {/* Description */}
               <p className="text-sm text-gray-300/90 mb-6 leading-relaxed">
-                Deploy KubeStellar on AWS EKS for production workloads with
-                enterprise-grade scalability and reliability. Full cloud
-                infrastructure automation included.
+                {t("awsEks.description")}
               </p>
 
               {/* Features Grid */}
@@ -243,7 +239,7 @@ export default function GetStartedSection() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>EKS 1.34</span>
+                  <span>{t("awsEks.eksVersion")}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-300">
                   <svg
@@ -257,7 +253,7 @@ export default function GetStartedSection() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>30 min setup</span>
+                  <span>{t("awsEks.setupTime")}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-300">
                   <svg
@@ -271,7 +267,7 @@ export default function GetStartedSection() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>Auto-scaling</span>
+                  <span>{t("awsEks.autoScaling")}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-300">
                   <svg
@@ -285,7 +281,7 @@ export default function GetStartedSection() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>AWS Account</span>
+                  <span>{t("awsEks.awsAccount")}</span>
                 </div>
               </div>
 
@@ -293,7 +289,7 @@ export default function GetStartedSection() {
               <div className="mt-auto pt-4 border-t border-slate-700/50">
                 <div className="flex items-center justify-between text-purple-400 group-hover:text-purple-300 transition-colors">
                   <span className="text-sm font-semibold">
-                    Start AWS Installation
+                    {t("awsEks.cta")}
                   </span>
                   <svg
                     className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"
@@ -449,7 +445,7 @@ export default function GetStartedSection() {
                         className="transition-colors duration-300 text-white-400 group-hover:text-[#FF0000]"
                         d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
                       />
-                      </svg>
+                    </svg>
                     {t("card2Button5")}
                   </Link>
                 </div>

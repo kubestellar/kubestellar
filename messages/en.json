@@ -21,7 +21,13 @@
     "terminalOutputSuccess": "SUCCESS",
     "terminalOutputSuccessText": "KubeStellar demo environment ready! Setup complete",
     "buttonInstall": "Install KubeStellar",
-    "buttonDocs": "Explore Docs"
+    "buttonDocs": "Explore Docs",
+    "getStartedWith": "Get Started with",
+    "chooseEnvironment": "Choose your deployment environment",
+    "localDevelopment": "Local Development",
+    "localDevelopmentTime": "Docker + Kind • 15 mins",
+    "awsEksProduction": "AWS EKS Production",
+    "awsEksProductionTime": "Enterprise Ready • 30 mins"
   },
   "footer": {
     "description": "Multi-Cluster Kubernetes orchestration platform that simplifies distributed workload management across diverse infrastructure.",
@@ -159,8 +165,30 @@
     "formSuccess": "Your email will be sent to the KubeStellar development mailing list. Please check your email client to complete sending!"
   },
   "getStartedSection": {
-    "title": "Ready to Get Started?",
+    "title": "Ready to",
+    "titleSpan": "Get Started?",
+    "installSubtitle": "Start with local testing or deploy to production infrastructure",
     "subtitle": "Join the growing community of KubeStellar users and contributors.",
+    "localDev": {
+      "title": "Local Development",
+      "subtitle": "Perfect for testing and learning",
+      "description": "Get started quickly with a local Kubernetes environment using Docker and Kind. Ideal for development, testing, and exploring KubeStellar features.",
+      "noCloudCosts": "No cloud costs",
+      "setupTime": "15 min setup",
+      "dockerKind": "Docker + Kind",
+      "k8sVersion": "K8s 1.34+",
+      "cta": "Start Local Installation"
+    },
+    "awsEks": {
+      "title": "AWS EKS Production",
+      "subtitle": "Enterprise-ready deployment",
+      "description": "Deploy KubeStellar on AWS EKS for production workloads with enterprise-grade scalability and reliability. Full cloud infrastructure automation included.",
+      "eksVersion": "EKS 1.34",
+      "setupTime": "30 min setup",
+      "autoScaling": "Auto-scaling",
+      "awsAccount": "AWS Account",
+      "cta": "Start AWS Installation"
+    },
     "card1Title": "Quick Installation",
     "card1Description": "Get up and running with KubeStellar in minutes using our streamlined installation guide with automated prerequisite checking and step-by-step deployment procedures.",
     "card1Button": "Start Quick Installation",
@@ -227,7 +255,8 @@
     "step5Tag3": "Policy Management",
     "step5Command1Comment": "# Check deployment status across clusters",
     "step5Command2Comment": "# View workload distribution",
-    "step5Command3Comment": "# Monitor resource usage"
+    "step5Command3Comment": "# Monitor resource usage",
+    "showMoreSteps": "Show More Steps"
   },
   "useCasesSection": {
     "title": "Use",
@@ -603,6 +632,8 @@
     "requirementsLabel": "Requirements:",
     "goodStandingLabel": "Opportunities in Good Standing:",
     "nextLevelLabel": "Next Level:",
+    "statsQuestion": "How do we audit our contributor ladder?",
+    "viewStats": "View Real-Time Statistics",
     "levels": {
       "contributor": {
         "title": "Contributor",
@@ -777,6 +808,8 @@
     "subtitle": "We're working on something amazing for the KubeStellar community",
     "description": "This exciting new feature is currently under development. Our team is crafting an exceptional experience that will enhance your multi-cluster Kubernetes orchestration journey.",
     "statusBadge": "Under Development",
+    "demoTitle": "See It In Action",
+    "demoSubtitle": "Watch our marketplace demo to get a glimpse of what's coming",
     "cta": {
       "title": "Explore KubeStellar Now",
       "subtitle": "While you wait, discover what KubeStellar can do for you today",

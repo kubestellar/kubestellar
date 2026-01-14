@@ -240,10 +240,10 @@ export default function MaintainerLadderPage() {
                   >
                     <div className="text-left">
                       <div className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">
-                        How do we audit our contributor ladder?
+                        {t("statsQuestion")}
                       </div>
                       <div className="text-lg font-semibold text-white flex items-center gap-2">
-                        View Real-Time Statistics
+                        {t("viewStats")}
                         <span className="text-blue-400 group-hover:translate-x-1 transition-transform inline-block">
                           →
                         </span>
