@@ -951,5 +951,35 @@
       "gitops": "GitOps",
       "costManagement": "Cost Management"
     }
+  },
+  "networkGlobe": {
+    "kubestellar": "KubeStellar",
+    "controlPlane": "Control Plane",
+    "clusters": {
+      "kubeflexCore": {
+        "name": "KubeFlex Core",
+        "description": "KubeFlex control plane managing multi-cluster operations"
+      },
+      "edgeClusters": {
+        "name": "Edge Clusters",
+        "description": "Edge computing clusters for distributed workloads"
+      },
+      "productionCluster": {
+        "name": "Production Cluster",
+        "description": "Production workloads and mission-critical applications"
+      },
+      "devTestCluster": {
+        "name": "Dev/Test Cluster",
+        "description": "Development and testing environments"
+      },
+      "multiCloudHub": {
+        "name": "Multi-Cloud Hub",
+        "description": "Cross-cloud orchestration and management"
+      }
+    }
+  },
+  "metadata": {
+    "title": "KubeStellar - Multi-Cluster Kubernetes Orchestration",
+    "description": "Simplify multi-cluster Kubernetes operations with intelligent workload distribution, unified management, and seamless orchestration across any infrastructure."
   }
 }

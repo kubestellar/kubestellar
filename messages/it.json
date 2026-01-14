@@ -21,7 +21,13 @@
     "terminalOutputSuccess": "SUCCESSO",
     "terminalOutputSuccessText": "Ambiente demo KubeStellar pronto! Configurazione completata",
     "buttonInstall": "Installa KubeStellar",
-    "buttonDocs": "Esplora la documentazione"
+    "buttonDocs": "Esplora la documentazione",
+    "getStartedWith": "Inizia con",
+    "chooseEnvironment": "Scegli il tuo ambiente di deployment",
+    "localDevelopment": "Sviluppo locale",
+    "localDevelopmentTime": "Docker + Kind • 15 min",
+    "awsEksProduction": "AWS EKS Produzione",
+    "awsEksProductionTime": "Enterprise Ready • 30 min"
   },
   "footer": {
     "description": "Piattaforma di orchestrazione Kubernetes multi‑cluster che semplifica la gestione dei workload distribuiti su infrastrutture eterogenee.",
@@ -156,8 +162,30 @@
     "formSuccess": "La tua email sarà inviata alla mailing list di sviluppo di KubeStellar. Controlla il client di posta per completare l'invio!"
   },
   "getStartedSection": {
-    "title": "Pronto per iniziare?",
+    "title": "Pronto per",
+    "titleSpan": "iniziare?",
+    "installSubtitle": "Inizia con i test locali o effettua il deploy su un'infrastruttura di produzione",
     "subtitle": "Unisciti alla crescente community di utenti e contributori KubeStellar.",
+    "localDev": {
+      "title": "Sviluppo locale",
+      "subtitle": "Ideale per test e apprendimento",
+      "description": "Inizia rapidamente con un ambiente Kubernetes locale usando Docker e Kind. Ideale per sviluppo, test ed esplorazione delle funzionalità di KubeStellar.",
+      "noCloudCosts": "Nessun costo cloud",
+      "setupTime": "15 min setup",
+      "dockerKind": "Docker + Kind",
+      "k8sVersion": "K8s 1.34+",
+      "cta": "Avvia installazione locale"
+    },
+    "awsEks": {
+      "title": "AWS EKS Produzione",
+      "subtitle": "Deployment enterprise-ready",
+      "description": "Distribuisci KubeStellar su AWS EKS per workload di produzione con scalabilità e affidabilità enterprise. Automazione completa dell'infrastruttura cloud inclusa.",
+      "eksVersion": "EKS 1.34",
+      "setupTime": "30 min setup",
+      "autoScaling": "Auto-scaling",
+      "awsAccount": "Account AWS",
+      "cta": "Avvia installazione AWS"
+    },
     "card1Title": "Installazione rapida",
     "card1Description": "Inizia con KubeStellar in pochi minuti grazie alla nostra guida di installazione semplificata, con controllo automatico dei prerequisiti e istruzioni passo‑passo.",
     "card1Button": "Avvia installazione rapida",
@@ -167,6 +195,7 @@
     "card2Button2": "GitHub",
     "card2Button3": "Progetti",
     "card2Button4": "Handbook",
+    "card2Button5": "YouTube",
     "card3Title": "Esplora la documentazione",
     "card3Description": "Guide complete, tutorial e riferimenti API per aiutarti a padroneggiare le funzionalità di KubeStellar.",
     "card3Link1": "Per iniziare",
@@ -223,11 +252,12 @@
     "step5Tag3": "Gestione policy",
     "step5Command1Comment": "# Verifica lo stato delle distribuzioni tra i cluster",
     "step5Command2Comment": "# Visualizza la distribuzione dei workload",
-    "step5Command3Comment": "# Monitora l'utilizzo delle risorse"
+    "step5Command3Comment": "# Monitora l'utilizzo delle risorse",
+    "showMoreSteps": "Mostra altri passaggi"
   },
   "useCasesSection": {
-    "title": "Use",
-    "titleSpan": "Cases",
+    "title": "Casi",
+    "titleSpan": "d'uso",
     "subtitle": "Scopri come le organizzazioni utilizzano KubeStellar per le loro esigenze multi‑cluster.",
     "learnMore": "Scopri di più",
     "cases": {
@@ -312,8 +342,8 @@
     }
   },
   "communityHandbook": {
-    "title": "Contributor",
-    "titleSpan": "Handbook",
+    "title": "Manuale del",
+    "titleSpan": "contributore",
     "learnMore": "Scopri di più",
     "cards": {
       "onboarding": {
@@ -916,5 +946,35 @@
       "gitops": "GitOps",
       "costManagement": "Gestione dei costi"
     }
+  },
+  "networkGlobe": {
+    "kubestellar": "KubeStellar",
+    "controlPlane": "Control Plane",
+    "clusters": {
+      "kubeflexCore": {
+        "name": "KubeFlex Core",
+        "description": "Control plane KubeFlex per la gestione delle operazioni multi‑cluster"
+      },
+      "edgeClusters": {
+        "name": "Cluster Edge",
+        "description": "Cluster di edge computing per workload distribuiti"
+      },
+      "productionCluster": {
+        "name": "Cluster di produzione",
+        "description": "Workload di produzione e applicazioni mission‑critical"
+      },
+      "devTestCluster": {
+        "name": "Cluster Dev/Test",
+        "description": "Ambienti di sviluppo e test"
+      },
+      "multiCloudHub": {
+        "name": "Hub Multi‑Cloud",
+        "description": "Orchestrazione e gestione cross‑cloud"
+      }
+    }
+  },
+  "metadata": {
+    "title": "KubeStellar - Orchestrazione Kubernetes Multi‑Cluster",
+    "description": "Semplifica le operazioni Kubernetes multi‑cluster con distribuzione intelligente dei workload, gestione unificata e orchestrazione trasparente su qualsiasi infrastruttura."
   }
 }

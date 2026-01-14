@@ -2,6 +2,7 @@ import { useRef, useMemo, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Sphere, Line, Text, Torus, Billboard } from "@react-three/drei";
 import * as THREE from "three";
+import { useTranslations } from "next-intl";
 import { COLORS } from "./colors";
 import DataPacket from "./DataPacket";
 import LogoElement from "./LogoElement";
@@ -30,6 +31,7 @@ interface CentralNodeChild extends THREE.Object3D {
 
 // Update the main component to accept props
 const NetworkGlobe = ({ isLoaded = true }: NetworkGlobeProps) => {
+  const t = useTranslations("networkGlobe");
   const globeRef = useRef<THREE.Mesh>(null);
   const gridLinesRef = useRef<THREE.Group>(null);
   const centralNodeRef = useRef<THREE.Group>(null);
@@ -44,48 +46,49 @@ const NetworkGlobe = ({ isLoaded = true }: NetworkGlobeProps) => {
   const clusters = useMemo(
     () => [
       {
-        name: "KubeFlex Core",
+        name: t("clusters.kubeflexCore.name"),
         position: [0, 3, 0] as [number, number, number],
         nodeCount: 6,
         radius: 0.8,
         color: COLORS.primary,
-        description: "KubeFlex control plane managing multi-cluster operations",
+        description: t("clusters.kubeflexCore.description"),
       },
       {
-        name: "Edge Clusters",
+        name: t("clusters.edgeClusters.name"),
         position: [3, 0, 0] as [number, number, number],
         nodeCount: 8,
         radius: 1,
         color: COLORS.highlight,
-        description: "Edge computing clusters for distributed workloads",
+        description: t("clusters.edgeClusters.description"),
       },
       {
-        name: "Production Cluster",
+        name: t("clusters.productionCluster.name"),
         position: [0, -3, 0] as [number, number, number],
         nodeCount: 5,
         radius: 0.7,
         color: COLORS.success,
-        description: "Production workloads and mission-critical applications",
+        description: t("clusters.productionCluster.description"),
       },
       {
-        name: "Dev/Test Cluster",
+        name: t("clusters.devTestCluster.name"),
         position: [-3, 0, 0] as [number, number, number],
         nodeCount: 7,
         radius: 0.9,
         color: COLORS.accent2,
-        description: "Development and testing environments",
+        description: t("clusters.devTestCluster.description"),
       },
       {
-        name: "Multi-Cloud Hub",
+        name: t("clusters.multiCloudHub.name"),
         position: [2, 2, -2] as [number, number, number],
         nodeCount: 4,
         radius: 0.6,
         color: COLORS.accent1,
-        description: "Cross-cloud orchestration and management",
+        description: t("clusters.multiCloudHub.description"),
       },
     ],
-    []
+    [t]
   );
+
 
   // Generate data flow paths
   const dataFlows = useMemo(() => {
@@ -321,7 +324,7 @@ const NetworkGlobe = ({ isLoaded = true }: NetworkGlobeProps) => {
             outlineColor={COLORS.background}
             fillOpacity={animationProgress}
           >
-            KubeStellar
+            {t("kubestellar")}
           </Text>
           <Text
             position={[0, -0.25, 0]}
@@ -331,7 +334,7 @@ const NetworkGlobe = ({ isLoaded = true }: NetworkGlobeProps) => {
             anchorY="middle"
             fillOpacity={animationProgress}
           >
-            Control Plane
+            {t("controlPlane")}
           </Text>
         </Billboard>
       </group>
