@@ -45,7 +45,9 @@ jobs:
           fi
 
           PR_TITLE=$(gh pr view $PR_NUMBER --json title --jq '.title')
-          if [[ "$PR_TITLE" != *"link"* ]] && [[ "$PR_TITLE" != *"Link"* ]]; then
+          # Case-insensitive matching for "link" in title
+          PR_TITLE_LOWER=${PR_TITLE,,}
+          if [[ "$PR_TITLE_LOWER" != *"link"* ]]; then
             echo "skip=true" >> $GITHUB_OUTPUT
             exit 0
           fi
@@ -90,8 +92,9 @@ jobs:
           for issue_num in $ISSUE_NUMBERS; do
             [ -z "$issue_num" ] && continue
             ISSUE_BODY=$(gh issue view $issue_num --json body --jq '.body' 2>/dev/null || true)
-            URL=$(echo "$ISSUE_BODY" | grep -oE 'https://kubestellar\.io/docs/[^ )\]"]+' | head -1)
-            [ -n "$URL" ] && BROKEN_URLS="$BROKEN_URLS $URL"
+            # Extract all URLs from the issue (not just the first one)
+            URLS=$(echo "$ISSUE_BODY" | grep -oE 'https://kubestellar\.io/docs/[^ )\]">,;!?:]+' | tr '\n' ' ' || true)
+            [ -n "$URLS" ] && BROKEN_URLS="$BROKEN_URLS $URLS"
           done
           echo "broken_urls=$BROKEN_URLS" >> $GITHUB_OUTPUT
 
@@ -102,9 +105,11 @@ jobs:
           PREVIEW_URL="${{ steps.netlify.outputs.preview_url }}"
           BROKEN_URLS="${{ steps.find-urls.outputs.broken_urls }}"
 
+          # Require at least one broken URL to verify - don't auto-merge if we can't
+          # confirm a specific fix was made
           if [ -z "$BROKEN_URLS" ]; then
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$PREVIEW_URL" --max-time 30 || echo "000")
-            [ "$HTTP_STATUS" == "200" ] && echo "verified=true" >> $GITHUB_OUTPUT || echo "verified=false" >> $GITHUB_OUTPUT
+            echo "No broken URLs found to verify - skipping auto-merge"
+            echo "verified=false" >> $GITHUB_OUTPUT
             exit 0
           fi
 
@@ -126,6 +131,7 @@ jobs:
         run: |
           PR_NUMBER="${{ steps.pr-info.outputs.pr_number }}"
           gh pr ready $PR_NUMBER 2>/dev/null || true
+          # Use --admin to bypass DCO requirement since Copilot doesn't sign commits
           gh pr merge $PR_NUMBER --squash --admin --body "Auto-merged: Copilot link fix verified"
           echo "✅ Merged PR #$PR_NUMBER"
 
