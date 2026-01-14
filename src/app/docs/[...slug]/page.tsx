@@ -236,8 +236,9 @@ function sanitizeHtmlForMdx(content: string): string {
 function replaceTemplateVariables(content: string): string {
   // Use CURRENT_VERSION from config to support versioned documentation
   // When a version branch is created, CURRENT_VERSION is updated to that version
-  const versionBranch = CURRENT_VERSION === '0.29.0' ? 'main' : `release-${CURRENT_VERSION}`
-  const versionTag = CURRENT_VERSION === '0.29.0' ? 'latest' : `v${CURRENT_VERSION}`
+  const version = CURRENT_VERSION as string
+  const versionBranch = version === '0.29.0' ? 'main' : `release-${version}`
+  const versionTag = version === '0.29.0' ? 'latest' : `v${version}`
 
   const vars: Record<string, string> = {
     'config.ks_branch': versionBranch,
