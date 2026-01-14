@@ -61,6 +61,13 @@
 [context."docs/0.21.0"]
   command = "npm run build"
 
+# Kubeflex version branches
+[context."docs/kubeflex/0.8.0"]
+  command = "npm run build"
+
+[context."docs/kubeflex/0.7.0"]
+  command = "npm run build"
+
 # Forms configuration
 [forms]
   # Enable spam filtering

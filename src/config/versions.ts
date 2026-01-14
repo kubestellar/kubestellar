@@ -137,6 +137,16 @@ const KUBEFLEX_VERSIONS: Record<string, VersionInfo> = {
     branch: "main",
     isDefault: true,
   },
+  "0.8.0": {
+    label: "v0.8.0",
+    branch: "docs/kubeflex/0.8.0",
+    isDefault: false,
+  },
+  "0.7.0": {
+    label: "v0.7.0",
+    branch: "docs/kubeflex/0.7.0",
+    isDefault: false,
+  },
 }
 
 // multi-plugin versions
