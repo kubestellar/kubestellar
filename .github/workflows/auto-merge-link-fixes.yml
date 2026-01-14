@@ -1,0 +1,137 @@
+name: Auto-merge Copilot Link Fixes
+
+on:
+  check_run:
+    types: [completed]
+  pull_request_target:
+    types: [opened, synchronize, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  auto-merge-link-fix:
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'check_run' &&
+       contains(github.event.check_run.name, 'netlify') &&
+       github.event.check_run.conclusion == 'success') ||
+      github.event_name == 'pull_request_target'
+    steps:
+      - name: Get PR info
+        id: pr-info
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+          elif [ "${{ github.event_name }}" == "check_run" ]; then
+            PR_NUMBER=$(echo '${{ toJson(github.event.check_run.pull_requests) }}' | jq -r '.[0].number // empty')
+          fi
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+          PR_AUTHOR=$(gh pr view $PR_NUMBER --json author --jq '.author.login')
+          if [[ "$PR_AUTHOR" != *"copilot"* ]]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          PR_TITLE=$(gh pr view $PR_NUMBER --json title --jq '.title')
+          if [[ "$PR_TITLE" != *"link"* ]] && [[ "$PR_TITLE" != *"Link"* ]]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "skip=false" >> $GITHUB_OUTPUT
+
+      - name: Wait for Netlify
+        if: steps.pr-info.outputs.skip != 'true'
+        id: netlify
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ steps.pr-info.outputs.pr_number }}"
+
+          for i in {1..30}; do
+            CHECKS=$(gh pr checks $PR_NUMBER 2>&1 || true)
+            if echo "$CHECKS" | grep -q "netlify.*deploy-preview.*pass"; then
+              echo "preview_url=https://deploy-preview-${PR_NUMBER}--kubestellar-docs.netlify.app" >> $GITHUB_OUTPUT
+              echo "ready=true" >> $GITHUB_OUTPUT
+              exit 0
+            elif echo "$CHECKS" | grep -q "netlify.*deploy-preview.*fail"; then
+              echo "ready=false" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "ready=false" >> $GITHUB_OUTPUT
+
+      - name: Find broken URLs
+        if: steps.pr-info.outputs.skip != 'true' && steps.netlify.outputs.ready == 'true'
+        id: find-urls
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ steps.pr-info.outputs.pr_number }}"
+          PR_BODY=$(gh pr view $PR_NUMBER --json body --jq '.body // ""')
+          COMMITS=$(gh pr view $PR_NUMBER --json commits --jq '.commits[].messageHeadline // ""')
+
+          ISSUE_NUMBERS=$(echo "$PR_BODY $COMMITS" | grep -oE '#[0-9]+' | tr -d '#' | sort -u | tr '\n' ' ')
+
+          BROKEN_URLS=""
+          for issue_num in $ISSUE_NUMBERS; do
+            [ -z "$issue_num" ] && continue
+            ISSUE_BODY=$(gh issue view $issue_num --json body --jq '.body' 2>/dev/null || true)
+            URL=$(echo "$ISSUE_BODY" | grep -oE 'https://kubestellar\.io/docs/[^ )\]"]+' | head -1)
+            [ -n "$URL" ] && BROKEN_URLS="$BROKEN_URLS $URL"
+          done
+          echo "broken_urls=$BROKEN_URLS" >> $GITHUB_OUTPUT
+
+      - name: Verify links fixed
+        if: steps.pr-info.outputs.skip != 'true' && steps.netlify.outputs.ready == 'true'
+        id: verify
+        run: |
+          PREVIEW_URL="${{ steps.netlify.outputs.preview_url }}"
+          BROKEN_URLS="${{ steps.find-urls.outputs.broken_urls }}"
+
+          if [ -z "$BROKEN_URLS" ]; then
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$PREVIEW_URL" --max-time 30 || echo "000")
+            [ "$HTTP_STATUS" == "200" ] && echo "verified=true" >> $GITHUB_OUTPUT || echo "verified=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          ALL_FIXED=true
+          for url in $BROKEN_URLS; do
+            PREVIEW_PATH=$(echo "$url" | sed 's|https://kubestellar.io||')
+            TEST_URL="${PREVIEW_URL}${PREVIEW_PATH}"
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$TEST_URL" --max-time 30 || echo "000")
+            [ "$HTTP_STATUS" != "200" ] && ALL_FIXED=false && echo "❌ $TEST_URL: $HTTP_STATUS"
+            [ "$HTTP_STATUS" == "200" ] && echo "✅ $TEST_URL: 200"
+          done
+
+          [ "$ALL_FIXED" == "true" ] && echo "verified=true" >> $GITHUB_OUTPUT || echo "verified=false" >> $GITHUB_OUTPUT
+
+      - name: Auto-merge
+        if: steps.pr-info.outputs.skip != 'true' && steps.netlify.outputs.ready == 'true' && steps.verify.outputs.verified == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_SYNC_TOKEN }}
+        run: |
+          PR_NUMBER="${{ steps.pr-info.outputs.pr_number }}"
+          gh pr ready $PR_NUMBER 2>/dev/null || true
+          gh pr merge $PR_NUMBER --squash --admin --body "Auto-merged: Copilot link fix verified"
+          echo "✅ Merged PR #$PR_NUMBER"
+
+      - name: Comment if failed
+        if: steps.pr-info.outputs.skip != 'true' && steps.netlify.outputs.ready == 'true' && steps.verify.outputs.verified == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ steps.pr-info.outputs.pr_number }} --body "⚠️ Auto-merge blocked: Links not fully fixed in preview."
