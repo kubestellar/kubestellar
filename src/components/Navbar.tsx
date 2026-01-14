@@ -96,6 +96,20 @@ export default function Navbar() {
           container.addEventListener("mouseenter", showMenu);
           container.addEventListener("mouseleave", hideMenu);
 
+          // Clear timeout when hovering the dropdown button/trigger
+          // This fixes the issue where moving from menu back to button closes the menu
+          const button = container.querySelector<HTMLElement>(
+            "[data-dropdown-button]"
+          );
+          if (button) {
+            button.addEventListener("mouseenter", () => {
+              if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = null;
+              }
+            });
+          }
+
           menu.addEventListener("mouseenter", () => {
             if (timeoutRef.current) {
               clearTimeout(timeoutRef.current);
