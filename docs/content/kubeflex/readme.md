@@ -35,20 +35,20 @@ KubeFlex implements a sophisticated multi-tenant architecture that separates con
 - **ocm**: Open Cluster Management control plane for multi-cluster federation scenarios
 - **external**: Import existing external clusters under KubeFlex management (roadmap)
 
-For detailed architecture information, see the [Architecture Guide](docs/architecture.md).
+For detailed architecture information, see the [Architecture Guide](./architecture.md).
 
 ## Multi-Tenancy Approach
 
 KubeFlex addresses the fundamental challenge of Kubernetes multi-tenancy by providing each tenant with a dedicated control plane while maintaining cost efficiency through shared infrastructure. This approach delivers strong isolation at both control and data plane levels.
 
-For a comprehensive analysis of multi-tenancy approaches and KubeFlex's solution, see the [Multi-Tenancy Guide](docs/multi-tenancy.md).
+For a comprehensive analysis of multi-tenancy approaches and KubeFlex's solution, see the [Multi-Tenancy Guide](./multi-tenancy.md).
 
 ## Installation
 
 [kind](https://kind.sigs.k8s.io) and [kubectl](https://kubernetes.io/docs/tasks/tools/) are
 required. A kind hosting cluster is created automatically by the kubeflex CLI. You may
 also install KubeFlex on other Kube distros, as long as they support an nginx ingress
-with SSL passthru, or on OpenShift. See the [User's Guide](docs/users.md) for more details.
+with SSL passthru, or on OpenShift. See the [User's Guide](./users.md) for more details.
 
 Download the latest kubeflex CLI binary release for your OS/Architecture from the
 [release page](https://github.com/kubestellar/kubeflex/releases) and copy it
@@ -75,7 +75,7 @@ brew upgrade kflex
 
 ## Quick Start
 
-Get started with KubeFlex quickly by following our [Quick Start Guide](docs/quickstart.md). The guide includes:
+Get started with KubeFlex quickly by following our [Quick Start Guide](./quickstart.md). The guide includes:
 
 - Basic multi-tenant setup with step-by-step commands
 - Advanced development team scenarios with complete isolation
@@ -102,10 +102,10 @@ Get started with KubeFlex quickly by following our [Quick Start Guide](docs/quic
 
 ## Documentation
 
-- [Quick Start Guide](docs/quickstart.md): Get up and running quickly with KubeFlex
-- [User Guide](docs/users.md): Detailed usage instructions and advanced scenarios
-- [Architecture Guide](docs/architecture.md): Deep-dive into technical architecture
-- [Multi-Tenancy Guide](docs/multi-tenancy.md): Comprehensive multi-tenancy analysis and use cases
+- [Quick Start Guide](./quickstart.md): Get up and running quickly with KubeFlex
+- [User Guide](./users.md): Detailed usage instructions and advanced scenarios
+- [Architecture Guide](./architecture.md): Deep-dive into technical architecture
+- [Multi-Tenancy Guide](./multi-tenancy.md): Comprehensive multi-tenancy analysis and use cases
 - [Contributing Guide](./CONTRIBUTING.md): How to contribute to KubeFlex development
 
 ## Community and Support

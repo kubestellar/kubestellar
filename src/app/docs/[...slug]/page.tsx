@@ -383,7 +383,15 @@ export default async function Page(props: PageProps) {
   // --- END PROCESSING INCLUDES ---
 
   const filePathToRoute = new Map<string, string>()
-  Object.entries(routeMap).forEach(([r, fp]) => filePathToRoute.set(fp, r))
+  // Only set if not already set - prefer nav structure routes over fallback routes
+  Object.entries(routeMap).forEach(([r, fp]) => {
+    if (!filePathToRoute.has(fp)) {
+      filePathToRoute.set(fp, r)
+    }
+  })
+
+  // Get the base path for links based on project
+  const linkBasePath = projectId === 'kubestellar' ? '/docs' : `/docs/${projectId}`
 
   // Rewrite Markdown links/images using the fully processed content
   let rewrittenText = processedContent.replace(/(!?\[.*?\])\((.*?)\)/g, (match, label, link) => {
@@ -411,7 +419,7 @@ export default async function Page(props: PageProps) {
       if (!targetRoute) targetRoute = filePathToRoute.get(resolvedPath + '.mdx')
 
       if (targetRoute) {
-        return `${label}(/docs/${targetRoute}${linkHash ? '#' + linkHash : ''})`
+        return `${label}(${linkBasePath}/${targetRoute}${linkHash ? '#' + linkHash : ''})`
       }
 
       // Keep the original link if we can't resolve it
@@ -455,8 +463,11 @@ export default async function Page(props: PageProps) {
   const rawJs = await compileMdx(processedData, { filePath })
   const { default: MDXContent, toc, metadata } = evaluate(rawJs, component)
 
+  // Get project-specific pageMap for the sidebar
+  const { pageMap } = buildPageMap(projectId)
+
   return (
-    <Wrapper toc={toc} metadata={metadata} sourceCode={rawJs}>
+    <Wrapper toc={toc} metadata={metadata} sourceCode={rawJs} pageMap={pageMap}>
       <MDXContent />
     </Wrapper>
   )

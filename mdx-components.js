@@ -5,9 +5,11 @@ import { buildPageMap } from './src/app/docs/page-map';
 export function useMDXComponents(components) {
   return {
     // Wrapper component that wraps the entire MDX content with DocsLayout
-    wrapper: ({ children, toc, metadata, sourceCode, ...props }) => {
-      const { pageMap } = buildPageMap();
-      
+    // pageMap can be passed from server-side for project-specific navigation
+    wrapper: ({ children, toc, metadata, sourceCode, pageMap: providedPageMap, ...props }) => {
+      // Use provided pageMap (from server) or fall back to default (KubeStellar)
+      const pageMap = providedPageMap || buildPageMap().pageMap;
+
       return (
         <DocsLayout pageMap={pageMap} toc={toc} metadata={metadata}>
           {children}
