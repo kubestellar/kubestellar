@@ -253,7 +253,7 @@ export function getProjectFromPath(pathname: string): ProjectConfig {
   if (pathname.startsWith("/docs/multi-plugin")) {
     return PROJECTS["multi-plugin"]
   }
-  if (pathname.startsWith("/docs/kubectl-claude")) {
+  if (pathname.startsWith("/docs/kubectl-claude") || pathname.startsWith("/docs/related-projects/kubectl-claude")) {
     return PROJECTS["kubectl-claude"]
   }
   return PROJECTS.kubestellar
