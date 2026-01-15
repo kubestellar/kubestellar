@@ -110,6 +110,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_SYNC_TOKEN }}
         run: |
+          # Configure git identity
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
           # Go back to main for the PR
           git checkout main
           git pull origin main
