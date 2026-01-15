@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { ChevronRight, ChevronDown, Moon, Sun, PanelRightOpenIcon, PanelLeftOpen } from 'lucide-react';
 import { useSharedConfig } from '@/hooks/useSharedConfig';
 
 // Production URL - all cross-project links go here
@@ -19,18 +20,84 @@ const STATIC_RELATED_PROJECTS = [
 
 interface RelatedProjectsProps {
   variant?: 'full' | 'slim';
+  onCollapse?: () => void;
+  isMobile?: boolean;
+  bannerActive?: boolean;
 }
 
-export function RelatedProjects({ variant = 'full' }: RelatedProjectsProps) {
+export function RelatedProjects({ variant = 'full', onCollapse, isMobile = false, bannerActive = false }: RelatedProjectsProps) {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { config } = useSharedConfig();
+  const { resolvedTheme, setTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === 'dark';
 
   // Get related projects from config or fallback
   const relatedProjects = config?.relatedProjects ?? STATIC_RELATED_PROJECTS;
 
-  // Don't render in slim mode
-  if (variant === 'slim') return null;
+  // Slim variant - icon-only vertical layout
+  if (variant === 'slim') {
+    if (!mounted) {
+      return (
+        <div className="shrink-0 flex flex-col items-center gap-2 py-4 min-w-16">
+          <div className="w-5 h-5" />
+          <div className="w-5 h-5" />
+        </div>
+      );
+    }
+
+    return (
+      <div
+        className="shrink-0 sticky flex flex-col items-center gap-2 py-4 min-w-16 border-t border-gray-200 dark:border-gray-700"
+        suppressHydrationWarning
+      >
+        {/* Theme Toggle Icon */}
+        <button
+          onClick={() => setTheme(isDark ? 'light' : 'dark')}
+          title="Change theme"
+          className="group p-2 rounded-md hover:font-bold transition-all"
+          style={{
+            color: isDark ? '#f3f4f6' : '#111827',
+          }}
+          suppressHydrationWarning
+        >
+          <div className="relative w-5 h-5">
+            <Moon
+              className={`absolute inset-0 w-5 h-5 transition-all duration-300 group-hover:rotate-45 ${
+                isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'
+              }`}
+            />
+            <Sun
+              className={`absolute inset-0 w-5 h-5 transition-all duration-300 group-hover:rotate-45 ${
+                !isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 rotate-90 scale-0'
+              }`}
+            />
+          </div>
+        </button>
+
+        {/* Expand Sidebar Icon */}
+        {onCollapse && (
+          <button
+            onClick={onCollapse}
+            title="Expand sidebar"
+            className="p-2 rounded-md hover:font-bold transition-all"
+            style={{
+              color: isDark ? '#f3f4f6' : '#111827',
+            }}
+            suppressHydrationWarning
+          >
+            <PanelLeftOpen className="w-5 h-5" />
+          </button>
+        )}
+      </div>
+    );
+  }
 
   // Determine current project from pathname
   const getCurrentProject = () => {
@@ -59,11 +126,11 @@ export function RelatedProjects({ variant = 'full' }: RelatedProjectsProps) {
   };
 
   return (
-    <div className="shrink-0 py-2 px-4 border-t border-gray-200 dark:border-gray-700">
+    <div className={`shrink-0 px-4 border-t border-gray-200 dark:border-gray-700 ${bannerActive ? 'py-1' : 'py-2'}`}>
       {/* Header - clickable to toggle */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center justify-between w-full py-2 text-xs font-semibold uppercase tracking-wider transition-colors text-gray-500 dark:text-gray-400"
+        className={`flex items-center justify-between w-full text-xs font-semibold uppercase tracking-wider transition-colors text-gray-500 dark:text-gray-400 ${bannerActive ? 'py-1' : 'py-2'}`}
       >
         <span>Related Projects</span>
         <span className="ml-auto">
@@ -78,33 +145,82 @@ export function RelatedProjects({ variant = 'full' }: RelatedProjectsProps) {
       {/* Project links */}
       <div
         className={`
-          space-y-1 overflow-hidden transition-all duration-200 ease-in-out
-          ${isExpanded ? 'max-h-96 opacity-100 pb-2' : 'max-h-0 opacity-0'}
+          overflow-hidden transition-all duration-200 ease-in-out
+          ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}
+          ${bannerActive ? 'space-y-0' : 'space-y-1 pb-2'}
         `}
       >
         {relatedProjects.map((project: { title: string; href: string; description?: string }) => {
           const isCurrentProject = project.title === currentProject;
           const projectUrl = getProjectUrl(project.href);
-          const isExternal = projectUrl.startsWith('http');
 
           return (
             <a
               key={project.title}
               href={projectUrl}
               className={`
-                block px-3 py-1.5 text-sm rounded-md transition-colors
+                block px-3 text-sm rounded-md transition-colors
+                ${bannerActive ? 'py-0.5' : 'py-1.5'}
                 ${isCurrentProject
                   ? 'bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }
               `}
-              {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
             >
               {project.title}
             </a>
           );
         })}
       </div>
+
+      {/* Footer Controls */}
+      {mounted && (
+        <div
+          className={`flex items-center gap-2 border-t border-gray-200 dark:border-gray-700 ${bannerActive ? 'pt-2 mt-1' : 'pt-3 mt-2'}`}
+          suppressHydrationWarning
+        >
+          {/* Theme Toggle Button */}
+          <button
+            onClick={() => setTheme(isDark ? 'light' : 'dark')}
+            title="Change theme"
+            className="group cursor-pointer h-7 rounded-md px-2 text-sm font-thin transition-all hover:font-bold flex items-center gap-2 flex-1"
+            style={{
+              color: isDark ? '#f3f4f6' : '#111827',
+            }}
+            suppressHydrationWarning
+          >
+            <div className="relative w-5 h-5">
+              <Moon
+                className={`absolute inset-0 w-5 h-5 transition-all duration-300 group-hover:rotate-45 ${
+                  isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'
+                }`}
+              />
+              <Sun
+                className={`absolute inset-0 w-5 h-5 transition-all duration-300 group-hover:rotate-45 ${
+                  !isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 rotate-90 scale-0'
+                }`}
+              />
+            </div>
+            <span>{isDark ? 'Dark' : 'Light'}</span>
+          </button>
+
+          {/* Collapse Sidebar Button - Hidden on mobile */}
+          {onCollapse && !isMobile && (
+            <button
+              onClick={onCollapse}
+              className="transition-all cursor-pointer rounded-md p-2 hover:font-bold"
+              style={{
+                color: isDark ? '#f3f4f6' : '#111827',
+              }}
+              title="Collapse sidebar"
+              type="button"
+              suppressHydrationWarning
+            >
+              <PanelRightOpenIcon className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

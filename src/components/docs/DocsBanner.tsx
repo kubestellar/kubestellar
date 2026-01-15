@@ -23,10 +23,10 @@ export function DocsBanner() {
 
   return (
     <div className={`relative ${isDark ? 'bg-neutral-900' : 'bg-blue-50'} border-b ${isDark ? 'border-gray-800' : 'border-blue-100'}`}>
-      <div className="max-w-7xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto py-2 px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between flex-wrap">
           <div className="flex-1 flex items-center justify-center">
-            <span className={`${isDark ? 'text-gray-200' : 'text-gray-800'} text-sm md:text-base`}>
+            <span className={`${isDark ? 'text-gray-200' : 'text-gray-800'} text-xs md:text-sm`}>
               🚀 🚀 🚀 ATTENTION: KubeStellar needs your help - please take our 2-minute survey{' '}
               <Link 
                 href={getLocalizedUrl("https://kubestellar.io/survey")}
@@ -49,7 +49,7 @@ export function DocsBanner() {
             } focus:outline-none focus:ring-2 focus:ring-blue-500`}
             aria-label="Dismiss banner"
           >
-            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </button>

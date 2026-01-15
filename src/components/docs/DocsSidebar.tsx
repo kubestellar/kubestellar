@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronRight, ChevronDown, FileText } from 'lucide-react';
-import { SidebarFooter } from './SidebarFooter';
 import { RelatedProjects } from './RelatedProjects';
 import { useDocsMenu } from './DocsProvider';
 
@@ -52,13 +51,15 @@ export function DocsSidebar({ pageMap, className }: DocsSidebarProps) {
       }
     };
 
-    // Only calculate once on mount, then on resize
-    if (!layoutCalculatedRef.current) {
-      calculateOffsets();
-    }
+    // Calculate on mount and when banner state changes
+    // Use setTimeout to allow DOM to update after banner dismiss
+    const timeoutId = setTimeout(calculateOffsets, 50);
 
     window.addEventListener('resize', calculateOffsets);
-    return () => window.removeEventListener('resize', calculateOffsets);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', calculateOffsets);
+    };
   }, [bannerDismissed]);
 
   // Store initial pathname for initialization
@@ -217,21 +218,16 @@ export function DocsSidebar({ pageMap, className }: DocsSidebarProps) {
   // Render full sidebar (expanded state)
   const renderFullSidebar = () => (
     <>
-      {/* Scrollable navigation area - flex-1 takes remaining space, min-h-0 allows shrinking */}
+      {/* Scrollable navigation area */}
       <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
         <nav className="p-4 pb-6 w-full space-y-2">
           {pageMap.map(item => renderMenuItem(item))}
         </nav>
       </div>
 
-      {/* Related Projects - shrink-0 prevents it from shrinking */}
+      {/* Related Projects - fixed at bottom, shrink-0 prevents shrinking */}
       <div className="shrink-0">
-        <RelatedProjects />
-      </div>
-
-      {/* Footer at bottom - shrink-0 prevents it from shrinking */}
-      <div className="shrink-0">
-        <SidebarFooter onCollapse={toggleSidebar} isMobile={menuOpen} />
+        <RelatedProjects onCollapse={toggleSidebar} isMobile={menuOpen} bannerActive={!bannerDismissed} />
       </div>
     </>
   );
@@ -241,9 +237,9 @@ export function DocsSidebar({ pageMap, className }: DocsSidebarProps) {
     <div className="flex flex-col h-full">
       {/* Spacer */}
       <div className="flex-1"></div>
-      
+
       {/* Footer with icon buttons */}
-      <SidebarFooter onCollapse={toggleSidebar} variant="slim" />
+      <RelatedProjects onCollapse={toggleSidebar} variant="slim" />
     </div>
   );
 
