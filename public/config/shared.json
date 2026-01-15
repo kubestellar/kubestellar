@@ -150,6 +150,11 @@
         "isDefault": false,
         "isDev": true
       },
+      "0.4.4": {
+        "label": "v0.4.4",
+        "branch": "docs/kubectl-claude/0.4.4",
+        "isDefault": false
+      },
       "0.4.3": {
         "label": "v0.4.3",
         "branch": "docs/kubectl-claude/0.4.3",

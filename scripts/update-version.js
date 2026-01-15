@@ -77,7 +77,33 @@ console.log(`  Branch: ${branch}`);
 console.log(`  Set as latest: ${setLatest}`);
 
 // Update latest label if setting as latest
+let previousLatestVersion = null;
+let previousLatestBranch = null;
+
 if (setLatest) {
+  // Extract current latest version before updating (to preserve as historical entry)
+  const extractLabelRegex = new RegExp(
+    `const ${constName}[\\s\\S]*?latest:\\s*\\{[\\s\\S]*?label:\\s*"v([\\d.]+) \\(Latest\\)"`
+  );
+  const extractBranchRegex = new RegExp(
+    `const ${constName}[\\s\\S]*?latest:\\s*\\{[\\s\\S]*?branch:\\s*"([^"]+)"`
+  );
+
+  const labelMatch = content.match(extractLabelRegex);
+  const branchMatch = content.match(extractBranchRegex);
+
+  if (labelMatch && branchMatch) {
+    previousLatestVersion = labelMatch[1];
+    previousLatestBranch = branchMatch[1];
+    // Only preserve if it's different from main (actual release)
+    if (previousLatestBranch !== 'main' && previousLatestVersion !== version) {
+      console.log(`  Previous latest: v${previousLatestVersion} (${previousLatestBranch})`);
+    } else {
+      previousLatestVersion = null;
+      previousLatestBranch = null;
+    }
+  }
+
   // Update the "latest" entry's label to show the new version
   const latestRegex = new RegExp(
     `(const ${constName}[\\s\\S]*?latest:\\s*\\{[\\s\\S]*?label:\\s*")v[\\d.]+( \\(Latest\\)")`,
@@ -119,10 +145,32 @@ if (setLatest) {
   }
 }
 
-// Check if version entry already exists or if we're setting as latest (no duplicate needed)
+// Add version entry for previous latest (when setting new latest) or for non-latest versions
 const versionEntryRegex = new RegExp(`"${escapeRegex(version)}":\\s*\\{`, '');
-if (setLatest) {
-  console.log(`  Skipping version entry (latest already points to ${version})`);
+if (setLatest && previousLatestVersion) {
+  // Add entry for the PREVIOUS latest version (so it remains accessible)
+  const prevVersionEntryRegex = new RegExp(`"${escapeRegex(previousLatestVersion)}":\\s*\\{`, '');
+  if (!prevVersionEntryRegex.test(content)) {
+    const prevEntry = `  "${previousLatestVersion}": {
+    label: "v${previousLatestVersion}",
+    branch: "${previousLatestBranch}",
+    isDefault: false,
+  },`;
+
+    const mainEntryRegex = new RegExp(
+      `(const ${constName}[\\s\\S]*?main:\\s*\\{[^}]+\\},)`,
+      ''
+    );
+
+    if (mainEntryRegex.test(content)) {
+      content = content.replace(mainEntryRegex, `$1\n${prevEntry}`);
+      console.log(`  Added historical entry for previous latest v${previousLatestVersion}`);
+    }
+  } else {
+    console.log(`  Previous latest v${previousLatestVersion} already has an entry`);
+  }
+} else if (setLatest) {
+  console.log(`  No previous latest to preserve (was pointing to main)`);
 } else if (versionEntryRegex.test(content)) {
   console.log(`  Version ${version} already exists in ${constName}, skipping addition`);
 } else {
@@ -178,6 +226,20 @@ if (fs.existsSync(sharedJsonPath)) {
     sharedConfig.versions[project] = {};
   }
 
+  // Capture previous latest before updating (for shared.json)
+  let sharedPrevVersion = null;
+  let sharedPrevBranch = null;
+  if (setLatest && sharedConfig.versions[project].latest) {
+    const prevLabel = sharedConfig.versions[project].latest.label;
+    sharedPrevBranch = sharedConfig.versions[project].latest.branch;
+    // Extract version from label like "v0.4.4 (Latest)"
+    const match = prevLabel.match(/^v([\d.]+)/);
+    if (match && sharedPrevBranch !== 'main' && match[1] !== version) {
+      sharedPrevVersion = match[1];
+      console.log(`  Previous latest: v${sharedPrevVersion} (${sharedPrevBranch})`);
+    }
+  }
+
   // Update latest label and branch if setting as latest
   if (setLatest && sharedConfig.versions[project].latest) {
     sharedConfig.versions[project].latest.label = `v${version} (Latest)`;
@@ -192,9 +254,19 @@ if (fs.existsSync(sharedJsonPath)) {
     console.log(`  Updated currentVersion to ${version}`);
   }
 
-  // Add new version entry if it doesn't exist (skip if setting as latest - no duplicate needed)
-  if (setLatest) {
-    console.log(`  Skipping version entry (latest already points to ${version})`);
+  // Add entry for previous latest (when setting new latest) or for non-latest versions
+  if (setLatest && sharedPrevVersion && !sharedConfig.versions[project][sharedPrevVersion]) {
+    // Add entry for the PREVIOUS latest version (so it remains accessible)
+    sharedConfig.versions[project][sharedPrevVersion] = {
+      label: `v${sharedPrevVersion}`,
+      branch: sharedPrevBranch,
+      isDefault: false
+    };
+    console.log(`  Added historical entry for previous latest v${sharedPrevVersion}`);
+  } else if (setLatest && sharedPrevVersion) {
+    console.log(`  Previous latest v${sharedPrevVersion} already has an entry`);
+  } else if (setLatest) {
+    console.log(`  No previous latest to preserve (was pointing to main)`);
   } else if (!sharedConfig.versions[project][version]) {
     sharedConfig.versions[project][version] = {
       label: `v${version}`,
