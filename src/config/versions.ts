@@ -132,7 +132,7 @@ const KUBESTELLAR_VERSIONS: Record<string, VersionInfo> = {
 const A2A_VERSIONS: Record<string, VersionInfo> = {
   latest: {
     label: "v0.1.0 (Latest)",
-    branch: "main",
+    branch: "docs/a2a/0.1.0",
     isDefault: true,
   },
   main: {
@@ -172,7 +172,7 @@ const KUBEFLEX_VERSIONS: Record<string, VersionInfo> = {
 const MULTI_PLUGIN_VERSIONS: Record<string, VersionInfo> = {
   latest: {
     label: "v0.1.0 (Latest)",
-    branch: "main",
+    branch: "docs/multi-plugin/0.1.0",
     isDefault: true,
   },
   main: {
