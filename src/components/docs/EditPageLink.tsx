@@ -24,9 +24,10 @@ function detectCurrentBranch(versions: VersionEntry[]): string {
 
   const hostname = window.location.hostname;
 
-  // Production site = main (latest points to a version branch, but edits go to main)
+  // Production site uses the "latest" version's branch
   if (hostname === 'kubestellar.io' || hostname === 'www.kubestellar.io') {
-    return 'main';
+    const latestVersion = versions.find(v => v.key === 'latest');
+    return latestVersion?.branch || 'main';
   }
 
   // Netlify branch deploys: {branch-slug}--{site-name}.netlify.app
