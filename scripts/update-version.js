@@ -83,10 +83,12 @@ let previousLatestBranch = null;
 if (setLatest) {
   // Extract current latest version before updating (to preserve as historical entry)
   const extractLabelRegex = new RegExp(
-    `const ${constName}[\\s\\S]*?latest:\\s*\\{[\\s\\S]*?label:\\s*"v([\\d.]+) \\(Latest\\)"`
+    `const ${constName}.*?latest:\\s*\\{.*?label:\\s*"v([\\d.]+) \\(Latest\\)"`,
+    's'
   );
   const extractBranchRegex = new RegExp(
-    `const ${constName}[\\s\\S]*?latest:\\s*\\{[\\s\\S]*?branch:\\s*"([^"]+)"`
+    `const ${constName}.*?latest:\\s*\\{.*?branch:\\s*"([^"]+)"`,
+    's'
   );
 
   const labelMatch = content.match(extractLabelRegex);
@@ -106,8 +108,8 @@ if (setLatest) {
 
   // Update the "latest" entry's label to show the new version
   const latestRegex = new RegExp(
-    `(const ${constName}[\\s\\S]*?latest:\\s*\\{[\\s\\S]*?label:\\s*")v[\\d.]+( \\(Latest\\)")`,
-    ''
+    `(const ${constName}.*?latest:\\s*\\{.*?label:\\s*")v[\\d.]+( \\(Latest\\)")`,
+    's'
   );
 
   if (latestRegex.test(content)) {
@@ -119,7 +121,8 @@ if (setLatest) {
 
   // Update the "latest" entry's branch to point to the frozen version branch
   const latestBranchRegex = new RegExp(
-    `(const ${constName}[\\s\\S]*?latest:\\s*\\{[\\s\\S]*?branch:\\s*")[^"]+(")`
+    `(const ${constName}.*?latest:\\s*\\{.*?branch:\\s*")[^"]+(")`,
+    's'
   );
 
   if (latestBranchRegex.test(content)) {
@@ -133,8 +136,8 @@ if (setLatest) {
   // Match the project section and update currentVersion
   const projectKey = project === 'multi-plugin' ? '"multi-plugin"' : project;
   const currentVersionRegex = new RegExp(
-    `(${escapeRegex(projectKey)}:\\s*\\{[\\s\\S]*?currentVersion:\\s*")([^"]+)(")`,
-    ''
+    `(${escapeRegex(projectKey)}:\\s*\\{.*?currentVersion:\\s*")([^"]+)(")`,
+    's'
   );
 
   if (currentVersionRegex.test(content)) {
@@ -146,10 +149,10 @@ if (setLatest) {
 }
 
 // Add version entry for previous latest (when setting new latest) or for non-latest versions
-const versionEntryRegex = new RegExp(`"${escapeRegex(version)}":\\s*\\{`, '');
+const versionEntryRegex = new RegExp(`"${escapeRegex(version)}":\\s*\\{`);
 if (setLatest && previousLatestVersion) {
   // Add entry for the PREVIOUS latest version (so it remains accessible)
-  const prevVersionEntryRegex = new RegExp(`"${escapeRegex(previousLatestVersion)}":\\s*\\{`, '');
+  const prevVersionEntryRegex = new RegExp(`"${escapeRegex(previousLatestVersion)}":\\s*\\{`);
   if (!prevVersionEntryRegex.test(content)) {
     const prevEntry = `  "${previousLatestVersion}": {
     label: "v${previousLatestVersion}",
@@ -158,8 +161,8 @@ if (setLatest && previousLatestVersion) {
   },`;
 
     const mainEntryRegex = new RegExp(
-      `(const ${constName}[\\s\\S]*?main:\\s*\\{[^}]+\\},)`,
-      ''
+      `(const ${constName}.*?main:\\s*\\{[^}]+\\},)`,
+      's'
     );
 
     if (mainEntryRegex.test(content)) {
@@ -183,8 +186,8 @@ if (setLatest && previousLatestVersion) {
 
   // Find the main entry in the specific version constant and add after it
   const mainEntryRegex = new RegExp(
-    `(const ${constName}[\\s\\S]*?main:\\s*\\{[^}]+\\},)`,
-    ''
+    `(const ${constName}.*?main:\\s*\\{[^}]+\\},)`,
+    's'
   );
 
   if (mainEntryRegex.test(content)) {
@@ -193,8 +196,8 @@ if (setLatest && previousLatestVersion) {
   } else {
     // Fallback: try to add after latest entry
     const latestEntryRegex = new RegExp(
-      `(const ${constName}[\\s\\S]*?latest:\\s*\\{[^}]+\\},)`,
-      ''
+      `(const ${constName}.*?latest:\\s*\\{[^}]+\\},)`,
+      's'
     );
 
     if (latestEntryRegex.test(content)) {
