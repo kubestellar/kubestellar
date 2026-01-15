@@ -365,3 +365,4 @@ export async function generateStaticParams() {
 
   return allParams
 }
+
