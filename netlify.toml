@@ -166,6 +166,32 @@
   status = 301
   force = true
 
+# Redirect kflex.kubestellar.io to kubestellar.io/docs/kubeflex (alias for kubeflex)
+[[redirects]]
+  from = "https://kflex.kubestellar.io/*"
+  to = "https://kubestellar.io/docs/kubeflex/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://kflex.kubestellar.io"
+  to = "https://kubestellar.io/docs/kubeflex/overview/introduction"
+  status = 301
+  force = true
+
+# Redirect claude.kubestellar.io to kubestellar.io/docs/kubectl-claude
+[[redirects]]
+  from = "https://claude.kubestellar.io/*"
+  to = "https://kubestellar.io/docs/kubectl-claude/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://claude.kubestellar.io"
+  to = "https://kubestellar.io/docs/kubectl-claude/overview/introduction"
+  status = 301
+  force = true
+
 # Redirect project root pages to first content page
 [[redirects]]
   from = "/docs/a2a"
