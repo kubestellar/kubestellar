@@ -89,85 +89,15 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Clone source docs (non-kubestellar projects only)
-        if: steps.check-branch.outputs.exists != 'true' && steps.vars.outputs.project != 'kubestellar'
-        run: |
-          echo "Cloning ${{ steps.vars.outputs.source_repo }} at ${{ steps.vars.outputs.source_branch }}..."
-          git clone --branch "${{ steps.vars.outputs.source_branch }}" --depth 1 \
-            "https://github.com/${{ steps.vars.outputs.source_repo }}.git" /tmp/source
-
       - name: Create version branch
         if: steps.check-branch.outputs.exists != 'true'
         run: |
+          # All docs content lives in main branch - just create version branch from it
+          # No need to clone from source repos - main already has proper structure
+          echo "Creating version branch ${{ steps.branch.outputs.name }} from main"
           git checkout -b "${{ steps.branch.outputs.name }}"
-
-          PROJECT="${{ steps.vars.outputs.project }}"
-
-          # KubeStellar docs already live in this repo - just create branch, no copy needed
-          if [ "$PROJECT" = "kubestellar" ]; then
-            echo "KubeStellar docs live in this repo - creating version branch from current main"
-            echo "No content copy needed"
-            exit 0
-          fi
-
-          # For other projects, copy docs from source repo
-          echo "Copying docs for project: $PROJECT"
-
-          case "$PROJECT" in
-            a2a)
-              rm -rf docs/content/a2a/*
-              if [ -d "/tmp/source/docs-site/docs" ]; then
-                cp -r /tmp/source/docs-site/docs/* docs/content/a2a/
-                echo "Copied A2A docs from docs-site/docs/"
-              elif [ -d "/tmp/source/docs" ]; then
-                cp -r /tmp/source/docs/* docs/content/a2a/
-                echo "Copied A2A docs from docs/"
-              else
-                echo "Warning: No docs directory found in A2A source"
-              fi
-              ;;
-            kubeflex)
-              rm -rf docs/content/kubeflex/*
-              if [ -d "/tmp/source/docs" ]; then
-                cp -r /tmp/source/docs/* docs/content/kubeflex/
-                echo "Copied KubeFlex docs from docs/"
-              else
-                echo "Warning: /tmp/source/docs not found"
-              fi
-              ;;
-            multi-plugin)
-              rm -rf docs/content/multi-plugin/*
-              if [ -d "/tmp/source/docs" ]; then
-                cp -r /tmp/source/docs/* docs/content/multi-plugin/
-                echo "Copied Multi-Plugin docs from docs/"
-              else
-                echo "Warning: /tmp/source/docs not found"
-              fi
-              ;;
-            kubectl-claude)
-              rm -rf docs/content/kubectl-claude/*
-              if [ -d "/tmp/source/docs" ]; then
-                cp -r /tmp/source/docs/* docs/content/kubectl-claude/
-                echo "Copied kubectl-claude docs from docs/"
-              else
-                echo "Warning: /tmp/source/docs not found"
-              fi
-              ;;
-          esac
-
-      - name: Commit and push branch
-        if: steps.check-branch.outputs.exists != 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -s -m "docs: add ${{ steps.vars.outputs.project }} ${{ steps.branch.outputs.version }} docs
-
-          Source: ${{ steps.vars.outputs.source_repo }}@${{ steps.vars.outputs.source_branch }}
-
-          Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
           git push origin "${{ steps.branch.outputs.name }}"
-          echo "✅ Pushed branch ${{ steps.branch.outputs.name }}"
+          echo "✅ Created and pushed branch ${{ steps.branch.outputs.name }}"
 
       - name: Setup Node.js
         if: steps.vars.outputs.set_latest == 'true'
