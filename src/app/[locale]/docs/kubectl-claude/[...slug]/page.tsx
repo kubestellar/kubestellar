@@ -7,6 +7,7 @@ import { convertHtmlScriptsToJsxComments } from '@/lib/transformMdx'
 import { MermaidComponent } from '@/lib/Mermaid'
 import { buildPageMap, getContentPath } from '@/app/docs/page-map'
 import { CURRENT_VERSION } from '@/config/versions'
+import { locales } from '@/i18n/settings'
 import fs from 'fs'
 import path from 'path'
 
@@ -350,8 +351,10 @@ export default async function Page(props: PageProps) {
   )
 }
 
+// Disable dynamic params - only serve pre-generated pages
+export const dynamicParams = false
+
 export async function generateStaticParams() {
-  const locales = ['en', 'ja']
   const allParams: { locale: string; slug: string[] }[] = []
 
   const kubectlClaudeMap = buildPageMap('kubectl-claude')
