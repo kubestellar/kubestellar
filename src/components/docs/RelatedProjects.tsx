@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronRight, ChevronDown, ExternalLink } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import { useSharedConfig } from '@/hooks/useSharedConfig';
+
+// Production URL - all cross-project links go here
+const PRODUCTION_URL = 'https://kubestellar.io';
 
 // Static fallback for related projects
 const STATIC_RELATED_PROJECTS = [
@@ -41,6 +43,24 @@ export function RelatedProjects({ variant = 'full' }: RelatedProjectsProps) {
 
   const currentProject = getCurrentProject();
 
+  // Check if we're on production or a branch deploy
+  const isProduction = typeof window !== 'undefined' && 
+    (window.location.hostname === 'kubestellar.io' || 
+     window.location.hostname === 'www.kubestellar.io' ||
+     window.location.hostname === 'localhost');
+
+  // Get the full URL for a project link
+  // On branch deploys, use absolute URL to production for cross-project links
+  const getProjectUrl = (href: string, projectTitle: string) => {
+    // If we're on production or localhost, use relative links
+    if (isProduction) {
+      return href;
+    }
+    // On branch deploys, always link to production for all projects
+    // This ensures users can navigate between projects even on old version branches
+    return `${PRODUCTION_URL}${href}`;
+  };
+
   return (
     <div className="shrink-0 py-2 px-4 border-t border-gray-200 dark:border-gray-700">
       {/* Header - clickable to toggle */}
@@ -58,55 +78,36 @@ export function RelatedProjects({ variant = 'full' }: RelatedProjectsProps) {
         </span>
       </button>
 
-      {/* Project Links */}
+      {/* Project links */}
       <div
         className={`
-          overflow-hidden transition-all duration-300 ease-in-out
-          ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}
+          space-y-1 overflow-hidden transition-all duration-200 ease-in-out
+          ${isExpanded ? 'max-h-96 opacity-100 pb-2' : 'max-h-0 opacity-0'}
         `}
       >
-        <ul className="space-y-1 py-1">
-          {relatedProjects.map((project) => {
-            const isCurrentProject = project.title === currentProject;
-            const isExternal = project.href.startsWith('http');
+        {relatedProjects.map((project: { title: string; href: string; description?: string }) => {
+          const isCurrentProject = project.title === currentProject;
+          const projectUrl = getProjectUrl(project.href, project.title);
+          const isExternal = projectUrl.startsWith('http');
 
-            return (
-              <li key={project.title}>
-                {isExternal ? (
-                  <a
-                    href={project.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`
-                      flex items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-colors
-                      ${isCurrentProject
-                        ? 'bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}
-                    `}
-                  >
-                    <span className="flex-1 truncate">{project.title}</span>
-                    <ExternalLink className="w-3 h-3 shrink-0 opacity-50" />
-                  </a>
-                ) : (
-                  <Link
-                    href={project.href}
-                    className={`
-                      flex items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-colors
-                      ${isCurrentProject
-                        ? 'bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}
-                    `}
-                  >
-                    <span className="flex-1 truncate">{project.title}</span>
-                  </Link>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+          return (
+            <a
+              key={project.title}
+              href={projectUrl}
+              className={`
+                block px-3 py-1.5 text-sm rounded-md transition-colors
+                ${isCurrentProject
+                  ? 'bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }
+              `}
+              {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >
+              {project.title}
+            </a>
+          );
+        })}
       </div>
     </div>
   );
 }
-
-export default RelatedProjects;
