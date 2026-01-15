@@ -41,7 +41,7 @@ export interface ProjectConfig {
 const KUBESTELLAR_VERSIONS: Record<string, VersionInfo> = {
   latest: {
     label: "v0.29.0 (Latest)",
-    branch: "main",
+    branch: "docs/0.29.0",
     isDefault: true,
   },
   main: {
