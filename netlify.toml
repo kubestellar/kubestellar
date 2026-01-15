@@ -179,29 +179,16 @@
   status = 301
   force = true
 
-# Redirect claude.kubestellar.io to kubestellar.io/en/docs/kubectl-claude (with locale)
+# Redirect claude.kubestellar.io to kubestellar.io/docs/kubectl-claude
 [[redirects]]
   from = "https://claude.kubestellar.io/*"
-  to = "https://kubestellar.io/en/docs/kubectl-claude/:splat"
+  to = "https://kubestellar.io/docs/kubectl-claude/:splat"
   status = 301
   force = true
 
 [[redirects]]
   from = "https://claude.kubestellar.io"
-  to = "https://kubestellar.io/en/docs/kubectl-claude/overview/introduction"
-  status = 301
-  force = true
-
-# Redirect /docs/kubectl-claude to /en/docs/kubectl-claude for backwards compatibility
-[[redirects]]
-  from = "/docs/kubectl-claude/*"
-  to = "/en/docs/kubectl-claude/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/docs/kubectl-claude"
-  to = "/en/docs/kubectl-claude"
+  to = "https://kubestellar.io/docs/kubectl-claude/overview/introduction"
   status = 301
   force = true
 

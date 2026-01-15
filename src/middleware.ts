@@ -29,8 +29,7 @@ export default function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Use negative lookahead to exclude docs EXCEPT kubectl-claude which gets i18n
-    "/((?!docs(?!/kubectl-claude)|api|_next|_vercel|agenda|blog|code|community|drive|infomercial|join_us|joinus|ladder|ladder_stats|linkedin|quickstart|slack|survey|tv|youtube|.*\\..*).*)",
+    "/((?!docs|api|_next|_vercel|agenda|blog|code|community|drive|infomercial|join_us|joinus|ladder|ladder_stats|linkedin|quickstart|slack|survey|tv|youtube|.*\\..*).*)",
     "/",
   ],
 };
