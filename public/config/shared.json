@@ -159,11 +159,6 @@
         "label": "v0.4.0",
         "branch": "docs/kubectl-claude/0.4.0",
         "isDefault": false
-      },
-      "0.4.4": {
-        "label": "v0.4.4",
-        "branch": "docs/kubectl-claude/0.4.4",
-        "isDefault": false
       }
     }
   },

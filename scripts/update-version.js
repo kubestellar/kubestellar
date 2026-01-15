@@ -119,9 +119,11 @@ if (setLatest) {
   }
 }
 
-// Check if version entry already exists
+// Check if version entry already exists or if we're setting as latest (no duplicate needed)
 const versionEntryRegex = new RegExp(`"${escapeRegex(version)}":\\s*\\{`, '');
-if (versionEntryRegex.test(content)) {
+if (setLatest) {
+  console.log(`  Skipping version entry (latest already points to ${version})`);
+} else if (versionEntryRegex.test(content)) {
   console.log(`  Version ${version} already exists in ${constName}, skipping addition`);
 } else {
   // Add new version entry after 'main' entry
@@ -190,8 +192,10 @@ if (fs.existsSync(sharedJsonPath)) {
     console.log(`  Updated currentVersion to ${version}`);
   }
 
-  // Add new version entry if it doesn't exist
-  if (!sharedConfig.versions[project][version]) {
+  // Add new version entry if it doesn't exist (skip if setting as latest - no duplicate needed)
+  if (setLatest) {
+    console.log(`  Skipping version entry (latest already points to ${version})`);
+  } else if (!sharedConfig.versions[project][version]) {
     sharedConfig.versions[project][version] = {
       label: `v${version}`,
       branch: branch,
