@@ -186,7 +186,7 @@ const MULTI_PLUGIN_VERSIONS: Record<string, VersionInfo> = {
 // kubectl-claude versions
 const KUBECTL_CLAUDE_VERSIONS: Record<string, VersionInfo> = {
   latest: {
-    label: "v0.4.0 (Latest)",
+    label: "v0.4.3 (Latest)",
     branch: "main",
     isDefault: true,
   },
@@ -195,6 +195,11 @@ const KUBECTL_CLAUDE_VERSIONS: Record<string, VersionInfo> = {
     branch: "main",
     isDefault: false,
     isDev: true,
+  },
+  "0.4.3": {
+    label: "v0.4.3",
+    branch: "docs/kubectl-claude/0.4.3",
+    isDefault: false,
   },
   "0.4.0": {
     label: "v0.4.0",
