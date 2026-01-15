@@ -33,4 +33,4 @@ jobs:
         run: |
           gh api repos/kubestellar/docs/dispatches \
             -f event_type=create-version-branch \
-            -f client_payload="{\"project\":\"a2a\",\"version\":\"${{ steps.version.outputs.tag }}\",\"source_repo\":\"${{ github.repository }}\",\"source_branch\":\"${{ steps.version.outputs.branch }}\"}"
+            -f client_payload="{\"project\":\"kubeflex\",\"version\":\"${{ steps.version.outputs.tag }}\",\"source_repo\":\"${{ github.repository }}\",\"source_branch\":\"${{ steps.version.outputs.branch }}\"}"
