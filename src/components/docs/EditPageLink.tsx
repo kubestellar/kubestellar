@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import { useSharedConfig, getVersionsForProject, VersionInfo } from '@/hooks/useSharedConfig';
 import { getProjectVersions as getStaticProjectVersions } from '@/config/versions';
 import type { ProjectId } from '@/config/versions';
@@ -103,14 +104,18 @@ function isValidGitHubEditUrl(url: string): boolean {
 
 export function EditPageLink({ filePath, projectId, variant = 'full' }: EditPageLinkProps) {
   const { config } = useSharedConfig();
+  const [currentBranch, setCurrentBranch] = useState<string>('main');
 
   // Get versions to detect current branch
   const versions = config
     ? getVersionsForProject(config, projectId)
     : getStaticProjectVersions(projectId);
 
-  // Detect current branch from hostname
-  const currentBranch = detectCurrentBranch(versions);
+  // Detect current branch from hostname on client-side mount
+  useEffect(() => {
+    const detected = detectCurrentBranch(versions);
+    setCurrentBranch(detected);
+  }, [versions]);
 
   // Build edit URL with correct branch
   const editBaseUrl = buildEditBaseUrl(projectId, currentBranch);
