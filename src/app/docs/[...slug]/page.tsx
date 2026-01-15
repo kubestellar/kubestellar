@@ -510,13 +510,8 @@ export async function generateStaticParams() {
     }
   }
 
-  // kubectl-claude routes (prefixed with 'kubectl-claude')
-  const kubectlClaudeMap = buildPageMap('kubectl-claude')
-  for (const route of Object.keys(kubectlClaudeMap.routeMap)) {
-    if (route !== '') {
-      allParams.push({ slug: ['kubectl-claude', ...route.split('/')] })
-    }
-  }
+  // kubectl-claude routes are now handled by [locale]/docs/kubectl-claude/[...slug]
+  // to support localization - removed from here to avoid conflicts
 
   return allParams
 }
