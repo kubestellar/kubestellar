@@ -51,13 +51,10 @@ export function RelatedProjects({ variant = 'full' }: RelatedProjectsProps) {
 
   // Get the full URL for a project link
   // On branch deploys, use absolute URL to production for cross-project links
-  const getProjectUrl = (href: string, projectTitle: string) => {
-    // If we're on production or localhost, use relative links
+  const getProjectUrl = (href: string) => {
     if (isProduction) {
       return href;
     }
-    // On branch deploys, always link to production for all projects
-    // This ensures users can navigate between projects even on old version branches
     return `${PRODUCTION_URL}${href}`;
   };
 
@@ -87,7 +84,7 @@ export function RelatedProjects({ variant = 'full' }: RelatedProjectsProps) {
       >
         {relatedProjects.map((project: { title: string; href: string; description?: string }) => {
           const isCurrentProject = project.title === currentProject;
-          const projectUrl = getProjectUrl(project.href, project.title);
+          const projectUrl = getProjectUrl(project.href);
           const isExternal = projectUrl.startsWith('http');
 
           return (
