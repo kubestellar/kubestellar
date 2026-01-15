@@ -9,7 +9,7 @@
  *   --project      Project ID (kubestellar, a2a, kubeflex, multi-plugin)
  *   --version      Version number (e.g., 0.30.0)
  *   --branch       Branch name for this version (e.g., docs/0.30.0)
- *   --set-latest   If provided, updates the "latest" label and currentVersion
+ *   --set-latest   If provided, updates the "latest" label, branch, and currentVersion
  */
 
 const fs = require('fs');
@@ -89,6 +89,18 @@ if (setLatest) {
     console.log(`  Updated latest label to v${version}`);
   } else {
     console.warn(`  Warning: Could not find latest label pattern in ${constName}`);
+  }
+
+  // Update the "latest" entry's branch to point to the frozen version branch
+  const latestBranchRegex = new RegExp(
+    `(const ${constName}[\\s\\S]*?latest:\\s*\\{[\\s\\S]*?branch:\\s*")[^"]+(")`
+  );
+
+  if (latestBranchRegex.test(content)) {
+    content = content.replace(latestBranchRegex, `$1${branch}$2`);
+    console.log(`  Updated latest branch to ${branch}`);
+  } else {
+    console.warn(`  Warning: Could not find latest branch pattern in ${constName}`);
   }
 
   // Update currentVersion in the project config
