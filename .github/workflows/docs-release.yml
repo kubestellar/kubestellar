@@ -31,6 +31,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_SYNC_TOKEN }}
         run: |
-          gh api repos/kubestellar/docs/dispatches \
-            -f event_type=create-version-branch \
-            -f client_payload="{\"project\":\"kubestellar\",\"version\":\"${{ steps.version.outputs.tag }}\",\"source_repo\":\"${{ github.repository }}\",\"source_branch\":\"${{ steps.version.outputs.branch }}\"}"
+          cat <<EOF | gh api repos/kubestellar/docs/dispatches --input -
+          {
+            "event_type": "create-version-branch",
+            "client_payload": {
+              "project": "kubestellar",
+              "version": "${{ steps.version.outputs.tag }}",
+              "source_repo": "${{ github.repository }}",
+              "source_branch": "${{ steps.version.outputs.branch }}"
+            }
+          }
+          EOF
