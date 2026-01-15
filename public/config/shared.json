@@ -140,8 +140,8 @@
     },
     "kubectl-claude": {
       "latest": {
-        "label": "v0.4.4 (Latest)",
-        "branch": "docs/kubectl-claude/0.4.4",
+        "label": "v0.4.5 (Latest)",
+        "branch": "docs/kubectl-claude/0.4.5",
         "isDefault": true
       },
       "main": {
@@ -186,7 +186,7 @@
     "kubectl-claude": {
       "name": "kubectl-claude",
       "basePath": "kubectl-claude",
-      "currentVersion": "0.4.4"
+      "currentVersion": "0.4.5"
     }
   },
   "relatedProjects": [
@@ -223,5 +223,5 @@
     "multi-plugin": "https://github.com/kubestellar/kubectl-multi-plugin/edit/main/docs",
     "kubectl-claude": "https://github.com/kubestellar/kubectl-claude/edit/main/docs"
   },
-  "updatedAt": "2026-01-15T06:21:14.796Z"
+  "updatedAt": "2026-01-15T06:30:48.358Z"
 }
