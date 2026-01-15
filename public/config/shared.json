@@ -105,7 +105,7 @@
     "kubeflex": {
       "latest": {
         "label": "v0.9.3 (Latest)",
-        "branch": "main",
+        "branch": "docs/kubeflex/0.9.3",
         "isDefault": true
       },
       "main": {

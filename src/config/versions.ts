@@ -147,7 +147,7 @@ const A2A_VERSIONS: Record<string, VersionInfo> = {
 const KUBEFLEX_VERSIONS: Record<string, VersionInfo> = {
   latest: {
     label: "v0.9.3 (Latest)",
-    branch: "main",
+    branch: "docs/kubeflex/0.9.3",
     isDefault: true,
   },
   main: {
