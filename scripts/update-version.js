@@ -46,7 +46,8 @@ const versionConstants = {
   'kubestellar': 'KUBESTELLAR_VERSIONS',
   'a2a': 'A2A_VERSIONS',
   'kubeflex': 'KUBEFLEX_VERSIONS',
-  'multi-plugin': 'MULTI_PLUGIN_VERSIONS'
+  'multi-plugin': 'MULTI_PLUGIN_VERSIONS',
+  'kubectl-claude': 'KUBECTL_CLAUDE_VERSIONS'
 };
 
 const constName = versionConstants[project];

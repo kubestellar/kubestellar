@@ -16,7 +16,7 @@ export const NETLIFY_SITE_NAME = "kubestellar-docs"
 export const PRODUCTION_URL = "https://kubestellar.io"
 
 // Project identifiers
-export type ProjectId = "kubestellar" | "a2a" | "kubeflex" | "multi-plugin"
+export type ProjectId = "kubestellar" | "a2a" | "kubeflex" | "multi-plugin" | "kubectl-claude"
 
 // Version info structure
 export interface VersionInfo {
@@ -183,6 +183,21 @@ const MULTI_PLUGIN_VERSIONS: Record<string, VersionInfo> = {
   },
 }
 
+// kubectl-claude versions
+const KUBECTL_CLAUDE_VERSIONS: Record<string, VersionInfo> = {
+  latest: {
+    label: "v0.3.0 (Latest)",
+    branch: "main",
+    isDefault: true,
+  },
+  main: {
+    label: "main (dev)",
+    branch: "main",
+    isDefault: false,
+    isDev: true,
+  },
+}
+
 // All projects configuration
 export const PROJECTS: Record<ProjectId, ProjectConfig> = {
   kubestellar: {
@@ -217,6 +232,14 @@ export const PROJECTS: Record<ProjectId, ProjectConfig> = {
     contentPath: "docs/content/multi-plugin",
     versions: MULTI_PLUGIN_VERSIONS,
   },
+  "kubectl-claude": {
+    id: "kubectl-claude",
+    name: "kubectl-claude",
+    basePath: "kubectl-claude",
+    currentVersion: "0.3.0",
+    contentPath: "docs/content/kubectl-claude",
+    versions: KUBECTL_CLAUDE_VERSIONS,
+  },
 }
 
 // Get project from URL pathname
@@ -229,6 +252,9 @@ export function getProjectFromPath(pathname: string): ProjectConfig {
   }
   if (pathname.startsWith("/docs/multi-plugin")) {
     return PROJECTS["multi-plugin"]
+  }
+  if (pathname.startsWith("/docs/kubectl-claude")) {
+    return PROJECTS["kubectl-claude"]
   }
   return PROJECTS.kubestellar
 }

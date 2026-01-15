@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       project:
-        description: 'Project (kubestellar, a2a, kubeflex, multi-plugin)'
+        description: 'Project (kubestellar, a2a, kubeflex, multi-plugin, kubectl-claude)'
         required: true
         type: choice
         options:
@@ -14,6 +14,7 @@ on:
           - a2a
           - kubeflex
           - multi-plugin
+          - kubectl-claude
       version:
         description: 'Version number (e.g., 0.30.0)'
         required: true
@@ -71,6 +72,7 @@ jobs:
             a2a) BRANCH="docs/a2a/${VERSION}" ;;
             kubeflex) BRANCH="docs/kubeflex/${VERSION}" ;;
             multi-plugin) BRANCH="docs/multi-plugin/${VERSION}" ;;
+            kubectl-claude) BRANCH="docs/kubectl-claude/${VERSION}" ;;
             *) echo "Unknown project: $PROJECT"; exit 1 ;;
           esac
           echo "name=$BRANCH" >> $GITHUB_OUTPUT
@@ -138,6 +140,15 @@ jobs:
               if [ -d "/tmp/source/docs" ]; then
                 cp -r /tmp/source/docs/* docs/content/multi-plugin/
                 echo "Copied Multi-Plugin docs from docs/"
+              else
+                echo "Warning: /tmp/source/docs not found"
+              fi
+              ;;
+            kubectl-claude)
+              rm -rf docs/content/kubectl-claude/*
+              if [ -d "/tmp/source/docs" ]; then
+                cp -r /tmp/source/docs/* docs/content/kubectl-claude/
+                echo "Copied kubectl-claude docs from docs/"
               else
                 echo "Warning: /tmp/source/docs not found"
               fi
