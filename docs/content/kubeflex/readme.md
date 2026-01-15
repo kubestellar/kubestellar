@@ -9,9 +9,6 @@ A flexible and scalable platform for running Kubernetes control plane APIs with 
   <a href="https://github.com/kubestellar/kubeflex/releases" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/github/release/kubestellar/kubeflex/all.svg?style=flat-square" alt="GitHub release" />
   </a>
-  <a href="https://github.com/kubestellar/kubeflex/actions/workflows/ci.yaml" target="_blank" rel="noopener noreferrer">
-    <img src="https://github.com/kubestellar/kubeflex/actions/workflows/ci.yaml/badge.svg" alt="CI" />
-  </a>
 </div>
 
 > **KubeFlex** is a CNCF sandbox project under the KubeStellar umbrella that enables "control-plane-as-a-service" multi-tenancy for Kubernetes.
