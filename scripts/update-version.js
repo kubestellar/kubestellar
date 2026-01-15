@@ -176,10 +176,12 @@ if (fs.existsSync(sharedJsonPath)) {
     sharedConfig.versions[project] = {};
   }
 
-  // Update latest label if setting as latest
+  // Update latest label and branch if setting as latest
   if (setLatest && sharedConfig.versions[project].latest) {
     sharedConfig.versions[project].latest.label = `v${version} (Latest)`;
+    sharedConfig.versions[project].latest.branch = branch;
     console.log(`  Updated latest label to v${version}`);
+    console.log(`  Updated latest branch to ${branch}`);
   }
 
   // Update currentVersion in projects

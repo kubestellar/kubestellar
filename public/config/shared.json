@@ -34,8 +34,10 @@
       "main": { "label": "main (dev)", "branch": "main", "isDefault": false, "isDev": true }
     },
     "kubectl-claude": {
-      "latest": { "label": "v0.4.3 (Latest)", "branch": "main", "isDefault": true },
-      "main": { "label": "main (dev)", "branch": "main", "isDefault": false, "isDev": true }
+      "latest": { "label": "v0.4.3 (Latest)", "branch": "docs/kubectl-claude/0.4.3", "isDefault": true },
+      "main": { "label": "main (dev)", "branch": "main", "isDefault": false, "isDev": true },
+      "0.4.3": { "label": "v0.4.3", "branch": "docs/kubectl-claude/0.4.3", "isDefault": false },
+      "0.4.0": { "label": "v0.4.0", "branch": "docs/kubectl-claude/0.4.0", "isDefault": false }
     }
   },
   "projects": {

@@ -194,7 +194,7 @@ jobs:
             --branch "${{ steps.branch.outputs.name }}" \
             --set-latest
 
-          git add src/config/versions.ts
+          git add src/config/versions.ts public/config/shared.json
           git commit -s -m "chore: update ${{ steps.vars.outputs.project }} to v${{ steps.branch.outputs.version }}
 
           Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
