@@ -187,8 +187,8 @@ const MULTI_PLUGIN_VERSIONS: Record<string, VersionInfo> = {
 // Note: Only latest/main for now - older versions don't have docs structure
 const KUBECTL_CLAUDE_VERSIONS: Record<string, VersionInfo> = {
   latest: {
-    label: "v0.4.4 (Latest)",
-    branch: "docs/kubectl-claude/0.4.4",
+    label: "v0.4.5 (Latest)",
+    branch: "docs/kubectl-claude/0.4.5",
     isDefault: true,
   },
   main: {
