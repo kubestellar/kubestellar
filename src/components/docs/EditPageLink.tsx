@@ -6,6 +6,7 @@ import type { ProjectId } from '@/config/versions';
 interface EditPageLinkProps {
   filePath: string;
   projectId: ProjectId;
+  variant?: 'full' | 'icon';
 }
 
 // Static edit base URLs (fallback if shared config unavailable)
@@ -32,7 +33,7 @@ function isValidGitHubEditUrl(url: string): boolean {
   }
 }
 
-export function EditPageLink({ filePath, projectId }: EditPageLinkProps) {
+export function EditPageLink({ filePath, projectId, variant = 'full' }: EditPageLinkProps) {
   const { config } = useSharedConfig();
 
   // Get edit base URL from config or fallback
@@ -53,6 +54,40 @@ export function EditPageLink({ filePath, projectId }: EditPageLinkProps) {
   // CodeQL: URL is validated above to only allow https://github.com with /edit/ path
   const safeUrl = new URL(editUrl);
 
+  // Pencil icon SVG
+  const PencilIcon = () => (
+    <svg
+      className={variant === 'icon' ? 'w-5 h-5' : 'w-4 h-4'}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+      />
+    </svg>
+  );
+
+  // Icon-only variant for top right placement
+  if (variant === 'icon') {
+    return (
+      <a
+        href={safeUrl.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Edit this page on GitHub"
+        className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+      >
+        <PencilIcon />
+      </a>
+    );
+  }
+
+  // Full variant (original) for bottom of page
   return (
     <div className="mt-12 pt-6 border-t border-gray-200 dark:border-neutral-700">
       <a
@@ -61,20 +96,7 @@ export function EditPageLink({ filePath, projectId }: EditPageLinkProps) {
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
       >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-          />
-        </svg>
+        <PencilIcon />
         Edit this page on GitHub
       </a>
     </div>
