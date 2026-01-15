@@ -1,0 +1,36 @@
+name: Trigger Docs Update
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g., v0.5.0)'
+        required: true
+
+# No GITHUB_TOKEN permissions needed - uses WORKFLOW_SYNC_TOKEN secret
+permissions: {}
+
+jobs:
+  trigger-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+            echo "branch=main" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+            echo "branch=${{ github.event.release.target_commitish }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trigger docs repo
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_SYNC_TOKEN }}
+        run: |
+          gh api repos/kubestellar/docs/dispatches \
+            -f event_type=create-version-branch \
+            -f client_payload="{\"project\":\"kubestellar\",\"version\":\"${{ steps.version.outputs.tag }}\",\"source_repo\":\"${{ github.repository }}\",\"source_branch\":\"${{ steps.version.outputs.branch }}\"}"
