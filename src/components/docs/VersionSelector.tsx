@@ -5,9 +5,10 @@ import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import {
   getProjectFromPath,
-  getProjectVersions,
+  getProjectVersions as getStaticProjectVersions,
   getVersionUrl,
 } from '@/config/versions';
+import { useSharedConfig, getVersionsForProject } from '@/hooks/useSharedConfig';
 
 interface VersionSelectorProps {
   className?: string;
@@ -61,13 +62,20 @@ export function VersionSelector({ className = '', isMobile = false }: VersionSel
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
+  // Fetch dynamic config from production (always shows latest versions)
+  const { config: sharedConfig } = useSharedConfig();
+
   // Detect current project from URL
   const currentProject = getProjectFromPath(pathname);
   const projectId = currentProject.id;
 
-  // Get versions for the current project and sort them
-  // Order: default first, then dev, then rest by version number descending
-  const versions = getProjectVersions(projectId).sort((a, b) => {
+  // Get versions - prefer dynamic config, fall back to static
+  const rawVersions = sharedConfig
+    ? getVersionsForProject(sharedConfig, projectId)
+    : getStaticProjectVersions(projectId);
+
+  // Sort versions: default first, then dev, then rest by version number descending
+  const versions = rawVersions.sort((a, b) => {
     if (a.isDefault && !b.isDefault) return -1;
     if (!a.isDefault && b.isDefault) return 1;
     if (a.isDev && !b.isDev) return -1;

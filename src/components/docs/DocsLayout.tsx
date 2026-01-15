@@ -5,7 +5,9 @@ import { DocsSidebar } from './DocsSidebar';
 import { TableOfContents } from './TableOfContents';
 import { MobileTOC } from './MobileTOC';
 import { MobileHeader } from './MobileSidebarToggle';
+import { EditPageLink } from './EditPageLink';
 import { useDocsMenu } from './DocsProvider';
+import type { ProjectId } from '@/config/versions';
 
 interface TOCItem {
   id: string;
@@ -33,9 +35,11 @@ interface DocsLayoutProps {
   pageMap: PageMapItem[];
   toc?: TOCItem[];
   metadata?: Metadata;
+  filePath?: string;
+  projectId?: ProjectId;
 }
 
-export function DocsLayout({ children, pageMap, toc, metadata }: DocsLayoutProps) {
+export function DocsLayout({ children, pageMap, toc, metadata, filePath, projectId }: DocsLayoutProps) {
   const { menuOpen, toggleMenu } = useDocsMenu();
 
   return (
@@ -55,18 +59,23 @@ export function DocsLayout({ children, pageMap, toc, metadata }: DocsLayoutProps
       <main className="flex-1 min-w-0 lg:ml-0">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Mobile Header with Sidebar Toggle - Only visible on mobile/tablet */}
-          <MobileHeader 
+          <MobileHeader
             onToggleSidebar={toggleMenu}
             pageTitle={metadata?.title}
           />
-          
+
           {/* Mobile TOC Accordion - Only visible on mobile/tablet */}
           <MobileTOC toc={toc} />
-          
+
           {/* Article content */}
           <article className="prose prose-slate dark:prose-invert max-w-none">
             {children}
           </article>
+
+          {/* Edit this page link */}
+          {filePath && projectId && (
+            <EditPageLink filePath={filePath} projectId={projectId} />
+          )}
         </div>
       </main>
 

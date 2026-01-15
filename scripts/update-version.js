@@ -164,3 +164,46 @@ if (content !== originalContent) {
 } else {
   console.log(`\nNo changes needed for ${versionsPath}`);
 }
+
+// Also update shared.json for dynamic version loading
+const sharedJsonPath = path.join(__dirname, '../public/config/shared.json');
+if (fs.existsSync(sharedJsonPath)) {
+  console.log('\nUpdating shared.json...');
+  const sharedConfig = JSON.parse(fs.readFileSync(sharedJsonPath, 'utf8'));
+
+  // Initialize project versions if not exists
+  if (!sharedConfig.versions[project]) {
+    sharedConfig.versions[project] = {};
+  }
+
+  // Update latest label if setting as latest
+  if (setLatest && sharedConfig.versions[project].latest) {
+    sharedConfig.versions[project].latest.label = `v${version} (Latest)`;
+    console.log(`  Updated latest label to v${version}`);
+  }
+
+  // Update currentVersion in projects
+  if (setLatest && sharedConfig.projects && sharedConfig.projects[project]) {
+    sharedConfig.projects[project].currentVersion = version;
+    console.log(`  Updated currentVersion to ${version}`);
+  }
+
+  // Add new version entry if it doesn't exist
+  if (!sharedConfig.versions[project][version]) {
+    sharedConfig.versions[project][version] = {
+      label: `v${version}`,
+      branch: branch,
+      isDefault: false
+    };
+    console.log(`  Added version entry for ${version}`);
+  }
+
+  // Update timestamp
+  sharedConfig.updatedAt = new Date().toISOString();
+
+  // Write updated shared.json
+  fs.writeFileSync(sharedJsonPath, JSON.stringify(sharedConfig, null, 2) + '\n');
+  console.log(`✅ Updated ${sharedJsonPath}`);
+} else {
+  console.log(`\nWarning: ${sharedJsonPath} not found, skipping shared config update`);
+}

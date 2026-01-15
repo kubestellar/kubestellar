@@ -1,0 +1,63 @@
+{
+  "versions": {
+    "kubestellar": {
+      "latest": { "label": "v0.29.0 (Latest)", "branch": "docs/0.29.0", "isDefault": true },
+      "main": { "label": "main (dev)", "branch": "main", "isDefault": false, "isDev": true },
+      "0.28.0": { "label": "v0.28.0", "branch": "docs/0.28.0", "isDefault": false },
+      "0.27.2": { "label": "v0.27.2", "branch": "docs/0.27.2", "isDefault": false },
+      "0.27.1": { "label": "v0.27.1", "branch": "docs/0.27.1", "isDefault": false },
+      "0.27.0": { "label": "v0.27.0", "branch": "docs/0.27.0", "isDefault": false },
+      "0.26.0": { "label": "v0.26.0", "branch": "docs/0.26.0", "isDefault": false },
+      "0.25.1": { "label": "v0.25.1", "branch": "docs/0.25.1", "isDefault": false },
+      "0.25.0": { "label": "v0.25.0", "branch": "docs/0.25.0", "isDefault": false },
+      "0.24.0": { "label": "v0.24.0", "branch": "docs/0.24.0", "isDefault": false },
+      "0.23.1": { "label": "v0.23.1", "branch": "docs/0.23.1", "isDefault": false },
+      "0.23.0": { "label": "v0.23.0", "branch": "docs/0.23.0", "isDefault": false },
+      "0.22.0": { "label": "v0.22.0", "branch": "docs/0.22.0", "isDefault": false },
+      "0.21.2": { "label": "v0.21.2", "branch": "docs/0.21.2", "isDefault": false },
+      "0.21.1": { "label": "v0.21.1", "branch": "docs/0.21.1", "isDefault": false },
+      "0.21.0": { "label": "v0.21.0", "branch": "docs/0.21.0", "isDefault": false },
+      "legacy": { "label": "Older Versions", "branch": "legacy", "isDefault": false, "externalUrl": "https://kubestellar.github.io/kubestellar" }
+    },
+    "a2a": {
+      "latest": { "label": "v0.1.0 (Latest)", "branch": "main", "isDefault": true },
+      "main": { "label": "main (dev)", "branch": "main", "isDefault": false, "isDev": true }
+    },
+    "kubeflex": {
+      "latest": { "label": "v0.9.3 (Latest)", "branch": "main", "isDefault": true },
+      "main": { "label": "main (dev)", "branch": "main", "isDefault": false, "isDev": true },
+      "0.8.0": { "label": "v0.8.0", "branch": "docs/kubeflex/0.8.0", "isDefault": false },
+      "0.7.0": { "label": "v0.7.0", "branch": "docs/kubeflex/0.7.0", "isDefault": false }
+    },
+    "multi-plugin": {
+      "latest": { "label": "v0.1.0 (Latest)", "branch": "main", "isDefault": true },
+      "main": { "label": "main (dev)", "branch": "main", "isDefault": false, "isDev": true }
+    },
+    "kubectl-claude": {
+      "latest": { "label": "v0.4.3 (Latest)", "branch": "main", "isDefault": true },
+      "main": { "label": "main (dev)", "branch": "main", "isDefault": false, "isDev": true }
+    }
+  },
+  "projects": {
+    "kubestellar": { "name": "KubeStellar", "basePath": "", "currentVersion": "0.29.0" },
+    "a2a": { "name": "A2A", "basePath": "a2a", "currentVersion": "0.1.0" },
+    "kubeflex": { "name": "KubeFlex", "basePath": "kubeflex", "currentVersion": "0.9.3" },
+    "multi-plugin": { "name": "Multi Plugin", "basePath": "multi-plugin", "currentVersion": "0.1.0" },
+    "kubectl-claude": { "name": "kubectl-claude", "basePath": "kubectl-claude", "currentVersion": "0.4.3" }
+  },
+  "relatedProjects": [
+    { "title": "KubeStellar", "href": "/docs/what-is-kubestellar/overview", "description": "Multi-cluster configuration management" },
+    { "title": "kubectl-claude", "href": "/docs/kubectl-claude/overview/introduction", "description": "AI-powered kubectl plugin" },
+    { "title": "KubeFlex", "href": "/docs/kubeflex/overview/introduction", "description": "Lightweight Kubernetes control planes" },
+    { "title": "A2A", "href": "/docs/a2a/overview/introduction", "description": "Agent-to-Agent protocol" },
+    { "title": "Multi Plugin", "href": "/docs/multi-plugin/overview/introduction", "description": "Multi-cluster kubectl plugin" }
+  ],
+  "editBaseUrls": {
+    "kubestellar": "https://github.com/kubestellar/docs/edit/main/docs/content",
+    "a2a": "https://github.com/kubestellar/a2a/edit/main/docs",
+    "kubeflex": "https://github.com/kubestellar/kubeflex/edit/main/docs",
+    "multi-plugin": "https://github.com/kubestellar/kubectl-multi-plugin/edit/main/docs",
+    "kubectl-claude": "https://github.com/kubestellar/kubectl-claude/edit/main/docs"
+  },
+  "updatedAt": "2026-01-15T01:45:00Z"
+}

@@ -32,11 +32,8 @@ export function SidebarFooter({ onCollapse, variant = 'full', isMobile = false }
     }
 
     return (
-      <div 
-        className="shrink-0 sticky flex flex-col items-center gap-2 py-4 min-w-16"
-        style={{
-          borderTop: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
-        }}
+      <div
+        className="shrink-0 sticky flex flex-col items-center gap-2 py-4 min-w-16 border-t border-gray-200 dark:border-gray-700"
         suppressHydrationWarning
       >
         {/* Theme Toggle Icon */}
@@ -83,10 +80,8 @@ export function SidebarFooter({ onCollapse, variant = 'full', isMobile = false }
   if (!mounted) {
     return (
       <div
-        className="shrink-0 flex items-center gap-2 py-4 px-4"
+        className="shrink-0 flex items-center gap-2 py-4 px-4 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800"
         style={{
-          backgroundColor: '#ffffff',
-          borderTop: '1px solid #e5e7eb',
           boxShadow: '0 -1px 6px 0 rgba(0,0,0,0.07)',
         }}
         suppressHydrationWarning
@@ -98,11 +93,9 @@ export function SidebarFooter({ onCollapse, variant = 'full', isMobile = false }
 
   return (
     <div
-      className="shrink-0 flex items-center gap-2 py-4 px-4"
+      className="shrink-0 flex items-center gap-2 py-4 px-4 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800"
       style={{
-        borderTop: isDark ? '1px solid #1f2937' : '1px solid #e5e7eb',
         boxShadow: '0 -1px 6px 0 rgba(0,0,0,0.07)',
-        backgroundColor: isDark ? '#000000' : '#ffffff',
       }}
       suppressHydrationWarning
     >

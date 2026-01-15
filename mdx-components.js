@@ -6,12 +6,12 @@ export function useMDXComponents(components) {
   return {
     // Wrapper component that wraps the entire MDX content with DocsLayout
     // pageMap can be passed from server-side for project-specific navigation
-    wrapper: ({ children, toc, metadata, sourceCode, pageMap: providedPageMap, ...props }) => {
+    wrapper: ({ children, toc, metadata, sourceCode, pageMap: providedPageMap, filePath, projectId, ...props }) => {
       // Use provided pageMap (from server) or fall back to default (KubeStellar)
       const pageMap = providedPageMap || buildPageMap().pageMap;
 
       return (
-        <DocsLayout pageMap={pageMap} toc={toc} metadata={metadata}>
+        <DocsLayout pageMap={pageMap} toc={toc} metadata={metadata} filePath={filePath} projectId={projectId}>
           {children}
         </DocsLayout>
       );
