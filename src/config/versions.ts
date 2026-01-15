@@ -197,6 +197,11 @@ const KUBECTL_CLAUDE_VERSIONS: Record<string, VersionInfo> = {
     isDefault: false,
     isDev: true,
   },
+  "0.4.4": {
+    label: "v0.4.4",
+    branch: "docs/kubectl-claude/0.4.4",
+    isDefault: false,
+  },
 }
 
 // All projects configuration
