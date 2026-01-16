@@ -100,6 +100,8 @@ These rules avoid making assumptions about workload semantics while still provid
 
 Conditions use uniform rules across all workload kinds.
 
+> **Implementation Note:** For Kubernetes resource kinds that are specially handled by KubeStellar and have built-in health checks in Argo CD (such as Deployment, StatefulSet, ReplicaSet, and DaemonSet), only condition types necessary for Argo CD's health evaluation are aggregated. This ensures compatibility with Argo CD's health assessment logic.
+
 ### Truth Value
 
 | WEC condition values | Aggregated value |
