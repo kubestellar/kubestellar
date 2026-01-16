@@ -69,3 +69,17 @@ jobs:
 
           helm package ${{ env.CORE_CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion} --dependency-update
           helm push ./core-chart*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar
+
+      - name: Trigger docs version branch
+        uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3
+        with:
+          token: ${{ secrets.WORKFLOW_SYNC_TOKEN }}
+          repository: kubestellar/docs
+          event-type: create-version-branch
+          client-payload: |
+            {
+              "project": "kubestellar",
+              "version": "${{ github.ref_name }}",
+              "source_repo": "${{ github.repository }}",
+              "source_branch": "main"
+            }
