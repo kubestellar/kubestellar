@@ -50,6 +50,28 @@ const (
 	timeout = 500 * time.Second
 )
 
+// IsOpenShiftCluster detects if we're running in an OpenShift cluster
+func IsOpenShiftCluster(ctx context.Context, client *kubernetes.Clientset) bool {
+	// Check for OpenShift-specific API groups
+	groups, err := client.Discovery().ServerGroups()
+	if err != nil {
+		klog.V(3).Info("Failed to get server groups", "error", err)
+		return false
+	}
+
+	// Look for OpenShift-specific API groups
+	for _, group := range groups.Groups {
+		if group.Name == "route.openshift.io" || group.Name == "security.openshift.io" {
+			return true
+		}
+	}
+
+	// Check for OpenShift SCC annotation on namespace
+	// This is a fallback check
+	_, err = client.CoreV1().Namespaces().Get(ctx, "openshift", metav1.GetOptions{})
+	return err == nil
+}
+
 func GetConfig(context string) *rest.Config {
 	ginkgo.GinkgoHelper()
 	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
@@ -227,6 +249,17 @@ func DeleteDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string,
 
 func CreateDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string, name string, labels map[string]string) {
 	ginkgo.GinkgoHelper()
+
+	// Check if we're in OpenShift and adjust container configuration accordingly
+	isOpenShift := IsOpenShiftCluster(ctx, wds)
+
+	var securityContext *corev1.SecurityContext
+	if isOpenShift {
+		// For OpenShift, use minimal security context that works with restricted-v2 SCC
+		// Let OpenShift's SCC handle user assignment and privilege management
+		securityContext = &corev1.SecurityContext{}
+	}
+
 	deployment := appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
@@ -258,6 +291,7 @@ func CreateDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string,
 									ContainerPort: 80,
 								},
 							},
+							SecurityContext: securityContext,
 						},
 					},
 				},
