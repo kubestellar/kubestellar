@@ -7,23 +7,28 @@
 - [KubeFlex Hosting Cluster as ITS](#kubeflex-hosting-cluster-as-its)
 - [Important Note on ITS Registration](#important-note-on-its-registration)
 - [Architecture and Components](#architecture-and-components)
-An Inventory and Transport Space (ITS) is a core component of the KubeStellar architecture that serves two primary functions:
-
-1. **Inventory Management**: It maintains a registry of all Workload Execution Clusters (WECs) available in the system.
-2. **Transport Facilitation**: It handles the movement of workloads from Workload Description Spaces (WDSes) to the appropriate WECs.
 
 ## What is an ITS?
 
-An ITS is a space (a Kubernetes-like API server with storage) that:
+An Inventory and Transport Space (ITS) is a core component of the KubeStellar architecture. At its foundation, an ITS is an OCM (Open Cluster Management) "hub" that serves as a Kubernetes-like API server with storage.
+
+An ITS combines two essential aspects of the KubeStellar system:
+
+- **An inventory space** that is part of the interface to KubeStellar, maintaining a registry of all Workload Execution Clusters (WECs) available in the system.
+- **A transport space** that is part of the implementation of KubeStellar, handling the movement of workloads from Workload Description Spaces (WDSes) to the appropriate WECs.
+
+More specifically, an ITS:
 
 - Holds inventory information about all registered WECs using [ManagedCluster.v1.cluster.open-cluster-management.io](https://github.com/open-cluster-management-io/api/blob/v0.12.0/cluster/v1/types.go#L33) objects
 - Contains a "customization-properties" namespace with ConfigMaps carrying additional properties for each WEC
 - Manages mailbox namespaces that correspond 1:1 with each WEC, holding ManifestWork objects
 - Runs the OCM (Open Cluster Management) Cluster Manager to synchronize objects with the WECs
 
+For more details on how the ITS fits into the overall system design, see the [Architecture](architecture.md) page.
+
 ## Creating an ITS
 
-An ITS can be created in several ways:
+There is currently one supported way to create an ITS: using the KubeStellar Core Helm Chart.
 
 ### Using the KubeStellar Core Helm Chart
 
@@ -35,6 +40,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
 ```
 
 You can customize your ITS by specifying:
+
 - `name`: A unique name for the ITS
 - `type`: 
   - `vcluster` (default): Creates a virtual cluster
@@ -60,6 +66,7 @@ helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart 
 ```
 
 This approach:
+
 - Avoids creating a separate virtual cluster
 - Simplifies the architecture by reusing the hosting cluster
 - Makes the ITS directly accessible through the hosting cluster's API server
@@ -70,7 +77,8 @@ Creating an ITS includes installing the relevant OCM (Open Cluster Management) m
 
 ## Architecture and Components
 
-The ITS runs the OCM Cluster Manager, which:
+The ITS runs the OCM Cluster Manager. This manager performs the following functions:
+
 - Accepts registrations from WECs through the OCM registration agent
 - Manages the distribution of workloads to WECs
 - Maintains status information from the WECs
