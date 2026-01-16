@@ -58,6 +58,10 @@ We ❤️ our contributors! If you're interested in helping us out, please head 
 
 This community has a [Code of Conduct](./CODE_OF_CONDUCT.md). Please make sure to follow it.
 
+<a href="https://www.star-history.com/#kubestellar/kubestellar&type=date&legend=top-left">
+  <img src="https://api.star-history.com/svg?repos=kubestellar/kubestellar&type=date&legend=top-left" width="600">
+</a>
+
 ## Our Roadmap
 Have a look at what we are working on next, see our [Roadmap](docs/content/direct/roadmap.md) 
 
