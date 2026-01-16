@@ -1,8 +1,22 @@
 # Release notes
 
+---
+
+**Security Note:** KubeStellar has not had any CVEs assigned to its codebase. All releases are monitored for dependency vulnerabilities via Dependabot. For security reporting, see [SECURITY.md](https://github.com/kubestellar/kubestellar/blob/main/SECURITY.md).
+
+---
+
 The following sections list the known issues for each release. The issue list is not differential (i.e., compared to previous releases) but a full list representing the overall state of the specific release. 
 
 ## 0.29.0
+
+### Security Fixes
+
+**No CVEs were addressed in this release.**
+
+KubeStellar actively monitors for vulnerabilities using Dependabot and GitHub Security Advisories.
+
+---
 
 This release makes some backward-incompatible changes, as follows.
 
@@ -19,6 +33,12 @@ This release makes some backward-incompatible changes, as follows.
 * If (a) the workload object count or volume vs the configured limits on content of a `ManifestWork` causes multiple `ManifestWork` to be created for one `Binding` (`BindingPolicy`) AND (b) the limit on number of workload objects in one `ManifestWork` is greater then 1, then there may be transients where workload objects are deleted and re-created in a WEC --- which, in addition to possibly being troubling on its own, will certainly thwart the "create-only" functionality. The default limit on the number of workload objects in one `ManifestWork` is 1, so this issue will only arise when you use a non-default value. In this case you will avoid this issue if you set that limit to be at least the highest number of workload objects that will appear in a `Binding` (do check your `Binding` objects, lest you be surprised) AND your workload is not so large that multiple `ManifestWork` are created due to the limit on their size.
 
 ## 0.28.0
+
+### Security Fixes
+
+**No CVEs were addressed in this release.**
+
+---
 
 Helm chart, the name of the subobject for ArgoCD has changed from
 `argo-cd` to `argocd`.

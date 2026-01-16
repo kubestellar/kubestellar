@@ -180,7 +180,30 @@ _Congratulations! Your pull request has been successfully merged!_ 👏
 
 If you have any questions about contributing, don't hesitate to reach out to us on the KubeStellar-dev [Slack channel](https://cloud-native.slack.com/archives/C097094RZ3M/).
 
+## Release Security Checklist
 
+Before creating a release, maintainers must:
+
+1. **Check for vulnerabilities:**
+   ```bash
+   # Install govulncheck if not present
+   go install golang.org/x/vuln/cmd/govulncheck@latest
+   
+   # Run vulnerability check
+   govulncheck ./...
+   ```
+
+2. **Review security alerts:**
+   - Check [Dependabot alerts](https://github.com/kubestellar/kubestellar/security/dependabot)
+   - Check [Security advisories](https://github.com/kubestellar/kubestellar/security/advisories)
+
+3. **Update release notes:**
+   - In `docs/content/direct/release-notes.md`, add a "Security Fixes" section
+   - If CVEs were fixed: List them with CVE-ID and description
+   - If no CVEs: Add "**No CVEs were addressed in this release.**"
+
+4. **Include in GitHub release:**
+   - Copy the security section to the GitHub release notes
 
 ## Testing Locally
 
