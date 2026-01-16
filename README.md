@@ -1,9 +1,6 @@
 <!--
-Note: This repo has two README files with nearly identical content:
-- /README.md
-- /docs/content/readme.md
-
-If you update shared content in one, please make the same change in the other so they stay in sync.
+KubeStellar README
+Documentation: https://kubestellar.io/docs
 -->
 
 
@@ -32,7 +29,7 @@ If you update shared content in one, please make the same change in the other so
 
 KubeStellar is particularly beneficial if you're currently deploying in a single cluster and are looking to expand to multiple clusters, or if you're already using multiple clusters and are seeking a more streamlined developer experience.
 
-![KubeStellar High Level View](docs/content/images/kubestellar-high-level.png)
+![KubeStellar High Level View](https://kubestellar.io/docs/images/kubestellar-high-level.png)
 
 The use of multiple clusters offers several advantages, including:
 
@@ -59,7 +56,7 @@ We ❤️ our contributors! If you're interested in helping us out, please head 
 This community has a [Code of Conduct](./CODE_OF_CONDUCT.md). Please make sure to follow it.
 
 ## Our Roadmap
-Have a look at what we are working on next, see our [Roadmap](docs/content/direct/roadmap.md) 
+Have a look at what we are working on next, see our [Roadmap](https://kubestellar.io/docs/roadmap) 
 
 ## Getting in touch
 
@@ -104,7 +101,7 @@ There are several ways to communicate with us:
 
 <td>
     <a href="https://landscape.cncf.io">
-        <img src="/docs/overrides/images/cncf-color.png" width="300px;" alt="Cloud Native Computing Foundation Logo"/>
+        <img src="https://www.cncf.io/wp-content/uploads/2022/07/cncf-color-bg.svg" width="300px;" alt="Cloud Native Computing Foundation Logo"/>
     </a>
 </td>
 <br>We are a Cloud Native Computing Foundation sandbox project.
