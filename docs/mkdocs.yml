@@ -242,11 +242,10 @@ plugins:
       module_name: 'main'
   # Configure multiple language support
 
-  # - redirects:
-  #       redirect_maps:
-  #           'docs': 'docs/Coding%20Milestones/PoC2023q1/outline/'
-  #           'old/file.md': 'new/file.md'
-  #           'some_file.md': 'http://external.url.com/foobar'
+  - redirects:
+      redirect_maps:
+          'direct/get-started/knownissue-wsl-ghcr-helm.md': 'direct/knownissue-helm-ghcr.md'
+          'direct/knownissue-wsl-ghcr-helm.md': 'direct/knownissue-helm-ghcr.md' 
 
 markdown_extensions:
   - markdown_captions
