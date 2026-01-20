@@ -34,10 +34,10 @@ actions/setup-python:
   tag: v6.1.0
   tag-url: https://github.com/actions/setup-python/tree/v6.1.0
 actions/setup-go:
-  sha: 4dc6199c7b1a012772edbd06daecab0f50c9053c
-  sha-url: https://github.com/actions/setup-go/commit/4dc6199c7b1a012772edbd06daecab0f50c9053c
-  tag: v6.1.0
-  tag-url: https://github.com/actions/setup-go/tree/v6.1.0
+  sha: 7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
+  sha-url: https://github.com/actions/setup-go/commit/7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
+  tag: v6.2.0
+  tag-url: https://github.com/actions/setup-go/tree/v6.2.0
 anchore/sbom-action/download-syft:
   sha: 0b82b0b1a22399a1c542d4d656f70cd903571b5c
   sha-url: https://github.com/anchore/sbom-action/commit/0b82b0b1a22399a1c542d4d656f70cd903571b5c
