@@ -338,7 +338,7 @@ func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatus 
 	// update resolutions sensitive to the workstatus
 	for bindingName, resolutions := range c.bindingNameToResolutions {
 		resolution, exists := resolutions[workStatus.SourceObjectIdentifier]
-		logger.V(5).Info("Considering bindingResolution", "workStatusRef", workStatus.workStatusRef, "bindingName", bindingName, "resolution", resolution, "exists", exists)
+		logger.V(5).Info("Considering bindingResolution", "workStatusRef", workStatus.workStatusRef, "statusLen", len(workStatus.status), "bindingName", bindingName, "resolution", resolution, "exists", exists)
 		if !exists {
 			continue
 		}
@@ -346,14 +346,14 @@ func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatus 
 		content := getCombinedContentMap(c.wdsListers, workStatus, resolution)
 
 		// this call logs errors, but does not return them for now
-		if resolution.evaluateWorkStatus(ctx, c.celEvaluator, workStatus.WECName, content) {
+		if resolution.evaluateWorkStatus(ctx, c.celEvaluator, workStatus.SourceObjectIdentifier, bindingName, workStatus.WECName, content) {
 			combinedStatusIdentifiersToQueue.Insert(util.IdentifierForCombinedStatus(resolution.getName(),
 				workStatus.SourceObjectIdentifier.ObjectName.Namespace))
 		} else {
 			logger.V(5).Info("No change for combinedStatusResolution", "workStatusRef", workStatus.workStatusRef, "bindingName", bindingName)
 		}
 	}
-	logger.V(5).Info("Done considering bindingResolutions", "workStatusRef", workStatus.workStatusRef, "count", len(c.bindingNameToResolutions))
+	logger.V(5).Info("Done considering bindingResolutions", "workStatusRef", workStatus.workStatusRef, "statusLen", len(workStatus.status), "count", len(c.bindingNameToResolutions))
 
 	return combinedStatusIdentifiersToQueue
 }
@@ -519,7 +519,7 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(ctx co
 			content := getCombinedContentMap(c.wdsListers, workStat, csResolution)
 
 			// evaluate workstatus
-			if csResolution.evaluateWorkStatus(ctx, c.celEvaluator, workStat.WECName, content) {
+			if csResolution.evaluateWorkStatus(ctx, c.celEvaluator, workloadObjIdentifier, bindingName, workStat.WECName, content) {
 				combinedStatusesToQueue.Insert(util.IdentifierForCombinedStatus(csResolution.getName(),
 					workloadObjIdentifier.ObjectName.Namespace))
 			}
