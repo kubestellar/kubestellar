@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"math"
 	"reflect"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -1186,7 +1186,7 @@ func numericEqual(a, b interface{}) bool {
 }
 
 func sortedStringSlice(s []string) []string {
-	sort.Sort(sort.StringSlice(s))
+	slices.Sort(s)
 	return s
 }
 
