@@ -133,7 +133,7 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 	wantMultiWEC := wantReturn && isMultiWEC
 
 	if !wantReturn && !haveMultiWEC && !haveSingleton {
-		logger.V(5).Info("Workload object neither wants nor has returned status", "objectIdentifier", objectIdentifier)
+		logger.V(5).Info("No request to return status into workload object", "objectIdentifier", objectIdentifier)
 		return nil
 	}
 

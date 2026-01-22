@@ -103,11 +103,11 @@ type statusCollectorData struct {
 	// Never nil
 	collectorSpec *v1alpha1.StatusCollectorSpec
 
-	// wecToData is a map of workstatus-hosting WEC name to the
+	// WECToData is a map of workstatus-hosting WEC name to the
 	// evaluation of the workstatus against the statuscollector's clauses.
 	// The map contains entries for workstatuses that pass the statuscollector's
 	// filter.
-	wecToData map[string]*workStatusData
+	WECToData map[string]*workStatusData
 }
 
 // workStatusData is a struct that represents the evaluation of a workstatus
@@ -164,11 +164,11 @@ func (c *combinedStatusResolution) setCollectionDestinations(destinationsSet set
 	c.CollectionDestinations = destinationsSet
 	// trim the statuscollector data that are not relevant anymore
 	for _, data := range c.StatusCollectorNameToData {
-		if data == nil || len(data.wecToData) == 0 {
+		if data == nil || len(data.WECToData) == 0 {
 			continue
 		}
 		for clusterName := range removedDestinations {
-			delete(data.wecToData, clusterName)
+			delete(data.WECToData, clusterName)
 		}
 	}
 
@@ -216,7 +216,7 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 			} else {
 				c.StatusCollectorNameToData[statusCollectorName] = &statusCollectorData{
 					collectorSpec: statusCollectorSpec,
-					wecToData:     make(map[string]*workStatusData),
+					WECToData:     make(map[string]*workStatusData),
 				}
 			}
 
@@ -250,7 +250,7 @@ func (c *combinedStatusResolution) updateStatusCollector(statusCollectorName str
 	// and invalidate all cached workstatus evaluations by resetting the map
 	c.StatusCollectorNameToData[statusCollectorName] = &statusCollectorData{
 		collectorSpec: statusCollectorSpec,
-		wecToData:     make(map[string]*workStatusData),
+		WECToData:     make(map[string]*workStatusData),
 	}
 
 	return true
@@ -360,13 +360,14 @@ func (c *combinedStatusResolution) compareCombinedStatus(status *v1alpha1.Combin
 // exists.
 // TODO: handle errors
 func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEvaluator *celEvaluator,
+	workloadObjectID util.ObjectIdentifier, bindingName string,
 	workStatusWECName string, content map[string]interface{}) bool {
 	c.Lock()
 	defer c.Unlock()
 	logger := klog.FromContext(ctx)
 
 	if !c.CollectionDestinations.Has(workStatusWECName) {
-		logger.V(5).Info("WEC is not status-collected", "wecName", workStatusWECName)
+		logger.V(5).Info("WEC is not status-collected", "objectID", workloadObjectID, "bindingName", bindingName, "wecName", workStatusWECName)
 		return false // workstatus is not relevant to this combinedstatus resolution
 	}
 
@@ -379,8 +380,19 @@ func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEv
 			content, scData)
 		updated = updated || changed
 	}
-	logger.V(5).Info("Evaluated collectors", "wecName", workStatusWECName, "numCollectors", len(c.StatusCollectorNameToData), "updated", updated)
-
+	if vlog := logger.V(5); vlog.Enabled() {
+		if updated {
+			vlog.Info("Evaluated collectors", "updated", updated, "objectID", workloadObjectID, "bindingName", bindingName, "wecName", workStatusWECName, "contentLen", len(content), "StatusCollectorNameToData", c.StatusCollectorNameToData)
+		} else {
+			summary := abstract.PrimitiveMapValMap(c.StatusCollectorNameToData, func(csd *statusCollectorData) any {
+				if csd == nil {
+					return "(nil *statusCollectorData)"
+				}
+				return abstract.MapKeysToAny(abstract.AsPrimitiveMap(csd.WECToData))
+			})
+			vlog.Info("Evaluated collectors", "updated", updated, "objectID", workloadObjectID, "bindingName", bindingName, "wecName", workStatusWECName, "contentLen", len(content), "summary", summary)
+		}
+	}
 	return updated
 }
 
@@ -446,10 +458,10 @@ func (c *combinedStatusResolution) queryingContentRequirements() (bool, bool, bo
 // resolution.
 func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvaluator, workStatusWECName string,
 	content map[string]interface{}, scData *statusCollectorData) bool {
-	wsData, exists := scData.wecToData[workStatusWECName]
+	wsData, exists := scData.WECToData[workStatusWECName]
 
 	if content == nil { // workstatus is empty/deleted, remove the workstatus data if it exists
-		delete(scData.wecToData, workStatusWECName)
+		delete(scData.WECToData, workStatusWECName)
 		return exists
 	}
 	var evalErrors []v1alpha1.ErrorInColumn
@@ -467,7 +479,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 		} else {
 			if tn == "bool" && !eval.Value().(bool) { // workstatus is not relevant
 				if exists { // remove the workstatus data if it exists
-					delete(scData.wecToData, workStatusWECName)
+					delete(scData.WECToData, workStatusWECName)
 					return true
 				}
 				return false
@@ -483,7 +495,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 			combinedFieldsEval: make(map[string]ref.Val),
 			selectEval:         make(map[string]ref.Val),
 		}
-		scData.wecToData[workStatusWECName] = wsData
+		scData.WECToData[workStatusWECName] = wsData
 		updated = true
 	}
 
@@ -620,7 +632,7 @@ func handleSelectReadLocked(scName string, scData *statusCollectorData) *v1alpha
 	namedStatusCombination := v1alpha1.NamedStatusCombination{
 		Name:        scName,
 		ColumnNames: make([]string, 0, len(scData.collectorSpec.Select)),
-		Rows:        make([]v1alpha1.StatusCombinationRow, 0, len(scData.wecToData)),
+		Rows:        make([]v1alpha1.StatusCombinationRow, 0, len(scData.WECToData)),
 	}
 
 	// add column names
@@ -630,7 +642,7 @@ func handleSelectReadLocked(scName string, scData *statusCollectorData) *v1alpha
 		})...)
 
 	// add rows for each workstatus
-	for _, wsData := range scData.wecToData {
+	for _, wsData := range scData.WECToData {
 		row := v1alpha1.StatusCombinationRow{
 			Columns: make([]v1alpha1.Value, 0, len(scData.collectorSpec.Select)),
 		}
@@ -770,7 +782,7 @@ func handleAggregationReadLocked(scName string, scData *statusCollectorData) *v1
 	ValueToNumber := map[any]int{}
 	idToAggregationGroup := map[string]*aggregationGroup{}
 
-	if len(scData.collectorSpec.GroupBy) == 0 && len(scData.wecToData) == 0 {
+	if len(scData.collectorSpec.GroupBy) == 0 && len(scData.WECToData) == 0 {
 		// len(scData.GroupBy) == 0 means there is exactly one group to aggregate over.
 		// len(scData.wecToData) == 0 means that the loop below will not put the group in the map.
 		idToAggregationGroup[""] = &aggregationGroup{GroupBy: map[string]ref.Val{},
@@ -778,7 +790,7 @@ func handleAggregationReadLocked(scName string, scData *statusCollectorData) *v1
 	}
 	rowErrors := []v1alpha1.RowEvaluationError{}
 	coveredColumns := sets.New[string]()
-	for wecName, wsData := range scData.wecToData {
+	for wecName, wsData := range scData.WECToData {
 		if len(wsData.evalErrors) > 0 {
 			for _, errIC := range wsData.evalErrors {
 				if coveredColumns.Has(errIC.ColumnName) {
