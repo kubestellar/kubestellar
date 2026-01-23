@@ -464,7 +464,7 @@ for i in "${!cps[@]}" ; do # for all control planes in context ${context}
             ocm_version=""
             # Fix for Issue #2724: Check if namespace exists to prevent crash
             if KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl get ns open-cluster-management > /dev/null 2>&1; then
-                ocm_version=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl get deploy -n open-cluster-management cluster-manager -o jsonpath={.spec.template.spec.containers[0].image} 2>/dev/null | cut -d: -f2 || true)
+               ocm_version=$(KUBECONFIG=${cp_kubeconfig[cp_n]} kubectl get deploy -n open-cluster-management cluster-manager -o jsonpath={.spec.template.spec.containers[0].image} | cut -d: -f2 || true)
             fi
 
             if [ -n "$ocm_version" ]; then
