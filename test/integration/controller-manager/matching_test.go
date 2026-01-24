@@ -19,10 +19,9 @@ package cmtest
 import (
 	"context"
 	"fmt"
-	"io"
 	"math/rand"
-	"net/http"
 	"os"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"sync"
@@ -47,9 +46,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	k8smetrics "k8s.io/component-base/metrics"
 	"k8s.io/klog/v2"
-	"k8s.io/klog/v2/ktesting"
-	kastesting "k8s.io/kubernetes/cmd/kube-apiserver/app/testing"
-	"k8s.io/kubernetes/test/integration/framework"
+	"sigs.k8s.io/controller-runtime/pkg/envtest"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	a "github.com/kubestellar/kubestellar/pkg/abstract"
@@ -59,16 +56,13 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-const managedClusterCRDURL = "https://raw.githubusercontent.com/open-cluster-management-io/api/v0.12.0/cluster/v1/0000_00_clusters.open-cluster-management.io_managedclusters.crd.yaml"
-const manifestWorkCRDURL = "https://raw.githubusercontent.com/open-cluster-management-io/api/v0.12.0/work/v1/0000_00_work.open-cluster-management.io_manifestworks.crd.yaml"
 
 // NumObjEnvar is the name of the environment variable that can be used to specify the number of objects
 const NumObjEnvar = "CONTROLLER_TEST_NUM_OBJECTS"
 
 // An integration test for the binding controller.
-// This test uses an in-process kube-apiserver created by k8s.io/kubernetes/cmd/kube-apiserver/app/testing.
-// That code launches an external insecure etcd server.
-// YOU MUST HAVE THE ETCD BINARY ON YOUR `$PATH`.
+// This test uses controller-runtime's envtest instead of internal Kubernetes testing packages.
+// envtest provides a real kube-apiserver and etcd for testing.
 //
 // This test exercises the workload matching functionality.
 // The test maintains a set of workload objects, which varies throughout the test.
@@ -100,29 +94,38 @@ func TestMatching(t *testing.T) {
 	rg.Uint64()
 	rg.Uint64()
 	rg.Uint64()
-	testWriter := framework.NewTBWriter(t)
-	logger, ctx := ktesting.NewTestContext(t)
+	logger := klog.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	reg := k8smetrics.NewKubeRegistry()
 	spacesClientMetrics := ksmetrics.NewMultiSpaceClientMetrics()
 	ksmetrics.MustRegister(reg.Register, spacesClientMetrics)
 	wdsClientMetrics := spacesClientMetrics.MetricsForSpace("wds")
 	itsClientMetrics := spacesClientMetrics.MetricsForSpace("its")
 
-	logger.Info("Starting etcd server")
-	framework.StartEtcd(t, testWriter)
-	logger.Info("Starting TestController")
-	t.Log("Beginning TestController")
-	ctx, cancel := context.WithCancel(ctx)
-	testServer, err := kastesting.StartTestServer(t, kastesting.NewDefaultTestServerOptions(), []string{}, framework.SharedEtcd())
+	logger.Info("Setting up test environment")
+	testEnv := &envtest.Environment{
+		CRDDirectoryPaths: []string{
+			filepath.Join("..", "..", "..", "config", "crd", "bases"),
+		},
+		ErrorIfCRDPathMissing: true,
+	}
+
+	logger.Info("Starting test environment")
+	config, err := testEnv.Start()
 	if err != nil {
-		t.Fatalf("Failed to kastesting.StartTestServer: %s", err)
+		t.Fatalf("Failed to start test environment: %s", err)
 	}
-	fullTeardwon := func() {
-		cancel()
-		testServer.TearDownFn()
-	}
-	t.Cleanup(fullTeardwon)
-	config := testServer.ClientConfig
+
+	t.Cleanup(func() {
+		logger.Info("Stopping test environment")
+		if err := testEnv.Stop(); err != nil {
+			t.Errorf("Failed to stop test environment: %s", err)
+		}
+	})
+
+	logger.Info("Test environment started successfully")
 	k8sClient, err := k8sclient.NewForConfig(config)
 	if err != nil {
 		t.Fatalf("Failed to create Kubernetes client: %s", err)
@@ -396,15 +399,7 @@ func TestMatching(t *testing.T) {
 	logger.Info("Success", "rounds", nRounds, "nObj", nObj)
 }
 
-var crdGVK = apiextensionsapi.SchemeGroupVersion.WithKind("CustomResourceDefinition")
 
-func createCRD(t *testing.T, ctx context.Context, kind, url string, serializer *k8sjson.Serializer, apiextClient apiextensionsclientset.Interface) (*apiextensionsapi.CustomResourceDefinition, error) {
-	crdYAML, err := urlGet(url)
-	if err != nil {
-		t.Fatalf("Failed to read %s CRD from %s: %s", kind, url, err)
-	}
-	return createCRDFromLiteral(t, ctx, kind, crdYAML, serializer, apiextClient)
-}
 
 type gvrnn struct {
 	metav1.GroupVersionResource
@@ -672,18 +667,3 @@ func typeMeta(kind string, groupVersion k8sschema.GroupVersion) metav1.TypeMeta 
 	return metav1.TypeMeta{Kind: kind, APIVersion: groupVersion.String()}
 }
 
-func urlGet(urlStr string) (string, error) {
-	resp, err := http.Get(urlStr)
-	if err != nil {
-		return "", err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("get(%s) returned %v", urlStr, err)
-	}
-	read, err := io.ReadAll(resp.Body)
-	readS := string(read)
-	if err != nil {
-		return readS, fmt.Errorf("failed to ReadAll(get(%s)): %w", readS, err)
-	}
-	return readS, err
-}
