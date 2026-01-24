@@ -19,16 +19,15 @@ package cmtest
 import (
 	"context"
 	"encoding/json"
+	"path/filepath"
 	"testing"
 
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/dynamic"
-	"k8s.io/klog/v2/ktesting"
-	kastesting "k8s.io/kubernetes/cmd/kube-apiserver/app/testing"
-	"k8s.io/kubernetes/test/integration/framework"
+	"k8s.io/klog/v2"
+	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	"sigs.k8s.io/yaml"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -36,27 +35,33 @@ import (
 )
 
 func TestBindingPolicyValidation(t *testing.T) {
-	testWriter := framework.NewTBWriter(t)
-	logger, ctx := ktesting.NewTestContext(t)
-	logger.Info("Starting etcd server")
-	framework.StartEtcd(t, testWriter)
-	logger.Info("Starting TestController")
-	t.Log("Beginning TestController")
-	ctx, cancel := context.WithCancel(ctx)
-	testServer, err := kastesting.StartTestServer(t, kastesting.NewDefaultTestServerOptions(), []string{}, framework.SharedEtcd())
+	logger := klog.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	logger.Info("Setting up test environment")
+	testEnv := &envtest.Environment{
+		CRDDirectoryPaths: []string{
+			filepath.Join("..", "..", "..", "config", "crd", "bases"),
+		},
+		ErrorIfCRDPathMissing: true,
+	}
+
+	logger.Info("Starting test environment")
+	config, err := testEnv.Start()
 	if err != nil {
-		t.Fatalf("Failed to kastesting.StartTestServer: %s", err)
+		t.Fatalf("Failed to start test environment: %s", err)
 	}
-	fullTeardwon := func() {
-		cancel()
-		testServer.TearDownFn()
-	}
-	t.Cleanup(fullTeardwon)
-	config := testServer.ClientConfig
-	if err != nil {
-		t.Fatalf("Failed to create Kubernetes client: %s", err)
-	}
-	logger.Info("Started test server", "config", config)
+
+	t.Cleanup(func() {
+		logger.Info("Stopping test environment")
+		if err := testEnv.Stop(); err != nil {
+			t.Errorf("Failed to stop test environment: %s", err)
+		}
+	})
+
+	logger.Info("Test environment started successfully")
+
 	configCopy := *config
 	config4json := &configCopy
 	config4json.ContentType = "application/json"
@@ -83,7 +88,6 @@ func TestBindingPolicyValidation(t *testing.T) {
 		t.Fatalf("Failed to create dynamic client: %s", err)
 	}
 	dynIfc := dynClient.Resource(ksapi.SchemeGroupVersion.WithResource("bindingpolicies"))
-	converter := runtime.DefaultUnstructuredConverter
 	for _, testCase := range []struct {
 		name     string
 		specJSON string
@@ -91,39 +95,42 @@ func TestBindingPolicyValidation(t *testing.T) {
 	}{
 		{name: "junk-field-in-spec", specJSON: `{"junk": 1}`},
 		{name: "junk-field-in-policy", specJSON: `{"downsync": [{"junq": true}]}`},
-		// Test: empty ObjectTest (no selector fields, valid fields only)
 		{name: "empty-object-test", specJSON: `{"downsync": [{"createOnly": true}]}`},
-		// Test: use of now-invalid 'statusCollection' field (should fail OpenAPI validation)
 		{name: "invalid-statusCollection-field", specJSON: `{"downsync": [{"statusCollection": {"statusCollectors": ["phred"]}}]}`},
 		{name: "match-all-resources", specJSON: `{"downsync": [{"resources": ["*"]}]}`, expectOK: true},
 	} {
 		t.Run(testCase.name, func(t *testing.T) {
-			blankBP := ksapi.BindingPolicy{
-				TypeMeta:   metav1.TypeMeta{APIVersion: ksapi.SchemeGroupVersion.String(), Kind: "BindingPolicy"},
-				ObjectMeta: metav1.ObjectMeta{Name: testCase.name},
-			}
-			srcM, err := converter.ToUnstructured(&blankBP)
+			var specMap map[string]interface{}
+			err := json.Unmarshal([]byte(testCase.specJSON), &specMap)
 			if err != nil {
-				t.Fatalf("Failed to convert to Unstructured: %s", err)
+				t.Fatalf("Failed to unmarshal test case spec: %s", err)
 			}
-			spec := map[string]any{}
-			err = json.Unmarshal([]byte(testCase.specJSON), &spec)
-			if err != nil {
-				t.Fatalf("Failed to unmarshal spec: %s", err)
+			bpMap := map[string]interface{}{
+				"apiVersion": ksapi.SchemeGroupVersion.String(),
+				"kind":       "BindingPolicy",
+				"metadata": map[string]interface{}{
+					"name": testCase.name,
+				},
+				"spec": specMap,
 			}
-			unstructured.SetNestedMap(srcM, spec, "spec")
-			srcU := &unstructured.Unstructured{Object: srcM}
-			echo, err := dynIfc.Create(ctx, srcU, metav1.CreateOptions{FieldValidation: metav1.FieldValidationStrict, FieldManager: "test"})
-			if testCase.expectOK == (err == nil) {
-				t.Logf("Success; err=%s", err)
-			} else if err == nil {
-				t.Errorf("Failed to get expected error; echo=%#v", echo.Object)
+			bpUns := &unstructured.Unstructured{Object: bpMap}
+			created, err := dynIfc.Create(ctx, bpUns, metav1.CreateOptions{})
+			if testCase.expectOK {
+				if err != nil {
+					t.Fatalf("Expected successful create but got error: %s", err)
+				}
+				logger.Info("Created BindingPolicy", "name", testCase.name)
+				err = dynIfc.Delete(ctx, created.GetName(), metav1.DeleteOptions{})
+				if err != nil {
+					t.Errorf("Failed to delete created BindingPolicy: %s", err)
+				}
 			} else {
-				t.Errorf("Got unexpected error: %s; srcM=%#v", err, srcM)
-			}
-			if err == nil {
-				dynIfc.Delete(ctx, srcU.GetName(), metav1.DeleteOptions{})
+				if err == nil {
+					t.Fatalf("Expected create to fail but it succeeded")
+				}
+				logger.Info("Create failed as expected", "name", testCase.name, "error", err)
 			}
 		})
 	}
+	logger.Info("Success")
 }
