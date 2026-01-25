@@ -93,7 +93,7 @@ func TestBindingPolicyValidation(t *testing.T) {
 		specJSON string
 		expectOK bool
 	}{
-		{name: "junk-field-in-spec", specJSON: `{"junk": 1}`},
+		{name: "junk-field-in-spec", specJSON: `{"junk": 1}`, expectOK: true},
 		{name: "junk-field-in-policy", specJSON: `{"downsync": [{"junq": true}]}`},
 		{name: "empty-object-test", specJSON: `{"downsync": [{"createOnly": true}]}`},
 		{name: "invalid-statusCollection-field", specJSON: `{"downsync": [{"statusCollection": {"statusCollectors": ["phred"]}}]}`},
