@@ -86,7 +86,7 @@ func main() {
 	coreClient := kubeClient.CoreV1()
 
 	dynClient := dynclient.NewForConfigOrDie(restConfig)
-	controlplanes := kfapi.GroupVersion.WithResource("controlplanes")
+	controlplanes := kfapi.SchemeGroupVersion.WithResource("controlplanes")
 	cpClient := dynClient.Resource(controlplanes)
 
 	var kubeconfigContent []byte
