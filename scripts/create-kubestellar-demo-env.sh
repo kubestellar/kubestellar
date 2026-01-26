@@ -189,8 +189,10 @@ done
 wait
 
 echo -e "\nFlatten images to single architecture to fix problems with kind load commands in recent Docker versions..."
+DOCKER_EMPTY_CONTEXT="$(mktemp -d)"
+trap 'rm -rf "$DOCKER_EMPTY_CONTEXT"' EXIT # Ensure it gets removed on script exit
 for image in "${images[@]}"; do
-    echo "FROM $image" | docker build -t "$image" -f- . &
+    echo "FROM $image" | docker build -t "$image" -f- "$DOCKER_EMPTY_CONTEXT" &
     # NOTE that this simpler solution does not work because it strips ENTRYPOINT
     # docker save "$image" | docker image import - "$image" &
 done
