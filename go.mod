@@ -15,23 +15,23 @@ require (
 	github.com/spf13/pflag v1.0.6
 	golang.org/x/time v0.7.0
 	google.golang.org/protobuf v1.36.1
-	k8s.io/api v0.32.10
-	k8s.io/apiextensions-apiserver v0.32.10
-	k8s.io/apimachinery v0.32.10
-	k8s.io/apiserver v0.32.10
+	k8s.io/api v0.32.11
+	k8s.io/apiextensions-apiserver v0.32.11
+	k8s.io/apimachinery v0.32.11
+	k8s.io/apiserver v0.32.11
 	k8s.io/cli-runtime v0.32.2
-	k8s.io/client-go v0.32.10
-	k8s.io/code-generator v0.32.10
-	k8s.io/component-base v0.32.10
+	k8s.io/client-go v0.32.11
+	k8s.io/code-generator v0.32.11
+	k8s.io/component-base v0.32.11
 	k8s.io/klog/v2 v2.130.1
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738
-	open-cluster-management.io/api v0.15.0
+	open-cluster-management.io/api v1.0.0
 	sigs.k8s.io/controller-runtime v0.20.4
 	sigs.k8s.io/yaml v1.4.0
 )
 
 require (
-	cel.dev/expr v0.18.0 // indirect
+	cel.dev/expr v0.19.1 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
 	github.com/NYTimes/gziphandler v1.1.1 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
