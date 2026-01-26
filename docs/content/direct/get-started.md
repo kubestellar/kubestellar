@@ -12,18 +12,6 @@ The two ways to create this simple configuration are as follows.
 
 ### Note for Windows users
 
-After [installing WSL](https://learn.microsoft.com/en-us/windows/wsl/install), it is possible to start a Fedora 43 distribution with the command:
-
-```shell
-wsl --install FedoraLinux-43
-```
-
-Afterwards, the pre-requisites needed by KubeStellar and the demo script can be installed using the command:
-
-```shell
-bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/refs/tags/v{{ config.ks_latest_release }}/scripts/setup-wsl-fedora.sh)
-```
-
 For some users on WSL, use of the setup procedure on this page and/or the demo environment creation script may require running as the user `root` in Linux. There is a [known issue about this](knownissue-helm-ghcr.md).
 
 ### Important: Shell Variables for Example Scenarios
@@ -196,7 +184,7 @@ Note that `kind` does not support three or more concurrent clusters unless you r
     Note that the CSRs condition is supposed to be `Pending` until you approve them in step 4.
 
     For convenience, you can use a shell loop to automatically check every few seconds:
-
+    
     ```shell
     # This will check every 10 seconds until both CSRs are present
     while true; do
