@@ -95,16 +95,20 @@ var excludedGroups = map[string]bool{
 	"control.kubestellar.io":       true,
 }
 
-// Resource names to exclude for watchers as they should not delivered to other clusters
-// TODO - add also group version to qualify and avoid filtering when same names used on
-// user-supplied CRDs
-var excludedResourceNames = map[string]bool{
-	"events":               true,
-	"nodes":                true,
-	"csistoragecapacities": true,
-	"csinodes":             true,
-	"endpoints":            true,
-	"workstatuses":         true,
+// Resource GroupResources to exclude for watchers as they should not be delivered to other clusters.
+// Qualified by API group to avoid collisions with user CRDs having the same resource name.
+var excludedGroupResources = map[schema.GroupResource]bool{
+	{Group: "", Resource: "events"}:                             true,
+	{Group: "events.k8s.io", Resource: "events"}:                true,
+	{Group: "", Resource: "nodes"}:                              true,
+	{Group: "storage.k8s.io", Resource: "csistoragecapacities"}: true,
+	{Group: "storage.k8s.io", Resource: "csinodes"}:             true,
+	{Group: "", Resource: "endpoints"}:                          true,
+	{Group: "control.kubestellar.io", Resource: "workstatuses"}: true,
+}
+
+func isExcludedGroupResource(gr schema.GroupResource) bool {
+	return excludedGroupResources[gr]
 }
 
 const (
@@ -416,7 +420,11 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 		}
 		logger.V(1).Info("Working on APIResourceList", "groupVersion", list.GroupVersion, "numResources", len(list.APIResources))
 		for _, resource := range list.APIResources {
-			if _, excluded := excludedResourceNames[resource.Name]; excluded {
+			gr := schema.GroupResource{
+				Group:    gv.Group,
+				Resource: resource.Name,
+			}
+			if isExcludedGroupResource(gr) {
 				continue
 			}
 			informable := verbsSupportInformers(resource.Verbs)

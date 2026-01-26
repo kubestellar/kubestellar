@@ -118,9 +118,15 @@ func (c *Controller) includedToWatch(r APIResource) bool {
 	if !util.IsAPIGroupAllowed(r.groupVersion.Group, c.allowedGroupsSet) {
 		return false
 	}
-	if _, excluded := excludedResourceNames[r.resource.Name]; excluded {
+	gr := schema.GroupResource{
+		Group:    r.groupVersion.Group,
+		Resource: r.resource.Name,
+	}
+
+	if isExcludedGroupResource(gr) {
 		return false
 	}
+
 	return true
 }
 
