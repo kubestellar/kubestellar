@@ -15,7 +15,7 @@ The two ways to create this simple configuration are as follows.
 After [installing WSL](https://learn.microsoft.com/en-us/windows/wsl/install), it is possible to start a Fedora 43 distribution with the command:
 
 ```shell
-wsl --install FeroraLinux-43
+wsl --install FedoraLinux-43
 ```
 
 Afterwards, the pre-requisites needed by KubeStellar and the demo script can be installed using the command:
