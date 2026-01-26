@@ -99,6 +99,7 @@ var excludedGroups = map[string]bool{
 // Qualified by API group to avoid collisions with user CRDs having the same resource name.
 var excludedGroupResources = map[schema.GroupResource]bool{
 	{Group: "", Resource: "events"}:                             true,
+	{Group: "events.k8s.io", Resource: "events"}:                true,
 	{Group: "", Resource: "nodes"}:                              true,
 	{Group: "storage.k8s.io", Resource: "csistoragecapacities"}: true,
 	{Group: "storage.k8s.io", Resource: "csinodes"}:             true,
@@ -423,7 +424,6 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 				Group:    gv.Group,
 				Resource: resource.Name,
 			}
-
 			if isExcludedGroupResource(gr) {
 				continue
 			}
