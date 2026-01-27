@@ -1,5 +1,6 @@
 module github.com/kubestellar/kubestellar
 
+// DCO trust configuration test - trivial change to verify automatic DCO check pass
 go 1.24.1
 
 require (
