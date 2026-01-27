@@ -79,10 +79,10 @@ peter-evans/create-or-update-comment:
   tag: v5.0.0
   tag-url: https://github.com/peter-evans/create-or-update-comment/tree/v5.0.0
 peter-evans/repository-dispatch:
-  sha: ff45666b9427631e3450c54a1bcbee4d9ff4d7c0
-  sha-url: https://github.com/peter-evans/repository-dispatch/commit/ff45666b9427631e3450c54a1bcbee4d9ff4d7c0
-  tag: v3.0.0
-  tag-url: https://github.com/peter-evans/repository-dispatch/tree/v3.0.0
+  sha: 28959ce8df70de7be546dd1250a005dd32156697
+  sha-url: https://github.com/peter-evans/repository-dispatch/commit/28959ce8df70de7be546dd1250a005dd32156697
+  tag: v4.0.1
+  tag-url: https://github.com/peter-evans/repository-dispatch/tree/v4.0.1
 technote-space/assign-author:
   sha: 9558557c5c4816f38bd06176fbc324ba14bb3160
   sha-url: https://github.com/technote-space/assign-author/commit/9558557c5c4816f38bd06176fbc324ba14bb3160
