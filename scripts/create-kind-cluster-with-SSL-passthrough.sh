@@ -122,6 +122,8 @@ fi
 # Waiting for prefetching to complete... load images into cluster
 ###############################################################################
 if [[ "$prefetch" == "true" ]] ; then
+  DOCKER_EMPTY_CONTEXT="$(mktemp -d)"
+  trap 'rm -rf "$DOCKER_EMPTY_CONTEXT"' EXIT # Ensure it gets removed on script exit
   for i in "${!prefetch_pids[@]}" ; do
     echo -n "Waiting for prefetch process with pid=${prefetch_pids[i]} to complete... "
     wait ${prefetch_pids[i]}
@@ -130,6 +132,8 @@ if [[ "$prefetch" == "true" ]] ; then
     if [[ "$exitcode" != "0" ]] ; then
       >&2 echo "ERROR: prefetch process failed!"
     fi
+    echo "Rebuiding image \"${prefetch_images[i]}\" locally with single architecture..."
+    echo "FROM ${prefetch_images[i]}" | docker build -t "${prefetch_images[i]}" -f- "$DOCKER_EMPTY_CONTEXT"
     echo "Loading image \"${prefetch_images[i]}\"to the cluster..."
     kind load docker-image "${prefetch_images[i]}" --name "$name"
   done
@@ -152,12 +156,12 @@ kubectl --context "kind-${name}" patch deployment ingress-nginx-controller -n in
 
 if [[ "$wait" == "true" ]] ; then
   echo "Waiting for nginx ingress with SSL passthrough to be ready..."
-  
+
   echo "Waiting for nginx ingress controller deployment to be rolled out..."
   kubectl --context "kind-${name}" rollout status deployment/ingress-nginx-controller \
     --namespace ingress-nginx \
     --timeout=300s
-  
+
   echo "Waiting for nginx ingress controller pod to be ready..."
   kubectl --context "kind-${name}" wait --namespace ingress-nginx \
     --for=condition=ready pod \

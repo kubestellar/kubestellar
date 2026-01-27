@@ -212,9 +212,14 @@ ko-build-get-kubeconfig-local: ## Build local kflex-get-kubeconfig container ima
 # this is used for local testing
 .PHONY: kind-load-image
 kind-load-image: ko-build-controller-manager-local ko-build-transport-local ko-build-get-kubeconfig-local
-	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${CONTROLLER_MANAGER_IMAGE}
-	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${TRANSPORT_IMAGE}
-	kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${GET_KFCFG_IMAGE}
+    DOCKER_EMPTY_CONTEXT := $(shell mktemp -d)
+    docker build -t "${CONTROLLER_MANAGER_IMAGE}" f- "$(DOCKER_EMPTY_CONTEXT)" <<< "FROM ${CONTROLLER_MANAGER_IMAGE}"
+    docker build -t "${TRANSPORT_IMAGE}" -f- "$(DOCKER_EMPTY_CONTEXT)" <<< "FROM ${TRANSPORT_IMAGE}"
+    docker build -t "${GET_KFCFG_IMAGE}" -f- "$(DOCKER_EMPTY_CONTEXT)" <<< "FROM ${GET_KFCFG_IMAGE}"
+    rm -rf "$(DOCKER_EMPTY_CONTEXT)"
+    kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${CONTROLLER_MANAGER_IMAGE}
+    kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${TRANSPORT_IMAGE}
+    kind load --name ${KIND_HOSTING_CLUSTER} docker-image ${GET_KFCFG_IMAGE}
 
 # this is used for local testing
 .PHONY: k3d-load-image
