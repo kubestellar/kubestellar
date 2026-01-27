@@ -38,7 +38,7 @@ jobs:
           echo "GITHUB_ACTION_REF=$GITHUB_ACTION_REF"
 
   generate-and-push:
-    if: github.repository_owner == 'kubestellar' || github.repository_owner == github.actor
+    if: false     # github.repository_owner == 'kubestellar' || github.repository_owner == github.actor
     name: Generate and push docs
     runs-on: ubuntu-latest
     permissions:
