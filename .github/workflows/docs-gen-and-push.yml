@@ -23,6 +23,7 @@ concurrency:
 
 jobs:
   debug:
+    if: false
     name: print relevant info
     runs-on: ubuntu-latest
     steps:
