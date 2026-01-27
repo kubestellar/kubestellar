@@ -18,6 +18,7 @@ package cmtest
 
 import (
 	"context"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -29,9 +30,8 @@ import (
 	k8sjson "k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/apimachinery/pkg/util/wait"
 	k8smetrics "k8s.io/component-base/metrics"
-	"k8s.io/klog/v2/ktesting"
-	kastesting "k8s.io/kubernetes/cmd/kube-apiserver/app/testing"
-	"k8s.io/kubernetes/test/integration/framework"
+	"k8s.io/klog/v2"
+	"sigs.k8s.io/controller-runtime/pkg/envtest"
 
 	"github.com/kubestellar/kubestellar/pkg/binding"
 	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
@@ -39,70 +39,94 @@ import (
 )
 
 // An integration test for the binding controller.
-// This test uses an in-process kube-apiserver created by k8s.io/kubernetes/cmd/kube-apiserver/app/testing.
-// That code launches an external insecure etcd server.
-// YOU MUST HAVE THE ETCD BINARY ON YOUR `$PATH`.
+// This test uses controller-runtime's envtest instead of internal Kubernetes testing packages.
+// envtest provides a real kube-apiserver and etcd for testing.
 //
 // This test exercises the crd handling functionality.
 func TestCRDHandling(t *testing.T) {
-	testWriter := framework.NewTBWriter(t)
-	logger, ctx := ktesting.NewTestContext(t)
+	logger := klog.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Initialize metrics
 	reg := k8smetrics.NewKubeRegistry()
 	spacesClientMetrics := ksmetrics.NewMultiSpaceClientMetrics()
 	ksmetrics.MustRegister(reg.Register, spacesClientMetrics)
 	wdsClientMetrics := spacesClientMetrics.MetricsForSpace("wds")
 	itsClientMetrics := spacesClientMetrics.MetricsForSpace("its")
-	logger.Info("Starting etcd server")
-	framework.StartEtcd(t, testWriter)
-	logger.Info("Starting TestController")
-	t.Log("Beginning TestController")
-	ctx, cancel := context.WithCancel(ctx)
-	testServer, err := kastesting.StartTestServer(t, kastesting.NewDefaultTestServerOptions(), []string{}, framework.SharedEtcd())
+
+	// Setup test environment using envtest
+	logger.Info("Setting up test environment")
+	testEnv := &envtest.Environment{
+		CRDDirectoryPaths: []string{
+			filepath.Join("..", "..", "..", "config", "crd", "bases"),
+		},
+		ErrorIfCRDPathMissing: true,
+	}
+
+	// Start the test environment
+	logger.Info("Starting test environment")
+	config, err := testEnv.Start()
 	if err != nil {
-		t.Fatalf("Failed to kastesting.StartTestServer: %s", err)
+		t.Fatalf("Failed to start test environment: %s", err)
 	}
-	fullTeardwon := func() {
-		cancel()
-		testServer.TearDownFn()
-	}
-	t.Cleanup(fullTeardwon)
-	config := testServer.ClientConfig
-	if err != nil {
-		t.Fatalf("Failed to create Kubernetes client: %s", err)
-	}
-	logger.Info("Started test server", "config", config)
+
+	// Setup cleanup
+	t.Cleanup(func() {
+		logger.Info("Stopping test environment")
+		if err := testEnv.Stop(); err != nil {
+			t.Errorf("Failed to stop test environment: %s", err)
+		}
+	})
+
+	logger.Info("Test environment started successfully")
+
+	// Create client for JSON marshaling
 	configCopy := *config
 	config4json := &configCopy
 	config4json.ContentType = "application/json"
 	logger.Info("REST config for JSON marshaling", "config", config4json)
+
+	// Create apiextensions client
 	apiextClient, err := apiextensionsclientset.NewForConfig(config)
 	if err != nil {
 		t.Fatalf("Failed to create apiextensions client: %s", err)
 	}
+
+	// Setup scheme and serializer
 	scheme := runtime.NewScheme()
 	err = apiextensionsapi.AddToScheme(scheme)
 	if err != nil {
 		t.Fatalf("Failed to apiextensionsapi.AddToScheme(scheme): %s", err)
 	}
 	serializer := k8sjson.NewYAMLSerializer(k8sjson.DefaultMetaFactory, scheme, scheme)
+
+	// Create OCM CRDs
 	createCRD(t, ctx, "ManagedCluster", managedClusterCRDURL, serializer, apiextClient)
 	createCRD(t, ctx, "ManifestWork", manifestWorkCRDURL, serializer, apiextClient)
+
+	// Wait for CRDs to be established
 	time.Sleep(5 * time.Second)
+
+	// Create controller
 	ctlr, err := binding.NewController(logger, wdsClientMetrics, itsClientMetrics, config4json, config, "test-wds", nil, testWorkloadObserver{})
 	if err != nil {
 		t.Fatalf("Failed to create controller: %s", err)
 	}
+
 	logger.Info("About to EnsureCRDs")
 	err = ctlr.EnsureCRDs(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log("CRDs ensured")
+
 	err = ctlr.AppendKSResources(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log("Appended KS resources to discovered lists")
+
 	err = ctlr.Start(ctx, 4, make(chan interface{}, 1))
 	if err != nil {
 		t.Fatal(err)
@@ -202,20 +226,6 @@ func TestCRDHandling(t *testing.T) {
 type testWorkloadObserver struct{}
 
 func (two testWorkloadObserver) HandleWorkloadObjectEvent(gvr schema.GroupVersionResource, oldObj, obj util.MRObject, eventType binding.WorkloadEventType, wasDeletedFinalStateUnknown bool) {
-}
-
-func createCRDFromLiteral(t *testing.T, ctx context.Context, kind, literal string, serializer *k8sjson.Serializer,
-	apiextClient apiextensionsclientset.Interface) (*apiextensionsapi.CustomResourceDefinition, error) {
-	crdAny, _, err := serializer.Decode([]byte(literal), &crdGVK, &apiextensionsapi.CustomResourceDefinition{})
-	if err != nil {
-		t.Fatalf("Failed to Decode %s CRD: %s", kind, err)
-	}
-	crd := crdAny.(*apiextensionsapi.CustomResourceDefinition)
-	created, err := apiextClient.ApiextensionsV1().CustomResourceDefinitions().Create(ctx, crd, metav1.CreateOptions{})
-	if err != nil {
-		t.Fatalf("Failed to create %s CRD: %s", kind, err)
-	}
-	return created, nil
 }
 
 const crd1Literal string = `
