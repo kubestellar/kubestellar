@@ -6,7 +6,6 @@ Note: This repo has two README files with nearly identical content:
 If you update shared content in one, please make the same change in the other so they stay in sync.
 -->
 
-
 <img alt="KubeStellar Logo" width="500px" align="left" src="KubeStellar-with-Logo.png" />
 
 <br/>
@@ -22,17 +21,17 @@ If you update shared content in one, please make the same change in the other so
 [![](https://api.scorecard.dev/projects/github.com/kubestellar/kubestellar/badge)](https://scorecard.dev/viewer/?uri=github.com/kubestellar/kubestellar)
 [![](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubestellar)](https://artifacthub.io/packages/search?repo=kubestellar)
 <a href="https://cloud-native.slack.com/archives/C097094RZ3M">
-    <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
+<img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
 </a>
 <a href="https://deepwiki.com/kubestellar/kubestellar">
-    <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
+<img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
 </a>
 
 **KubeStellar** is a Cloud Native Computing Foundation (CNCF) Sandbox project that simplifies the deployment and configuration of applications across multiple Kubernetes clusters. It provides a seamless experience akin to using a single cluster, and it integrates with the tools you're already familiar with, eliminating the need to modify existing resources.
 
 KubeStellar is particularly beneficial if you're currently deploying in a single cluster and are looking to expand to multiple clusters, or if you're already using multiple clusters and are seeking a more streamlined developer experience.
 
-![KubeStellar High Level View](docs/content/images/kubestellar-high-level.png)
+![KubeStellar High Level View](https://raw.githubusercontent.com/kubestellar/docs/main/docs/content/images/kubestellar-high-level.png)
 
 The use of multiple clusters offers several advantages, including:
 
@@ -59,7 +58,8 @@ We ❤️ our contributors! If you're interested in helping us out, please head 
 This community has a [Code of Conduct](./CODE_OF_CONDUCT.md). Please make sure to follow it.
 
 ## Our Roadmap
-Have a look at what we are working on next, see our [Roadmap](docs/content/direct/roadmap.md) 
+
+Have a look at what we are working on next, see our [Roadmap](docs/content/direct/roadmap.md)
 
 ## Getting in touch
 
@@ -69,17 +69,17 @@ There are several ways to communicate with us:
 
 - The [`#kubestellar-dev` channel](https://cloud-native.slack.com/archives/C097094RZ3M) in the [CNCF Slack workspace](https://communityinviter.com/apps/cloud-native/cncf)
 - Our mailing lists:
-    - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
-    - [kubestellar-users](https://groups.google.com/g/kubestellar-users) for discussions among users and potential users
+  - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
+  - [kubestellar-users](https://groups.google.com/g/kubestellar-users) for discussions among users and potential users
 - Subscribe to the [community meeting calendar](https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MWM4a2loZDZrOWwzZWQzZ29xanZwa3NuMWdfMjAyMzA1MThUMTQwMDAwWiBiM2Q2NWM5MmJlZDdhOTg4NGVmN2ZlOWUzZjZjOGZlZDE2ZjZmYjJmODExZjU3NTBmNTQ3NTY3YTVkZDU4ZmVkQGc&tmsrc=b3d65c92bed7a9884ef7fe9e3f6c8fed16f6fb2f811f5750f547567a5dd58fed%40group.calendar.google.com&scp=ALL) for community meetings and events
-    - The [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list is subscribed to this calendar
+  - The [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list is subscribed to this calendar
 - See recordings of past KubeStellar community meetings on [YouTube](https://www.youtube.com/@kubestellar)
 - See [upcoming](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity-meeting) and [past](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aclosed+label%3Acommunity-meeting) community meeting agendas and notes
 - Browse the [shared Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing) to share design docs, notes, etc.
-    - Members of the [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list can view this drive
+  - Members of the [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list can view this drive
 - Follow us on:
-    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
-    - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
+  - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
+  - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
 
 <div>
 <h2><font size="6"><img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Red%20Heart.png" alt="Red Heart" width="40" height="40" /> Contributors </font></h2>
@@ -103,12 +103,11 @@ There are several ways to communicate with us:
 <br>
 
 <td>
-    <a href="https://landscape.cncf.io">
-        <img src="/docs/overrides/images/cncf-color.png" width="300px;" alt="Cloud Native Computing Foundation Logo"/>
+ <a href="https://landscape.cncf.io">
+        <img src="https://raw.githubusercontent.com/kubestellar/docs/main/docs/overrides/images/cncf-color.png" width="300px;" alt="Cloud Native Computing Foundation Logo"/>
     </a>
 </td>
 <br>We are a Cloud Native Computing Foundation sandbox project.
 <br>Kubernetes and the Kubernetes logo are registered trademarks of The Linux Foundation® (TLF).
 <br>The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/legal/trademark-usage">Trademark Usage page</a>.
 <br>© 2022-2025. The KubeStellar Authors.
-
