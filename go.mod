@@ -1,3 +1,4 @@
+// Test comment for DCO trust verification
 module github.com/kubestellar/kubestellar
 
 go 1.24.1
