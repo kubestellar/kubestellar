@@ -36,7 +36,7 @@ jobs:
         run: echo LDFLAGS="$(make ldflags)" >> $GITHUB_ENV
 
       - name: Install syft binary executable
-        uses: anchore/sbom-action/download-syft@0b82b0b1a22399a1c542d4d656f70cd903571b5c
+        uses: anchore/sbom-action/download-syft@deef08a0db64bfad603422135db61477b16cef56
 
       - name: Run GoReleaser on tag
         uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a
