@@ -19,6 +19,7 @@ package status
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"reflect"
@@ -355,10 +356,10 @@ func (c *combinedStatusResolution) compareCombinedStatus(status *v1alpha1.Combin
 // combinedstatus resolution.
 //
 // The function returns true if any statuscollector
-// data is updated. If an evaluation fails, the function logs an error.
+// data is updated. If any evaluation fails, the error is recorded and logged.
 // if workStatusContent is nil, the function removes the workstatus data if it
 // exists.
-// TODO: handle errors
+// Errors are logged during evaluation, but are not surfaced in CombinedStatus output.
 func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEvaluator *celEvaluator,
 	workloadObjectID util.ObjectIdentifier, bindingName string,
 	workStatusWECName string, content map[string]interface{}) bool {
@@ -376,9 +377,26 @@ func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEv
 		if scData == nil {
 			continue
 		}
-		changed := evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator, workStatusWECName,
-			content, scData)
+		changed := evaluateWorkStatusAgainstStatusCollectorWriteLocked(
+			celEvaluator, workStatusWECName,
+			content, scData,
+		)
 		updated = updated || changed
+
+		wsData := scData.WECToData[workStatusWECName]
+		if wsData != nil && len(wsData.evalErrors) > 0 {
+			for _, errIC := range wsData.evalErrors {
+				logger.Error(
+					errors.New(errIC.Error),
+					"Error evaluating workstatus",
+					"bindingName", bindingName,
+					"workloadObjectID", workloadObjectID,
+					"wecName", workStatusWECName,
+					"column", errIC.ColumnName,
+				)
+			}
+		}
+
 	}
 	if vlog := logger.V(5); vlog.Enabled() {
 		if updated {
