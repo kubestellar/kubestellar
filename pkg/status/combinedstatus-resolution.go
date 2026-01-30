@@ -19,6 +19,7 @@ package status
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"reflect"
@@ -386,7 +387,7 @@ func (c *combinedStatusResolution) evaluateWorkStatus(ctx context.Context, celEv
 		if wsData != nil && len(wsData.evalErrors) > 0 {
 			for _, errIC := range wsData.evalErrors {
 				logger.Error(
-					fmt.Errorf("%s", errIC.Error),
+					errors.New(errIC.Error),
 					"Error evaluating workstatus",
 					"bindingName", bindingName,
 					"workloadObjectID", workloadObjectID,
