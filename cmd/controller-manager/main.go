@@ -239,7 +239,7 @@ func main() {
 		lock := &resourcelock.LeaseLock{
 			LeaseMeta: metav1.ObjectMeta{
 				Name:      "kubestellar-controller-manager",
-				Namespace: util.ClusterScopedObjectsCombinedStatusNamespace,
+				Namespace: "kube-system",
 			},
 			Client: leaseClient,
 			LockConfig: resourcelock.ResourceLockConfig{
