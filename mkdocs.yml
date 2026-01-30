@@ -1,0 +1,10 @@
+site_name: KubeStellar
+docs_dir: docs
+
+theme:
+  name: material
+
+nav:
+  - Home: index.md
+  - Blog: blog/index.md
+
