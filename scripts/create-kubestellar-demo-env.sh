@@ -184,19 +184,23 @@ images=("ghcr.io/loft-sh/vcluster:0.16.4"
         "quay.io/kubestellar/postgresql:16.0.0-debian-11-r13")
 
 for image in "${images[@]}"; do
-    docker pull "$image" &
+    if ! docker inspect $image &> /dev/null; then
+        docker pull $image
+    fi
 done
 wait
 
-echo -e "\nFlatten images to single architecture to fix problems with kind load commands in recent Docker versions..."
-DOCKER_EMPTY_CONTEXT="$(mktemp -d)"
-for image in "${images[@]}"; do
-    echo "FROM $image" | docker build -t "$image" -f- "$DOCKER_EMPTY_CONTEXT" &
-    # NOTE that this simpler solution does not work because it strips ENTRYPOINT
-    # docker save "$image" | docker image import - "$image" &
-done
-wait
-rm -rf "$DOCKER_EMPTY_CONTEXT"
+if [ "$k8s_platform" == "kind" ]; then
+    echo -e "\nFlatten images to single architecture to fix problems with kind load commands in recent Docker versions..."
+    DOCKER_EMPTY_CONTEXT="$(mktemp -d)"
+    for image in "${images[@]}"; do
+        echo "FROM $image" | docker build -t "$image" -f- "$DOCKER_EMPTY_CONTEXT"
+        # NOTE that this simpler solution does not work because it strips ENTRYPOINT
+        # docker save "$image" | docker image import - "$image" &
+    done
+    wait
+    rm -rf "$DOCKER_EMPTY_CONTEXT"
+fi
 
 for image in "${images[@]}"; do
     if [ "$k8s_platform" == "kind" ]; then

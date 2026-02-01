@@ -119,7 +119,7 @@ fi
 
 
 ###############################################################################
-# Waiting for prefetching to complete... load images into cluster
+# Wait for image prefetch, then flatten, then load into cluster
 ###############################################################################
 if [[ "$prefetch" == "true" ]] ; then
   DOCKER_EMPTY_CONTEXT="$(mktemp -d)"
