@@ -84,6 +84,7 @@ if [[ "$prefetch" == "true" ]] ; then
   nginx_ingress="$(curl --no-progress-meter "$NGINX_INGRESS_URL" | sed 's/@sha256.*$//')"
   IFS=' ' read -r -a prefetch_images <<< "$(echo "$nginx_ingress" | grep 'image: ' | awk '{print $2}' | uniq | tr '\n' ' ')"
   for image in "${prefetch_images[@]}" ; do
+    if docker inspect "$image" &> /dev/null; then continue; fi
     echo -n "Prefetching image: \"${image}\"... "
     docker pull "${image}" -q &
     prefetch_pids+=("$!")
@@ -132,10 +133,12 @@ if [[ "$prefetch" == "true" ]] ; then
     if [[ "$exitcode" != "0" ]] ; then
       >&2 echo "ERROR: prefetch process failed!"
     fi
-    echo "Rebuiding image \"${prefetch_images[i]}\" locally with single architecture..."
-    echo "FROM ${prefetch_images[i]}" | docker build -t "${prefetch_images[i]}" -f- "$DOCKER_EMPTY_CONTEXT"
-    echo "Loading image \"${prefetch_images[i]}\"to the cluster..."
-    kind load docker-image "${prefetch_images[i]}" --name "$name"
+  done
+  for image in "${prefetch_images[@]}"; do
+    echo "Rebuilding image \"${image}\" locally with single architecture..."
+    echo "FROM ${image}" | docker build -t "${image}" -f- "$DOCKER_EMPTY_CONTEXT"
+    echo "Loading image \"${image}\" into the cluster..."
+    kind load docker-image "${image}" --name "$name"
   done
 fi
 
