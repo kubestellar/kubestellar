@@ -62,7 +62,7 @@ else
 INSTALL_GOBIN=$(shell go env GOBIN)
 endif
 
-GOLANGCI_LINT_VER := v1.50.1
+GOLANGCI_LINT_VER := v1.62.2
 GOLANGCI_LINT_BIN := golangci-lint
 GOLANGCI_LINT := $(TOOLS_GOBIN_DIR)/$(GOLANGCI_LINT_BIN)-$(GOLANGCI_LINT_VER)
 
@@ -292,6 +292,7 @@ update-contextual-logging: $(LOGCHECK)
 
 .PHONY: lint
 lint: $(GOLANGCI_LINT) $(STATICCHECK) $(LOGCHECK)
+	$(GOLANGCI_LINT) run --config .golangci.yml ./...
 	./hack/verify-contextual-logging.sh
 
 VENVDIR=$(abspath docs/venv)
