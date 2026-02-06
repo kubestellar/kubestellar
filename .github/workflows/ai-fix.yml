@@ -1,0 +1,26 @@
+name: AI Fix with Copilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Issue number to assign to Copilot
+        required: true
+        type: string
+  issues:
+    types: [labeled]
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  ai-fix:
+    uses: kubestellar/infra/.github/workflows/reusable-ai-fix.yml@main
+    with:
+      issue_number: ${{ github.event.inputs.issue_number || '' }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
