@@ -1,0 +1,29 @@
+name: Copilot PR Automation
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to process
+        required: true
+        type: string
+  pull_request_target:
+    types: [opened, synchronize, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  statuses: write
+
+concurrency:
+  group: copilot-automation-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  copilot-automation:
+    uses: kubestellar/infra/.github/workflows/reusable-copilot-automation.yml@main
+    with:
+      pr_number: ${{ github.event.inputs.pr_number || '' }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
