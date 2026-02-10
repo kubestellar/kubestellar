@@ -194,7 +194,7 @@ spec:
                     x-kubernetes-list-type: map
                   namespaceScope:
                     description: |-
-                      `namespaceScope` holds a list of references to namsepace-scoped objects to downsync and how the
+                      `namespaceScope` holds a list of references to namespace-scoped objects to downsync and how the
                       downsync is to be modulated.
                       No duplications.
                     items:

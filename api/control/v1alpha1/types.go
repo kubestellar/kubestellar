@@ -45,7 +45,7 @@ import (
 // the value of the property named "clusterName" is the name of the WEC's inventory object.
 //
 // Any failure in any template expansion for a given Binding suppresses propagation of
-// desired state from that Binding; the previosly propagated desired state from that Binding,
+// desired state from that Binding; the previously propagated desired state from that Binding,
 // if any, remains in place in the WEC.
 //
 // Note that this sort of customization has limited applicability.  It can only be used where
@@ -330,7 +330,7 @@ type DownsyncObjectClauses struct {
 	// +listMapKey=name
 	ClusterScope []ClusterScopeDownsyncClause `json:"clusterScope,omitempty"`
 
-	// `namespaceScope` holds a list of references to namsepace-scoped objects to downsync and how the
+	// `namespaceScope` holds a list of references to namespace-scoped objects to downsync and how the
 	// downsync is to be modulated.
 	// No duplications.
 	// +listType=map
@@ -560,7 +560,7 @@ type StatusCollectorList struct {
 // - the string "."
 // - the UID of the BindingPolicy object.
 // The CombinedStatus object has the following labels:
-// - "status.kubestellar.io/api-group" holding the API Group (not verison) of the workload object;
+// - "status.kubestellar.io/api-group" holding the API Group (not version) of the workload object;
 // - "status.kubestellar.io/resource" holding the resource (lowercase plural) of the workload object;
 // - "status.kubestellar.io/namespace" holding the namespace of the workload object;
 // - "status.kubestellar.io/name" holding the name of the workload object;

@@ -599,7 +599,7 @@ func addLabelsToCombinedStatus(combinedStatus *v1alpha1.CombinedStatus,
 		combinedStatus.Labels = make(map[string]string)
 	}
 	// The CombinedStatus object has the following labels:
-	// - "status.kubestellar.io/api-group" holding the API Group (not verison) of the workload object;
+	// - "status.kubestellar.io/api-group" holding the API Group (not version) of the workload object;
 	// - "status.kubestellar.io/resource" holding the resource (lowercase plural) of the workload object;
 	// - "status.kubestellar.io/namespace" holding the namespace of the workload object;
 	// - "status.kubestellar.io/name" holding the name of the workload object;
