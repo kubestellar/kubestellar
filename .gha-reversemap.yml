@@ -1,8 +1,8 @@
 actions/checkout:
-  sha: 8e8c483db84b4bee98b60c0593521ed34d9990e8
-  sha-url: https://github.com/actions/checkout/commit/8e8c483db84b4bee98b60c0593521ed34d9990e8
-  tag: v6.0.1
-  tag-url: https://github.com/actions/checkout/tree/v6.0.1
+  sha: de0fac2e4500dabe0009e67214ff5f5447ce83dd
+  sha-url: https://github.com/actions/checkout/commit/de0fac2e4500dabe0009e67214ff5f5447ce83dd
+  tag: v6.0.2
+  tag-url: https://github.com/actions/checkout/tree/v6.0.2
 actions/stale:
   sha: 997185467fa4f803885201cee163a9f38240193d
   sha-url: https://github.com/actions/stale/commit/997185467fa4f803885201cee163a9f38240193d
@@ -29,10 +29,10 @@ JasonEtco/create-an-issue:
   tag: v2
   tag-url: https://github.com/JasonEtco/create-an-issue/tree/v2
 actions/setup-python:
-  sha: 83679a892e2d95755f2dac6acb0bfd1e9ac5d548
-  sha-url: https://github.com/actions/setup-python/commit/83679a892e2d95755f2dac6acb0bfd1e9ac5d548
-  tag: v6.1.0
-  tag-url: https://github.com/actions/setup-python/tree/v6.1.0
+  sha: a309ff8b426b58ec0e2a45f0f869d46889d02405
+  sha-url: https://github.com/actions/setup-python/commit/a309ff8b426b58ec0e2a45f0f869d46889d02405
+  tag: v6.2.0
+  tag-url: https://github.com/actions/setup-python/tree/v6.2.0
 actions/setup-go:
   sha: 7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
   sha-url: https://github.com/actions/setup-go/commit/7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
@@ -54,10 +54,10 @@ azure/setup-helm:
   tag: v4.3.1
   tag-url: https://github.com/azure/setup-helm/tree/v4.3.1
 docker/login-action:
-  sha: 5e57cd118135c172c3672efd75eb46360885c0ef
-  sha-url: https://github.com/docker/login-action/commit/5e57cd118135c172c3672efd75eb46360885c0ef
-  tag: v3.6.0
-  tag-url: https://github.com/docker/login-action/tree/v3.6.0
+  sha: c94ce9fb468520275223c153574b00df6fe4bcc9
+  sha-url: https://github.com/docker/login-action/commit/c94ce9fb468520275223c153574b00df6fe4bcc9
+  tag: v3.7.0
+  tag-url: https://github.com/docker/login-action/tree/v3.7.0
 actions/first-interaction:
   sha: 1c4688942c71f71d4f5502a26ea67c331730fa4d
   sha-url: https://github.com/actions/first-interaction/commit/1c4688942c71f71d4f5502a26ea67c331730fa4d
