@@ -98,27 +98,3 @@ func SliceMapToK8sSet[Domain any, Range comparable](slice []Domain, fn func(Doma
 	}
 	return ans
 }
-
-// SliceFilter returns a func that filters a slice, returning a new slice that
-// has every member E of the original slice for which `pass(E) == keepVal`.
-func SliceFilter[Elt any, Test comparable](pass func(Elt) Test, keepVal Test) func([]Elt) []Elt {
-	return func(slice []Elt) []Elt {
-		ans := []Elt{}
-		for _, elt := range slice {
-			if pass(elt) == keepVal {
-				ans = append(ans, elt)
-			}
-		}
-		return ans
-	}
-}
-
-// SliceHas returns true iff the given slice has at least one copy of the given element.
-func SliceHas[Elt comparable](slice []Elt, seek Elt) bool {
-	for _, elt := range slice {
-		if elt == seek {
-			return true
-		}
-	}
-	return false
-}
