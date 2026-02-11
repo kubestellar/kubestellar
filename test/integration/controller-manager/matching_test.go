@@ -23,6 +23,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"slices"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -464,13 +465,13 @@ func (mor mrObjRsc) MatchesAny(t *testing.T, tests []ksapi.DownsyncPolicyClause)
 		if test.APIGroup != nil && gvk.Group != *test.APIGroup {
 			continue
 		}
-		if len(test.Resources) > 0 && !(binding.SliceContains(test.Resources, mor.Resource) || binding.SliceContains(test.Resources, "*")) {
+		if len(test.Resources) > 0 && !(slices.Contains(test.Resources, mor.Resource) || slices.Contains(test.Resources, "*")) {
 			continue
 		}
-		if len(test.Namespaces) > 0 && !(binding.SliceContains(test.Namespaces, mor.MRObject.GetNamespace()) || binding.SliceContains(test.Namespaces, "*")) {
+		if len(test.Namespaces) > 0 && !(slices.Contains(test.Namespaces, mor.MRObject.GetNamespace()) || slices.Contains(test.Namespaces, "*")) {
 			continue
 		}
-		if len(test.ObjectNames) > 0 && !(binding.SliceContains(test.ObjectNames, mor.MRObject.GetName()) || binding.SliceContains(test.ObjectNames, "*")) {
+		if len(test.ObjectNames) > 0 && !(slices.Contains(test.ObjectNames, mor.MRObject.GetName()) || slices.Contains(test.ObjectNames, "*")) {
 			continue
 		}
 		if len(test.NamespaceSelectors) > 0 && !(mor.Namespace == nil && binding.ALabelSelectorIsEmpty(test.NamespaceSelectors...) ||
