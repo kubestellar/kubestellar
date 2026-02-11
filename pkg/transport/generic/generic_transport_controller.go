@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"go/token"
+	"slices"
 	"sync"
 	"time"
 
@@ -693,7 +694,7 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	if err != nil {
 		return fmt.Errorf("failed to build wrapped object(s) from Binding '%s' - %w", binding.GetName(), err)
 	}
-	if binding.Status.ObservedGeneration != binding.Generation || !abstract.SliceEqual(binding.Status.Errors, bindingErrors) {
+	if binding.Status.ObservedGeneration != binding.Generation || !slices.Equal(binding.Status.Errors, bindingErrors) {
 		bindingCopy := binding.DeepCopy()
 		bindingCopy.Status = v1alpha1.BindingStatus{
 			ObservedGeneration: binding.Generation,
@@ -849,7 +850,7 @@ func (c *genericTransportController) computeDestToCustomizedObjects(uncustomized
 			if customizeThisObject && destToCustomizedWrapees == nil {
 				destToCustomizedWrapees = map[v1alpha1.Destination][]WrapeeWithUID{}
 				for _, dest := range binding.Spec.Destinations {
-					destToCustomizedWrapees[dest] = abstract.SliceCopy(uncustomizedWrapees[:objIdx])
+					destToCustomizedWrapees[dest] = slices.Clone(uncustomizedWrapees[:objIdx])
 				}
 			}
 			if destToCustomizedWrapees != nil {

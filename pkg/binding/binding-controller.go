@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"slices"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -50,7 +51,6 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
-	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/pkg/crd"
 	ksclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	controlclient "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/control/v1alpha1"
@@ -623,7 +623,7 @@ func shouldQueueBindingOnUpdate(old, new *v1alpha1.Binding) bool {
 			return true
 		}
 	}
-	return !abstract.SliceEqual(old.Status.Errors, new.Status.Errors)
+	return !slices.Equal(old.Status.Errors, new.Status.Errors)
 }
 
 func shouldSkipUpdate(old, new interface{}) bool {

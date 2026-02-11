@@ -44,26 +44,6 @@ func NewSliceByFilter[Elt any](input []Elt, good func(Elt) bool) []Elt {
 	return newSlice
 }
 
-// SliceCopy copies a given slice into new storage
-func SliceCopy[Elt any](input []Elt) []Elt {
-	if input == nil {
-		return nil
-	}
-	return append(make([]Elt, 0, len(input)), input...)
-}
-
-func SliceEqual[Elt comparable](slice1, slice2 []Elt) bool {
-	if len(slice1) != len(slice2) {
-		return false
-	}
-	for idx, elt1 := range slice1 {
-		if elt1 != slice2[idx] {
-			return false
-		}
-	}
-	return true
-}
-
 func SliceMap[Domain, Range any](slice []Domain, fn func(Domain) Range) []Range {
 	if slice == nil {
 		return nil
