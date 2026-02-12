@@ -81,6 +81,18 @@ func TestIsAPIGroupAllowed(t *testing.T) {
 			allowedAPIGroups: nil,
 			expected:         true,
 		},
+		{
+			name:             "api group is not in allowed set",
+			resourceGroup:    "batch",
+			allowedAPIGroups: sets.New("apps", "networking.k8s.io", "policy"),
+			expected:         false,
+		},
+		{
+			name:             "api group is allowed by empty set (no restrictions)",
+			resourceGroup:    "apps",
+			allowedAPIGroups: sets.New[string](),
+			expected:         true,
+		},
 	}
 
 	// Iterate over the test cases and run the function with the input
