@@ -272,12 +272,3 @@ func ALabelSelectorIsEmpty(selectors ...metav1.LabelSelector) bool {
 	}
 	return false
 }
-
-func SliceContains[Elt comparable](slice []Elt, seek Elt) bool {
-	for _, elt := range slice {
-		if elt == seek {
-			return true
-		}
-	}
-	return false
-}

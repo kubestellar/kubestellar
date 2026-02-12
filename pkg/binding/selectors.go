@@ -19,6 +19,7 @@ package binding
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -149,16 +150,16 @@ func (c *Controller) testObject(ctx context.Context, bindingName string, objIden
 		if test.APIGroup != nil && (*test.APIGroup) != objIdentifier.GVK.Group {
 			continue
 		}
-		if len(test.Resources) > 0 && !(SliceContains(test.Resources, "*") ||
-			SliceContains(test.Resources, objIdentifier.Resource)) {
+		if len(test.Resources) > 0 && !(slices.Contains(test.Resources, "*") ||
+			slices.Contains(test.Resources, objIdentifier.Resource)) {
 			continue
 		}
-		if len(test.Namespaces) > 0 && !(SliceContains(test.Namespaces, "*") ||
-			SliceContains(test.Namespaces, objIdentifier.ObjectName.Namespace)) {
+		if len(test.Namespaces) > 0 && !(slices.Contains(test.Namespaces, "*") ||
+			slices.Contains(test.Namespaces, objIdentifier.ObjectName.Namespace)) {
 			continue
 		}
-		if len(test.ObjectNames) > 0 && !(SliceContains(test.ObjectNames, "*") ||
-			SliceContains(test.ObjectNames, objIdentifier.ObjectName.Name)) {
+		if len(test.ObjectNames) > 0 && !(slices.Contains(test.ObjectNames, "*") ||
+			slices.Contains(test.ObjectNames, objIdentifier.ObjectName.Name)) {
 			continue
 		}
 		if len(test.ObjectSelectors) > 0 && !labelsMatchAny(c.logger, objLabels, test.ObjectSelectors) {
