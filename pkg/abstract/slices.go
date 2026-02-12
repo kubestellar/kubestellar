@@ -44,26 +44,6 @@ func NewSliceByFilter[Elt any](input []Elt, good func(Elt) bool) []Elt {
 	return newSlice
 }
 
-// SliceCopy copies a given slice into new storage
-func SliceCopy[Elt any](input []Elt) []Elt {
-	if input == nil {
-		return nil
-	}
-	return append(make([]Elt, 0, len(input)), input...)
-}
-
-func SliceEqual[Elt comparable](slice1, slice2 []Elt) bool {
-	if len(slice1) != len(slice2) {
-		return false
-	}
-	for idx, elt1 := range slice1 {
-		if elt1 != slice2[idx] {
-			return false
-		}
-	}
-	return true
-}
-
 func SliceMap[Domain, Range any](slice []Domain, fn func(Domain) Range) []Range {
 	if slice == nil {
 		return nil
@@ -97,28 +77,4 @@ func SliceMapToK8sSet[Domain any, Range comparable](slice []Domain, fn func(Doma
 		ans.Insert(fn(elt))
 	}
 	return ans
-}
-
-// SliceFilter returns a func that filters a slice, returning a new slice that
-// has every member E of the original slice for which `pass(E) == keepVal`.
-func SliceFilter[Elt any, Test comparable](pass func(Elt) Test, keepVal Test) func([]Elt) []Elt {
-	return func(slice []Elt) []Elt {
-		ans := []Elt{}
-		for _, elt := range slice {
-			if pass(elt) == keepVal {
-				ans = append(ans, elt)
-			}
-		}
-		return ans
-	}
-}
-
-// SliceHas returns true iff the given slice has at least one copy of the given element.
-func SliceHas[Elt comparable](slice []Elt, seek Elt) bool {
-	for _, elt := range slice {
-		if elt == seek {
-			return true
-		}
-	}
-	return false
 }

@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"slices"
 	"strconv"
 	"time"
 
@@ -36,7 +37,6 @@ import (
 	ptr "k8s.io/utils/pointer"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
-	"github.com/kubestellar/kubestellar/pkg/abstract"
 	"github.com/kubestellar/kubestellar/test/util"
 )
 
@@ -734,7 +734,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					return fmt.Errorf("expected combination for %q but got one for %q", fullStatusCollectorName, gotName)
 				}
 				expectedColumnNames := []string{"wecName", "status"}
-				if gotColumnNames := cs.Results[0].ColumnNames; !abstract.SliceEqual(expectedColumnNames, gotColumnNames) {
+				if gotColumnNames := cs.Results[0].ColumnNames; !slices.Equal(expectedColumnNames, gotColumnNames) {
 					return fmt.Errorf("expected ColumnNames %#v but got %#v", expectedColumnNames, gotColumnNames)
 				}
 				if n := len(cs.Results[0].Rows); n != 2 {
@@ -785,7 +785,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					return fmt.Errorf("expected combination for %q but got one for %q", sumAvailableReplicasStatusCollectorName, gotName)
 				}
 				expectedColumnNames := []string{"sum"}
-				if gotColumnNames := cs.Results[0].ColumnNames; !abstract.SliceEqual(expectedColumnNames, gotColumnNames) {
+				if gotColumnNames := cs.Results[0].ColumnNames; !slices.Equal(expectedColumnNames, gotColumnNames) {
 					return fmt.Errorf("expected ColumnNames %#v but got %#v", expectedColumnNames, gotColumnNames)
 				}
 				if n := len(cs.Results[0].Rows); n != 1 {
@@ -826,7 +826,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					return fmt.Errorf("expected combination for %q but got one for %q", listNginxWecsStatusCollectorName, gotName)
 				}
 				expectedColumnNames := []string{"wecName"}
-				if gotColumnNames := cs.Results[0].ColumnNames; !abstract.SliceEqual(expectedColumnNames, gotColumnNames) {
+				if gotColumnNames := cs.Results[0].ColumnNames; !slices.Equal(expectedColumnNames, gotColumnNames) {
 					return fmt.Errorf("expected ColumnNames %#v but got %#v", expectedColumnNames, gotColumnNames)
 				}
 				if n := len(cs.Results[0].Rows); n != 2 {
@@ -936,7 +936,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					return fmt.Errorf("expected 1 NamedStatusCombination but got %d", n)
 				}
 				expectedColumnNames := []string{"count", "max", "min", "sum", "avg"}
-				if gotColumnNames := cs.Results[0].ColumnNames; !abstract.SliceEqual(expectedColumnNames, gotColumnNames) {
+				if gotColumnNames := cs.Results[0].ColumnNames; !slices.Equal(expectedColumnNames, gotColumnNames) {
 					return fmt.Errorf("expected columnNames %#v but got %#v", expectedColumnNames, gotColumnNames)
 				}
 				if n := len(cs.Results[0].Rows); n != 1 {
