@@ -125,6 +125,15 @@ is_installed_go() {
         'go version 1.23'
 }
 
+is_installed_ginkgo() {
+    is_installed 'Ginkgo' \
+        'ginkgo' \
+        'ginkgo version' \
+        'ginkgo version' \
+        'go install github.com/onsi/ginkgo/v2/ginkgo@latest' \
+        ''
+}
+
 is_installed_helm() {
     local log
     is_installed 'Helm' \
@@ -190,6 +199,7 @@ is_installed_k3d() {
         'https://k3d.io/#installation' \
         'k3d version v5.7.4'
 }
+
 is_installed_ko() {
     is_installed 'KO' \
         'ko' \
@@ -239,7 +249,7 @@ is_installed_yq() {
 
 
 # Global constants
-PROGRAMS="@(argo|brew|docker|go|helm|jq|kflex|kind|ko|kubectl|make|ocm|yq|k3d)"
+PROGRAMS="@(argo|brew|docker|go|helm|jq|kflex|kind|ko|kubectl|make|ocm|yq|k3d|ginkgo)"
 
 # Global parameters
 assert="false"  # true => exit on missing program
@@ -281,7 +291,7 @@ else
     echov() { :; }
 fi
 
-# Dsiplay the list of programs, if requested
+# Display the list of programs, if requested
 if [ "$list" == "true" ]; then
     IFS='@|()' read -r -a programs <<< "$(echo "$PROGRAMS" | sed -e "s/^@(//" -e "s/)//")"
     echo "${programs[@]}"

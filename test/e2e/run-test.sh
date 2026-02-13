@@ -71,24 +71,17 @@ case "$test" in
         exit 1;;
 esac
 
-# Check ginkgo prereq only if running ginkgo tests
-if [ "$test" == "ginkgo" ]; then
-    if ! command -v ginkgo >/dev/null 2>&1; then
-        echo "$0: ginkgo is required to run ginkgo-based E2E tests." >&2
-        echo "Make sure it is installed and available in your PATH." >&2
-        echo "Install it with:" >&2
-        echo "  go install github.com/onsi/ginkgo/v2/ginkgo@latest" >&2
-        exit 1
-    fi
-fi
-
 set -e # exit on error
 
 SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
 COMMON_SRCS="${SRC_DIR}/common"
 scripts_dir="${SRC_DIR}/../../scripts"
 
-"${scripts_dir}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm
+if [ $test == "ginkgo" ]; then
+    "${scripts_dir}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm ginkgo
+else
+    "${scripts_dir}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm
+fi
 
 "${COMMON_SRCS}/cleanup.sh" --env "$env"
 source "${COMMON_SRCS}/setup-shell.sh"
