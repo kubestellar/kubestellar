@@ -21,6 +21,7 @@ func AggregateStatefulSetStatus(statuses []map[string]any) (map[string]any, erro
 	aggregatedStatus := make(map[string]any)
 
 	// Aggregate readiness-related numeric fields using minimum, per spec
+	aggregatedStatus["replicas"] = GetMin(statuses, "replicas")
 	aggregatedStatus["readyReplicas"] = GetMin(statuses, "readyReplicas")
 	aggregatedStatus["currentReplicas"] = GetMin(statuses, "currentReplicas")
 	aggregatedStatus["updatedReplicas"] = GetMin(statuses, "updatedReplicas")

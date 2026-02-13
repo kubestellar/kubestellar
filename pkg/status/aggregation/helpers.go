@@ -16,31 +16,28 @@ limitations under the License.
 
 package aggregation
 
-import "time"
+import (
+	"sort"
+	"time"
+)
 
 // GetCommonString returns the string value for the given field
 // only if all statuses contain the same non-empty value.
 func GetCommonString(statuses []map[string]any, field string) (string, bool) {
-	var value string
+	if len(statuses) == 0 {
+		return "", false
+	}
 
-	for i, status := range statuses {
-		v, ok := status[field].(string)
-		if !ok || v == "" {
-			return "", false
-		}
+	value, _ := statuses[0][field].(string)
+	if value == "" {
+		return "", false
+	}
 
-		if i == 0 {
-			value = v
-			continue
-		}
-
+	for _, status := range statuses[1:] {
+		v, _ := status[field].(string)
 		if v != value {
 			return "", false
 		}
-	}
-
-	if value == "" {
-		return "", false
 	}
 
 	return value, true
@@ -73,10 +70,17 @@ func AggregateConditions(statuses []map[string]any) []any {
 		}
 	}
 
+	// Sort condition types for deterministic output order
+	types := make([]string, 0, len(conditionSets))
+	for t := range conditionSets {
+		types = append(types, t)
+	}
+	sort.Strings(types)
+
 	result := make([]any, 0, len(conditionSets))
 
-	for _, conds := range conditionSets {
-		if agg := aggregateConditionSet(conds); agg != nil {
+	for _, t := range types {
+		if agg := aggregateConditionSet(conditionSets[t]); agg != nil {
 			result = append(result, agg)
 		}
 	}
