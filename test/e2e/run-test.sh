@@ -71,6 +71,17 @@ case "$test" in
         exit 1;;
 esac
 
+# Check ginkgo prereq only if running ginkgo tests
+if [ "$test" == "ginkgo" ]; then
+    if ! command -v ginkgo >/dev/null 2>&1; then
+        echo "$0 ginkgo is required to run ginkgo-based E2E tests."
+        echo "Make sure it is installed and available in your PATH."
+        echo "Install it with:"
+        echo "  go install github.com/onsi/ginkgo/v2/ginkgo@latest"
+        exit 1
+    fi
+fi
+
 set -e # exit on error
 
 SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
