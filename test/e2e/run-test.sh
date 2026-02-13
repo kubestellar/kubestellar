@@ -74,10 +74,10 @@ esac
 # Check ginkgo prereq only if running ginkgo tests
 if [ "$test" == "ginkgo" ]; then
     if ! command -v ginkgo >/dev/null 2>&1; then
-        echo "$0 ginkgo is required to run ginkgo-based E2E tests."
-        echo "Make sure it is installed and available in your PATH."
-        echo "Install it with:"
-        echo "  go install github.com/onsi/ginkgo/v2/ginkgo@latest"
+        echo "$0: ginkgo is required to run ginkgo-based E2E tests." >&2
+        echo "Make sure it is installed and available in your PATH." >&2
+        echo "Install it with:" >&2
+        echo "  go install github.com/onsi/ginkgo/v2/ginkgo@latest" >&2
         exit 1
     fi
 fi
