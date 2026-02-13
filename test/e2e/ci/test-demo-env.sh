@@ -51,10 +51,49 @@ done
 sleep 30
 
 # Check that there are no Pods in trouble
-listing=$(date; kubectl --context ${platform}-kubeflex get pods -A | grep -vw Running | grep -vw Completed)
-if ! wc -l <<<"$listing" | grep -qw 2; then
+echo "Checking for troubled Pods..."
+
+troubled=0
+
+while read ns name ready status rest; do
+    # Skip healthy Pods
+    if [[ "$status" == "Running" || "$status" == "Completed" ]]; then
+        continue
+    fi
+
+    # Check if Pod is owned by a Job
+    owner_kind=$(kubectl --context ${platform}-kubeflex get pod -n "$ns" "$name" \
+        -o jsonpath='{.metadata.ownerReferences[0].kind}' 2>/dev/null || echo "")
+    owner_name=$(kubectl --context ${platform}-kubeflex get pod -n "$ns" "$name" \
+        -o jsonpath='{.metadata.ownerReferences[0].name}' 2>/dev/null || echo "")
+
+    if [[ "$owner_kind" == "Job" && -n "$owner_name" ]]; then
+        # Get Job status in one call (handles race if Job deleted)
+        job_info=$(kubectl --context ${platform}-kubeflex get job -n "$ns" "$owner_name" \
+            -o jsonpath='{.status.conditions[?(@.type=="Complete")].status},{.status.conditions[?(@.type=="Failed")].status},{.status.succeeded},{.status.active}' 2>/dev/null || echo "")
+
+        if [[ -z "$job_info" ]]; then
+            echo "Ignoring Pod $ns/$name (Job $owner_name not found, likely cleaned up)"
+            continue
+        fi
+
+        IFS=',' read -r complete_status _ succeeded active <<< "$job_info"
+        succeeded=${succeeded:-0}
+        active=${active:-0}
+
+        if [[ "$complete_status" == "True" ]] || [[ "$succeeded" -ge 1 ]] || [[ "$active" -ge 1 ]]; then
+            echo "Ignoring Pod $ns/$name (Job $owner_name: complete=$complete_status, succeeded=$succeeded, active=$active)"
+            continue
+        fi
+    fi
+
+    echo "Pod in trouble: $ns/$name ($status)"
+    troubled=1
+
+done < <(kubectl --context ${platform}-kubeflex get pods -A --no-headers)
+
+if [[ "$troubled" -ne 0 ]]; then
     echo "Some KubeFlex hosting cluster Pods are in trouble" >&2
-    echo "$listing" >&2
     exit 1
 fi
 
