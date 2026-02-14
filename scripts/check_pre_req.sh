@@ -131,7 +131,7 @@ is_installed_ginkgo() {
         'ginkgo version' \
         'ginkgo version' \
         'go install github.com/onsi/ginkgo/v2/ginkgo@v2.22.2' \
-        'Ginkgo Version 2.22.2'
+        'Ginkgo Version 2.0'
 }
 
 is_installed_helm() {
