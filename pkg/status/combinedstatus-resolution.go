@@ -545,7 +545,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 			eval = celtypes.DefaultTypeAdapter.NativeToValue(err.Error())
 		}
 
-		prevVal, exists := wsData.selectEval[groupByNamedExp.Name]
+		prevVal, exists := wsData.groupByEval[groupByNamedExp.Name]
 		if eval != nil {
 			updated = updated || !exists || eval.Equal(prevVal).Value() != true
 		} else {
@@ -575,7 +575,7 @@ func evaluateWorkStatusAgainstStatusCollectorWriteLocked(celEvaluator *celEvalua
 			})
 		}
 
-		prevVal, exists := wsData.selectEval[combinedFieldNamedAgg.Name]
+		prevVal, exists := wsData.combinedFieldsEval[combinedFieldNamedAgg.Name]
 		if eval != nil {
 			updated = updated || !exists || eval.Equal(prevVal).Value() != true
 		} else {
