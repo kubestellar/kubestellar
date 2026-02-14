@@ -77,7 +77,11 @@ SRC_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
 COMMON_SRCS="${SRC_DIR}/common"
 scripts_dir="${SRC_DIR}/../../scripts"
 
-"${scripts_dir}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm
+if [ $test == "ginkgo" ]; then
+    "${scripts_dir}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm ginkgo
+else
+    "${scripts_dir}/check_pre_req.sh" --assert --verbose kubectl docker kind make go ko yq helm kflex ocm
+fi
 
 "${COMMON_SRCS}/cleanup.sh" --env "$env"
 source "${COMMON_SRCS}/setup-shell.sh"
