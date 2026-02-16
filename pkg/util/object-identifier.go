@@ -17,6 +17,8 @@ limitations under the License.
 package util
 
 import (
+	"fmt"
+
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -34,6 +36,19 @@ type ObjectIdentifier struct {
 	GVK        schema.GroupVersionKind
 	Resource   string
 	ObjectName cache.ObjectName
+}
+
+// String returns a human-readable representation of the ObjectIdentifier.
+// String returns a human-readable representation of the ObjectIdentifier.
+// For namespaced objects it returns "group/version/resource(namespace/name)",
+// for cluster-scoped objects it returns "group/version/resource(name)".
+// Core resources (empty group) render as "v1/pods(ns/name)" rather than "/v1/pods(ns/name)".
+func (identifier ObjectIdentifier) String() string {
+	gvr := identifier.GVK.GroupVersion().String() + "/" + identifier.Resource
+	if identifier.ObjectName.Namespace != "" {
+		return fmt.Sprintf("%s(%s/%s)", gvr, identifier.ObjectName.Namespace, identifier.ObjectName.Name)
+	}
+	return fmt.Sprintf("%s(%s)", gvr, identifier.ObjectName.Name)
 }
 
 func (identifier *ObjectIdentifier) GVR() schema.GroupVersionResource {
