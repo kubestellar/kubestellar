@@ -63,6 +63,14 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				}},
 			},
 		)
+		ginkgo.By("waiting for nginx deployment to propagate to WECs")
+		util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 1)
+		util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 1)
+
+		// Wait for deployments to be ready on WECs (critical for status collection)
+		ginkgo.By("waiting for nginx deployment to be ready on WECs")
+		util.WaitForDepolymentAvailability(ctx, wec1, ns, "nginx")
+		util.WaitForDepolymentAvailability(ctx, wec2, ns, "nginx")
 	})
 
 	ginkgo.Context("multiple WECs", func() {
@@ -725,7 +733,9 @@ var _ = ginkgo.Describe("end to end testing", func() {
 
 			testAndStatusCollection[0].StatusCollectors = []string{fullStatusCollectorName}
 			util.CreateBindingPolicy(ctx, ksWds, bpName, clusterSelector, testAndStatusCollection)
-
+			// Wait for a bit to allow the status collected by WECs to propagate through OCM and be reflected in the CombinedStatus.
+			ginkgo.By("waiting for status propagation from WECs through OCM")
+			time.Sleep(15 * time.Second)
 			util.WaitForCombinedStatus(ctx, ksWds, wds, ns, workloadName, bpName, func(cs *ksapi.CombinedStatus) error {
 				if n := len(cs.Results); n != 1 {
 					return fmt.Errorf("expected 1 NamedStatusCombination but got %d", n)
