@@ -54,12 +54,26 @@ spec:
               - '{{"{{.ITSName}}"}}'
               - --output-file
               - /etc/kube/its/kubeconfig
+            resources:
+              requests:
+                memory: "64Mi"
+                cpu: "100m"
+              limits:
+                memory: "256Mi"
+                cpu: "500m"
             volumeMounts:
             - name: its-kubeconfig-volume
               mountPath: /etc/kube/its
           containers:
           - name: transport-controller
             image: ghcr.io/kubestellar/kubestellar/ocm-transport-controller:{{.Values.TRANSPORT_VERSION | default .Values.KUBESTELLAR_VERSION}}
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "100m"
+              limits:
+                memory: "512Mi"
+                cpu: "1000m"
             args:
             - --metrics-bind-address={{.Values.transport_controller.metrics_bind_addr}}
             - --pprof-bind-address={{.Values.transport_controller.pprof_bind_addr}}
