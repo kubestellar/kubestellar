@@ -95,6 +95,21 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateDeploymentDeletion(ctx, wec2, ns, "nginx")
 
 			ginkgo.By("creating new BindingPolicy and expecting corresponding Binding")
+			// Create a StatusCollector so CombinedStatus gets created and can be waited on deterministically
+			util.CreateStatusCollector(ctx, ksWds, "create-only-status",
+				ksapi.StatusCollectorSpec{
+					Select: []ksapi.NamedExpression{
+						{
+							Name: "wecName",
+							Def:  "inventory.name",
+						},
+						{
+							Name: "replicas",
+							Def:  "returned.status.replicas",
+						},
+					},
+					Limit: 10,
+				})
 			util.CreateBindingPolicy(ctx, ksWds, "nginx",
 				[]metav1.LabelSelector{
 					{MatchLabels: map[string]string{"location-group": "edge"}},
@@ -109,7 +124,9 @@ var _ = ginkgo.Describe("end to end testing", func() {
 						ObjectSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"app.kubernetes.io/name": "nginx"}}},
 					},
 						DownsyncModulation: ksapi.DownsyncModulation{
-							CreateOnly: true}},
+							CreateOnly:       true,
+							StatusCollectors: []string{"create-only-status"},
+						}},
 				},
 			)
 			util.ValidateBinding(ctx, ksWds, "nginx", func(binding *ksapi.Binding) bool {
@@ -119,8 +136,15 @@ var _ = ginkgo.Describe("end to end testing", func() {
 					len(binding.Spec.Workload.NamespaceScope) == 1 &&
 					binding.Spec.Workload.NamespaceScope[0].CreateOnly
 			})
-			util.ValidateDeploymentReplicas(ctx, wec1, ns, "nginx", 1)
-			util.ValidateDeploymentReplicas(ctx, wec2, ns, "nginx", 1)
+			
+			// Use Eventually to wait for the initial state (deployment created with 1 replica)
+			gomega.Eventually(func() int {
+				return util.GetNumDeploymentReplicas(ctx, wec1, ns)
+			}).Should(gomega.Equal(1))
+			gomega.Eventually(func() int {
+				return util.GetNumDeploymentReplicas(ctx, wec2, ns)
+			}).Should(gomega.Equal(1))
+			
 			dep1 := util.GetDeployment(ctx, wec1, ns, "nginx")
 			dep2 := util.GetDeployment(ctx, wec2, ns, "nginx")
 
@@ -130,9 +154,16 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				ctx, "nginx", types.MergePatchType, objPatch, metav1.PatchOptions{})
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-			time.Sleep(30 * time.Second)
-			gomega.Expect(util.GetNumDeploymentReplicas(ctx, wec1, ns)).To(gomega.Equal(1))
-			gomega.Expect(util.GetNumDeploymentReplicas(ctx, wec2, ns)).To(gomega.Equal(1))
+			// Use Consistently to verify that the WEC deployments remain at 1 replica over a reasonable time period
+			// This ensures that create-only mode is actually preventing updates, not just that the update hasn't happened yet
+			gomega.Consistently(func() int {
+				return util.GetNumDeploymentReplicas(ctx, wec1, ns)
+			}, 30*time.Second, 1*time.Second).Should(gomega.Equal(1))
+			gomega.Consistently(func() int {
+				return util.GetNumDeploymentReplicas(ctx, wec2, ns)
+			}, 30*time.Second, 1*time.Second).Should(gomega.Equal(1))
+			
+			// Also verify that the deployment UIDs remain unchanged (no recreation)
 			dep1b := util.GetDeployment(ctx, wec1, ns, "nginx")
 			dep2b := util.GetDeployment(ctx, wec2, ns, "nginx")
 			gomega.Expect(dep1b.UID).To(gomega.Equal(dep1.UID))
