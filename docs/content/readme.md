@@ -50,6 +50,10 @@ See the [Getting Started setup guide](direct/get-started.md) for getting started
 
 We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](contribution-guidelines/contributing-inc.md) guide.
 
+<a href="https://www.star-history.com/#kubestellar/kubestellar&type=date&legend=top-left">
+  <img src="https://api.star-history.com/svg?repos=kubestellar/kubestellar&type=date&legend=top-left" width="600">
+</a>
+
 ## Getting in touch
 
 There are several ways to communicate with us:

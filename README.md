@@ -17,6 +17,9 @@
 <a href="https://cloud-native.slack.com/archives/C097094RZ3M"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
+<a href="https://deepwiki.com/kubestellar/kubestellar">
+  <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
+</a>
 
 **KubeStellar** is a Cloud Native Computing Foundation (CNCF) Sandbox project that simplifies the deployment and configuration of applications across multiple Kubernetes clusters. It provides a seamless experience akin to using a single cluster, and it integrates with the tools you're already familiar with, eliminating the need to modify existing resources.
 
@@ -49,6 +52,10 @@ For usage, architecture, and other documentation, see [the website](https://kube
 We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING.md) guide and be sure to look at `main` or the release of interest to you.
 
 This community has a [Code of Conduct](./CODE_OF_CONDUCT.md). Please make sure to follow it.
+
+<a href="https://www.star-history.com/#kubestellar/kubestellar&type=date&legend=top-left">
+  <img src="https://api.star-history.com/svg?repos=kubestellar/kubestellar&type=date&legend=top-left" width="600">
+</a>
 
 ## Our Roadmap
 Have a look at what we are working on next, see our [Roadmap](docs/content/direct/roadmap.md) 
@@ -104,3 +111,4 @@ Instantly get access to our documents and meeting invites at http://kubestellar.
 <br>Kubernetes and the Kubernetes logo are registered trademarks of The Linux Foundation® (TLF).
 <br>The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/legal/trademark-usage">Trademark Usage page</a>.
 <br>© 2022-2025. The KubeStellar Authors.
+
