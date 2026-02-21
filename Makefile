@@ -218,10 +218,10 @@ kind-load-image: ko-build-controller-manager-local ko-build-transport-local ko-b
 
 # this is used for local testing
 .PHONY: k3d-load-image
-k3d-load-image: ko-build-controller-manager-local ko-build-transport-local
+k3d-load-image: ko-build-controller-manager-local ko-build-transport-local ko-build-get-kubeconfig-local
 	k3d image import ${CONTROLLER_MANAGER_IMAGE} -c ${K3D_HOSTING_CLUSTER}
-	k3d image import ${CONTROLLER_MANAGER_IMAGE} -c ${TRANSPORT_IMAGE}
-	k3d image import ${CONTROLLER_MANAGER_IMAGE} -c ${GET_KFCFG_IMAGE}
+	k3d image import ${TRANSPORT_IMAGE} -c ${K3D_HOSTING_CLUSTER}
+	k3d image import ${GET_KFCFG_IMAGE} -c ${K3D_HOSTING_CLUSTER}
 
 ##@ Deployment
 
