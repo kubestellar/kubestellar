@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,17 +27,17 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
 
-	controlv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	apicontrolv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	versioned "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	internalinterfaces "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
+	controlv1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 )
 
 // CombinedStatusInformer provides access to a shared informer and lister for
 // CombinedStatuses.
 type CombinedStatusInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.CombinedStatusLister
+	Lister() controlv1alpha1.CombinedStatusLister
 }
 
 type combinedStatusInformer struct {
@@ -72,7 +72,7 @@ func NewFilteredCombinedStatusInformer(client versioned.Interface, namespace str
 				return client.ControlV1alpha1().CombinedStatuses(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&controlv1alpha1.CombinedStatus{},
+		&apicontrolv1alpha1.CombinedStatus{},
 		resyncPeriod,
 		indexers,
 	)
@@ -83,9 +83,9 @@ func (f *combinedStatusInformer) defaultInformer(client versioned.Interface, res
 }
 
 func (f *combinedStatusInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&controlv1alpha1.CombinedStatus{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicontrolv1alpha1.CombinedStatus{}, f.defaultInformer)
 }
 
-func (f *combinedStatusInformer) Lister() v1alpha1.CombinedStatusLister {
-	return v1alpha1.NewCombinedStatusLister(f.Informer().GetIndexer())
+func (f *combinedStatusInformer) Lister() controlv1alpha1.CombinedStatusLister {
+	return controlv1alpha1.NewCombinedStatusLister(f.Informer().GetIndexer())
 }

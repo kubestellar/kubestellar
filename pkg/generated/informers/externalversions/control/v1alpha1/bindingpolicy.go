@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,17 +27,17 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
 
-	controlv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	apicontrolv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	versioned "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	internalinterfaces "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
+	controlv1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 )
 
 // BindingPolicyInformer provides access to a shared informer and lister for
 // BindingPolicies.
 type BindingPolicyInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.BindingPolicyLister
+	Lister() controlv1alpha1.BindingPolicyLister
 }
 
 type bindingPolicyInformer struct {
@@ -71,7 +71,7 @@ func NewFilteredBindingPolicyInformer(client versioned.Interface, resyncPeriod t
 				return client.ControlV1alpha1().BindingPolicies().Watch(context.TODO(), options)
 			},
 		},
-		&controlv1alpha1.BindingPolicy{},
+		&apicontrolv1alpha1.BindingPolicy{},
 		resyncPeriod,
 		indexers,
 	)
@@ -82,9 +82,9 @@ func (f *bindingPolicyInformer) defaultInformer(client versioned.Interface, resy
 }
 
 func (f *bindingPolicyInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&controlv1alpha1.BindingPolicy{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicontrolv1alpha1.BindingPolicy{}, f.defaultInformer)
 }
 
-func (f *bindingPolicyInformer) Lister() v1alpha1.BindingPolicyLister {
-	return v1alpha1.NewBindingPolicyLister(f.Informer().GetIndexer())
+func (f *bindingPolicyInformer) Lister() controlv1alpha1.BindingPolicyLister {
+	return controlv1alpha1.NewBindingPolicyLister(f.Informer().GetIndexer())
 }
