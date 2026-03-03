@@ -25,7 +25,7 @@ set -x
 set -e
 
 if ! which etcd; then
-    etcd_version=3.5.12
+    etcd_version=3.5.16
     platform="$(go env GOOS)-$(go env GOARCH)"
 
     case "$(go env GOOS)" in

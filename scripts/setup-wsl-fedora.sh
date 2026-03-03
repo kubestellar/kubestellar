@@ -211,7 +211,7 @@ success "✅ oc installed."
 # OCM clusteradmin
 # -------------------------------
 title "📦 Installing OCM clusteradmin"
-bash <(curl -s -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh) v0.10.1
+bash <(curl -s -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh) v1.2.0
 clusteradm version || true
 success "✅ OCM clusteradmin installed."
 

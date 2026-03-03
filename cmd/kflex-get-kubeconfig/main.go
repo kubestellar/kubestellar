@@ -88,12 +88,8 @@ func main() {
 
 	dynClient := dynclient.NewForConfigOrDie(restConfig)
 	// NEW — construct GVR directly:
-	controlplanes := schema.GroupVersionResource{
-		Group:    "tenancy.kflex.kubestellar.org",
-		Version:  "v1alpha1",
-		Resource: "controlplanes",
-	}
-	cpClient := dynClient.Resource(controlplanes)
+	var SchemeGroupVersion = schema.GroupVersion{Group: "tenancy.kflex.kubestellar.org", Version: "v1alpha1"}
+	cpClient := dynClient.Resource(SchemeGroupVersion.WithResource("controlplanes"))
 
 	var kubeconfigContent []byte
 	backoff := wait.Backoff{
