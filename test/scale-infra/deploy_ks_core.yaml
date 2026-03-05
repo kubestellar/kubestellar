@@ -35,12 +35,12 @@
              sudo chmod a+x /usr/local/bin/yq
 
     - name: install OCM CLI
-      shell: curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/main/install.sh | bash
+      shell: curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v1.2.0/install.sh | bash
         
     - name: install the KubeFlex CLI
       shell: |
              sudo su <<EOF
-             bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubeflex/main/scripts/install-kubeflex.sh) --ensure-folder /usr/local/bin --strip-bin --version v0.8.8
+             bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubeflex/refs/tags/v0.9.3/scripts/install-kubeflex.sh) --ensure-folder /usr/local/bin --strip-bin --version v0.9.3
              EOF
 
     - name: install Helm
