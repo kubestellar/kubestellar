@@ -23,6 +23,12 @@ import (
 	"text/template"
 )
 
+const (
+	// maxTemplateInputSize is the maximum allowed size of a template input string.
+	// Inputs exceeding this limit are rejected to prevent DoS attacks via large templates.
+	maxTemplateInputSize = 256 * 1024 // 256KB
+)
+
 // ExpandTemplates crawls over the input data structure and does
 // template expansion on every `string` except those that are map keys.
 // The input is made up of `map[string]any`, `[]any`, `string`, and other primitives.
@@ -77,12 +83,24 @@ func (exp *expander) expandAny(path string, data any) any {
 }
 
 // expandString does template expansion on one string
-func (exp *expander) expandString(path, input string) string {
+func (exp *expander) expandString(path, input string) (output string) {
+	defer func() {
+		if r := recover(); r != nil {
+			exp.errors = append(exp.errors, fmt.Sprintf("template execution panic at %s: %v", path, r))
+			output = ""
+		}
+	}()
 	if !strings.Contains(input, "{{") {
 		return input
 	}
+	if len(input) > maxTemplateInputSize {
+		exp.errors = append(exp.errors, fmt.Sprintf("template input at %s exceeds maximum allowed size of %d bytes", path, maxTemplateInputSize))
+		return ""
+	}
 	exp.wantedChange = true
-	tmpl := template.New(path).Option("missingkey=error")
+	tmpl := template.New(path).
+		Funcs(restrictedFuncMap()).
+		Option("missingkey=error")
 	tmpl, err := tmpl.Parse(input)
 	if err != nil {
 		exp.errors = append(exp.errors, peel(err).Error())
@@ -95,6 +113,21 @@ func (exp *expander) expandString(path, input string) string {
 		exp.errors = append(exp.errors, peel(err).Error())
 	}
 	return ans
+}
+
+// restrictedFuncMap returns a FuncMap that disables potentially dangerous built-in template functions.
+// Since template expansion is only intended for simple key substitution ({{.key}}),
+// functions that could be misused for injection or unexpected side-effects are disabled.
+func restrictedFuncMap() template.FuncMap {
+	disabledFn := func(args ...any) (any, error) {
+		return nil, fmt.Errorf("function not allowed in templates")
+	}
+	return template.FuncMap{
+		"call":     disabledFn,
+		"html":     disabledFn,
+		"js":       disabledFn,
+		"urlquery": disabledFn,
+	}
 }
 
 func peel(err error) error {

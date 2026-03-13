@@ -28,6 +28,102 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
+// TestExpandTemplatesOversizedInput verifies that strings exceeding maxTemplateInputSize
+// are rejected with an error and do not cause a DoS.
+func TestExpandTemplatesOversizedInput(t *testing.T) {
+	// A string of exactly maxTemplateInputSize bytes (with template syntax) should be allowed.
+	atLimit := "{{.key}}" + strings.Repeat("A", maxTemplateInputSize-len("{{.key}}"))
+	_, _, errs := ExpandTemplates("test", atLimit, map[string]string{"key": "v"})
+	for _, e := range errs {
+		if strings.Contains(e, "exceeds maximum allowed size") {
+			t.Errorf("expected no size-limit error at exact limit, got: %v", errs)
+			break
+		}
+	}
+
+	// A string of exactly maxTemplateInputSize+1 bytes should be rejected.
+	oversize := "{{.key}}" + strings.Repeat("A", maxTemplateInputSize-len("{{.key}}")+1)
+	input := map[string]any{"field": oversize}
+	defs := map[string]string{"key": "value"}
+
+	_, _, errs = ExpandTemplates("test", input, defs)
+	if len(errs) == 0 {
+		t.Error("expected an error for oversized template input, got none")
+	}
+	found := false
+	for _, e := range errs {
+		if strings.Contains(e, "exceeds maximum allowed size") {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Errorf("expected 'exceeds maximum allowed size' error, got: %v", errs)
+	}
+}
+
+// TestExpandTemplatesRestrictedFunctions verifies that the disabled template functions
+// (call, html, js, urlquery) return errors instead of executing.
+func TestExpandTemplatesRestrictedFunctions(t *testing.T) {
+	tests := []struct {
+		name     string
+		template string
+	}{
+		{"html function disabled", `{{html "<b>test</b>"}}`},
+		{"js function disabled", `{{js "alert(1)"}}`},
+		{"urlquery function disabled", `{{urlquery "a=1&b=2"}}`},
+		// call is overridden to prevent indirect function invocation; calling a
+		// built-in like print via call should be blocked.
+		{"call function disabled", `{{call print "hello"}}`},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			_, _, errs := ExpandTemplates("test", tc.template, map[string]string{})
+			if len(errs) == 0 {
+				t.Errorf("expected error for restricted function %q, got none", tc.name)
+			}
+		})
+	}
+}
+
+// TestExpandTemplatesMissingKeyError verifies that referencing a non-existent template key
+// returns an error gracefully without panicking.
+func TestExpandTemplatesMissingKeyError(t *testing.T) {
+	input := "{{.nonexistentKey}}"
+	defs := map[string]string{}
+
+	_, _, errs := ExpandTemplates("test", input, defs)
+	if len(errs) == 0 {
+		t.Error("expected an error for missing key, got none")
+	}
+}
+
+// TestExpandTemplatesValidSubstitution verifies that normal template substitution
+// still works correctly after applying security restrictions.
+func TestExpandTemplatesValidSubstitution(t *testing.T) {
+	input := map[string]any{
+		"greeting": "Hello, {{.name}}!",
+		"static":   "no template here",
+	}
+	defs := map[string]string{"name": "World"}
+
+	output, wantedChange, errs := ExpandTemplates("test", input, defs)
+	if len(errs) != 0 {
+		t.Errorf("unexpected errors: %v", errs)
+	}
+	if !wantedChange {
+		t.Error("expected wantedChange=true, got false")
+	}
+	outMap := output.(map[string]any)
+	if outMap["greeting"] != "Hello, World!" {
+		t.Errorf("expected 'Hello, World!', got %q", outMap["greeting"])
+	}
+	if outMap["static"] != "no template here" {
+		t.Errorf("expected 'no template here', got %q", outMap["static"])
+	}
+}
+
 func FuzzTestCustomize(f *testing.F) {
 	f.Add(int64(42)) // Add seed values - must match the parameter types
 	f.Add(int64(19))
