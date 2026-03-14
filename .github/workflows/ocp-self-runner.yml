@@ -35,7 +35,7 @@ jobs:
           mkdir clusteradm
           export INSTALL_DIR="$PWD/clusteradm"
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
-          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz --output kubeflex.tar.gz
+          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.9.3/kubeflex_0.9.3_linux_amd64.tar.gz --output kubeflex.tar.gz
           tar -xvf kubeflex.tar.gz bin/kflex
           go install github.com/onsi/ginkgo/v2/ginkgo
           curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.15/openshift-client-linux.tar.gz --output openshift-client-linux.tar.gz
@@ -51,7 +51,7 @@ jobs:
           kubectl get secret kubeconfigfile --output="jsonpath={.data.edgeplatform-cicd-config}" | base64 --decode > kubeconfig.tmp
           export KUBECONFIG=$PWD/kubeconfig.tmp
           export KUBESTELLAR_VERSION=0.22.0
-          export OCM_STATUS_ADDON_VERSION=0.2.0-rc8
+          export OCM_STATUS_ADDON_VERSION=0.2.0-rc17
           export OCM_TRANSPORT_PLUGIN=0.1.8
           export PATH=~/oc:$PATH
           export KFLEX_DISABLE_CHATTY=true
@@ -87,7 +87,7 @@ jobs:
           export USE_SUDO=false
           export INSTALL_DIR="$PWD/clusteradm"
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
-          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz --output kubeflex.tar.gz
+          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.9.3/kubeflex_0.9.3_linux_amd64.tar.gz --output kubeflex.tar.gz
           tar -xvf kubeflex.tar.gz bin/kflex
           go install github.com/onsi/ginkgo/v2/ginkgo
           curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.15/openshift-client-linux.tar.gz --output openshift-client-linux.tar.gz
@@ -100,7 +100,7 @@ jobs:
           kubectl get secret kubeconfigfile --output="jsonpath={.data.edgeplatform-cicd-config}" | base64 --decode > kubeconfig.tmp
           export KUBECONFIG=$PWD/kubeconfig.tmp
           export KUBESTELLAR_VERSION=0.22.0
-          export OCM_STATUS_ADDON_VERSION=0.2.0-rc8
+          export OCM_STATUS_ADDON_VERSION=0.2.0-rc17
           export OCM_TRANSPORT_PLUGIN=0.1.8
           export PATH=~/oc:$PATH
           export KFLEX_DISABLE_CHATTY=true

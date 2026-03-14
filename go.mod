@@ -22,7 +22,7 @@ require (
 	k8s.io/code-generator v0.32.13
 	k8s.io/component-base v0.32.13
 	k8s.io/klog/v2 v2.130.1
-	k8s.io/kubernetes v1.32.11
+	k8s.io/kubernetes v1.32.13
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738
 	open-cluster-management.io/api v1.0.0
 	sigs.k8s.io/controller-runtime v0.20.4
@@ -154,7 +154,6 @@ require (
 )
 
 replace (
-	k8s.io/cloud-provider => k8s.io/cloud-provider v0.32.13
 	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.32.13
 	k8s.io/component-helpers => k8s.io/component-helpers v0.32.13
 	k8s.io/controller-manager => k8s.io/controller-manager v0.32.13

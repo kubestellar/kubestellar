@@ -30,7 +30,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 	dynclient "k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
@@ -87,9 +86,8 @@ func main() {
 	coreClient := kubeClient.CoreV1()
 
 	dynClient := dynclient.NewForConfigOrDie(restConfig)
-	// NEW — construct GVR directly:
-	var SchemeGroupVersion = schema.GroupVersion{Group: "tenancy.kflex.kubestellar.org", Version: "v1alpha1"}
-	cpClient := dynClient.Resource(SchemeGroupVersion.WithResource("controlplanes"))
+	controlplanes := kfapi.SchemeGroupVersion.WithResource("controlplanes")
+	cpClient := dynClient.Resource(controlplanes)
 
 	var kubeconfigContent []byte
 	backoff := wait.Backoff{
