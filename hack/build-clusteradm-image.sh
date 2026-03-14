@@ -97,6 +97,16 @@ case "$clusteradm_version" in
         go mod tidy
         go mod vendor
         ;;
+    (1.0.0)
+        go get github.com/docker/docker@v27.5.1 \
+           github.com/containerd/containerd@v1.7.28 \
+           golang.org/x/crypto@v0.40.0 \
+           golang.org/x/net@v0.42.0 \
+           golang.org/x/oauth2@v0.30.0 \
+           helm.sh/helm/v3@v3.16.4
+        go mod tidy
+        go mod vendor
+        ;;    
 esac
 
 

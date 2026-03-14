@@ -35,7 +35,7 @@
              sudo chmod a+x /usr/local/bin/yq
 
     - name: install OCM CLI
-      shell: curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v1.2.0/install.sh | bash
+      shell: curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v1.0.0/install.sh | bash
         
     - name: install the KubeFlex CLI
       shell: |
