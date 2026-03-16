@@ -44,10 +44,10 @@ anchore/sbom-action/download-syft:
   tag: v0.21.1
   tag-url: https://github.com/anchore/sbom-action/tree/v0.21.1
 goreleaser/goreleaser-action:
-  sha: e435ccd777264be153ace6237001ef4d979d3a7a
-  sha-url: https://github.com/goreleaser/goreleaser-action/commit/e435ccd777264be153ace6237001ef4d979d3a7a
-  tag: v6.4.0
-  tag-url: https://github.com/goreleaser/goreleaser-action/tree/v6.4.0
+  sha: ec59f474b9834571250b370d4735c50f8e2d1e29
+  sha-url: https://github.com/goreleaser/goreleaser-action/commit/ec59f474b9834571250b370d4735c50f8e2d1e29
+  tag: v7.0.0
+  tag-url: https://github.com/goreleaser/goreleaser-action/tree/v7.0.0
 azure/setup-helm:
   sha: 1a275c3b69536ee54be43f2070a358922e12c8d4
   sha-url: https://github.com/azure/setup-helm/commit/1a275c3b69536ee54be43f2070a358922e12c8d4
