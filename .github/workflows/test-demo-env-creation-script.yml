@@ -28,11 +28,11 @@ jobs:
     name: Test demo env creation script on kind
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
         with:
-          go-version: 1.24.5
+          go-version: 1.24
           cache: true
 
       - name: Install kubectl
@@ -42,11 +42,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          bash <(curl -sSL https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v1.0.0/install.sh) 1.0.0
-          wget -nv https://github.com/kubestellar/kubeflex/releases/download/v0.9.3/kubeflex_0.9.3_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.9.3_linux_amd64.tar.gz bin/kflex
+          bash <(curl -sSL https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
+          wget -nv https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.1_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.9.3_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.9.1_linux_amd64.tar.gz
 
       - name: Run test
         run: test/e2e/ci/test-demo-env.sh kind
@@ -158,11 +158,11 @@ jobs:
     name: Test demo env creation script on k3d
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
         with:
-          go-version: 1.24.5
+          go-version: 1.24
           cache: true
 
       - name: Install kubectl
@@ -172,11 +172,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          bash <(curl -sSL https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v1.0.0/install.sh) 1.0.0
-          wget -nv https://github.com/kubestellar/kubeflex/releases/download/v0.9.3/kubeflex_0.9.3_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.9.3_linux_amd64.tar.gz bin/kflex
+          bash <(curl -sSL https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
+          wget -nv https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.1_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.9.3_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.9.1_linux_amd64.tar.gz
           bash <(curl -sSL https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh)
 
       - name: Run test
