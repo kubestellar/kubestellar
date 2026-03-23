@@ -107,8 +107,6 @@ esac
 pushd "${SRC_DIR}/../../.."
 if [ "$use_release" = true ] ; then
   helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-    --create-namespace \
-    --namespace kubeflex-system \
     --version $(yq .KUBESTELLAR_VERSION core-chart/values.yaml) \
     --kube-context $HOSTING_CONTEXT \
     --set-json='ITSes=[{"name":"its1"}]' \

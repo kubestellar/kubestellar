@@ -177,7 +177,7 @@ is_installed_kflex() {
         'kflex version | grep "^Kubeflex version:"' \
         'kflex version | grep "^Kubeflex version:"' \
         'https://github.com/kubestellar/kubeflex' \
-        'Kubeflex version: v0.8.0'
+        'Kubeflex version: v0.9.3'
 }
 
 is_installed_kind() {

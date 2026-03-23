@@ -54,7 +54,7 @@ jobs:
 
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
         with:
-          go-version: 1.24.5
+          go-version: 1.26
           cache: true
 
       - name: Install kubectl
@@ -65,7 +65,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
+          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v1.0.0/install.sh) 1.0.0
           wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.3/kubeflex_0.9.3_linux_amd64.tar.gz
           tar -xvf kubeflex_0.9.3_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
@@ -232,7 +232,7 @@ jobs:
 
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
         with:
-          go-version: 1.24.5
+          go-version: 1.26
           cache: true
 
       - name: Install kubectl
