@@ -30,23 +30,23 @@ type FakeControlV1alpha1 struct {
 }
 
 func (c *FakeControlV1alpha1) Bindings() v1alpha1.BindingInterface {
-	return &FakeBindings{c}
+	return newFakeBindings(c)
 }
 
 func (c *FakeControlV1alpha1) BindingPolicies() v1alpha1.BindingPolicyInterface {
-	return &FakeBindingPolicies{c}
+	return newFakeBindingPolicies(c)
 }
 
 func (c *FakeControlV1alpha1) CombinedStatuses(namespace string) v1alpha1.CombinedStatusInterface {
-	return &FakeCombinedStatuses{c, namespace}
+	return newFakeCombinedStatuses(c, namespace)
 }
 
 func (c *FakeControlV1alpha1) CustomTransforms() v1alpha1.CustomTransformInterface {
-	return &FakeCustomTransforms{c}
+	return newFakeCustomTransforms(c)
 }
 
 func (c *FakeControlV1alpha1) StatusCollectors() v1alpha1.StatusCollectorInterface {
-	return &FakeStatusCollectors{c}
+	return newFakeStatusCollectors(c)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

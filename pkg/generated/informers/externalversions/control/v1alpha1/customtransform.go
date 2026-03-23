@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,17 +27,17 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
 
-	controlv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	apicontrolv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	versioned "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	internalinterfaces "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
+	controlv1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 )
 
 // CustomTransformInformer provides access to a shared informer and lister for
 // CustomTransforms.
 type CustomTransformInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.CustomTransformLister
+	Lister() controlv1alpha1.CustomTransformLister
 }
 
 type customTransformInformer struct {
@@ -71,7 +71,7 @@ func NewFilteredCustomTransformInformer(client versioned.Interface, resyncPeriod
 				return client.ControlV1alpha1().CustomTransforms().Watch(context.TODO(), options)
 			},
 		},
-		&controlv1alpha1.CustomTransform{},
+		&apicontrolv1alpha1.CustomTransform{},
 		resyncPeriod,
 		indexers,
 	)
@@ -82,9 +82,9 @@ func (f *customTransformInformer) defaultInformer(client versioned.Interface, re
 }
 
 func (f *customTransformInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&controlv1alpha1.CustomTransform{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicontrolv1alpha1.CustomTransform{}, f.defaultInformer)
 }
 
-func (f *customTransformInformer) Lister() v1alpha1.CustomTransformLister {
-	return v1alpha1.NewCustomTransformLister(f.Informer().GetIndexer())
+func (f *customTransformInformer) Lister() controlv1alpha1.CustomTransformLister {
+	return controlv1alpha1.NewCustomTransformLister(f.Informer().GetIndexer())
 }

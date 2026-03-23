@@ -19,112 +19,35 @@ limitations under the License.
 package fake
 
 import (
-	"context"
-
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	gentype "k8s.io/client-go/gentype"
 
 	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	controlv1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/typed/control/v1alpha1"
 )
 
-// FakeCombinedStatuses implements CombinedStatusInterface
-type FakeCombinedStatuses struct {
+// fakeCombinedStatuses implements CombinedStatusInterface
+type fakeCombinedStatuses struct {
+	*gentype.FakeClientWithList[*v1alpha1.CombinedStatus, *v1alpha1.CombinedStatusList]
 	Fake *FakeControlV1alpha1
-	ns   string
 }
 
-var combinedstatusesResource = v1alpha1.SchemeGroupVersion.WithResource("combinedstatuses")
-
-var combinedstatusesKind = v1alpha1.SchemeGroupVersion.WithKind("CombinedStatus")
-
-// Get takes name of the combinedStatus, and returns the corresponding combinedStatus object, and an error if there is any.
-func (c *FakeCombinedStatuses) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.CombinedStatus, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(combinedstatusesResource, c.ns, name), &v1alpha1.CombinedStatus{})
-
-	if obj == nil {
-		return nil, err
+func newFakeCombinedStatuses(fake *FakeControlV1alpha1, namespace string) controlv1alpha1.CombinedStatusInterface {
+	return &fakeCombinedStatuses{
+		gentype.NewFakeClientWithList[*v1alpha1.CombinedStatus, *v1alpha1.CombinedStatusList](
+			fake.Fake,
+			namespace,
+			v1alpha1.SchemeGroupVersion.WithResource("combinedstatuses"),
+			v1alpha1.SchemeGroupVersion.WithKind("CombinedStatus"),
+			func() *v1alpha1.CombinedStatus { return &v1alpha1.CombinedStatus{} },
+			func() *v1alpha1.CombinedStatusList { return &v1alpha1.CombinedStatusList{} },
+			func(dst, src *v1alpha1.CombinedStatusList) { dst.ListMeta = src.ListMeta },
+			func(list *v1alpha1.CombinedStatusList) []*v1alpha1.CombinedStatus {
+				return gentype.ToPointerSlice(list.Items)
+			},
+			func(list *v1alpha1.CombinedStatusList, items []*v1alpha1.CombinedStatus) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1alpha1.CombinedStatus), err
-}
-
-// List takes label and field selectors, and returns the list of CombinedStatuses that match those selectors.
-func (c *FakeCombinedStatuses) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.CombinedStatusList, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewListAction(combinedstatusesResource, combinedstatusesKind, c.ns, opts), &v1alpha1.CombinedStatusList{})
-
-	if obj == nil {
-		return nil, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1alpha1.CombinedStatusList{ListMeta: obj.(*v1alpha1.CombinedStatusList).ListMeta}
-	for _, item := range obj.(*v1alpha1.CombinedStatusList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested combinedStatuses.
-func (c *FakeCombinedStatuses) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(combinedstatusesResource, c.ns, opts))
-
-}
-
-// Create takes the representation of a combinedStatus and creates it.  Returns the server's representation of the combinedStatus, and an error, if there is any.
-func (c *FakeCombinedStatuses) Create(ctx context.Context, combinedStatus *v1alpha1.CombinedStatus, opts v1.CreateOptions) (result *v1alpha1.CombinedStatus, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(combinedstatusesResource, c.ns, combinedStatus), &v1alpha1.CombinedStatus{})
-
-	if obj == nil {
-		return nil, err
-	}
-	return obj.(*v1alpha1.CombinedStatus), err
-}
-
-// Update takes the representation of a combinedStatus and updates it. Returns the server's representation of the combinedStatus, and an error, if there is any.
-func (c *FakeCombinedStatuses) Update(ctx context.Context, combinedStatus *v1alpha1.CombinedStatus, opts v1.UpdateOptions) (result *v1alpha1.CombinedStatus, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(combinedstatusesResource, c.ns, combinedStatus), &v1alpha1.CombinedStatus{})
-
-	if obj == nil {
-		return nil, err
-	}
-	return obj.(*v1alpha1.CombinedStatus), err
-}
-
-// Delete takes name of the combinedStatus and deletes it. Returns an error if one occurs.
-func (c *FakeCombinedStatuses) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(combinedstatusesResource, c.ns, name, opts), &v1alpha1.CombinedStatus{})
-
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakeCombinedStatuses) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(combinedstatusesResource, c.ns, listOpts)
-
-	_, err := c.Fake.Invokes(action, &v1alpha1.CombinedStatusList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched combinedStatus.
-func (c *FakeCombinedStatuses) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.CombinedStatus, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(combinedstatusesResource, c.ns, name, pt, data, subresources...), &v1alpha1.CombinedStatus{})
-
-	if obj == nil {
-		return nil, err
-	}
-	return obj.(*v1alpha1.CombinedStatus), err
 }

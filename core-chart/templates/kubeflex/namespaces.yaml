@@ -1,8 +1,0 @@
-{{- if and (index .Values "kubeflex-operator" "install") (not (lookup "v1" "Namespace" "" "kubeflex-system")) }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: kubeflex-system
-  labels:
-    name: kubestellar-core
-{{- end }}

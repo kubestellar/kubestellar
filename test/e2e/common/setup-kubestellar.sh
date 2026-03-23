@@ -129,12 +129,26 @@ popd
 : Waiting for OCM hub to be ready...
 kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.its-hub-init}=true' --timeout 800s
 kubectl wait -n its1-system job.batch/its-hub-init --for condition=Complete --timeout 800s
-kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 800s
-kubectl wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 800s
+kubectl wait controlplane.tenancy.kflex.kubestellar.org/its1 --for 'jsonpath={.status.postCreateHooks.install-status-addon}=true' --timeout 1200s
+kubectl wait -n its1-system job.batch/install-status-addon --for condition=Complete --timeout 1200s
 
 kubectl wait -n its1-system job.batch/update-cluster-info --for condition=Complete --timeout 400s
+echo "Checking OCM hub initialization status..."
+kubectl --context "$HOSTING_CONTEXT" get controlplane its1 -o yaml || echo "ControlPlane its1 not found"
+kubectl --context "$HOSTING_CONTEXT" describe job -n its1-system its-hub-init || echo "Job its-hub-init not found"
+kubectl --context "$HOSTING_CONTEXT" logs -n its1-system job/its-hub-init --tail=50 || echo "Logs unavailable"
+
+# Verify status addon installation
+echo "Checking OCM status addon installation..."
+kubectl --context "$HOSTING_CONTEXT" describe job -n its1-system install-status-addon || echo "Job install-status-addon not found"
+kubectl --context "$HOSTING_CONTEXT" logs -n its1-system job/install-status-addon --tail=50 || echo "Logs unavailable"
 
 kubectl --context "$HOSTING_CONTEXT" -n wds1-system wait --for=condition=Ready pod -l name=transport-controller --timeout 800s
+# Check wds1-system namespace exists
+kubectl --context "$HOSTING_CONTEXT" get ns wds1-system || echo "wds1-system namespace not found"
+
+# List all pods in wds1-system to check their status
+kubectl --context "$HOSTING_CONTEXT" get pods -n wds1-system -o wide || echo "No pods found in wds1-system"
 
 echo "transport controller is running."
 

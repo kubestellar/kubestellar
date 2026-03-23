@@ -97,8 +97,3 @@ case "$clusteradm_version" in
         go mod tidy
         go mod vendor
         ;;
-esac
-
-
-export KO_DOCKER_REPO=$registry
-ko build -B ./cmd/clusteradm -t $clusteradm_version --sbom=none --platform $platform
