@@ -109,10 +109,10 @@ ossf/scorecard-action:
   tag: v2.4.3
   tag-url: https://github.com/ossf/scorecard-action/tree/v2.4.3
 aquasecurity/trivy-action:
-  sha: b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
-  sha-url: https://github.com/aquasecurity/trivy-action/commit/b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
-  tag: 0.33.1
-  tag-url: https://github.com/aquasecurity/trivy-action/tree/0.33.1
+  sha: 57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+  sha-url: https://github.com/aquasecurity/trivy-action/commit/57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+  tag: v0.35.0
+  tag-url: https://github.com/aquasecurity/trivy-action/tree/v0.35.0
 github/codeql-action/upload-sarif:
   sha: 45c373516f557556c15d420e3f5e0aa3d64366bc
   sha-url: https://github.com/github/codeql-action/commit/45c373516f557556c15d420e3f5e0aa3d64366bc
