@@ -94,6 +94,21 @@ There are several ways to communicate with us:
 <br>
 <br>
 
+<div>
+<h2><font size="6"><img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Star.png" alt="Star" width="40" height="40" /> Star History </font></h2>
+</div>
+<br>
+
+<a href="https://www.star-history.com/#kubestellar/kubestellar&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=kubestellar/kubestellar&type=date&legend=top-left&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=kubestellar/kubestellar&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=kubestellar/kubestellar&type=date&legend=top-left" width="100%" />
+ </picture>
+</a>
+<br>
+<br>
+
 [![CLOMonitor report summary](https://clomonitor.io/api/projects/cncf/kubestellar/report-summary?theme=light)](https://clomonitor.io/projects/cncf/kubestellar)
 <br>
 <br>
