@@ -48,6 +48,10 @@ In a single-cluster setup, developers typically access the cluster and deploy Ku
 
 KubeStellar simplifies this process by allowing developers to define a binding policy between clusters and Kubernetes objects. It then uses your regular single-cluster tooling to deploy and configure each cluster based on these binding policies, making multi-cluster operations as straightforward as managing a single cluster. This approach enhances productivity and efficiency, making KubeStellar a valuable tool in a multi-cluster Kubernetes environment.
 
+## Console
+
+Try the [KubeStellar Console](https://console.kubestellar.io) — an open-source web dashboard for managing multi-cluster Kubernetes deployments. Monitor clusters, deploy workloads, manage GPU resources, and troubleshoot with 400+ AI-powered missions. It starts in demo mode so you can explore immediately.
+
 ## Website
 
 For usage, architecture, and other documentation, see [the website](https://kubestellar.io).
