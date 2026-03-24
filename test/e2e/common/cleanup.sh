@@ -35,6 +35,13 @@ if [ $env == "kind" ];then
     kubectl config delete-context cluster1 || true
     kubectl config delete-context cluster2 || true
 
+elif [ $env == "k3d" ];then
+    k3d cluster delete cluster1 || true
+    k3d cluster delete cluster2 || true
+    k3d cluster delete kubeflex || true
+    kubectl config delete-context cluster1 || true
+    kubectl config delete-context cluster2 || true
+
 elif [ $env == "ocp" ];then
     # Unregister the managed clusters
     function unregister_cluster() {
@@ -65,7 +72,7 @@ elif [ $env == "ocp" ];then
     kubectl config unset contexts.wds2
 else
    echo "$0: unknown flag option" >&2 ;
-   echo "Usage: $0 [--env kind | ocp]" >& 2
+   echo "Usage: $0 [--env kind | k3d | ocp]" >& 2
    exit 1
 fi
 

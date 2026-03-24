@@ -23,6 +23,7 @@ import (
 	"math"
 	"slices"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/onsi/ginkgo/v2"
@@ -475,6 +476,9 @@ var _ = ginkgo.Describe("end to end testing", func() {
 
 	ginkgo.Context("singleton status creation and deletion", func() {
 		ginkgo.It("sets (or deletes) singleton status when a singleton bindingpolicy/deployment is created (or deleted)", func(ctx context.Context) {
+			if strings.Contains(ksSetupFlags, "host-its-wds") {
+				ginkgo.Skip("Skipping on host-its-wds because hosting cluster maintains non-zero deployment status")
+			}
 			util.DeleteDeployment(ctx, wds, ns, "nginx") // we don't have to delete nginx
 			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 0)
 			util.CreateDeployment(ctx, wds, ns, "nginx-singleton",
@@ -505,6 +509,9 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		})
 
 		ginkgo.It("only counts number of qualified WECs", func(ctx context.Context) {
+			if strings.Contains(ksSetupFlags, "host-its-wds") {
+				ginkgo.Skip("Skipping on host-its-wds because hosting cluster maintains non-zero deployment status")
+			}
 			util.CreateBindingPolicy(ctx, ksWds, "nginx-singleton",
 				[]metav1.LabelSelector{
 					{MatchLabels: map[string]string{"name": "cluster1"}},
@@ -529,6 +536,9 @@ var _ = ginkgo.Describe("end to end testing", func() {
 
 	ginkgo.Context("singleton status eventual consistency", func() {
 		ginkgo.It("cleans up previously synced but currently invalid singleton status", func(ctx context.Context) {
+			if strings.Contains(ksSetupFlags, "host-its-wds") {
+				ginkgo.Skip("Skipping on host-its-wds because hosting cluster maintains non-zero deployment status")
+			}
 			ginkgo.By("creating nginx-singleton Deployment and BindingPolicy and expecting singleton status")
 			util.DeleteDeployment(ctx, wds, ns, "nginx")
 			util.CreateDeployment(ctx, wds, ns, "nginx-singleton",
@@ -666,6 +676,9 @@ var _ = ginkgo.Describe("end to end testing", func() {
 		})
 
 		ginkgo.It("survives ITS vcluster coming down", func(ctx context.Context) {
+			if strings.Contains(ksSetupFlags, "host-its-wds") {
+				ginkgo.Skip("Skipping on host-its-wds because hosting cluster does not deploy a separate vcluster")
+			}
 			util.DeletePods(ctx, coreCluster, "its1-system", "vcluster")
 			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 1)
 			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 1)
@@ -676,7 +689,9 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.DeletePods(ctx, coreCluster, "wds1-system", "kubestellar")
 			util.DeletePods(ctx, coreCluster, "wds1-system", "transport")
 			util.DeletePods(ctx, coreCluster, "kubeflex-system", "")
-			util.DeletePods(ctx, coreCluster, "its1-system", "vcluster")
+			if !strings.Contains(ksSetupFlags, "host-its-wds") {
+				util.DeletePods(ctx, coreCluster, "its1-system", "vcluster")
+			}
 			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 1)
 			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 1)
 
@@ -689,7 +704,9 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 2)
 			util.Expect1PodOfEach(ctx, coreCluster, "wds1-system", "kubestellar-controller-manager", "transport-controller")
 			util.Expect1PodOfEach(ctx, coreCluster, "kubeflex-system", "kubeflex-controller-manager", "postgres-postgresql-0")
-			util.Expect1PodOfEach(ctx, coreCluster, "its1-system", "vcluster")
+			if !strings.Contains(ksSetupFlags, "host-its-wds") {
+				util.Expect1PodOfEach(ctx, coreCluster, "its1-system", "vcluster")
+			}
 		})
 	})
 
