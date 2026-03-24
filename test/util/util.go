@@ -227,6 +227,8 @@ func DeleteDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string,
 
 func CreateDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string, name string, labels map[string]string) {
 	ginkgo.GinkgoHelper()
+
+	// Use Apache httpd image (works on plain Kubernetes and OpenShift, no rate limits from DockerHub)
 	deployment := appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
@@ -250,7 +252,7 @@ func CreateDeployment(ctx context.Context, wds *kubernetes.Clientset, ns string,
 					Containers: []corev1.Container{
 						{
 							Name:  name,
-							Image: "public.ecr.aws/nginx/nginx:latest",
+							Image: "public.ecr.aws/docker/library/httpd:alpine3.23",
 							Ports: []corev1.ContainerPort{
 								{
 									Name:          "http",

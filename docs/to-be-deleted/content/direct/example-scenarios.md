@@ -89,7 +89,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: public.ecr.aws/nginx/nginx:latest
+        image: public.ecr.aws/docker/library/httpd:alpine3.23
         ports:
         - containerPort: 80
 EOF
@@ -371,7 +371,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: public.ecr.aws/nginx/nginx:latest
+        image: public.ecr.aws/docker/library/httpd:alpine3.23
         ports:
         - containerPort: 80
 EOF
@@ -480,7 +480,7 @@ spec:
     spec:
       containers:
       - name: nginx-res
-        image: public.ecr.aws/nginx/nginx:latest
+        image: public.ecr.aws/docker/library/httpd:alpine3.23
         ports:
         - containerPort: 80
 EOF

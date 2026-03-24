@@ -18,6 +18,6 @@ spec:
       serviceAccountName: nginx-sa
       containers:
       - name: nginx-sa
-        image: public.ecr.aws/nginx/nginx:latest
+        image: public.ecr.aws/docker/library/httpd:alpine3.23
         ports:
         - containerPort: 80
