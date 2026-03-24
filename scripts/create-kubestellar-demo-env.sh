@@ -264,13 +264,31 @@ kubectl --context its1 label managedcluster cluster1 location-group=edge name=cl
 kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
 
 echo
-echo Waiting for transport controller to create namespace customization-properties
+echo "Waiting for transport controller pod to be ready..."
+kubectl --context $k8s_platform-kubeflex wait -n wds1-system pod \
+    -l name=transport-controller \
+    --for=condition=Ready \
+    --timeout=300s || {
+    echo "Transport controller pod failed to become ready. Current status:" >&2
+    kubectl --context $k8s_platform-kubeflex get pod -n wds1-system -l name=transport-controller -o wide >&2
+    kubectl --context $k8s_platform-kubeflex logs -n wds1-system -l name=transport-controller --all-containers --tail=50 >&2
+    exit 1
+}
+echo -e "\033[33m✔\033[0m Transport controller pod is ready"
+
+echo
+echo "Waiting for transport controller to create namespace customization-properties"
 # We allow versions of kubectl that do not support `kubectl wait --for=create`
 wait_counter=0
-while ! (kubectl --context its1 get ns customization-properties) ; do
-    if (($wait_counter > 20)); then
-        echo "Namespace customization-properties failed to appear!" >&2
+while ! (kubectl --context its1 get ns customization-properties 2>/dev/null) ; do
+    if (($wait_counter > 30)); then
+        echo "Namespace customization-properties failed to appear after 5 minutes!" >&2
+        echo "Transport controller logs:" >&2
+        kubectl --context $k8s_platform-kubeflex logs -n wds1-system -l name=transport-controller --tail=100 >&2
         exit 1
+    fi
+    if (($wait_counter % 6 == 0)) && (($wait_counter > 0)); then
+        echo "  Still waiting for customization-properties namespace (${wait_counter}0s elapsed)..."
     fi
     ((wait_counter += 1))
     sleep 10
