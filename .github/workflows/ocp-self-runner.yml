@@ -26,7 +26,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
+        uses: azure/setup-kubectl@15650b3ad78fff148532a140b8a4c821796b2d7b
         id: install
 
       - name: Install dependencies
@@ -78,7 +78,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
+        uses: azure/setup-kubectl@15650b3ad78fff148532a140b8a4c821796b2d7b
         id: install
 
       - name: Install dependencies
