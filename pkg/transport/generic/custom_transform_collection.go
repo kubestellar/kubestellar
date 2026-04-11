@@ -273,6 +273,9 @@ func (ctc *customTransformCollectionImpl) setBindingGroupResources(bindingName s
 			// When the set goes empty, time to delete this data
 			if grTransformData.bindingsThatCare.Len() == 0 {
 				delete(ctc.grToTransformData, groupResource)
+				for ctName := range grTransformData.ctNames {
+					delete(ctc.ctNameToSpec, ctName)
+				}
 			}
 		}
 	}
