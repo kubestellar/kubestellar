@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"context"
 	"embed"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -30,7 +31,7 @@ import (
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
-	"k8s.io/apimachinery/pkg/api/errors"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -83,7 +84,7 @@ func ApplyCRDs(ctx context.Context, controllerName string,
 		_, err = clientsetExt.Create(ctx, desiredCRD, metav1.CreateOptions{FieldValidation: metav1.FieldValidationStrict, FieldManager: controllerName})
 		if err == nil {
 			logger.Info("Created CRD", "name", desiredCRD.Name)
-		} else if !errors.IsAlreadyExists(err) {
+		} else if !apierrors.IsAlreadyExists(err) {
 			return fmt.Errorf("unable to create CRD named %s: %w", crdU.GetName(), err)
 		} else {
 			existingCRD, err := clientsetExt.Get(ctx, desiredCRD.Name, metav1.GetOptions{})
@@ -91,7 +92,7 @@ func ApplyCRDs(ctx context.Context, controllerName string,
 				return fmt.Errorf("failed to fetch an existing CRD, name=%s: %w", desiredCRD.Name, err)
 			}
 			if apiequality.Semantic.DeepEqual(existingCRD.Spec, desiredCRD.Spec) {
-				logger.Info("Existing CRD is acceptable, name=%s", desiredCRD.Name)
+				logger.Info("Existing CRD is acceptable", "name", desiredCRD.Name)
 				continue
 			}
 			desiredCRD.ResourceVersion = existingCRD.ResourceVersion
@@ -127,7 +128,10 @@ func filterCRDsByNames(crds []*unstructured.Unstructured, names sets.Set[string]
 func readCRDs() ([]*unstructured.Unstructured, error) {
 	crds := make([]*unstructured.Unstructured, 0)
 
-	dirEntries, _ := fs.ReadDir(embeddedFiles, "files")
+	dirEntries, err := fs.ReadDir(embeddedFiles, "files")
+	if err != nil {
+		return nil, fmt.Errorf("failed to read embedded CRD files: %w", err)
+	}
 	for _, entry := range dirEntries {
 		file, err := embeddedFiles.Open("files/" + entry.Name())
 		if err != nil {
@@ -159,7 +163,7 @@ func DecodeYAML(yamlBytes []byte) ([]*unstructured.Unstructured, error) {
 	for {
 		yamlDoc, err := yamlReader.Read()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return nil, err
@@ -183,6 +187,9 @@ func waitForCRDAccepted(ctx context.Context,
 	return wait.PollUntilContextCancel(ctx, 1*time.Second, true, func(ctx context.Context) (bool, error) {
 		crd, err := clientset.Get(ctx, crdName, metav1.GetOptions{})
 		if err != nil {
+			if apierrors.IsNotFound(err) || apierrors.IsForbidden(err) {
+				return false, fmt.Errorf("permanent error waiting for CRD %s: %w", crdName, err)
+			}
 			return false, nil
 		}
 
