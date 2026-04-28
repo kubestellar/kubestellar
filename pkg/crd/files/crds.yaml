@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.15.0
+    controller-gen.kubebuilder.io/version: v0.17.3
   name: bindingpolicies.control.kubestellar.io
 spec:
   group: control.kubestellar.io
@@ -302,7 +302,6 @@ spec:
                         definition of how this interacts with `.wantSingletonReportedState`,
                         see the comment on that field.
 
-
                         If the object's kind is one of the few that this feature handles specially
                         then the aggregation is done with awareness of, and consideration for,
                         the semantics of their `.status` sections;
@@ -317,35 +316,29 @@ spec:
                         and requests that the `.status` of such objects propagate from the WEC
                         to the WDS.
 
-
                         For a precise description of this field and how it interacts with
                         WantMultiWECReportedState, start with a few definitions.
-
 
                         For a given workload object, _singleton status return is requested_
                         if and only if there exists at least one BindingPolicy or Binding
                         that has `wantSingletonReportedState==true` in a clause that
                         matches/references the workload object.
 
-
                         For a given workload object, _multi-WEC status return is requested_
                         if and only if there exists at least one BindingPolicy or Binding
                         that has `wantMultiWECReportedState==true` in a clause that
                         matches/references the workload object.
-
 
                         The _qualified singleton WEC set_ of a workload object is the set of WECs that are
                         associated with that workload object by at least one BindingPolicy or Binding
                         that has `wantSingletonReportedState==true` in a clause that
                         matches/references the workload object.
 
-
                         The _qualified WEC set_ of a workload object is the set of WECs that are
                         associated with that workload object by at least one BindingPolicy or Binding
                         that has EITHER `wantSingletonReportedState==true`
                         OR `wantMultiWECReportedState==true` in a clause that
                         matches/references the workload object.
-
 
                         For a given workload object, while singleton status return is requested,
                         KubeStellar maintains a label on the object whose name (key) is
@@ -354,18 +347,15 @@ spec:
                         While singleton status return is _not_ requested, KubeStellar suppresses
                         the existence of a label with that name (key).
 
-
                         While either singleton or multi-WEC status return is requested on an object
                         and the size of the object's qualified WEC set is 1, KubeStellar
                         propagates the object's `.status` from that WEC
                         to the `.status` section of the object in the WDS.
 
-
                         While multi-WEC status return is requested on an object and the size of
                         the object's qualified WEC set is greater than 1, KubeStellar combines
                         the `.status` of the object from each of those WECs and puts the
                         combination in the `.status` of the object in the WDS.
-
 
                         While neither of the above two conditions is true,
                         there is nothing in the `.status` of the object
@@ -421,7 +411,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.15.0
+    controller-gen.kubebuilder.io/version: v0.17.3
   name: bindings.control.kubestellar.io
 spec:
   group: control.kubestellar.io
@@ -528,7 +518,6 @@ spec:
                             definition of how this interacts with `.wantSingletonReportedState`,
                             see the comment on that field.
 
-
                             If the object's kind is one of the few that this feature handles specially
                             then the aggregation is done with awareness of, and consideration for,
                             the semantics of their `.status` sections;
@@ -543,35 +532,29 @@ spec:
                             and requests that the `.status` of such objects propagate from the WEC
                             to the WDS.
 
-
                             For a precise description of this field and how it interacts with
                             WantMultiWECReportedState, start with a few definitions.
-
 
                             For a given workload object, _singleton status return is requested_
                             if and only if there exists at least one BindingPolicy or Binding
                             that has `wantSingletonReportedState==true` in a clause that
                             matches/references the workload object.
 
-
                             For a given workload object, _multi-WEC status return is requested_
                             if and only if there exists at least one BindingPolicy or Binding
                             that has `wantMultiWECReportedState==true` in a clause that
                             matches/references the workload object.
-
 
                             The _qualified singleton WEC set_ of a workload object is the set of WECs that are
                             associated with that workload object by at least one BindingPolicy or Binding
                             that has `wantSingletonReportedState==true` in a clause that
                             matches/references the workload object.
 
-
                             The _qualified WEC set_ of a workload object is the set of WECs that are
                             associated with that workload object by at least one BindingPolicy or Binding
                             that has EITHER `wantSingletonReportedState==true`
                             OR `wantMultiWECReportedState==true` in a clause that
                             matches/references the workload object.
-
 
                             For a given workload object, while singleton status return is requested,
                             KubeStellar maintains a label on the object whose name (key) is
@@ -580,18 +563,15 @@ spec:
                             While singleton status return is _not_ requested, KubeStellar suppresses
                             the existence of a label with that name (key).
 
-
                             While either singleton or multi-WEC status return is requested on an object
                             and the size of the object's qualified WEC set is 1, KubeStellar
                             propagates the object's `.status` from that WEC
                             to the `.status` section of the object in the WDS.
 
-
                             While multi-WEC status return is requested on an object and the size of
                             the object's qualified WEC set is greater than 1, KubeStellar combines
                             the `.status` of the object from each of those WECs and puts the
                             combination in the `.status` of the object in the WDS.
-
 
                             While neither of the above two conditions is true,
                             there is nothing in the `.status` of the object
@@ -655,7 +635,6 @@ spec:
                             definition of how this interacts with `.wantSingletonReportedState`,
                             see the comment on that field.
 
-
                             If the object's kind is one of the few that this feature handles specially
                             then the aggregation is done with awareness of, and consideration for,
                             the semantics of their `.status` sections;
@@ -670,35 +649,29 @@ spec:
                             and requests that the `.status` of such objects propagate from the WEC
                             to the WDS.
 
-
                             For a precise description of this field and how it interacts with
                             WantMultiWECReportedState, start with a few definitions.
-
 
                             For a given workload object, _singleton status return is requested_
                             if and only if there exists at least one BindingPolicy or Binding
                             that has `wantSingletonReportedState==true` in a clause that
                             matches/references the workload object.
 
-
                             For a given workload object, _multi-WEC status return is requested_
                             if and only if there exists at least one BindingPolicy or Binding
                             that has `wantMultiWECReportedState==true` in a clause that
                             matches/references the workload object.
-
 
                             The _qualified singleton WEC set_ of a workload object is the set of WECs that are
                             associated with that workload object by at least one BindingPolicy or Binding
                             that has `wantSingletonReportedState==true` in a clause that
                             matches/references the workload object.
 
-
                             The _qualified WEC set_ of a workload object is the set of WECs that are
                             associated with that workload object by at least one BindingPolicy or Binding
                             that has EITHER `wantSingletonReportedState==true`
                             OR `wantMultiWECReportedState==true` in a clause that
                             matches/references the workload object.
-
 
                             For a given workload object, while singleton status return is requested,
                             KubeStellar maintains a label on the object whose name (key) is
@@ -707,18 +680,15 @@ spec:
                             While singleton status return is _not_ requested, KubeStellar suppresses
                             the existence of a label with that name (key).
 
-
                             While either singleton or multi-WEC status return is requested on an object
                             and the size of the object's qualified WEC set is 1, KubeStellar
                             propagates the object's `.status` from that WEC
                             to the `.status` section of the object in the WDS.
 
-
                             While multi-WEC status return is requested on an object and the size of
                             the object's qualified WEC set is greater than 1, KubeStellar combines
                             the `.status` of the object from each of those WECs and puts the
                             combination in the `.status` of the object in the WDS.
-
 
                             While neither of the above two conditions is true,
                             there is nothing in the `.status` of the object
@@ -789,7 +759,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.15.0
+    controller-gen.kubebuilder.io/version: v0.17.3
   name: combinedstatuses.control.kubestellar.io
 spec:
   group: control.kubestellar.io
@@ -957,7 +927,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.15.0
+    controller-gen.kubebuilder.io/version: v0.17.3
   name: customtransforms.control.kubestellar.io
 spec:
   group: control.kubestellar.io
@@ -1061,7 +1031,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.15.0
+    controller-gen.kubebuilder.io/version: v0.17.3
   name: statuscollectors.control.kubestellar.io
 spec:
   group: control.kubestellar.io
@@ -1110,10 +1080,8 @@ spec:
                   description: |-
                     NamedAggregator pairs a name with a way to aggregate over some objects.
 
-
                     - For `type=="COUNT"`, `subject` is omitted and the aggregate is the count
                     of those objects that are not `null`.
-
 
                     - For the other types, `subject` is required and SHOULD
                     evaluate to a numeric value; exceptions are handled as follows.

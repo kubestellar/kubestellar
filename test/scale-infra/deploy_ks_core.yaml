@@ -153,5 +153,3 @@
         kubehost: "{{ ansible_host }}"
       when: inventory_hostname == ansible_play_hosts_all[0]
 
-
-

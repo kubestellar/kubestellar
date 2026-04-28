@@ -19,15 +19,14 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
-	"time"
+	context "context"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
-	rest "k8s.io/client-go/rest"
+	gentype "k8s.io/client-go/gentype"
 
-	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	controlv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	scheme "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned/scheme"
 )
 
@@ -39,147 +38,34 @@ type BindingPoliciesGetter interface {
 
 // BindingPolicyInterface has methods to work with BindingPolicy resources.
 type BindingPolicyInterface interface {
-	Create(ctx context.Context, bindingPolicy *v1alpha1.BindingPolicy, opts v1.CreateOptions) (*v1alpha1.BindingPolicy, error)
-	Update(ctx context.Context, bindingPolicy *v1alpha1.BindingPolicy, opts v1.UpdateOptions) (*v1alpha1.BindingPolicy, error)
-	UpdateStatus(ctx context.Context, bindingPolicy *v1alpha1.BindingPolicy, opts v1.UpdateOptions) (*v1alpha1.BindingPolicy, error)
+	Create(ctx context.Context, bindingPolicy *controlv1alpha1.BindingPolicy, opts v1.CreateOptions) (*controlv1alpha1.BindingPolicy, error)
+	Update(ctx context.Context, bindingPolicy *controlv1alpha1.BindingPolicy, opts v1.UpdateOptions) (*controlv1alpha1.BindingPolicy, error)
+	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+	UpdateStatus(ctx context.Context, bindingPolicy *controlv1alpha1.BindingPolicy, opts v1.UpdateOptions) (*controlv1alpha1.BindingPolicy, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.BindingPolicy, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.BindingPolicyList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*controlv1alpha1.BindingPolicy, error)
+	List(ctx context.Context, opts v1.ListOptions) (*controlv1alpha1.BindingPolicyList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.BindingPolicy, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *controlv1alpha1.BindingPolicy, err error)
 	BindingPolicyExpansion
 }
 
 // bindingPolicies implements BindingPolicyInterface
 type bindingPolicies struct {
-	client rest.Interface
+	*gentype.ClientWithList[*controlv1alpha1.BindingPolicy, *controlv1alpha1.BindingPolicyList]
 }
 
 // newBindingPolicies returns a BindingPolicies
 func newBindingPolicies(c *ControlV1alpha1Client) *bindingPolicies {
 	return &bindingPolicies{
-		client: c.RESTClient(),
+		gentype.NewClientWithList[*controlv1alpha1.BindingPolicy, *controlv1alpha1.BindingPolicyList](
+			"bindingpolicies",
+			c.RESTClient(),
+			scheme.ParameterCodec,
+			"",
+			func() *controlv1alpha1.BindingPolicy { return &controlv1alpha1.BindingPolicy{} },
+			func() *controlv1alpha1.BindingPolicyList { return &controlv1alpha1.BindingPolicyList{} },
+		),
 	}
-}
-
-// Get takes name of the bindingPolicy, and returns the corresponding bindingPolicy object, and an error if there is any.
-func (c *bindingPolicies) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.BindingPolicy, err error) {
-	result = &v1alpha1.BindingPolicy{}
-	err = c.client.Get().
-		Resource("bindingpolicies").
-		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// List takes label and field selectors, and returns the list of BindingPolicies that match those selectors.
-func (c *bindingPolicies) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.BindingPolicyList, err error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	result = &v1alpha1.BindingPolicyList{}
-	err = c.client.Get().
-		Resource("bindingpolicies").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Watch returns a watch.Interface that watches the requested bindingPolicies.
-func (c *bindingPolicies) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Resource("bindingpolicies").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
-}
-
-// Create takes the representation of a bindingPolicy and creates it.  Returns the server's representation of the bindingPolicy, and an error, if there is any.
-func (c *bindingPolicies) Create(ctx context.Context, bindingPolicy *v1alpha1.BindingPolicy, opts v1.CreateOptions) (result *v1alpha1.BindingPolicy, err error) {
-	result = &v1alpha1.BindingPolicy{}
-	err = c.client.Post().
-		Resource("bindingpolicies").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(bindingPolicy).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Update takes the representation of a bindingPolicy and updates it. Returns the server's representation of the bindingPolicy, and an error, if there is any.
-func (c *bindingPolicies) Update(ctx context.Context, bindingPolicy *v1alpha1.BindingPolicy, opts v1.UpdateOptions) (result *v1alpha1.BindingPolicy, err error) {
-	result = &v1alpha1.BindingPolicy{}
-	err = c.client.Put().
-		Resource("bindingpolicies").
-		Name(bindingPolicy.Name).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(bindingPolicy).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *bindingPolicies) UpdateStatus(ctx context.Context, bindingPolicy *v1alpha1.BindingPolicy, opts v1.UpdateOptions) (result *v1alpha1.BindingPolicy, err error) {
-	result = &v1alpha1.BindingPolicy{}
-	err = c.client.Put().
-		Resource("bindingpolicies").
-		Name(bindingPolicy.Name).
-		SubResource("status").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(bindingPolicy).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Delete takes name of the bindingPolicy and deletes it. Returns an error if one occurs.
-func (c *bindingPolicies) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	return c.client.Delete().
-		Resource("bindingpolicies").
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *bindingPolicies) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	var timeout time.Duration
-	if listOpts.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
-	}
-	return c.client.Delete().
-		Resource("bindingpolicies").
-		VersionedParams(&listOpts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// Patch applies the patch and returns the patched bindingPolicy.
-func (c *bindingPolicies) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.BindingPolicy, err error) {
-	result = &v1alpha1.BindingPolicy{}
-	err = c.client.Patch(pt).
-		Resource("bindingpolicies").
-		Name(name).
-		SubResource(subresources...).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
 }

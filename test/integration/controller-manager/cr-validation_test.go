@@ -39,7 +39,7 @@ func TestBindingPolicyValidation(t *testing.T) {
 	testWriter := framework.NewTBWriter(t)
 	logger, ctx := ktesting.NewTestContext(t)
 	logger.Info("Starting etcd server")
-	framework.StartEtcd(t, testWriter)
+	framework.StartEtcd(t, testWriter, false)
 	logger.Info("Starting TestController")
 	t.Log("Beginning TestController")
 	ctx, cancel := context.WithCancel(ctx)

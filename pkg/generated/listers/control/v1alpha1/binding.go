@@ -19,11 +19,11 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/tools/cache"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 
-	v1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	controlv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
 // BindingLister helps list Bindings.
@@ -31,39 +31,19 @@ import (
 type BindingLister interface {
 	// List lists all Bindings in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.Binding, err error)
+	List(selector labels.Selector) (ret []*controlv1alpha1.Binding, err error)
 	// Get retrieves the Binding from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.Binding, error)
+	Get(name string) (*controlv1alpha1.Binding, error)
 	BindingListerExpansion
 }
 
 // bindingLister implements the BindingLister interface.
 type bindingLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*controlv1alpha1.Binding]
 }
 
 // NewBindingLister returns a new BindingLister.
 func NewBindingLister(indexer cache.Indexer) BindingLister {
-	return &bindingLister{indexer: indexer}
-}
-
-// List lists all Bindings in the indexer.
-func (s *bindingLister) List(selector labels.Selector) (ret []*v1alpha1.Binding, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Binding))
-	})
-	return ret, err
-}
-
-// Get retrieves the Binding from the index for a given name.
-func (s *bindingLister) Get(name string) (*v1alpha1.Binding, error) {
-	obj, exists, err := s.indexer.GetByKey(name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("binding"), name)
-	}
-	return obj.(*v1alpha1.Binding), nil
+	return &bindingLister{listers.New[*controlv1alpha1.Binding](indexer, controlv1alpha1.Resource("binding"))}
 }

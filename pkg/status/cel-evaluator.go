@@ -20,7 +20,6 @@ import (
 	"fmt"
 
 	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types/ref"
 
 	"github.com/kubestellar/kubestellar/api/control/v1alpha1"
@@ -51,12 +50,10 @@ type celEvaluator struct {
 // NewCELEvaluator initializes the CEL environment.
 func newCELEvaluator() (*celEvaluator, error) {
 	env, err := cel.NewEnv(
-		cel.Declarations(
-			decls.NewVar(sourceObjectKey, decls.NewMapType(decls.String, decls.Dyn)),
-			decls.NewVar(returnedKey, decls.NewMapType(decls.String, decls.Dyn)),
-			decls.NewVar(inventoryKey, decls.NewMapType(decls.String, decls.String)), // contains name:string only
-			decls.NewVar(propagationMetaKey, decls.NewMapType(decls.String, decls.Dyn)),
-		),
+		cel.Variable(sourceObjectKey, cel.MapType(cel.StringType, cel.DynType)),
+		cel.Variable(returnedKey, cel.MapType(cel.StringType, cel.DynType)),
+		cel.Variable(inventoryKey, cel.MapType(cel.StringType, cel.StringType)),
+		cel.Variable(propagationMetaKey, cel.MapType(cel.StringType, cel.DynType)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create CEL environment: %v", err)

@@ -109,7 +109,7 @@ func TestMatching(t *testing.T) {
 	itsClientMetrics := spacesClientMetrics.MetricsForSpace("its")
 
 	logger.Info("Starting etcd server")
-	framework.StartEtcd(t, testWriter)
+	framework.StartEtcd(t, testWriter, false)
 	logger.Info("Starting TestController")
 	t.Log("Beginning TestController")
 	ctx, cancel := context.WithCancel(ctx)

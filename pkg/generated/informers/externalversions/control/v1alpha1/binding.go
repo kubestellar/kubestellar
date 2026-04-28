@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,17 +27,17 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
 
-	controlv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
+	apicontrolv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	versioned "github.com/kubestellar/kubestellar/pkg/generated/clientset/versioned"
 	internalinterfaces "github.com/kubestellar/kubestellar/pkg/generated/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
+	controlv1alpha1 "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 )
 
 // BindingInformer provides access to a shared informer and lister for
 // Bindings.
 type BindingInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.BindingLister
+	Lister() controlv1alpha1.BindingLister
 }
 
 type bindingInformer struct {
@@ -71,7 +71,7 @@ func NewFilteredBindingInformer(client versioned.Interface, resyncPeriod time.Du
 				return client.ControlV1alpha1().Bindings().Watch(context.TODO(), options)
 			},
 		},
-		&controlv1alpha1.Binding{},
+		&apicontrolv1alpha1.Binding{},
 		resyncPeriod,
 		indexers,
 	)
@@ -82,9 +82,9 @@ func (f *bindingInformer) defaultInformer(client versioned.Interface, resyncPeri
 }
 
 func (f *bindingInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&controlv1alpha1.Binding{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicontrolv1alpha1.Binding{}, f.defaultInformer)
 }
 
-func (f *bindingInformer) Lister() v1alpha1.BindingLister {
-	return v1alpha1.NewBindingLister(f.Informer().GetIndexer())
+func (f *bindingInformer) Lister() controlv1alpha1.BindingLister {
+	return controlv1alpha1.NewBindingLister(f.Informer().GetIndexer())
 }
