@@ -63,16 +63,14 @@ func SplitLabelKeyAndValue(keyvalue string) (Label, error) {
 }
 
 func SelectorsMatchLabels(selectors []metav1.LabelSelector, labelsSet labels.Set) (bool, error) {
-	matches := true
 	for _, selectorApi := range selectors {
 		selector, err := metav1.LabelSelectorAsSelector(&selectorApi)
 		if err != nil {
 			return false, err
 		}
-		if !selector.Matches(labelsSet) {
-			matches = false
-			break
+		if selector.Matches(labelsSet) {
+			return true, nil
 		}
 	}
-	return matches, nil
+	return false, nil
 }
