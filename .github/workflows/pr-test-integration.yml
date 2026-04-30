@@ -39,7 +39,7 @@ jobs:
           cache: true
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
+        uses: azure/setup-kubectl@829323503d1be3d00ca8346e5391ca0b07a9ab0d
         id: install
 
       - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
