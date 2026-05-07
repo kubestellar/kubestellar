@@ -151,7 +151,16 @@ _Congratulations! Your pull request has been successfully merged!_ 👏
 
 If you have any questions about contributing, don't hesitate to reach out to us on the KubeStellar-dev [Slack channel](https://cloud-native.slack.com/archives/C097094RZ3M/).
 
+## Testing Policy
 
+To ensure the reliability and stability of KubeStellar, we maintain a rigorous testing policy. Automated testing is a fundamental requirement for all contributions to satisfy OpenSSF Best Practices.
+
+- **Requirement**: All new functionality, core logic changes, and major bug fixes **MUST** be accompanied by automated tests.
+- **Scope**:
+    - **Go Backend**: Contributions must include unit and/or integration tests.
+    - **Console**: Front-end changes must be covered by Playwright E2E tests for the Console.
+- **Enforcement**: Pull Requests without adequate test coverage will be flagged during review and may not be merged until sufficient tests are provided.
+- **CI/CD**: These tests are integrated into our GitHub Actions workflows to ensure zero-regression and maintain high code quality.
 
 ## Testing Locally
 
