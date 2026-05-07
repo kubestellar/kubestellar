@@ -20,7 +20,6 @@ on:
 
 permissions:
   contents: read
-  security-events: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -28,6 +27,9 @@ concurrency:
 
 jobs:
   scan:
+    permissions:
+      contents: read
+      security-events: write
     uses: kubestellar/infra/.github/workflows/reusable-image-scanning.yml@main
     secrets: inherit
     with:
