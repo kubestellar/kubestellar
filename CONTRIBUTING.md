@@ -162,6 +162,24 @@ To ensure the reliability and stability of KubeStellar, we maintain a rigorous t
 - **Enforcement**: Pull Requests without adequate test coverage will be flagged during review and may not be merged until sufficient tests are provided.
 - **CI/CD**: These tests are integrated into our GitHub Actions workflows to ensure zero-regression and maintain high code quality.
 
+## Testing Policy
+
+To ensure the reliability and stability of KubeStellar, we maintain a rigorous testing policy. Automated testing is a fundamental requirement for all contributions to satisfy OpenSSF Best Practices.
+
+- **Requirement**: All new functionality, changes to core logic, and bug fixes **MUST** include automated tests that verify the changed behavior or code path. Bug fixes should include a regression test when practical.
+- **Scope**:
+    - **Go Backend**: Contributions must include unit and/or integration tests.
+        - Unit tests are located alongside the code (e.g., in `pkg/`). Run them with `make test`.
+        - Integration tests are located in [test/integration/](test/integration/).
+        - End-to-end (E2E) tests are located in [test/e2e/](test/e2e/) and can be run using [run-test.sh](test/e2e/run-test.sh).
+    - **Console**: Front-end changes in the [Console repository](https://github.com/kubestellar/console) must be covered by Playwright E2E tests.
+- **Enforcement**: Pull requests that do not include the required tests for the changed behavior or code path will be flagged during review and may not be merged until those tests are provided.
+- **Exception Process**: If automated tests are impractical, explain the reason in the pull request description, describe any manual validation performed, and link a follow-up GitHub issue for adding or improving test coverage.
+- **CI/CD**: These tests are integrated into our GitHub Actions workflows to ensure zero-regression and maintain high code quality. Relevant workflows include:
+    - [Integration Tests Workflow](.github/workflows/pr-test-integration.yml)
+    - [E2E Tests Workflow](.github/workflows/pr-test-e2e.yml)
+    - [Linting Workflow](.github/workflows/golangci-lint.yml)
+
 ## Testing Locally
 
 
