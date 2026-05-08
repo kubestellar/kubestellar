@@ -236,10 +236,6 @@ jobs:
         if: always()
         run: kubectl --context k3d-kubeflex -n wds1-system logs $(kubectl --context k3d-kubeflex -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}')
 
-      - name: show ConfigMap transport-controller-config
-        if: always()
-        run: kubectl --context k3d-kubeflex get cm -n wds1-system transport-controller-config -o yaml
-
       - name: show bindingpolicies
         if: always()
         run: kubectl --context wds1 get bindingpolicies.control.kubestellar.io -o yaml
