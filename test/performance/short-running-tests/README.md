@@ -7,7 +7,7 @@ To generate the sample workload for KubeStellar performance experiments for shor
 1. Clone the following clusterloader2 repo: 
 
    ```bash
-   git clone -b release-1.31 https://github.com/kubernetes/perf-tests.git
+   git clone -b release-1.32 https://github.com/kubernetes/perf-tests.git
    ```
 
 2. Configure clusterloader2 to generate KS performance workloads:

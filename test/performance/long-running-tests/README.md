@@ -5,7 +5,7 @@ To generate the sample workload for KubeStellar performance experiments for long
 1. Clone the following clusterloader2 repo. It's the tool used to deploy the benchmark workload in a KubeStellar environment:
 
    ```bash 
-   git clone -b release-1.31 https://github.com/kubernetes/perf-tests.git
+   git clone -b release-1.32 https://github.com/kubernetes/perf-tests.git
    ```
 
 2. Configure clusterloader2 to generate KS performance workloads:
