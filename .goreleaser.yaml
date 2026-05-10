@@ -65,7 +65,7 @@ kos:
     - linux/arm64
   - id: kflex-get-kubeconfig
     repositories: 
-      -ghcr.io/kubestellar/kubestellar/kflex-get-kubeconfig
+      - ghcr.io/kubestellar/kubestellar/kflex-get-kubeconfig
     build: kflex-get-kubeconfig
     tags:
     - '{{.Version}}'
