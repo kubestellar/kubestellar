@@ -37,7 +37,7 @@ builds:
   env:
   - CGO_ENABLED=0
 kos:           
-  - id: controller-manager
+  - id: kubestellar-controller-manager
     repositories: 
       - ghcr.io/kubestellar/kubestellar/controller-manager
     build: controller-manager
