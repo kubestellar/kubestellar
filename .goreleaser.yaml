@@ -37,8 +37,9 @@ builds:
   env:
   - CGO_ENABLED=0
 kos:           
-  - id: kubestellar-controller-manager
-    repository: ghcr.io/kubestellar/kubestellar/controller-manager
+  - id: controller-manager
+    repositories: 
+      - ghcr.io/kubestellar/kubestellar/controller-manager
     build: controller-manager
     tags:
     - '{{.Version}}'
@@ -50,7 +51,8 @@ kos:
     - linux/amd64
     - linux/arm64
   - id: ocm-transport-controller
-    repository: ghcr.io/kubestellar/kubestellar/ocm-transport-controller
+    repositories: 
+      - ghcr.io/kubestellar/kubestellar/ocm-transport-controller
     build: ocm-transport-controller
     tags:
     - '{{.Version}}'
@@ -62,7 +64,8 @@ kos:
     - linux/amd64
     - linux/arm64
   - id: kflex-get-kubeconfig
-    repository: ghcr.io/kubestellar/kubestellar/kflex-get-kubeconfig
+    repositories: 
+      -ghcr.io/kubestellar/kubestellar/kflex-get-kubeconfig
     build: kflex-get-kubeconfig
     tags:
     - '{{.Version}}'
