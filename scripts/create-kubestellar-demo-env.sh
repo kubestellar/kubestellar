@@ -68,7 +68,7 @@ if ! dunsel=$(docker ps 2>&1); then
 fi
 echo "Container runtime is running."
 
-kubestellar_version=0.30.0-rc.1
+kubestellar_version=0.30.0
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
 echo -e "Checking that pre-req softwares are installed..."
@@ -180,7 +180,7 @@ kubectl config use-context $k8s_platform-kubeflex
 echo -e "\nPulling container images local..."
 images=("ghcr.io/loft-sh/vcluster:0.16.4"
         "rancher/k3s:v1.27.2-k3s1"
-        "quay.io/open-cluster-management/registration-operator:v0.15.2"
+        "quay.io/open-cluster-management/registration-operator:v1.0.0"
         "quay.io/kubestellar/postgresql:16.0.0-debian-11-r13")
 
 for image in "${images[@]}"; do
