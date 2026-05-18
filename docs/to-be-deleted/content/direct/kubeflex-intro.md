@@ -1,4 +1,4 @@
-# <img alt="Logo" width="90px" src="../images/kubeflex-logo.png" style="vertical-align: middle;" /> KubeFlex
+# <img alt="Logo" width="90px" src="images/kubeflex-logo.png" style="vertical-align: middle;" /> KubeFlex
 
 One of the technologies underlying KubeStellar is KubeFlex, a kubernetes-based platform designed to:
 
