@@ -70,7 +70,7 @@ var (
 			Help:    "Time taken to reconcile binding controller workqueue items",
 			Buckets: prometheus.DefBuckets,
 		},
-		[]string{"type", "outcome"},
+		[]string{"item_type", "outcome"},
 	)
 
 	bindingReconcileTotal = prometheus.NewCounterVec(
@@ -78,7 +78,7 @@ var (
 			Name: "kubestellar_binding_reconcile_total",
 			Help: "Total number of reconciliations processed by binding controller",
 		},
-		[]string{"type", "outcome"},
+		[]string{"item_type", "outcome"},
 	)
 )
 
@@ -737,12 +737,17 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 
 	// We wrap this block in a func so we can defer c.workqueue.Done.
 	err := func() error {
+		// We call Done here so the workqueue knows we have finished
+		// processing this item. We also must remember to call Forget if we
+		// do not want this work item being re-queued. For example, we do
+		// not call Forget if a transient error occurs, instead the item is
+		// put back on the workqueue and attempted again after a back-off
+		// period.
 		defer c.workqueue.Done(item)
 
-		// Run reconciler
+		// Run the reconciler, passing it the full object identifier
 		if err := c.reconcile(ctx, item); err != nil {
-
-			// Requeue transient failures
+			// Put the item back on the workqueue to handle any transient errors.
 			c.workqueue.AddRateLimited(item)
 
 			duration := time.Since(start).Seconds()
@@ -756,14 +761,15 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 				Inc()
 
 			return fmt.Errorf(
-				"error reconciling object (identifier: %#v, type: %T): %s, requeuing",
+				"error reconciling object (identifier: %#v, type: %T): %w, requeuing",
 				item,
 				item,
-				err.Error(),
+				err,
 			)
 		}
 
-		// Success path
+		// Finally, if no error occurs we Forget this item so it does not
+		// get queued again until another change happens.
 		c.workqueue.Forget(item)
 
 		duration := time.Since(start).Seconds()
