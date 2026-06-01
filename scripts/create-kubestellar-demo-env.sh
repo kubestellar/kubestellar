@@ -79,7 +79,7 @@ echo "Container runtime is running."
 
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
-SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd 2>/dev/null || echo ".")"
+SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo ".")"
 
 echo -e "Checking that pre-req softwares are installed..."
 if [ -f "${SRC_DIR}/check_pre_req.sh" ]; then
