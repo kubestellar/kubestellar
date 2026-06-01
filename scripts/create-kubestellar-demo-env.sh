@@ -18,26 +18,35 @@ set -e
 # Script info
 SCRIPT_NAME="create-kubestellar-demo-env.sh"
 
-# Default Kubernetes platform parameter
+# Default parameters
 k8s_platform="kind"
+kubestellar_version="0.30.0"
+git_ref=""
 
 # Parse command-line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --platform) k8s_platform="$2"; shift ;;
+        --version) kubestellar_version="$2"; shift ;;
+        --git-ref) git_ref="$2"; shift ;;
         -X) set -x ;;
         -h|--help)
-            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [-X] [-h|--help]" >&2
+            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [--version <version>] [--git-ref <ref>] [-X] [-h|--help]" >&2
             exit 0
             ;;
         *)
             echo "Unknown parameter passed: $1" >&2
-            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [-X] [-h|--help]" >&2
+            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [--version <version>] [--git-ref <ref>] [-X] [-h|--help]" >&2
             exit 1
             ;;
     esac
     shift
 done
+
+# If git_ref is not specified, default to v${kubestellar_version}
+if [[ -z "$git_ref" ]]; then
+    git_ref="v${kubestellar_version}"
+fi
 
 if [[ "$k8s_platform" != "kind" && "$k8s_platform" != "k3d" ]]; then
     echo "Invalid platform specified: $k8s_platform"
@@ -68,14 +77,25 @@ if ! dunsel=$(docker ps 2>&1); then
 fi
 echo "Container runtime is running."
 
-kubestellar_version=0.30.0
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
+SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd 2>/dev/null || echo ".")"
+
 echo -e "Checking that pre-req softwares are installed..."
-if [ "$k8s_platform" == "kind" ]; then
-    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker kind
+if [ -f "${SRC_DIR}/check_pre_req.sh" ]; then
+    echo "Using local check_pre_req.sh"
+    if [ "$k8s_platform" == "kind" ]; then
+        bash "${SRC_DIR}/check_pre_req.sh" --assert -V kflex ocm helm kubectl docker kind
+    else
+        bash "${SRC_DIR}/check_pre_req.sh" --assert -V kflex ocm helm kubectl docker k3d
+    fi
 else
-    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker k3d
+    echo "Fetching check_pre_req.sh from GitHub (ref: ${git_ref})...."
+    if [ "$k8s_platform" == "kind" ]; then
+        curl -s "https://raw.githubusercontent.com/kubestellar/kubestellar/${git_ref}/scripts/check_pre_req.sh" | bash -s -- --assert -V kflex ocm helm kubectl docker kind
+    else
+        curl -s "https://raw.githubusercontent.com/kubestellar/kubestellar/${git_ref}/scripts/check_pre_req.sh" | bash -s -- --assert -V kflex ocm helm kubectl docker k3d
+    fi
 fi
 
 ##########################################
@@ -167,7 +187,13 @@ done
 
 echo -e "Creating KubeFlex cluster with SSL Passthrough"
 if [ "$k8s_platform" == "kind" ]; then
-    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext
+    if [ -f "${SRC_DIR}/create-kind-cluster-with-SSL-passthrough.sh" ]; then
+        echo "Using local create-kind-cluster-with-SSL-passthrough.sh"
+        bash "${SRC_DIR}/create-kind-cluster-with-SSL-passthrough.sh" --name kubeflex --nosetcontext
+    else
+        echo "Fetching create-kind-cluster-with-SSL-passthrough.sh from GitHub (ref: ${git_ref})..."
+        curl -s "https://raw.githubusercontent.com/kubestellar/kubestellar/${git_ref}/scripts/create-kind-cluster-with-SSL-passthrough.sh" | bash -s -- --name kubeflex --nosetcontext
+    fi
 else
     k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
     kubectl wait --for=condition=Ready node --all --timeout=600s #Ensure both API server and nodes are ready
