@@ -18,9 +18,6 @@ set -e
 # Script info
 SCRIPT_NAME="create-kubestellar-demo-env.sh"
 
-echo "WARNING: ${SCRIPT_NAME} is deprecated and will be removed in a future release." >&2
-echo "Please use create-demo-env-from-given-release.sh instead, which requires explicitly specifying the KubeStellar version via the --version option." >&2
-
 # Default Kubernetes platform parameter
 k8s_platform="kind"
 
@@ -47,6 +44,9 @@ if [[ "$k8s_platform" != "kind" && "$k8s_platform" != "k3d" ]]; then
     echo "Supported platforms are: kind, k3d"
     exit 1
 fi
+
+echo "WARNING: ${SCRIPT_NAME} is deprecated and will be removed in a future release." >&2
+echo "Please use create-demo-env-from-given-release.sh instead, which requires explicitly specifying the KubeStellar version via the --version option." >&2
 
 echo "Selected Kubernetes platform: $k8s_platform"
 
