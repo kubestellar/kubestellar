@@ -33,9 +33,13 @@ source "${common_srcs}/setup-shell.sh"
 
 echo "Testing demo environment setup with platform: $platform"
 
+# Get the version from the deprecated script to test the new script and safely strip quotes
+kubestellar_version=$(grep -E '^kubestellar_version=' "${scripts_dir}/create-kubestellar-demo-env.sh" | cut -d= -f2 | tr -d '"' | tr -d "'")
+
+
 # Test the demo environment creation script
-echo "Creating demo environment with $platform..."
-if ! "${scripts_dir}/create-kubestellar-demo-env.sh" --platform $platform; then
+echo "Creating demo environment with $platform using version $kubestellar_version..."
+if ! "${scripts_dir}/create-demo-env-from-given-release.sh" --platform $platform --version "$kubestellar_version"; then
     echo "ERROR: Demo environment creation script failed for $platform!"
     exit 1
 fi

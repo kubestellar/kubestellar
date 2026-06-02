@@ -9,6 +9,7 @@ on:
     paths:
       - ".github/workflows/test-demo-env-creation-script.yml"
       - "scripts/create-kubestellar-demo-env.sh"
+      - "scripts/create-demo-env-from-given-release.sh"
       - "test/e2e/ci/test-demo-env.sh"
       - "test/e2e/common/setup-shell.sh"
       - "test/e2e/bash/use-kubestellar.sh"
@@ -16,6 +17,7 @@ on:
     paths:
       - ".github/workflows/test-demo-env-creation-script.yml"
       - "scripts/create-kubestellar-demo-env.sh"
+      - "scripts/create-demo-env-from-given-release.sh"
       - "test/e2e/ci/test-demo-env.sh"
       - "test/e2e/common/setup-shell.sh"
       - "test/e2e/bash/use-kubestellar.sh"

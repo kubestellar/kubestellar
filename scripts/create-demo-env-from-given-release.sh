@@ -16,31 +16,55 @@
 set -e
 
 # Script info
-SCRIPT_NAME="create-kubestellar-demo-env.sh"
-
-echo "WARNING: ${SCRIPT_NAME} is deprecated and will be removed in a future release." >&2
-echo "Please use create-demo-env-from-given-release.sh instead, which requires explicitly specifying the KubeStellar version via the --version option." >&2
+SCRIPT_NAME="create-demo-env-from-given-release.sh"
 
 # Default Kubernetes platform parameter
 k8s_platform="kind"
+kubestellar_version=""
 
 # Parse command-line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --platform) k8s_platform="$2"; shift ;;
-        -X) set -x ;;
+        --platform)
+            if [[ -z "$2" ]]; then
+                echo "Error: --platform requires an argument." >&2
+                exit 1
+            fi
+            k8s_platform="$2"
+            shift
+            ;;
+        -v|--version)
+            if [[ -z "$2" ]]; then
+                echo "Error: --version requires an argument." >&2
+                exit 1
+            fi
+            kubestellar_version="$2"
+            shift
+            ;;
+        -X)
+            set -x
+            ;;
         -h|--help)
-            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [-X] [-h|--help]" >&2
+            echo "Usage: ${SCRIPT_NAME} --version <version> [--platform <kind|k3d>] [-X] [-h|--help]" >&2
             exit 0
             ;;
         *)
             echo "Unknown parameter passed: $1" >&2
-            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [-X] [-h|--help]" >&2
+            echo "Usage: ${SCRIPT_NAME} --version <version> [--platform <kind|k3d>] [-X] [-h|--help]" >&2
             exit 1
             ;;
     esac
     shift
 done
+
+if [[ -z "$kubestellar_version" ]]; then
+    echo "Error: --version <version> is required." >&2
+    echo "Usage: ${SCRIPT_NAME} --version <version> [--platform <kind|k3d>] [-X] [-h|--help]" >&2
+    exit 1
+fi
+
+kubestellar_version="${kubestellar_version#v}"
+kubestellar_ref="v${kubestellar_version}"
 
 if [[ "$k8s_platform" != "kind" && "$k8s_platform" != "k3d" ]]; then
     echo "Invalid platform specified: $k8s_platform"
@@ -49,6 +73,23 @@ if [[ "$k8s_platform" != "kind" && "$k8s_platform" != "k3d" ]]; then
 fi
 
 echo "Selected Kubernetes platform: $k8s_platform"
+echo "KubeStellar Version: ${kubestellar_version}"
+echo "KubeStellar Git ref for helper scripts: ${kubestellar_ref}"
+
+SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo ".")"
+
+run_helper_script() {
+    local script_name="$1"
+    shift
+
+    if [ -f "${SRC_DIR}/${script_name}" ]; then
+        echo "Using local ${script_name}"
+        bash "${SRC_DIR}/${script_name}" "$@"
+    else
+        echo "Fetching ${script_name} from GitHub (ref: ${kubestellar_ref})..."
+        curl -s "https://raw.githubusercontent.com/kubestellar/kubestellar/${kubestellar_ref}/scripts/${script_name}" | bash -s -- "$@"
+    fi
+}
 
 # Function to check if a command exists
 command_exists() {
@@ -71,15 +112,9 @@ if ! dunsel=$(docker ps 2>&1); then
 fi
 echo "Container runtime is running."
 
-kubestellar_version=0.30.0
-echo -e "KubeStellar Version: ${kubestellar_version}"
-
 echo -e "Checking that pre-req softwares are installed..."
-if [ "$k8s_platform" == "kind" ]; then
-    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker kind
-else
-    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker k3d
-fi
+platform_tool="$k8s_platform"
+run_helper_script check_pre_req.sh --assert -V kflex ocm helm kubectl docker "$platform_tool"
 
 ##########################################
 cluster_clean_up() {
@@ -170,7 +205,7 @@ done
 
 echo -e "Creating KubeFlex cluster with SSL Passthrough"
 if [ "$k8s_platform" == "kind" ]; then
-    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext
+    run_helper_script create-kind-cluster-with-SSL-passthrough.sh --name kubeflex --nosetcontext
 else
     k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
     kubectl wait --for=condition=Ready node --all --timeout=600s #Ensure both API server and nodes are ready
@@ -216,7 +251,7 @@ else var_flags=""
 fi
 
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-        --version $kubestellar_version \
+        --version "$kubestellar_version" \
         --set-json='ITSes=[{"name":"its1"}]' \
         --set-json='WDSes=[{"name":"wds1"},{"name":"wds2", "type":"host"}]' \
         --set-json='verbosity.default=5' \
