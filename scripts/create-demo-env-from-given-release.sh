@@ -14,6 +14,7 @@
 # limitations under the License.
 
 set -e
+set -o pipefail
 
 # Script info
 SCRIPT_NAME="create-demo-env-from-given-release.sh"
@@ -87,7 +88,7 @@ run_helper_script() {
         bash "${SRC_DIR}/${script_name}" "$@"
     else
         echo "Fetching ${script_name} from GitHub (ref: ${kubestellar_ref})..."
-        curl -s "https://raw.githubusercontent.com/kubestellar/kubestellar/${kubestellar_ref}/scripts/${script_name}" | bash -s -- "$@"
+        curl -sSf "https://raw.githubusercontent.com/kubestellar/kubestellar/${kubestellar_ref}/scripts/${script_name}" | bash -s -- "$@"
     fi
 }
 
