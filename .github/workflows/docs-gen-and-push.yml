@@ -45,7 +45,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
           token: ${{ github.repository_owner == 'kubestellar' && secrets.GH_ALL_PROJECT_TOKEN || github.token }}
           persist-credentials: "true"
