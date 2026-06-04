@@ -64,6 +64,14 @@ if [[ -z "$kubestellar_version" ]]; then
     exit 1
 fi
 
+# Validate version format to prevent arbitrary remote code execution
+# Allow SemVer-like versions: X.Y.Z with optional pre-release/build metadata
+if ! [[ "$kubestellar_version" =~ ^v?[0-9]+(\.[0-9]+){2}([+-][0-9A-Za-z.-]+)?$ ]]; then
+    echo "Error: invalid version format: $kubestellar_version" >&2
+    echo "Expected format: X.Y.Z or vX.Y.Z (optionally with pre-release/build metadata)" >&2
+    exit 1
+fi
+
 kubestellar_version="${kubestellar_version#v}"
 kubestellar_ref="v${kubestellar_version}"
 
@@ -131,7 +139,8 @@ run_helper_script check_pre_req.sh --assert -V kflex ocm helm kubectl docker lso
 
 ##########################################
 cluster_clean_up() {
-    if ! error_message=$(eval "$1" 2>&1); then
+    local cmd=("$@")
+    if ! error_message=$( "${cmd[@]}" 2>&1 ); then
         echo "clean up failed. Error:"
         echo "$error_message"
     fi
@@ -155,33 +164,41 @@ context_clean_up() {
 }
 
 checking_cluster() {
+    local cluster_name="$1"
+    local csr_timeout=300  # 5 minutes
+    local elapsed=0
     while IFS= read -r line; do
         # Check for the cluster name and "Pending" status
-        if echo "$line" | grep -q "$1" && echo "$line" | grep -q "Pending"; then
-            echo "Pending CSR for $1 has been found, approving..."
-            if clusteradm --context its1 accept --clusters "$1"; then
-                echo -e "\033[33m✔\033[0m CSR Approved for $1."
+        if echo "$line" | grep -q "$cluster_name" && echo "$line" | grep -q "Pending"; then
+            echo "Pending CSR for $cluster_name has been found, approving..."
+            if clusteradm --context its1 accept --clusters "$cluster_name"; then
+                echo -e "\033[33m✔\033[0m CSR Approved for $cluster_name."
                 return 0
             else
-                echo -e "\033[0;31mX\033[0m Failed to approve CSR for $1."
+                echo -e "\033[0;31mX\033[0m Failed to approve CSR for $cluster_name."
                 return 1
             fi
         fi
-    done < <(kubectl --context its1 get csr --watch)
+        ((elapsed++))
+        if (( elapsed > csr_timeout )); then
+            echo "ERROR: CSR for $cluster_name did not appear within ${csr_timeout}s" >&2
+            return 1
+        fi
+    done < <(timeout "$csr_timeout" kubectl --context its1 get csr --watch)
 }
 
 echo -e "\nStarting environment clean up..."
 echo -e "Starting cluster clean up..."
 
 if command_exists "k3d"; then
-    cluster_clean_up "k3d cluster delete kubeflex"
-    cluster_clean_up "k3d cluster delete cluster1"
-    cluster_clean_up "k3d cluster delete cluster2"
+    cluster_clean_up k3d cluster delete kubeflex
+    cluster_clean_up k3d cluster delete cluster1
+    cluster_clean_up k3d cluster delete cluster2
 fi
 if command_exists "kind"; then
-    cluster_clean_up "kind delete cluster --name kubeflex"
-    cluster_clean_up "kind delete cluster --name cluster1"
-    cluster_clean_up "kind delete cluster --name cluster2"
+    cluster_clean_up kind delete cluster --name kubeflex
+    cluster_clean_up kind delete cluster --name cluster1
+    cluster_clean_up kind delete cluster --name cluster2
 fi
 
 echo -e "\033[33m✔\033[0m Cluster space clean up has been completed"
@@ -196,7 +213,7 @@ echo -e "\033[33m✔\033[0m Context space clean up completed"
 echo -e "\nCreating two $k8s_platform clusters to serve as example WECs"
 clusters=(cluster1 cluster2)
 temp_dir=$(mktemp -d)
-trap "rm -rf $temp_dir" EXIT
+trap "rm -rf \"$temp_dir\"" EXIT
 for cluster in "${clusters[@]}"; do
     if {
       if [ "$k8s_platform" == "kind" ]; then
@@ -233,8 +250,8 @@ images=("ghcr.io/loft-sh/vcluster:0.16.4"
         "quay.io/kubestellar/postgresql:16.0.0-debian-11-r13")
 
 for image in "${images[@]}"; do
-    if ! docker inspect $image &> /dev/null; then
-        docker pull $image &
+    if ! docker inspect "$image" &> /dev/null; then
+        docker pull "$image" &
     fi
 done
 wait
@@ -289,9 +306,16 @@ echo -e "\nRegistering cluster 1 and 2 for remote access with KubeStellar Core..
 # set flags to "" if you have installed KubeStellar on an OpenShift cluster
 flags="--force-internal-endpoint-lookup"
 clusters=(cluster1 cluster2);
-if ! joincmd=$(clusteradm --context its1 get token | grep '^clusteradm join')
-then echo -e "\033[0;31mX\033[0m get token failed!\n" >&2; echo "$joincmd" >&2; false
-fi
+token_output=$(clusteradm --context its1 get token 2>&1) || {
+    echo -e "\033[0;31mX\033[0m get token failed!" >&2
+    echo "$token_output" >&2
+    false
+}
+joincmd=$(echo "$token_output" | grep '^clusteradm join') || {
+    echo -e "\033[0;31mX\033[0m clusteradm join command not found in token output!" >&2
+    echo "Token output: $token_output" >&2
+    false
+}
 for cluster in "${clusters[@]}"; do
    if log=$(${joincmd/<cluster_name>/${cluster}} -v=6 --context ${cluster} --singleton ${flags} 2>&1)
    then echo -e "\033[33m✔\033[0m clusteradm join of $cluster succeeded"
@@ -309,8 +333,8 @@ checking_cluster cluster2
 echo
 echo "Checking the new clusters are in the OCM inventory and label them"
 kubectl --context its1 get managedclusters
-kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
-kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
+kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1 --overwrite
+kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2 --overwrite
 
 echo
 echo Waiting for transport controller to create namespace customization-properties

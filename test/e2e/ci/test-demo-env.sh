@@ -35,10 +35,18 @@ echo "Testing demo environment setup with platform: $platform"
 
 # Read a canonical version from a shared location instead of scraping it from the deprecated script.
 # This avoids the circular dependency and keeps the test valid after the deprecated script is removed.
+version_file="${scripts_dir}/kubestellar-demo-env-version.sh"
+if [[ ! -f "${version_file}" ]]; then
+    echo "ERROR: version file not found: ${version_file}" >&2
+    exit 1
+fi
 # shellcheck disable=SC1090
-source "${scripts_dir}/kubestellar-demo-env-version.sh"
+if ! source "${version_file}"; then
+    echo "ERROR: failed to source ${version_file}" >&2
+    exit 1
+fi
 if [[ -z "${kubestellar_version:-}" ]]; then
-    echo "ERROR: canonical KubeStellar version is not set in ${scripts_dir}/kubestellar-demo-env-version.sh" >&2
+    echo "ERROR: kubestellar_version is not set in ${version_file}" >&2
     exit 1
 fi
 
