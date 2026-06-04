@@ -50,6 +50,19 @@ echo "Please use create-demo-env-from-given-release.sh instead, which requires e
 
 echo "Selected Kubernetes platform: $k8s_platform"
 
+SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+version_file="${SRC_DIR}/kubestellar-demo-env-version.sh"
+if [[ -f "${version_file}" ]]; then
+    # shellcheck disable=SC1090
+    source "${version_file}"
+else
+    kubestellar_version=0.30.0
+fi
+if [[ -z "${kubestellar_version:-}" ]]; then
+    echo "ERROR: KubeStellar version is not set." >&2
+    exit 1
+fi
+
 # Function to check if a command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
@@ -71,7 +84,6 @@ if ! dunsel=$(docker ps 2>&1); then
 fi
 echo "Container runtime is running."
 
-kubestellar_version=0.30.0
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
 echo -e "Checking that pre-req softwares are installed..."
