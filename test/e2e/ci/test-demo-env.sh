@@ -44,7 +44,7 @@ fi
 
 # Test the demo environment creation script
 echo "Creating demo environment with $platform using version $kubestellar_version..."
-if ! "${scripts_dir}/create-demo-env-from-given-release.sh" --platform $platform --version "$kubestellar_version"; then
+if ! "${scripts_dir}/create-demo-env-from-given-release.sh" --platform "$platform" --version "$kubestellar_version"; then
     echo "ERROR: Demo environment creation script failed for $platform!"
     exit 1
 fi

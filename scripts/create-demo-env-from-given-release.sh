@@ -88,7 +88,11 @@ run_helper_script() {
         bash "${SRC_DIR}/${script_name}" "$@"
     else
         echo "Fetching ${script_name} from GitHub (ref: ${kubestellar_ref})..."
-        curl -sSf "https://raw.githubusercontent.com/kubestellar/kubestellar/${kubestellar_ref}/scripts/${script_name}" | bash -s -- "$@"
+        local tmp_script
+        tmp_script=$(mktemp)
+        trap 'rm -f "${tmp_script}"' RETURN
+        curl -sSf "https://raw.githubusercontent.com/kubestellar/kubestellar/${kubestellar_ref}/scripts/${script_name}" -o "${tmp_script}"
+        bash "${tmp_script}" "$@"
     fi
 }
 
@@ -100,10 +104,18 @@ command_exists() {
 # Function to check if a port is free
 wait_for_port_free() {
     local port=$1
-    while lsof -i $port >/dev/null 2>&1; do
+    while lsof -i "$port" >/dev/null 2>&1; do
         echo "Waiting for port $port to be free..."
         sleep 5
     done
+}
+
+get_host_arch() {
+    case "$(uname -m)" in
+        x86_64|amd64) echo amd64 ;;
+        aarch64|arm64) echo arm64 ;;
+        *) echo "$(uname -m)" ;;
+    esac
 }
 
 echo -e "Checking container runtime..."
@@ -115,7 +127,7 @@ echo "Container runtime is running."
 
 echo -e "Checking that pre-req softwares are installed..."
 platform_tool="$k8s_platform"
-run_helper_script check_pre_req.sh --assert -V kflex ocm helm kubectl docker "$platform_tool"
+run_helper_script check_pre_req.sh --assert -V kflex ocm helm kubectl docker lsof "$platform_tool"
 
 ##########################################
 cluster_clean_up() {
@@ -147,9 +159,7 @@ checking_cluster() {
         # Check for the cluster name and "Pending" status
         if echo "$line" | grep -q "$1" && echo "$line" | grep -q "Pending"; then
             echo "Pending CSR for $1 has been found, approving..."
-            clusteradm --context its1 accept --clusters "$1"
-
-            if [ $? -eq 0 ]; then
+            if clusteradm --context its1 accept --clusters "$1"; then
                 echo -e "\033[33m✔\033[0m CSR Approved for $1."
                 return 0
             else
@@ -236,7 +246,7 @@ for image in "${images[@]}"; do
         echo
         echo "Flatten container image $image to single architecture to work around https://github.com/kubernetes-sigs/kind/issues/3795 ..."
         echo "FROM $image" | docker build -t "$image" -f- "${temp_dir}/context"
-        if [[ "$(go env GOARCH)" != amd64 ]] && [[ "$image" =~ quay.io/open-cluster-management/ ]]; then
+        if [[ "$(get_host_arch)" != amd64 ]] && [[ "$image" =~ quay.io/open-cluster-management/ ]]; then
             echo "That InvalidBaseImagePlatform warning is expected because the original image is buggy"
         fi
         kind load docker-image "$image" --name kubeflex
@@ -276,7 +286,7 @@ echo -e "\033[33m✔\033[0m OCM hub is ready"
 
 echo -e "\nRegistering cluster 1 and 2 for remote access with KubeStellar Core..."
 
-: set flags to "" if you have installed KubeStellar on an OpenShift cluster
+# set flags to "" if you have installed KubeStellar on an OpenShift cluster
 flags="--force-internal-endpoint-lookup"
 clusters=(cluster1 cluster2);
 if ! joincmd=$(clusteradm --context its1 get token | grep '^clusteradm join')
