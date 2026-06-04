@@ -135,7 +135,7 @@ echo "Container runtime is running."
 
 echo -e "Checking that pre-req softwares are installed..."
 platform_tool="$k8s_platform"
-run_helper_script check_pre_req.sh --assert -V kflex ocm helm kubectl docker "$platform_tool"
+run_helper_script check_pre_req.sh --assert -V kflex ocm helm kubectl docker lsof timeout "$platform_tool"
 
 ##########################################
 cluster_clean_up() {
@@ -311,16 +311,31 @@ token_output=$(clusteradm --context its1 get token 2>&1) || {
     echo "$token_output" >&2
     false
 }
-joincmd=$(echo "$token_output" | grep '^clusteradm join') || {
+join_line=$(printf '%s\n' "$token_output" | grep -m 1 '^clusteradm join') || {
     echo -e "\033[0;31mX\033[0m clusteradm join command not found in token output!" >&2
     echo "Token output: $token_output" >&2
     false
 }
+read -r -a join_args <<< "$join_line"
+if [[ ${#join_args[@]} -lt 2 || "${join_args[0]}" != "clusteradm" || "${join_args[1]}" != "join" ]]; then
+    echo -e "\033[0;31mX\033[0m Unexpected join command format: $join_line" >&2
+    false
+fi
 for cluster in "${clusters[@]}"; do
-   if log=$(${joincmd/<cluster_name>/${cluster}} -v=6 --context ${cluster} --singleton ${flags} 2>&1)
-   then echo -e "\033[33m✔\033[0m clusteradm join of $cluster succeeded"
-   else echo -e "\033[0;31mX\033[0m clusteradm join of $cluster failed!" >&2; echo "$log" >&2; false
-   fi
+    join_cmd=("${join_args[@]}")
+    for i in "${!join_cmd[@]}"; do
+        join_cmd[i]="${join_cmd[i]//<cluster_name>/${cluster}}"
+    done
+    if [[ -n "$flags" ]]; then
+        join_cmd+=("$flags")
+    fi
+    if log=$("${join_cmd[@]}" -v=6 --context "${cluster}" --singleton 2>&1); then
+        echo -e "\033[33m✔\033[0m clusteradm join of $cluster succeeded"
+    else
+        echo -e "\033[0;31mX\033[0m clusteradm join of $cluster failed!" >&2
+        echo "$log" >&2
+        false
+    fi
 done
 
 echo -e "Checking that the CSR for cluster 1 and 2 appears..."
