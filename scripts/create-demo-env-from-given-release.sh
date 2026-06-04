@@ -135,7 +135,7 @@ echo "Container runtime is running."
 
 echo -e "Checking that pre-req softwares are installed..."
 platform_tool="$k8s_platform"
-run_helper_script check_pre_req.sh --assert -V kflex ocm helm kubectl docker lsof "$platform_tool"
+run_helper_script check_pre_req.sh --assert -V kflex ocm helm kubectl docker "$platform_tool"
 
 ##########################################
 cluster_clean_up() {
