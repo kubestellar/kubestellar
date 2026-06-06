@@ -182,7 +182,6 @@ Origin (DCO). This document was created by the Linux Kernel community and is a
 simple statement that you, as a contributor, have the legal right to make the
 contribution. See the [DCO](DCO) file for details.
 
-
 ## Contributing Without Writing Implementation Code (AI-Assisted Path)
 
 KubeStellar uses an AI-maintained codebase model that opens up a genuinely new contribution path — **you don't need to write Go or understand the codebase deeply to make a meaningful contribution.**
