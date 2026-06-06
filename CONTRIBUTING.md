@@ -181,3 +181,35 @@ By contributing to this project you agree to the Developer Certificate of
 Origin (DCO). This document was created by the Linux Kernel community and is a
 simple statement that you, as a contributor, have the legal right to make the
 contribution. See the [DCO](DCO) file for details.
+
+
+## Contributing Without Writing Implementation Code (AI-Assisted Path)
+
+KubeStellar uses an AI-maintained codebase model that opens up a genuinely new contribution path — **you don't need to write Go or understand the codebase deeply to make a meaningful contribution.**
+
+### How It Works
+
+1. **Write a failing test** — describe the behaviour you want to see (Playwright test for console features, API contract test, unit test, etc.)
+2. **Open a PR** with your failing test
+3. **An AI agent picks it up** and writes the implementation to make the test pass
+4. **You review** the implementation and provide feedback
+
+This removes the highest barrier to entry for most open source projects: needing to understand the codebase before contributing anything meaningful.
+
+### What Kind of Tests Can I Write?
+
+- **Playwright/E2E tests** for [KubeStellar Console](https://console.kubestellar.io) features
+- **API contract tests** — describe the expected request/response shape for a new or existing endpoint
+- **Unit tests** — describe expected behaviour for a specific function or module
+- **Integration tests** — describe how two components should interact
+
+### Getting Started
+
+1. Look for issues labelled [`good first issue`](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+state%3Aopen+label%3A%22good+first+issue%22) or [`help wanted`](https://github.com/kubestellar/kubestellar/labels/help%20wanted)
+2. Write a test that describes the missing or broken behaviour
+3. Open a PR with the failing test and label it `test-only`
+4. The AI agent will write the implementation — you review and iterate
+
+### Non-Code Contributions
+
+You can also contribute ideas, bug reports, and feature requests directly via [console.kubestellar.io/issue](https://console.kubestellar.io/issue) without touching code at all.
