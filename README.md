@@ -67,8 +67,7 @@ KubeStellar is a platform — the core orchestration engine is complemented by s
 ## UI Options
 
 KubeStellar has two open-source UI projects. Here is a quick guide to help you choose:
-
-| | [kubestellar/console](https://github.com/kubestellar/console) | [kubestellar/ui](https://github.com/kubestellar/ui) |
+| Project | [kubestellar/console](https://github.com/kubestellar/console) | [kubestellar/ui](https://github.com/kubestellar/ui) |
 |---|---|---|
 | **Best for** | New users — start here | Monitoring-focused deployments |
 | **Key features** | AI-powered missions, multi-cluster policy, demo mode | Cluster dashboarding, Prometheus/Grafana integration |
