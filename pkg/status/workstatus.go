@@ -155,6 +155,10 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 	if apiequality.Semantic.DeepEqual(unstrObj.Object["status"], status) {
 		logger.V(5).Info("Workload object found to already have intended status", "objectIdentifier", objectIdentifier)
 	} else {
+		// DeepCopy before mutating to avoid corrupting the informer cache.
+		// If UpdateStatus fails the original cached object must remain unchanged.
+		// See handleStatusReturnLabel in this file which does the same for labels.
+		unstrObj = unstrObj.DeepCopy()
 		// set the status and update the object
 		unstrObj.Object["status"] = status
 
