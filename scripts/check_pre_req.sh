@@ -158,6 +158,24 @@ is_installed_jq() {
         'jq-1.5'
 }
 
+is_installed_lsof() {
+    is_installed 'lsof' \
+        'lsof' \
+        'lsof -v 2>/dev/null | head -1' \
+        'lsof -v 2>/dev/null | head -1' \
+        'sudo apt-get install lsof or brew install lsof' \
+        ''
+}
+
+is_installed_timeout() {
+    is_installed 'timeout' \
+        'timeout' \
+        'timeout --version 2>/dev/null | head -1' \
+        'timeout --version 2>/dev/null | head -1' \
+        'sudo apt-get install coreutils or brew install coreutils' \
+        ''
+}
+
 is_installed_kcp() {
     is_installed 'kcp' \
         'kcp' \
@@ -245,7 +263,7 @@ is_installed_yq() {
 
 
 # Global constants
-PROGRAMS="@(argo|brew|docker|go|helm|jq|kflex|kind|ko|kubectl|make|ocm|yq|k3d|ginkgo)"
+PROGRAMS="@(argo|brew|docker|go|helm|jq|kflex|kind|ko|kubectl|lsof|make|ocm|timeout|yq|k3d|ginkgo)"
 
 # Global parameters
 assert="false"  # true => exit on missing program

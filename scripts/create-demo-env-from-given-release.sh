@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2024 The KubeStellar Authors.
+# Copyright 2026 The KubeStellar Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,30 +14,66 @@
 # limitations under the License.
 
 set -e
+set -o pipefail
 
 # Script info
-SCRIPT_NAME="create-kubestellar-demo-env.sh"
+SCRIPT_NAME="create-demo-env-from-given-release.sh"
 
 # Default Kubernetes platform parameter
 k8s_platform="kind"
+kubestellar_version=""
 
 # Parse command-line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --platform) k8s_platform="$2"; shift ;;
-        -X) set -x ;;
+        --platform)
+            if [[ -z "$2" ]]; then
+                echo "Error: --platform requires an argument." >&2
+                exit 1
+            fi
+            k8s_platform="$2"
+            shift
+            ;;
+        -v|--version)
+            if [[ -z "$2" ]]; then
+                echo "Error: --version requires an argument." >&2
+                exit 1
+            fi
+            kubestellar_version="$2"
+            shift
+            ;;
+        -X)
+            set -x
+            ;;
         -h|--help)
-            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [-X] [-h|--help]" >&2
+            echo "Usage: ${SCRIPT_NAME} --version <version> [--platform <kind|k3d>] [-X] [-h|--help]" >&2
             exit 0
             ;;
         *)
             echo "Unknown parameter passed: $1" >&2
-            echo "Usage: ${SCRIPT_NAME} [--platform <kind|k3d>] [-X] [-h|--help]" >&2
+            echo "Usage: ${SCRIPT_NAME} --version <version> [--platform <kind|k3d>] [-X] [-h|--help]" >&2
             exit 1
             ;;
     esac
     shift
 done
+
+if [[ -z "$kubestellar_version" ]]; then
+    echo "Error: --version <version> is required." >&2
+    echo "Usage: ${SCRIPT_NAME} --version <version> [--platform <kind|k3d>] [-X] [-h|--help]" >&2
+    exit 1
+fi
+
+# Validate version format to prevent arbitrary remote code execution
+# Allow SemVer-like versions: X.Y.Z with optional pre-release/build metadata
+if ! [[ "$kubestellar_version" =~ ^v?[0-9]+(\.[0-9]+){2}([+-][0-9A-Za-z.-]+)?$ ]]; then
+    echo "Error: invalid version format: $kubestellar_version" >&2
+    echo "Expected format: X.Y.Z or vX.Y.Z (optionally with pre-release/build metadata)" >&2
+    exit 1
+fi
+
+kubestellar_version="${kubestellar_version#v}"
+kubestellar_ref="v${kubestellar_version}"
 
 if [[ "$k8s_platform" != "kind" && "$k8s_platform" != "k3d" ]]; then
     echo "Invalid platform specified: $k8s_platform"
@@ -45,23 +81,28 @@ if [[ "$k8s_platform" != "kind" && "$k8s_platform" != "k3d" ]]; then
     exit 1
 fi
 
-echo "WARNING: ${SCRIPT_NAME} is deprecated and will be removed in a future release." >&2
-echo "Please use create-demo-env-from-given-release.sh instead, which requires explicitly specifying the KubeStellar version via the --version option." >&2
-
 echo "Selected Kubernetes platform: $k8s_platform"
+echo "KubeStellar Version: ${kubestellar_version}"
+echo "KubeStellar Git ref for helper scripts: ${kubestellar_ref}"
 
-SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-version_file="${SRC_DIR}/kubestellar-demo-env-version.sh"
-if [[ -f "${version_file}" ]]; then
-    # shellcheck disable=SC1090
-    source "${version_file}"
-else
-    kubestellar_version=0.30.0
-fi
-if [[ -z "${kubestellar_version:-}" ]]; then
-    echo "ERROR: KubeStellar version is not set." >&2
-    exit 1
-fi
+SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo ".")"
+
+run_helper_script() {
+    local script_name="$1"
+    shift
+
+    if [ -f "${SRC_DIR}/${script_name}" ]; then
+        echo "Using local ${script_name}"
+        bash "${SRC_DIR}/${script_name}" "$@"
+    else
+        echo "Fetching ${script_name} from GitHub (ref: ${kubestellar_ref})..."
+        local tmp_script
+        tmp_script=$(mktemp)
+        trap 'rm -f "${tmp_script}"' RETURN
+        curl -sSf "https://raw.githubusercontent.com/kubestellar/kubestellar/${kubestellar_ref}/scripts/${script_name}" -o "${tmp_script}"
+        bash "${tmp_script}" "$@"
+    fi
+}
 
 # Function to check if a command exists
 command_exists() {
@@ -71,10 +112,18 @@ command_exists() {
 # Function to check if a port is free
 wait_for_port_free() {
     local port=$1
-    while lsof -i $port >/dev/null 2>&1; do
+    while lsof -i "$port" >/dev/null 2>&1; do
         echo "Waiting for port $port to be free..."
         sleep 5
     done
+}
+
+get_host_arch() {
+    case "$(uname -m)" in
+        x86_64|amd64) echo amd64 ;;
+        aarch64|arm64) echo arm64 ;;
+        *) echo "$(uname -m)" ;;
+    esac
 }
 
 echo -e "Checking container runtime..."
@@ -84,18 +133,14 @@ if ! dunsel=$(docker ps 2>&1); then
 fi
 echo "Container runtime is running."
 
-echo -e "KubeStellar Version: ${kubestellar_version}"
-
 echo -e "Checking that pre-req softwares are installed..."
-if [ "$k8s_platform" == "kind" ]; then
-    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker kind
-else
-    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker k3d
-fi
+platform_tool="$k8s_platform"
+run_helper_script check_pre_req.sh --assert -V kflex ocm helm kubectl docker lsof timeout "$platform_tool"
 
 ##########################################
 cluster_clean_up() {
-    if ! error_message=$(eval "$1" 2>&1); then
+    local cmd=("$@")
+    if ! error_message=$( "${cmd[@]}" 2>&1 ); then
         echo "clean up failed. Error:"
         echo "$error_message"
     fi
@@ -119,35 +164,41 @@ context_clean_up() {
 }
 
 checking_cluster() {
+    local cluster_name="$1"
+    local csr_timeout=300  # 5 minutes
+    local elapsed=0
     while IFS= read -r line; do
         # Check for the cluster name and "Pending" status
-        if echo "$line" | grep -q "$1" && echo "$line" | grep -q "Pending"; then
-            echo "Pending CSR for $1 has been found, approving..."
-            clusteradm --context its1 accept --clusters "$1"
-
-            if [ $? -eq 0 ]; then
-                echo -e "\033[33m✔\033[0m CSR Approved for $1."
+        if echo "$line" | grep -q "$cluster_name" && echo "$line" | grep -q "Pending"; then
+            echo "Pending CSR for $cluster_name has been found, approving..."
+            if clusteradm --context its1 accept --clusters "$cluster_name"; then
+                echo -e "\033[33m✔\033[0m CSR Approved for $cluster_name."
                 return 0
             else
-                echo -e "\033[0;31mX\033[0m Failed to approve CSR for $1."
+                echo -e "\033[0;31mX\033[0m Failed to approve CSR for $cluster_name."
                 return 1
             fi
         fi
-    done < <(kubectl --context its1 get csr --watch)
+        ((elapsed++))
+        if (( elapsed > csr_timeout )); then
+            echo "ERROR: CSR for $cluster_name did not appear within ${csr_timeout}s" >&2
+            return 1
+        fi
+    done < <(timeout "$csr_timeout" kubectl --context its1 get csr --watch)
 }
 
 echo -e "\nStarting environment clean up..."
 echo -e "Starting cluster clean up..."
 
 if command_exists "k3d"; then
-    cluster_clean_up "k3d cluster delete kubeflex"
-    cluster_clean_up "k3d cluster delete cluster1"
-    cluster_clean_up "k3d cluster delete cluster2"
+    cluster_clean_up k3d cluster delete kubeflex
+    cluster_clean_up k3d cluster delete cluster1
+    cluster_clean_up k3d cluster delete cluster2
 fi
 if command_exists "kind"; then
-    cluster_clean_up "kind delete cluster --name kubeflex"
-    cluster_clean_up "kind delete cluster --name cluster1"
-    cluster_clean_up "kind delete cluster --name cluster2"
+    cluster_clean_up kind delete cluster --name kubeflex
+    cluster_clean_up kind delete cluster --name cluster1
+    cluster_clean_up kind delete cluster --name cluster2
 fi
 
 echo -e "\033[33m✔\033[0m Cluster space clean up has been completed"
@@ -162,7 +213,7 @@ echo -e "\033[33m✔\033[0m Context space clean up completed"
 echo -e "\nCreating two $k8s_platform clusters to serve as example WECs"
 clusters=(cluster1 cluster2)
 temp_dir=$(mktemp -d)
-trap "rm -rf $temp_dir" EXIT
+trap "rm -rf \"$temp_dir\"" EXIT
 for cluster in "${clusters[@]}"; do
     if {
       if [ "$k8s_platform" == "kind" ]; then
@@ -182,7 +233,7 @@ done
 
 echo -e "Creating KubeFlex cluster with SSL Passthrough"
 if [ "$k8s_platform" == "kind" ]; then
-    curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext
+    run_helper_script create-kind-cluster-with-SSL-passthrough.sh --name kubeflex --nosetcontext
 else
     k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
     kubectl wait --for=condition=Ready node --all --timeout=600s #Ensure both API server and nodes are ready
@@ -199,8 +250,8 @@ images=("ghcr.io/loft-sh/vcluster:0.16.4"
         "quay.io/kubestellar/postgresql:16.0.0-debian-11-r13")
 
 for image in "${images[@]}"; do
-    if ! docker inspect $image &> /dev/null; then
-        docker pull $image &
+    if ! docker inspect "$image" &> /dev/null; then
+        docker pull "$image" &
     fi
 done
 wait
@@ -212,7 +263,7 @@ for image in "${images[@]}"; do
         echo
         echo "Flatten container image $image to single architecture to work around https://github.com/kubernetes-sigs/kind/issues/3795 ..."
         echo "FROM $image" | docker build -t "$image" -f- "${temp_dir}/context"
-        if [[ "$(go env GOARCH)" != amd64 ]] && [[ "$image" =~ quay.io/open-cluster-management/ ]]; then
+        if [[ "$(get_host_arch)" != amd64 ]] && [[ "$image" =~ quay.io/open-cluster-management/ ]]; then
             echo "That InvalidBaseImagePlatform warning is expected because the original image is buggy"
         fi
         kind load docker-image "$image" --name kubeflex
@@ -228,7 +279,7 @@ else var_flags=""
 fi
 
 helm upgrade --install ks-core oci://ghcr.io/kubestellar/kubestellar/core-chart \
-        --version $kubestellar_version \
+        --version "$kubestellar_version" \
         --set-json='ITSes=[{"name":"its1"}]' \
         --set-json='WDSes=[{"name":"wds1"},{"name":"wds2", "type":"host"}]' \
         --set-json='verbosity.default=5' \
@@ -252,17 +303,39 @@ echo -e "\033[33m✔\033[0m OCM hub is ready"
 
 echo -e "\nRegistering cluster 1 and 2 for remote access with KubeStellar Core..."
 
-: set flags to "" if you have installed KubeStellar on an OpenShift cluster
+# set flags to "" if you have installed KubeStellar on an OpenShift cluster
 flags="--force-internal-endpoint-lookup"
 clusters=(cluster1 cluster2);
-if ! joincmd=$(clusteradm --context its1 get token | grep '^clusteradm join')
-then echo -e "\033[0;31mX\033[0m get token failed!\n" >&2; echo "$joincmd" >&2; false
+token_output=$(clusteradm --context its1 get token 2>&1) || {
+    echo -e "\033[0;31mX\033[0m get token failed!" >&2
+    echo "$token_output" >&2
+    false
+}
+join_line=$(printf '%s\n' "$token_output" | grep -m 1 '^clusteradm join') || {
+    echo -e "\033[0;31mX\033[0m clusteradm join command not found in token output!" >&2
+    echo "Token output: $token_output" >&2
+    false
+}
+read -r -a join_args <<< "$join_line"
+if [[ ${#join_args[@]} -lt 2 || "${join_args[0]}" != "clusteradm" || "${join_args[1]}" != "join" ]]; then
+    echo -e "\033[0;31mX\033[0m Unexpected join command format: $join_line" >&2
+    false
 fi
 for cluster in "${clusters[@]}"; do
-   if log=$(${joincmd/<cluster_name>/${cluster}} -v=6 --context ${cluster} --singleton ${flags} 2>&1)
-   then echo -e "\033[33m✔\033[0m clusteradm join of $cluster succeeded"
-   else echo -e "\033[0;31mX\033[0m clusteradm join of $cluster failed!" >&2; echo "$log" >&2; false
-   fi
+    join_cmd=("${join_args[@]}")
+    for i in "${!join_cmd[@]}"; do
+        join_cmd[i]="${join_cmd[i]//<cluster_name>/${cluster}}"
+    done
+    if [[ -n "$flags" ]]; then
+        join_cmd+=("$flags")
+    fi
+    if log=$("${join_cmd[@]}" -v=6 --context "${cluster}" --singleton 2>&1); then
+        echo -e "\033[33m✔\033[0m clusteradm join of $cluster succeeded"
+    else
+        echo -e "\033[0;31mX\033[0m clusteradm join of $cluster failed!" >&2
+        echo "$log" >&2
+        false
+    fi
 done
 
 echo -e "Checking that the CSR for cluster 1 and 2 appears..."
@@ -275,8 +348,8 @@ checking_cluster cluster2
 echo
 echo "Checking the new clusters are in the OCM inventory and label them"
 kubectl --context its1 get managedclusters
-kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1
-kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2
+kubectl --context its1 label managedcluster cluster1 location-group=edge name=cluster1 --overwrite
+kubectl --context its1 label managedcluster cluster2 location-group=edge name=cluster2 --overwrite
 
 echo
 echo Waiting for transport controller to create namespace customization-properties
