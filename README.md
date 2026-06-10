@@ -48,9 +48,21 @@ In a single-cluster setup, developers typically access the cluster and deploy Ku
 
 KubeStellar simplifies this process by allowing developers to define a binding policy between clusters and Kubernetes objects. It then uses your regular single-cluster tooling to deploy and configure each cluster based on these binding policies, making multi-cluster operations as straightforward as managing a single cluster. This approach enhances productivity and efficiency, making KubeStellar a valuable tool in a multi-cluster Kubernetes environment.
 
-## Console
+## Ecosystem
 
-Try the [KubeStellar Console](https://console.kubestellar.io) — an open-source web dashboard for managing multi-cluster Kubernetes deployments. Monitor clusters, deploy workloads, manage GPU resources, and troubleshoot with 400+ AI-powered missions. It starts in demo mode so you can explore immediately.
+KubeStellar is a platform — the core orchestration engine is complemented by sub-projects that deliver UI, AI agent tooling, and community content.
+
+| Sub-project | Role | Links |
+|-------------|------|-------|
+| **kubestellar** *(this repo)* | Core engine — BindingPolicy, WDS, ITS, WEC workload propagation | [Docs](https://kubestellar.io) · [Quickstart](https://docs.kubestellar.io/latest/Getting-Started/quickstart/) |
+| [console](https://github.com/kubestellar/console) | AI-powered web dashboard — 160+ cards, GPU monitoring, AI missions | [console.kubestellar.io](https://console.kubestellar.io) |
+| [console-marketplace](https://github.com/kubestellar/console-marketplace) | 153+ community card presets — GPU/AI/ML, ArgoCD, OPA, Falco, LLM-d | [Browse](https://github.com/kubestellar/console-marketplace) |
+| [console-kb](https://github.com/kubestellar/console-kb) | AI knowledge base — community missions and operational runbooks | [Browse](https://github.com/kubestellar/console-kb) |
+| [kubestellar-mcp](https://github.com/kubestellar/kubestellar-mcp) | MCP server — AI agent tooling for Claude, Cursor, Windsurf, VS Code | [Install](https://github.com/kubestellar/kubestellar-mcp#installation) |
+
+**[Try the Console →](https://console.kubestellar.io)** — start in demo mode, no install required. Monitor clusters, deploy workloads, manage GPU resources, and troubleshoot with 400+ AI-powered missions.
+
+> **AI-native stack**: combine [`kubestellar-mcp`](https://github.com/kubestellar/kubestellar-mcp) (natural-language cluster ops via Claude/Cursor/Windsurf) with Console's LLM-d monitoring cards for end-to-end AI inference infrastructure management.
 
 ## Website
 
@@ -114,4 +126,3 @@ There are several ways to communicate with us:
 <br>Kubernetes and the Kubernetes logo are registered trademarks of The Linux Foundation® (TLF).
 <br>The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/legal/trademark-usage">Trademark Usage page</a>.
 <br>© 2022-2025. The KubeStellar Authors.
-
