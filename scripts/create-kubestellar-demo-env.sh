@@ -47,6 +47,8 @@ fi
 
 echo "Selected Kubernetes platform: $k8s_platform"
 
+k3d_image="--image rancher/k3s:v1.32.13-k3s1"
+
 # Function to check if a command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
@@ -153,7 +155,7 @@ for cluster in "${clusters[@]}"; do
       if [ "$k8s_platform" == "kind" ]; then
         kind create cluster --name "${cluster}" &>"${temp_dir}/${cluster}.log"
       else
-        k3d cluster create --network k3d-kubeflex "${cluster}" &>"${temp_dir}/${cluster}.log"
+        k3d cluster create $k3d_image --network k3d-kubeflex "${cluster}" &>"${temp_dir}/${cluster}.log"
       fi
     }; then
         echo -e "\033[33m✔\033[0m Cluster $cluster was successfully created"
@@ -169,7 +171,7 @@ echo -e "Creating KubeFlex cluster with SSL Passthrough"
 if [ "$k8s_platform" == "kind" ]; then
     curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/create-kind-cluster-with-SSL-passthrough.sh | bash -s -- --name kubeflex --nosetcontext
 else
-    k3d cluster create -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
+    k3d cluster create $k3d_image -p "9443:443@loadbalancer" --k3s-arg "--disable=traefik@server:*" kubeflex
     kubectl wait --for=condition=Ready node --all --timeout=600s #Ensure both API server and nodes are ready
     helm install ingress-nginx ingress-nginx --set "controller.extraArgs.enable-ssl-passthrough=" --repo https://kubernetes.github.io/ingress-nginx --version 4.12.1 --namespace ingress-nginx --create-namespace --timeout 24h
 fi
@@ -193,13 +195,13 @@ wait
 mkdir "${temp_dir}/context"
 
 for image in "${images[@]}"; do
+    echo
+    echo "Flatten container image $image to single architecture to work around https://github.com/kubernetes-sigs/kind/issues/3795 ..."
+    echo "FROM $image" | docker build -t "$image" -f- "${temp_dir}/context"
+    if [[ "$(go env GOARCH)" != amd64 ]] && [[ "$image" =~ quay.io/open-cluster-management/ ]]; then
+        echo "That InvalidBaseImagePlatform warning is expected because the original image is buggy"
+    fi
     if [ "$k8s_platform" == "kind" ]; then
-        echo
-        echo "Flatten container image $image to single architecture to work around https://github.com/kubernetes-sigs/kind/issues/3795 ..."
-        echo "FROM $image" | docker build -t "$image" -f- "${temp_dir}/context"
-        if [[ "$(go env GOARCH)" != amd64 ]] && [[ "$image" =~ quay.io/open-cluster-management/ ]]; then
-            echo "That InvalidBaseImagePlatform warning is expected because the original image is buggy"
-        fi
         kind load docker-image "$image" --name kubeflex
     else
         k3d image import "$image" --cluster kubeflex
@@ -273,7 +275,7 @@ while ! (kubectl --context its1 get ns customization-properties) ; do
         exit 1
     fi
     ((wait_counter += 1))
-    sleep 10
+    sleep 15
 done
 
 echo
