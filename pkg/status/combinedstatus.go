@@ -105,6 +105,12 @@ func (c *Controller) updateOrCreateCombinedStatus(ctx context.Context,
 	csEcho, err := c.combinedStatusClient.Namespace(generatedCombinedStatus.Namespace).Create(ctx,
 		generatedCombinedStatus, metav1.CreateOptions{FieldManager: ControllerName})
 	if err != nil {
+		if errors.IsAlreadyExists(err) {
+			logger.V(2).Info("CombinedStatus already exists (create skipped, will re-sync)",
+				"binding", bindingName, "sourceObjectIdentifier", sourceObjectIdentifier,
+				"ns", generatedCombinedStatus.Namespace, "name", generatedCombinedStatus.Name)
+			return nil
+		}
 		return fmt.Errorf("failed to create CombinedStatus (ns, name = %v, %v): %w",
 			generatedCombinedStatus.Namespace, generatedCombinedStatus.Name, err)
 	}
