@@ -26,6 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	appsv1 "k8s.io/api/apps/v1"
 	dynamicfake "k8s.io/client-go/dynamic/fake"
 	k8stesting "k8s.io/client-go/testing"
 	"k8s.io/client-go/tools/cache"
@@ -33,17 +34,9 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-var testGVR = schema.GroupVersionResource{
-	Group:    "apps",
-	Version:  "v1",
-	Resource: "deployments",
-}
+var testGVR = appsv1.SchemeGroupVersion.WithResource("deployments")
 
-var testGVK = schema.GroupVersionKind{
-	Group:   "apps",
-	Version: "v1",
-	Kind:    "Deployment",
-}
+var testGVK = appsv1.SchemeGroupVersion.WithKind("Deployment")
 
 func newTestUnstructured(namespace, name string, status map[string]interface{}) *unstructured.Unstructured {
 	obj := &unstructured.Unstructured{
