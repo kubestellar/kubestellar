@@ -105,8 +105,12 @@ func TestUpdateObjectStatus_DoesNotMutateInformerCacheOnUpdateFailure(t *testing
 	originalStatus := map[string]interface{}{
 		"replicas": int64(1),
 	}
+	originalStatusCopy := make(map[string]interface{}, len(originalStatus))
+	for k, v := range originalStatus {
+		originalStatusCopy[k] = v
+	}
 
-	cachedObj := newTestUnstructured("test-ns", "test-deploy", originalStatus)
+	cachedObj := newTestUnstructured("test-ns", "test-deploy", originalStatusCopy)
 
 	fakeDynClient := dynamicfake.NewSimpleDynamicClient(newFakeScheme(), cachedObj)
 
