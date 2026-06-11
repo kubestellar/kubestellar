@@ -155,7 +155,9 @@ func TestUpdateObjectStatus_UpdatesStatusWhenDifferent(t *testing.T) {
 
 	updateCalled := false
 	fakeDynClient.PrependReactor("update", "deployments", func(action k8stesting.Action) (bool, runtime.Object, error) {
-		updateCalled = true
+		if updateAction, ok := action.(k8stesting.UpdateAction); ok && updateAction.GetSubresource() == "status" {
+			updateCalled = true
+		}
 		return false, nil, nil
 	})
 
