@@ -41,7 +41,7 @@ var testGVK = appsv1.SchemeGroupVersion.WithKind("Deployment")
 func newTestUnstructured(namespace, name string, status map[string]interface{}) *unstructured.Unstructured {
 	obj := &unstructured.Unstructured{
 		Object: map[string]interface{}{
-			"apiVersion": "apps/v1",
+			"apiVersion": appsv1.SchemeGroupVersion.String(),
 			"kind":       "Deployment",
 			"metadata": map[string]interface{}{
 				"name":            name,
