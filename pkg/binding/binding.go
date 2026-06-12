@@ -29,6 +29,10 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
+// maxBadSRExamples is the maximum number of singleton-reported-state violation
+// examples included in the BindingPolicy status error message.
+const maxBadSRExamples = 3
+
 // syncBinding syncs a binding object with what is resolved by the bindingpolicy resolver.
 func (c *Controller) syncBinding(ctx context.Context, bindingName string) error {
 	logger := klog.FromContext(ctx)
@@ -71,8 +75,11 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 
 	// generate binding spec from resolver
 	generatedBindingSpec := c.bindingPolicyResolver.GenerateBinding(bindingPolicyIdentifier)
-	if generatedBindingSpec == nil { // resolution does not exist, abort syncing
-		return fmt.Errorf("syncing Binding was stopped because it has no counterpart resolution")
+	if generatedBindingSpec == nil {
+		// Resolution was concurrently removed between ResolutionExists and GenerateBinding.
+		// This is a normal transient race during deletion; treat it like the Policy-gone case above.
+		logger.V(2).Info("Aborting sync of Binding because resolution was concurrently removed", "name", bindingName)
+		return nil
 	}
 
 	// calculate if the resolved decision is different from the current one
@@ -92,16 +99,16 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 	badSR := []objectWithNumWECs{}
 	for _, srStatus := range srPerObj {
 		if srStatus.WantSingletonReportedState && srStatus.NumWECs != 1 {
-			badSR = append(badSR, objectWithNumWECs{srStatus.ObjectId, srStatus.NumWECs})
-			if len(badSR) > 3 {
+			if len(badSR) >= maxBadSRExamples {
 				break
 			}
+			badSR = append(badSR, objectWithNumWECs{ObjectID: srStatus.ObjectId, NumWECs: srStatus.NumWECs})
 		}
 	}
 	if len(badSR) > 0 {
 		badSRBytes, err := json.Marshal(badSR)
 		if err != nil {
-			policyErrors = append(policyErrors, fmt.Sprintf("Failed to json.Marshal some example blighted objects (%#v): %s", badSR, err))
+			policyErrors = append(policyErrors, fmt.Sprintf("Failed to json.Marshal some example blighted objects (%v): %s", badSR, err))
 		} else {
 			policyErrors = append(policyErrors, fmt.Sprintf("Singleton reported status return is requested but some objects have the wrong number of associated WECs, for example: %s", string(badSRBytes)))
 		}
