@@ -333,6 +333,141 @@ func (tt *testTransport) UnwrapObjects(wrapped runtime.Object, kindToResource fu
 	return transport.Gloss{}, nil
 }
 
+type staticTransport struct {
+	gloss transport.Gloss
+}
+
+func (st staticTransport) WrapObjects([]transport.Wrapee, func(k8sschema.GroupKind) string) runtime.Object {
+	return &workapi.ManifestWork{
+		TypeMeta: typeMeta("ManifestWork", workapi.GroupVersion),
+	}
+}
+
+func (st staticTransport) UnwrapObjects(runtime.Object, func(k8sschema.GroupKind) (string, bool)) (transport.Gloss, error) {
+	return st.gloss, nil
+}
+
+func newWrappedManifestWork(t *testing.T, namespace, name string, annotations map[string]string) *unstructured.Unstructured {
+	t.Helper()
+	wrapped := &workapi.ManifestWork{
+		TypeMeta: typeMeta("ManifestWork", workapi.GroupVersion),
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace:   namespace,
+			Name:        name,
+			Annotations: annotations,
+		},
+	}
+	obj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(wrapped)
+	if err != nil {
+		t.Fatalf("Failed to convert ManifestWork to unstructured: %v", err)
+	}
+	return &unstructured.Unstructured{Object: obj}
+}
+
+func TestWrapBatchAnnotatesCustomTransformState(t *testing.T) {
+	ctlr := &genericTransportController{
+		transport: staticTransport{},
+		wdsName:   "test-wds",
+	}
+	wrapee := &unstructured.Unstructured{}
+	wrapee.SetAPIVersion("v1")
+	wrapee.SetKind("ConfigMap")
+	wrapee.SetName("sample")
+
+	wrapped, err := ctlr.wrapBatch([]transport.Wrapee{transport.NewWrapee(wrapee, false)},
+		[]string{"sha256:custom-transform"}, "sample-uid",
+		func(k8sschema.GroupKind) (string, bool) { return "", false },
+		&ksapi.Binding{
+			ObjectMeta: metav1.ObjectMeta{Name: "binding", UID: "binding-uid", Generation: 1},
+		}, 0)
+	if err != nil {
+		t.Fatalf("wrapBatch returned an error: %v", err)
+	}
+	if got := wrapped.GetAnnotations()[customTransformStateAnnotation]; got == "" {
+		t.Fatalf("Expected %s annotation to be set", customTransformStateAnnotation)
+	}
+}
+
+func TestCustomTransformStateDigestIsStable(t *testing.T) {
+	first := &ksapi.CustomTransform{
+		ObjectMeta: metav1.ObjectMeta{Name: "first"},
+		Spec: ksapi.CustomTransformSpec{
+			APIGroup: "apps",
+			Resource: "deployments",
+			Remove:   []string{"$.status"},
+		},
+	}
+	second := &ksapi.CustomTransform{
+		ObjectMeta: metav1.ObjectMeta{Name: "second"},
+		Spec: ksapi.CustomTransformSpec{
+			APIGroup: "",
+			Resource: "configmaps",
+			Remove:   []string{"$.metadata.annotations"},
+		},
+	}
+	digest := customTransformStateDigest([]*ksapi.CustomTransform{first, second})
+	if digest == "" {
+		t.Fatal("Expected non-empty digest")
+	}
+	if reordered := customTransformStateDigest([]*ksapi.CustomTransform{second, first}); reordered != digest {
+		t.Fatalf("Expected digest to be stable across informer order, got %q and %q", digest, reordered)
+	}
+	modified := second.DeepCopy()
+	modified.Spec.Remove = append(modified.Spec.Remove, "$.metadata.labels")
+	if changed := customTransformStateDigest([]*ksapi.CustomTransform{first, modified}); changed == digest {
+		t.Fatal("Expected digest to change when a CustomTransform spec changes")
+	}
+}
+
+func TestPropagateWrappedObjectUpdatesCustomTransformStateMismatch(t *testing.T) {
+	logger, ctx := ktesting.NewTestContext(t)
+	scheme := runtime.NewScheme()
+	if err := workapi.AddToScheme(scheme); err != nil {
+		t.Fatalf("Failed to add work API to scheme: %v", err)
+	}
+	wrapperGVR := workapi.GroupVersion.WithResource("manifestworks")
+	current := newWrappedManifestWork(t, "cluster-a", "wrapped", map[string]string{
+		originOwnerGenerationAnnotation: "7",
+		customTransformStateAnnotation:  "sha256:old",
+	})
+	desired := newWrappedManifestWork(t, "cluster-a", "wrapped", map[string]string{
+		originOwnerGenerationAnnotation: "7",
+		customTransformStateAnnotation:  "sha256:new",
+	})
+	itsDynamicClient := dynamicfake.NewSimpleDynamicClient(scheme, current.DeepCopy())
+	ctlr := &genericTransportController{
+		logger:           logger,
+		transport:        staticTransport{gloss: transport.Gloss{}},
+		transportClient:  itsDynamicClient,
+		wrappedObjectGVR: wrapperGVR,
+	}
+	currentWrappedObjectList := &unstructured.UnstructuredList{
+		Items: []unstructured.Unstructured{*current.DeepCopy()},
+	}
+	dest := ksapi.Destination{ClusterId: "cluster-a"}
+
+	err := ctlr.propagateWrappedObjectToClusters(ctx,
+		func(candidate ksapi.Destination) ([]transportTask, bool) {
+			if candidate != dest {
+				return nil, false
+			}
+			return []transportTask{{ObjU: desired, Gloss: transport.Gloss{}}}, true
+		},
+		func(k8sschema.GroupKind) (string, bool) { return "", false },
+		currentWrappedObjectList,
+		[]ksapi.Destination{dest})
+	if err != nil {
+		t.Fatalf("propagateWrappedObjectToClusters returned an error: %v", err)
+	}
+	got, err := itsDynamicClient.Resource(wrapperGVR).Namespace(dest.ClusterId).Get(ctx, "wrapped", metav1.GetOptions{})
+	if err != nil {
+		t.Fatalf("Failed to get updated wrapped object: %v", err)
+	}
+	if gotState := got.GetAnnotations()[customTransformStateAnnotation]; gotState != "sha256:new" {
+		t.Fatalf("Expected CustomTransform state to be updated, got %q", gotState)
+	}
+}
+
 func TestGenericController(t *testing.T) {
 	rg := rand.New(rand.NewSource(42))
 	rg.Uint64()
