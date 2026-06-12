@@ -18,6 +18,7 @@ package transport
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"go/token"
 	"slices"
@@ -174,6 +175,16 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 			Help:           "product of number of WECs and number of workload objects referenced by a Binding",
 			Buckets:        []float64{0, 1, 3, 10, 30, 100, 300, 1000, 3000, 10000, 30000},
 			StabilityLevel: k8smetrics.ALPHA}),
+		objectSyncDurationHist: k8smetrics.NewHistogramVec(&k8smetrics.HistogramOpts{
+			Namespace: "kubestellar", Subsystem: "transport_controller", Name: "object_sync_duration_seconds",
+			Help:           "time taken to sync one object reference to a destination cluster",
+			Buckets:        []float64{0.001, 0.01, 0.1, 0.5, 1.0, 2.0, 5.0, 10.0, 30.0, 60.0},
+			StabilityLevel: k8smetrics.ALPHA}, []string{"group", "version", "kind", "operation", "destination"}),
+		objectSizeHist: k8smetrics.NewHistogramVec(&k8smetrics.HistogramOpts{
+			Namespace: "kubestellar", Subsystem: "transport_controller", Name: "object_size_bytes",
+			Help:           "size in bytes of objects being synced to destination clusters",
+			Buckets:        []float64{100, 1000, 10000, 100000, 1000000, 10000000}, // 100B to 10MB
+			StabilityLevel: k8smetrics.ALPHA}, []string{"group", "version", "kind", "destination"}),
 		workqueue:                    workqueue,
 		transport:                    transportInstance,
 		transportClient:              measuredITSDynamicClient,
@@ -283,7 +294,7 @@ func (c *genericTransportController) RegisterMetrics(reg ksmetrics.RegisterFn) {
 		c.wecSampler, c.bindingSampler, c.transformSampler, c.propMapSampler, c.wrappedSampler,
 	)
 	ksmetrics.MustRegisterAbles(reg,
-		c.bindingWhatsHist, c.bindingWheresHist, c.bindingAreaHist,
+		c.bindingWhatsHist, c.bindingWheresHist, c.bindingAreaHist, c.objectSyncDurationHist, c.objectSizeHist,
 	)
 }
 
@@ -333,6 +344,8 @@ type genericTransportController struct {
 	customTransformInformerSynced                                                cache.InformerSynced
 	wecSampler, bindingSampler, transformSampler, propMapSampler, wrappedSampler ksmetrics.Sampler
 	bindingWhatsHist, bindingWheresHist, bindingAreaHist                         *k8smetrics.Histogram
+	objectSyncDurationHist                                                       *k8smetrics.HistogramVec
+	objectSizeHist                                                               *k8smetrics.HistogramVec
 
 	// workqueue is a rate limited work queue of references to objects to work on.
 	// This is used to queue work to be processed instead of performing it as soon as a change happens.
@@ -910,6 +923,12 @@ type transportTask struct {
 	Gloss transport.Gloss
 }
 
+// objectInfo holds both the GVK and size information for an object
+type objectInfo struct {
+	GVK  schema.GroupVersionKind
+	Size int64
+}
+
 func (c *genericTransportController) wrap(wrapeesToPropagate []WrapeeWithUID, kindToResource func(schema.GroupKind) (string, bool), binding *v1alpha1.Binding) ([]transportTask, error) {
 	var transportTasks []transportTask
 	var batchToPropagate []transport.Wrapee = nil
@@ -1145,8 +1164,14 @@ func popUnstructuredByID(list *unstructured.UnstructuredList, id klog.ObjectRef)
 }
 
 func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Context, namespace string, wrappedObject *unstructured.Unstructured) error {
+	startTime := time.Now()
 	logger := klog.FromContext(ctx)
+
+	// Extract objects from wrapped object for metrics labeling
+	objectInfos := c.extractObjectTypesFromWrapped(wrappedObject)
+
 	existingWrappedObject, err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Get(ctx, wrappedObject.GetName(), metav1.GetOptions{})
+	operation := "create"
 	if err != nil {
 		if !errors.IsNotFound(err) { // if object is not there, we need to create it. otherwise report an error.
 			return fmt.Errorf("failed to create wrapped object '%s' in destination WEC with namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
@@ -1164,24 +1189,95 @@ func (c *genericTransportController) createOrUpdateWrappedObject(ctx context.Con
 		} else {
 			logger.V(2).Info("Created wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "resourceVersion", wrappedObject2.GetResourceVersion())
 		}
-		return nil
-	}
-	// if we reached here object already exists, try update object
-	wrappedObject.SetResourceVersion(existingWrappedObject.GetResourceVersion())
-	wrappedObject.SetFinalizers(existingWrappedObject.GetFinalizers())
-	wrappedObject2, err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Update(ctx, wrappedObject, metav1.UpdateOptions{
-		FieldManager: ControllerName,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to update wrapped object '%s' in destination WEC mailbox namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
-	}
-	if hi := logger.V(3); hi.Enabled() {
-		hi.Info("Updated wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject2)
 	} else {
-		logger.V(2).Info("Updated wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject, "resourceVersion", wrappedObject2.GetResourceVersion())
+		// if we reached here object already exists, try update object
+		operation = "update"
+		wrappedObject.SetResourceVersion(existingWrappedObject.GetResourceVersion())
+		wrappedObject.SetFinalizers(existingWrappedObject.GetFinalizers())
+		wrappedObject2, err := c.transportClient.Resource(c.wrappedObjectGVR).Namespace(namespace).Update(ctx, wrappedObject, metav1.UpdateOptions{
+			FieldManager: ControllerName,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to update wrapped object '%s' in destination WEC mailbox namespace '%s' - %w", wrappedObject.GetName(), namespace, err)
+		}
+		if hi := logger.V(3); hi.Enabled() {
+			hi.Info("Updated wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject2)
+		} else {
+			logger.V(2).Info("Updated wrapped object in ITS", "namespace", namespace, "objectName", wrappedObject.GetName(), "wrappedObject", wrappedObject, "resourceVersion", wrappedObject2.GetResourceVersion())
+		}
+	}
+
+	// Record sync duration and object size metrics for each object type in the wrapped object
+	syncDuration := time.Since(startTime).Seconds()
+	for _, objInfo := range objectInfos {
+		// Record sync duration metric
+		c.objectSyncDurationHist.WithLabelValues(objInfo.GVK.Group, objInfo.GVK.Version, objInfo.GVK.Kind, operation, namespace).Observe(syncDuration)
+
+		// Record object size metric
+		c.objectSizeHist.WithLabelValues(objInfo.GVK.Group, objInfo.GVK.Version, objInfo.GVK.Kind, namespace).Observe(float64(objInfo.Size))
 	}
 
 	return nil
+}
+
+// extractObjectTypesFromWrapped extracts GVK and size information from objects contained in a wrapped object
+func (c *genericTransportController) extractObjectTypesFromWrapped(wrappedObject *unstructured.Unstructured) []objectInfo {
+	var objectInfos []objectInfo
+
+	// Extract the objects from the wrapped object's spec.objects field
+	specObjects, found, err := unstructured.NestedSlice(wrappedObject.Object, "spec", "objects")
+	if err != nil || !found {
+		// Fallback: use the wrapped object's own GVK and estimate its size
+		wrappedBytes, _ := wrappedObject.MarshalJSON()
+		return []objectInfo{{
+			GVK:  wrappedObject.GroupVersionKind(),
+			Size: int64(len(wrappedBytes)),
+		}}
+	}
+
+	// Deduplicate object types and accumulate sizes
+	gvkSizeMap := make(map[schema.GroupVersionKind]int64)
+
+	for _, obj := range specObjects {
+		if objMap, ok := obj.(map[string]interface{}); ok {
+			// Try to extract GVK from the object
+			apiVersion, _, _ := unstructured.NestedString(objMap, "apiVersion")
+			kind, _, _ := unstructured.NestedString(objMap, "kind")
+
+			if apiVersion != "" && kind != "" {
+				gv, err := schema.ParseGroupVersion(apiVersion)
+				if err == nil {
+					gvk := schema.GroupVersionKind{
+						Group:   gv.Group,
+						Version: gv.Version,
+						Kind:    kind,
+					}
+					// Calculate object size
+					objBytes, _ := json.Marshal(objMap)
+					gvkSizeMap[gvk] += int64(len(objBytes))
+				}
+			}
+		}
+	}
+
+	// Convert map to slice
+	for gvk, size := range gvkSizeMap {
+		objectInfos = append(objectInfos, objectInfo{
+			GVK:  gvk,
+			Size: size,
+		})
+	}
+
+	// If no objects found, use wrapped object's GVK as fallback
+	if len(objectInfos) == 0 {
+		wrappedBytes, _ := wrappedObject.MarshalJSON()
+		objectInfos = append(objectInfos, objectInfo{
+			GVK:  wrappedObject.GroupVersionKind(),
+			Size: int64(len(wrappedBytes)),
+		})
+	}
+
+	return objectInfos
 }
 
 // updateObjectFunc is a function that updates the given object.
