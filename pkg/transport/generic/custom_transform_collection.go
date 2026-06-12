@@ -213,7 +213,7 @@ func (ctc *customTransformCollectionImpl) invalidateCacheEntryLocked(ctx context
 		if bindingName == triggerBindingName {
 			continue
 		}
-		logger.V(5).Info("Enqueuing reference to Binding because "+reason, append(extraLogArgs, "bindingName", bindingName, "customTransformName", ctName, "oldGroupResource", oldGroupResource))
+		logger.V(5).Info("Enqueuing reference to Binding because "+reason, append(extraLogArgs, "bindingName", bindingName, "customTransformName", ctName, "oldGroupResource", oldGroupResource)...)
 		ctc.enqueue(bindingName)
 	}
 	for ctName := range oldGRTransformData.ctNames {
