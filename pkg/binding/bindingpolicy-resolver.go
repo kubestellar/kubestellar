@@ -351,11 +351,7 @@ func (resolver *bindingPolicyResolver) SetDestinations(bindingPolicyKey string,
 // ResolutionExists returns true if a resolution is associated with the
 // given bindingpolicy key.
 func (resolver *bindingPolicyResolver) ResolutionExists(bindingPolicyKey string) bool {
-	if resolver.getResolution(bindingPolicyKey) == nil {
-		return false
-	}
-
-	return true
+	return resolver.getResolution(bindingPolicyKey) != nil
 }
 
 // GetReportedStateRequestForObject returns four things.

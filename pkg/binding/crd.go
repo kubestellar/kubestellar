@@ -123,11 +123,7 @@ func (c *Controller) includedToWatch(r APIResource) bool {
 		Resource: r.resource.Name,
 	}
 
-	if isExcludedGroupResource(gr) {
-		return false
-	}
-
-	return true
+	return !isExcludedGroupResource(gr)
 }
 
 func crdEstablished(crd *apiextensionsv1.CustomResourceDefinition) bool {
