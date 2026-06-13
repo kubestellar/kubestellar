@@ -20,6 +20,7 @@ package main
 // to ensure that exec-entrypoint and run can make use of them.
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -28,12 +29,16 @@ import (
 
 	"github.com/spf13/pflag"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/client-go/tools/leaderelection"
+	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	_ "k8s.io/component-base/metrics/prometheus/version"
@@ -93,7 +98,8 @@ func main() {
 	klog.InitFlags(nil)
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()
-	ctx, _ := ksctlr.InitialContext()
+	ctx, cancel := ksctlr.InitialContext()
+	defer cancel()
 	logger := klog.FromContext(ctx)
 	ctrl.SetLogger(logger)
 	setupLog := logger.WithName("setup")
@@ -122,7 +128,75 @@ func main() {
 	wdsClientMetrics := spacesClientMetrics.MetricsForSpace("wds")
 	itsClientMetrics := spacesClientMetrics.MetricsForSpace("its")
 
-	// TODO: engage leader election if requested
+	// Engage leader election if requested
+	if enableLeaderElection {
+		id := os.Getenv("POD_NAME")
+		if id == "" {
+			var err error
+			id, err = os.Hostname()
+			if err != nil {
+				setupLog.Error(err, "failed to determine hostname for leader identity")
+				os.Exit(1)
+			}
+		}
+
+		ns := os.Getenv("POD_NAMESPACE")
+		if ns == "" {
+			nsData, err := os.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+			if err != nil {
+				setupLog.Error(err, "failed to determine namespace for leader election, set POD_NAMESPACE env var")
+				os.Exit(1)
+			}
+			ns = strings.TrimSpace(string(nsData))
+		}
+
+		lock := &resourcelock.LeaseLock{
+			LeaseMeta: metav1.ObjectMeta{
+				Name:      "kubestellar-controller-manager",
+				Namespace: ns,
+			},
+			Client: kubernetes.NewForConfigOrDie(ctrl.GetConfigOrDie()).CoordinationV1(),
+			LockConfig: resourcelock.ResourceLockConfig{
+				Identity: id,
+			},
+		}
+
+		setupLog.Info("Leader election identity", "identity", id, "namespace", ns)
+
+		leaderReady := make(chan struct{})
+		leaderElector, err := leaderelection.NewLeaderElector(leaderelection.LeaderElectionConfig{
+			Lock:            lock,
+			LeaseDuration:   15 * time.Second,
+			RenewDeadline:   10 * time.Second,
+			RetryPeriod:     2 * time.Second,
+			ReleaseOnCancel: true,
+			Callbacks: leaderelection.LeaderCallbacks{
+				OnStartedLeading: func(_ context.Context) {
+					close(leaderReady)
+					setupLog.Info("Became leader", "identity", id)
+				},
+				OnStoppedLeading: func() {
+					setupLog.Info("Lost leadership", "identity", id)
+					cancel()
+				},
+			},
+		})
+		if err != nil {
+			setupLog.Error(err, "failed to create leader elector")
+			os.Exit(1)
+		}
+
+		setupLog.Info("Waiting to become leader")
+		go leaderElector.Run(ctx)
+
+		select {
+		case <-leaderReady:
+			setupLog.Info("Proceeding with controller startup as leader")
+		case <-ctx.Done():
+			setupLog.Info("Context cancelled before becoming leader, exiting")
+			os.Exit(1)
+		}
+	}
 
 	// get the config for WDS
 	setupLog.Info("Getting config for WDS", "name", wdsName)
@@ -213,7 +287,10 @@ func main() {
 		}
 	}
 
-	select {}
+	select {
+	case <-ctx.Done():
+		setupLog.Info("Shutting down")
+	}
 }
 
 // workloadEventRelay implements binding.WorkloadEventHandler and relays the notifications
