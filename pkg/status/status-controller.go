@@ -101,8 +101,6 @@ type workloadObjectRef struct{ util.ObjectIdentifier }
 // bindingRef is a workqueue item that references a Binding
 type bindingRef string
 
-type workStatusON cache.ObjectName
-
 // workStatusRef is a workqueue item that references a WorkStatus
 type workStatusRef struct {
 	// Name is the Name of the WorkStatus object
