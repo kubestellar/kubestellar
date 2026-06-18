@@ -29,6 +29,13 @@ local-chart/
 # word counts
 /counts
 
+# Agent-generated operational artifacts
+*_log.md
+*-diagnosis.md
+*-summary.txt
+pr.md
+reviewer_log.md
+
 # Core Chart generated dependencies
 core-chart/Chart.lock
 core-chart/charts/
