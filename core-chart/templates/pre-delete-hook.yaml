@@ -1,0 +1,43 @@
+{{- if and (index .Values "kubeflex-operator" "install") (or .Values.ITSes .Values.WDSes ) }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-delete-cps"
+  namespace: kubeflex-system
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      restartPolicy: Never # OnFailure
+      securityContext:
+        runAsNonRoot: true
+      serviceAccountName: kubeflex-controller-manager
+      containers:
+      - name: uninstall-cps
+        image: quay.io/kubestellar/kubectl:{{ .Values.KUBECTL_VERSION }}
+        command: ['sh', '-c']
+        args:
+        - |
+          echo "Deleting Control Planes..."
+          {{- range $cp := .Values.WDSes }}
+          kubectl delete controlplane {{ $cp.name }}
+          {{- end }}
+          {{- range $cp := .Values.ITSes }}
+          kubectl delete controlplane {{ $cp.name }}
+          {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+{{- end }}

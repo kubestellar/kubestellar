@@ -1,0 +1,22 @@
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
+metadata:
+  name: perf-test-bindingpolicy
+  labels:
+    kubestellar: performance-test
+spec:
+  clusterSelectors:
+  - matchLabels: {"name":"cluster1"}
+  downsync:
+  - objectSelectors:
+    - matchLabels: {"app.kubernetes.io/name":"perf-test" }
+    wantSingletonReportedState: true
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/name: perf-test
+    kubestellar: performance-test
+  name: perf-test

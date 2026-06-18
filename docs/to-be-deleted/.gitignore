@@ -1,0 +1,4 @@
+venv
+generated
+__pycache__
+docs/scripts/generated_script.sh

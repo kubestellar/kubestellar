@@ -1,0 +1,7 @@
+type: S3
+config:
+  endpoint: "minio:9000"
+  bucket: "thanos"
+  access_key: %USERNAME%
+  secret_key: %PASSWORD%
+  insecure: true

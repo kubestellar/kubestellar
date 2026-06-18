@@ -1,0 +1,36 @@
+name: Image Scanning
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*.Dockerfile'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/image-scanning.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '*.Dockerfile'
+      - 'go.mod'
+      - 'go.sum'
+  schedule:
+    - cron: '0 8 * * 0'  # Weekly scan on Sunday
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  scan:
+    permissions:
+      contents: read
+      security-events: write
+    uses: kubestellar/infra/.github/workflows/reusable-image-scanning.yml@main
+    secrets: inherit
+    with:
+      dockerfile: 'core.Dockerfile'

@@ -1,0 +1,58 @@
+name: Run integration tests
+
+on:
+  workflow_call:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/workflows/**"
+      - "!.github/workflows/pr-test-e2e.yml"
+      - "**/*.md"
+      - "hack/verify-*"
+      - "hack/boilerplate/*"
+  push:
+    paths-ignore:
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/workflows/**"
+      - "!.github/workflows/pr-test-integration.yml"
+      - "**/*.md"
+      - "hack/verify-*"
+      - "hack/boilerplate/*"
+
+permissions:
+  contents: read
+
+jobs:
+  test-integration:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
+        with:
+          go-version: 1.26
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@829323503d1be3d00ca8346e5391ca0b07a9ab0d
+        id: install
+
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
+
+      - name: Install dependencies
+        run: |
+          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v1.0.0/install.sh) 1.0.0
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.3/kubeflex_0.9.3_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.3_linux_amd64.tar.gz bin/kflex
+          mv bin/kflex /usr/local/bin
+          rm -fr bin kubeflex_0.9.3_linux_amd64.tar.gz
+
+      - name: Run test
+        env:
+          USE_GOTESTSUM: "1"
+        run: hack/run-integration-tests.sh

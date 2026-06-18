@@ -1,0 +1,9 @@
+resources:
+- manager.yaml
+- config.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+- name: controller
+  newName: ghcr.io/kubestellar/kubestellar/controller-manager
+  newTag: "will be replaced by publishing workflow"

@@ -1,0 +1,26 @@
+
+{{$namespaces := DefaultParam .namespaces 1}}
+{{$actionName := DefaultParam .actionName "Creating"}}
+{{$numbeOfWorkloadObjects:= DefaultParam .numbeOfWorkloadObjects 10}}
+
+name: load
+namespace:
+  number: {{$namespaces}}
+tuningSets:
+
+# SteppedLoad defines a load that generates a burst of
+# a given size every X seconds.
+- name: RSteppedLoad
+  steppedLoad:
+    burstSize: 1
+    stepDelay: 60s
+
+steps:
+- module:
+    path: modules/long-duration-exp.yaml
+    params:
+      actionName: {{$actionName}}
+      tuningSet: RSteppedLoad
+      namespaces: {{$namespaces}}
+      numbeOfWorkloadObjects: {{$numbeOfWorkloadObjects}}
+

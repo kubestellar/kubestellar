@@ -1,0 +1,1 @@
+./hack/verify-contextual-logging.sh: line 29: logcheck: command not found

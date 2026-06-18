@@ -1,0 +1,85 @@
+name: goreleaser
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  packages: read
+
+env:
+  REGISTRY: ghcr.io
+  CORE_CHART_PATH: ./core-chart
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
+        with:
+          go-version: 1.26
+
+      - name: Delete non-semver tags
+        run: 'git tag -d $(git tag -l | grep -v "^v")'
+
+      - name: Set LDFLAGS
+        run: echo LDFLAGS="$(make ldflags)" >> $GITHUB_ENV
+
+      - name: Install syft binary executable
+        uses: anchore/sbom-action/download-syft@e22c389904149dbc22b58101806040fa8d37a610
+
+      - name: Run GoReleaser on tag
+        uses: goreleaser/goreleaser-action@5daf1e915a5f0af01ddbcd89a43b8061ff4f1a89
+        with:
+          distribution: goreleaser
+          version: v2.14.3
+          args: release --timeout 60m --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USER: ${{ github.actor }}
+          EMAIL: ${{ github.actor}}@users.noreply.github.com
+
+      - name: Set up Helm
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to registry
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package and push charts
+        run: |
+          chartVersion=$(echo ${{ github.ref_name }} | cut -c 2-)
+
+          sed -i "s/^KUBESTELLAR_VERSION:.*$/KUBESTELLAR_VERSION: \"${chartVersion}\"/g" ${{ env.CORE_CHART_PATH }}/values.yaml
+
+          helm package ${{ env.CORE_CHART_PATH }} --destination . --version ${chartVersion} --app-version ${chartVersion} --dependency-update
+          helm push ./core-chart*.tgz oci://${{ env.REGISTRY }}/kubestellar/kubestellar
+
+      - name: Trigger docs version branch
+        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4.0.1
+        with:
+          token: ${{ secrets.WORKFLOW_SYNC_TOKEN }}
+          repository: kubestellar/docs
+          event-type: create-version-branch
+          client-payload: |
+            {
+              "project": "kubestellar",
+              "version": "${{ github.ref_name }}",
+              "source_repo": "${{ github.repository }}",
+              "source_branch": "main"
+            }

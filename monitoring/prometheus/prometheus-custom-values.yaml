@@ -1,0 +1,71 @@
+prometheus:
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          #storageClassName: standard
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+    securityContext:
+      runAsGroup: null
+      runAsNonRoot: null
+      runAsUser: null
+      fsGroup: null
+      seccompProfile:
+        type: RuntimeDefault
+    serviceMonitorNamespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: ks-monitoring
+
+    remoteWrite:
+      - url: "%THANOS_HOST%/api/v1/receive"
+  serviceMonitor:
+    selfMonitor: false
+
+prometheusOperator:
+  serviceMonitor:
+    selfMonitor: false
+  admissionWebhooks:
+    patch:
+      securityContext:
+        runAsGroup: null
+        runAsNonRoot: null
+        runAsUser: null
+        seccompProfile:
+          type: RuntimeDefault
+  securityContext:
+        fsGroup: null
+        runAsGroup: null
+        runAsNonRoot: true
+        runAsUser: null
+        seccompProfile:
+          type: RuntimeDefault
+
+kubeApiServer:
+  enabled: %ENABLE_KUBEAPISERVER%
+kubeControllerManager:
+  enabled: false
+coreDns:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubelet:
+  enabled: false
+
+thanosRuler:
+  thanosRulerSpec:
+    securityContext:
+        runAsGroup: null
+        runAsNonRoot: null
+        runAsUser: null
+        fsGroup: null
+        seccompProfile:
+          type: RuntimeDefault
+   

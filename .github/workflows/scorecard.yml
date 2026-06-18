@@ -1,0 +1,20 @@
+name: OpenSSF Scorecard
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analysis:
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    uses: kubestellar/infra/.github/workflows/reusable-scorecard.yml@main
+    secrets: inherit

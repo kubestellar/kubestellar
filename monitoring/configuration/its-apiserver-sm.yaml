@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: %ITS%-apiserver
+  labels:
+    app: %ITS%-apiserver
+spec:
+  endpoints:
+  - bearerTokenSecret:
+      name: prometheus-%ITS%-secret
+      key: token
+    interval: 15s
+    path: /metrics
+    port: https
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
+  namespaceSelector:
+    matchNames:
+    - %ITS%-system
+  selector:
+    matchLabels:
+      its-app: kube-apiserver

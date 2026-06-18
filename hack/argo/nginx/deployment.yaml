@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-sa-deployment
+  namespace: nginx-sa
+  labels:
+    argocd.argoproj.io/instance: nginx-sa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-sa
+  template:
+    metadata:
+      labels:
+        app: nginx-sa
+    spec:
+      serviceAccountName: nginx-sa
+      containers:
+      - name: nginx-sa
+        image: public.ecr.aws/nginx/nginx:latest
+        ports:
+        - containerPort: 80

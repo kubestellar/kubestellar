@@ -1,0 +1,53 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    region: "{{ region }}"
+    group: "{{ sig_group }}"
+    cluster_name: "{{ k8s_cluster_name | default('ks-core') }}"
+  tasks:
+  - name: Read instance data
+    include_vars:
+      file: ".data/{{ region }}_{{ group }}/ec2_instances_{{ cluster_name }}.json"
+      name: ec2_instances
+
+  - name: Calculate number of EC2 instances
+    set_fact:
+      num_instances: "{{ (ec2_instances.instances | length)}}"
+
+  - fail: msg="no ec2 instances found"
+    when: num_instances == "0"
+
+  - name: Delete instances if too many - case1
+    set_fact:
+      ec2_delete_list: "{{ ec2_delete_list | default([]) + [ ec2_instances.instances[item].instance_id ] }}"
+    loop: "{{ range(0, num_instances | int) }}"
+
+  - name: Delete all instances
+    include_role:
+      name: ec2instances
+    vars:
+      verb: delete
+      instance_ids: "{{ ec2_delete_list }}"
+
+  - name: Purge instance data
+    ansible.builtin.file:
+      path: ".data/{{ region }}_{{ group }}/ec2_instances_{{ cluster_name }}.json"
+      state: absent
+
+  - name: Purge ansible hosts data
+    ansible.builtin.file:
+      path: ".data/{{ region }}_{{ group }}/hosts_{{ cluster_name }}"
+      state: absent
+
+  - name: Show instance data
+    debug:
+      msg:
+      - "{{ ec2_instances }}"
+
+  - name: Delete the security group
+    amazon.aws.ec2_group:
+      region: "{{ region }}"
+      name: "{{ group }}"
+      state: absent
+    failed_when: false

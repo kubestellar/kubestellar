@@ -1,0 +1,131 @@
+# Default values for KubeStellar-Core.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Container/chart image versions. These values are set during the chart release process,
+# please do not change them unless you know what you are doing.
+HELM_VERSION: "3.16.4"
+KUBECTL_VERSION: "1.32.13"
+KUBESTELLAR_VERSION: "0.30.0"
+# TRANSPORT_VERSION: e.g., "0.24.0"; defaults to KUBESTELLAR_VERSION value, if not defined
+# KFLEX_GET_KUBECONFIG: e.g., "0.24.0"; defaults to KUBESTELLAR_VERSION value, if not defined
+CLUSTERADM_VERSION: "1.0.0"
+OCM_STATUS_ADDON_VERSION: "0.2.0-rc17"
+
+
+# Control controller log verbosity
+# The "default" verbosity value will be used for all controllers unless a specific controller verbosity override is specified
+verbosity:
+  default: 2
+  # Specific controller verbosity overrides:
+  # kubestellar: 6
+  # clusteradm: 6
+  # status_controller: 6 DEPRECATED
+  # status_agent: 6 DEPRECATED
+  # transport: 6
+
+
+# KubeFlex override values
+kubeflex-operator:
+  install: true
+  # installPostgreSQL: true # automatically install the appropriate version of PostgreSQL required by KubeFlex
+  # isOpenShift: false # set this variable to true when installing the chart in an OpenShift cluster
+  # domain: localtest.me # used to define the DNS domain name used from outside the KubeFlex hosting cluster to reach that cluster's Ingress endpoint
+  # externalPort: 9443 # used to set the port to access the Control Planes API
+  # hostContainer: kubeflex-control-plane # used to set the name of the container that runs the KubeFlex hosting cluster
+  # verbosity: 0 $ used to set the verbosity of KubeFlex controller (this is not impacted by the global VERBOSITY value)
+
+
+# Argo CD values
+argocd:
+  install: false # enable/disaple the installation of Argo CD
+  # openshift:
+  #   enabled: true
+  global:
+    domain: argocd.localtest.me # When using the "create-kind-cluster-with-SSL-passthrough.sh" script, Argo UI will be accessible from the host at https://argocd.localtest.me:9443
+  applications: # list of Argo CD applications to be create
+  # Uncomment the lines below to deploy an application for the scenario-6 example in KubeStellar docs
+  # - name: scenario-6 # Argo CD application name required, must be unique
+  #   project: default # Argo CD project (application group), default: default
+  #   repoURL: https://github.com/francostellari/kubestellar # source repo url
+  #   targetRevision: argocd # default: HEAD # source repo branch
+  #   path: config/argocd/scenario-6 # source repo path to the application YAML
+  #   destinationWDS: wds1
+  #   destinationNamespace: default # default: default
+  #   syncPolicy: auto # default: manual
+
+
+# Configuration for the OCM Status Add-On Controller.
+# v here takes precedence over verbosity.status_controller
+status_controller: {}
+  # v: 2
+
+
+# Configuration for the OCM Status Add-On Agent.
+# v here takes precedence over verbosity.status_agent.
+status_agent:
+  hub_burst: 10 # int Allowed burst in requests/sec for accessing the hub from the agent
+  hub_qps: 5 # float Max average requests/sec for accessing the hub from the agent
+  local_burst: 10 # int Allowed burst in requests/sec for accessing the local cluster from the agent
+  local_qps: 5 # float Max average requests/sec for accessing the local cluster from the agent
+  log_flush_frequency: "5s" # duration Maximum number of seconds between log flushes on the agent
+  logging_format: text # string Sets the log format. Permitted formats: "json", "text". on the agent
+  metrics_bind_addr: ":8080" # string [host]:port at which to listen for HTTP requests for Prometheus /metrics requests on the agent
+  pprof_bind_addr: ":8082" # string [host]:port at which to listen for HTTP requests for go /debug/pprof requests on the agent
+  # v: 0 # Level number for the log level verbosity on the agent
+  vmodule: "" # pattern=N,... comma-separated list of pattern=N settings for file-filtered logging (only works for text log format) on the agent
+
+
+# Transport controller parameters
+transport_controller:
+  # [host]:port at which to listen for HTTP GET /metrics
+  metrics_bind_addr: ":8090"
+  # [host]:port at which to listen for HTTP GET /debug/pprof
+  pprof_bind_addr: ":8092"
+  # QPS and burst for accessing the ITS
+  transport_qps: 5
+  transport_burst: 10
+  # QPS and burst for accessing the WDS
+  wds_qps: 5
+  wds_burst: 10
+  # Bundling parameters
+  max_num_wrapped: 1
+  max_size_wrapped: 512000
+
+
+# Determine if the Post Create Hooks should be installed by the chart
+InstallPCHs: true
+
+
+# List the Inventory and Transport Spaces (ITSes) to be created by the chart
+# Each ITS consists of:
+# - a mandatory unique name
+# - an optional type, which could be host, vcluster, or external (default to vcluster, if not specified)
+# - an optional install_clusteradm flag, which could be true  or false  (default to true) to enable/disable the installation of OCM in the control plane
+# - an optional bootstrapSecret secion to be used for Control Plabes of type external (more details below)
+ITSes: # all the CPs in this list will execute the its.yaml PCH
+  # - name: its0 # name of the control plane
+  #   type: host # optional type of control plane: host, vcluster, or external (default to vcluster, if not specified)
+  #   install_clusteradm: true|false  # optional flag to enable/disable the installation of OCM in the control plane (default to true, if not specified)
+  # - name: its1 # name of the control plane
+  #   type: host # optional type of control plane: host, vcluster, or external (default to vcluster, if not specified)
+  #   install_clusteradm: true|false  # optional flag to enable/disable the installation of OCM in the control plane (default to true, if not specified)
+  # - name: its2 # name of the control plane
+  #   type: external # optional type of control plane: host, vcluster, or external (default to vcluster, if not specified)
+  #   install_clusteradm: true|false  # optional flag to enable/disable the installation of OCM in the control plane (default to true, if not specified)
+  #   bootstrapSecret: # this section is ignored unless type is "external"
+  #     name: <secret-name> # default: "<control-plane-name>-bootstrap"
+  #     namespace: <secret-namespace> # default: Helm chart installation namespace
+  #     key: <key-name> # default: "kubeconfig-incluster"
+
+
+# List the Workload Description Spaces (WDSes) to be created by the chart
+# Each WDS consists of a mandatory unique name and several optional parameters:
+# - type: host or k8s (default to k8s, if not specified)
+# - APIGroups: string holding a comma-separated list of APIGroups
+# - ITSName: the name of the ITS control plane to be used by the WDS. Note that the ITSName MUST be specified if more than one ITS exists at the moment the WDS PCH starts.
+WDSes: # all the CPs in this list will execute the transport-controller.yaml and kubestellar-controller.yaml PCHs
+  # - name: wds1 # name of the control plane
+  #   type: host # optional type of control plane host or k8s (default to k8s, if not specified)
+  #   APIGroups: "" # optional string holding a comma-separated list of APIGroups
+  #   ITSName: its1 # optional name of the ITS control plane, this MUST be specified if more than one ITS exists at the moment the WDS PCH starts

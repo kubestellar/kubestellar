@@ -1,0 +1,29 @@
+For your convenience you will probably want to add contexts to your
+kubeconfig named after the non-host-type control planes (WDSes and
+ITSes) that you just created (a host-type control plane is just an
+alias for the KubeFlex hosting cluster). You can do that with the
+following `kflex` commands; each creates a context and makes it the
+current one. See
+https://github.com/kubestellar/kubestellar/blob/{{ .Values.KUBESTELLAR_VERSION }}/docs/content/direct/core-chart.md#kubeconfig-files-and-contexts-for-control-planes
+for a way to do this without using `kflex`.
+Start by setting your current kubeconfig context to the one you used
+when installing this chart.
+
+kubectl config use-context $the_one_where_you_installed_this_chart
+kflex ctx --set-current-for-hosting # make sure the KubeFlex CLI's hidden state is right for what the Helm chart just did
+{{range $cp := (concat (.Values.ITSes | default list) (.Values.WDSes | default list) ) }}
+{{- if ne $cp.type "host" }}
+kflex ctx --overwrite-existing-context {{ $cp.name }}
+{{- end }}
+{{- end }}
+
+Finally, you can use `kflex ctx` to switch back to the kubeconfig
+context for your KubeFlex hosting cluster.
+
+{{- if .Values.argocd.install }}
+
+Access Argo CD UI at https://{{ .Values.argocd.global.domain }} (append :9443 for Kind or k3s installations).
+
+Obtain Argo CD admin password using the command:
+kubectl -n {{ .Release.Namespace }} get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+{{- end }}

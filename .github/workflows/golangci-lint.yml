@@ -1,0 +1,51 @@
+name: Static Analysis
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint Go Code
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.4.0
+
+      - name: Run golangci-lint
+        run: |
+          golangci-lint run --timeout=8m --issues-exit-code=0 --config=.golangci.yaml --max-issues-per-linter=50 --max-same-issues=10
+
+      - name: Add Lint Summary
+        if: always()
+        run: |
+          echo "### Static Analysis (Resource-Efficient Mode)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Schedule**: (Daily at 08:00 UTC) + manual dispatch" >> $GITHUB_STEP_SUMMARY
+          echo "- **Timeout**: Strict 10-minute limit" >> $GITHUB_STEP_SUMMARY
+          echo "- **Mode**: Standard lint with concurrency controls" >> $GITHUB_STEP_SUMMARY
+          echo "- **Purpose**: OpenSSF badge compliance visibility" >> $GITHUB_STEP_SUMMARY
+          echo "- **Config**: .golangci.yaml" >> $GITHUB_STEP_SUMMARY
+          echo "- **Resource Impact**: Minimal overhead - short daily runs" >> $GITHUB_STEP_SUMMARY

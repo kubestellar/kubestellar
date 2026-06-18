@@ -1,0 +1,94 @@
+{{$namespaces := DefaultParam .namespaces 1}}
+{{$namespaceNamePrefix := DefaultParam .namespaceNamePrefix "perf-test"}}
+{{$waitTime := DefaultParam .waitTime "10s"}}
+
+{{$K8S_CLUSTER := DefaultParam .K8S_CLUSTER true}}
+{{$OPENSHIFT_CLUSTER := DefaultParam .OPENSHIFT_CLUSTER false}}
+{{$CREATE_NS := DefaultParam .CREATE_NS true}}
+{{$tuningSet := DefaultParam .tuningSet "RandomizedLoad"}}
+
+
+name: load
+namespace:
+  number: 0
+  enableExistingNamespaces: true
+tuningSets:
+
+# Global100qps: use 100 qps globally:
+# * split equally qps among all running phases
+# * if some phase finishes, other phases will get more qps.
+- name: Global100qps
+  globalQPSLoad:
+    qps: 100
+    burst: 1
+
+# RandomizedLoad defines a load that is spread randomly
+# across a given total time.
+- name: RandomizedLoad
+  randomizedLoad:
+    AverageQPS: 10
+
+# SteppedLoad defines a load that generates a burst of
+# a given size every X seconds.
+- name: RSteppedLoad
+  steppedLoad:
+    burstSize: 200
+    stepDelay: 1s
+
+# ParallelismLimitedLoad does the operations as quickly as possible subject to a given
+# limit on the number running concurrently.
+- name: Sequence
+  parallelismLimitedLoad:
+    parallelismLimit: 100
+
+# PoissonLoad defines a load with Poisson arrival time
+# for a given rate parameter ExpectedActionsPerSecond (λ in the Poisson model)
+# ExpectedActionsPerSecond: specifies the possion rate parameter per second
+- name: PoissonLoad
+  poissonLoad:
+    expectedActionsPerSecond: 0.5
+
+
+steps:
+{{if $CREATE_NS}}
+- module:
+    path: modules/performance-test-module.yaml
+    params:
+      actionName: "Creating"
+      tuningSet: Sequence
+      namespaces: {{$namespaces}}
+      namespaceNamePrefix: {{$namespaceNamePrefix}}
+
+- name: "Wait {{$waitTime}}"
+  measurements:
+    - Identifier: Wait
+      Method: Sleep
+      Params:
+        duration: {{$waitTime}}
+{{end}}
+
+
+{{if $K8S_CLUSTER}}
+{{range $ssIndex := Loop $namespaces}}
+- module:
+    path: modules/cluster-density-k8s.yaml
+    params:
+      actionName: "Creating"
+      tuningSet: {{$tuningSet}}
+      namespaceName: {{$namespaceNamePrefix}}-{{$ssIndex}}
+      iterations: {{$ssIndex}}
+{{end}}
+{{end}}
+
+
+{{if $OPENSHIFT_CLUSTER}}
+{{range $ssIndex := Loop $namespaces}}
+- module:
+    path: modules/cluster-density-ocp.yaml
+    params:
+      actionName: "Creating"
+      tuningSet: {{$tuningSet}}
+      namespaceName: {{$namespaceNamePrefix}}-{{$ssIndex}}
+      iterations: {{$ssIndex}}
+{{end}}
+{{end}}

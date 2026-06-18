@@ -1,0 +1,14 @@
+name: "PR Title Verifier"
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  verify:
+    uses: kubestellar/infra/.github/workflows/reusable-pr-verify-title.yml@main
+    secrets: inherit

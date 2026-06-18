@@ -1,0 +1,25 @@
+{{- range $cp := .Values.ITSes }}
+---
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: ControlPlane
+metadata:
+  name: {{ $cp.name }}
+spec:
+  backend: shared
+  type: {{ $cp.type | default "vcluster" }}
+  waitForPostCreateHooks: true
+  postCreateHooks:
+  {{- if or (not (hasKey $cp "install_clusteradm")) (eq $cp.install_clusteradm true) }}
+    - hookName: its-hub-init
+  {{- end }}
+    - hookName: install-status-addon
+  globalVars:
+    ITSSecretName: {{ or (eq $cp.type "host") (eq $cp.type "external") | ternary "admin-kubeconfig" "vc-vcluster" }}
+    ITSSecretKey: {{ or (eq $cp.type "host") (eq $cp.type "external") | ternary "kubeconfig-incluster" "config-incluster" }}
+  {{- if eq $cp.type "external" }}
+  bootstrapSecretRef:
+    name: {{ ($cp.bootstrapSecret).name | default (printf "%s-bootstrap" $cp.name) }}
+    namespace: {{ ($cp.bootstrapSecret).namespace | default $.Release.Namespace }}
+    inClusterKey: {{ ($cp.bootstrapSecret).key | default "kubeconfig-incluster" }}
+  {{- end }}
+{{- end }}

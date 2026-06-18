@@ -1,0 +1,22 @@
+name: Spellcheck Action
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * 5"
+  push:
+    branches:
+      - main
+      - "release-*"
+    paths:
+      - ".github/workflows/spellcheck_action.yml"
+      - ".github/spellcheck/.spellcheck.yml"
+      - ".github/spellcheck/.wordlist.txt"
+
+permissions:
+  contents: read
+
+jobs:
+  spellcheck:
+    uses: kubestellar/infra/.github/workflows/reusable-spellcheck.yml@main
+    secrets: inherit

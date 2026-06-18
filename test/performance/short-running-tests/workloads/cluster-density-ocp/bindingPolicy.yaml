@@ -1,0 +1,13 @@
+apiVersion: control.kubestellar.io/v1alpha1
+kind: BindingPolicy
+metadata:
+  name: {{.Name}}
+  labels:
+    kubestellar: performance-test
+spec:
+  clusterSelectors:
+  - matchLabels: {"name":"cluster1"}
+  downsync:
+  - objectSelectors:
+    - matchLabels: {"app.kubernetes.io/name": {{.Name}} }
+    wantSingletonReportedState: true

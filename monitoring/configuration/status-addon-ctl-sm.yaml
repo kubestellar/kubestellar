@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: %ITS%-status-addon-controller
+spec:
+  endpoints:
+  - interval: 15s
+    path: /metrics
+    port: metrics
+    scheme: http
+  namespaceSelector:
+    matchNames:
+    - %ITS%-system
+  selector:
+    matchLabels:
+      app: status-addon-controller

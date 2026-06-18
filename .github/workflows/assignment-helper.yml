@@ -1,0 +1,12 @@
+name: Assignment Helper
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+
+jobs:
+  assignment-helper:
+    uses: kubestellar/infra/.github/workflows/reusable-assignment-helper.yml@main

@@ -1,0 +1,26 @@
+matrix:
+- name: Markdown
+  aspell:
+    lang: en
+  dictionary:
+    wordlists:
+    - .github/spellcheck/.wordlist.txt
+    encoding: utf-8
+  pipeline:
+  - pyspelling.filters.markdown:
+  - pyspelling.filters.html:
+      comments: false
+      ignores:
+        - code
+        - pre
+        - style
+        - script
+        - head
+        - noscript
+      ignore_classes:
+        - hidden
+        - sr-only
+        - copy-button
+  sources:
+  - '**/*.md'
+  default_encoding: utf-8

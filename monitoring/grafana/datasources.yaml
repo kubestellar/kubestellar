@@ -1,0 +1,25 @@
+securityContext:
+  runAsNonRoot: null
+  runAsUser: null
+  runAsGroup: null
+  fsGroup: null
+
+datasources:
+  pyroscope.yaml:
+   apiVersion: 1
+   datasources:
+   - name: pyroscope
+     type: grafana-pyroscope-datasource
+     uid: pyroscope-test
+     url: http://pyroscope.ks-monitoring.svc.cluster.local:4040
+  prometheus.yaml:
+   apiVersion: 1
+   datasources:
+   - name: thanos
+     type: prometheus
+     uid: prometheus-test
+     url: http://thanos-query.ks-monitoring.svc.cluster.local:9090
+     jsonData:
+       manageAlerts: false
+       prometheusType: Thanos #Cortex | Mimir | Prometheus | Thanos
+       prometheusVersion: 2.40.0

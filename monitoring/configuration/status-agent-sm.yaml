@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name:  %WEC%-status-agent
+  labels:
+    app: %WEC%-status-agent
+spec:
+  endpoints:
+  - interval: 15s
+    path: /metrics
+    port: metrics
+    scheme: http
+  namespaceSelector:
+    matchNames:
+    - open-cluster-management-agent-addon
+  selector:
+    matchLabels:
+      app: status-agent

@@ -1,0 +1,19 @@
+## Objects module provides a module for creating k8s objects.
+
+## Input params
+{{$actionName := .actionName}}
+{{$namespaces := .namespaces}}
+{{$namespaceNamePrefix := .namespaceNamePrefix}}
+{{$tuningSet := .tuningSet}}
+
+
+steps:
+- name: "{{$actionName}} Namespaces and BindingPolicies Objects"
+  phases:
+  - tuningSet: {{$tuningSet}}
+    ReplicasPerNamespace: {{$namespaces}}
+    objectBundle:
+    - basename: {{$namespaceNamePrefix}}
+      objectTemplatePath: bindingPolicy.yaml
+    - basename: {{$namespaceNamePrefix}}
+      objectTemplatePath: namespace.yaml

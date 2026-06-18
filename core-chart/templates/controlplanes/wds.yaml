@@ -1,0 +1,22 @@
+{{- range .Values.WDSes }}
+---
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: ControlPlane
+metadata:
+  name: {{ .name }}
+spec:
+  backend: shared
+  type: {{ .type | default "k8s" }}
+  waitForPostCreateHooks: true
+  postCreateHooks:
+    - hookName: kubestellar-controller
+      vars:
+        APIGroups: '{{ .APIGroups }}'
+    - hookName: transport-controller
+      vars:
+        WDSSecretName: admin-kubeconfig
+        WDSSecretKey: kubeconfig-incluster
+  globalVars:
+    ControlPlaneName: {{ .name }}
+    ITSName: '{{ .ITSName }}'
+{{- end }}

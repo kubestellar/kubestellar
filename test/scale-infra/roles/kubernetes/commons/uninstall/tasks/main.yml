@@ -1,0 +1,8 @@
+---
+# tasks file for uninstall-k8s
+- name: remove kubernetes
+  shell: |
+         sudo kubeadm reset -y 
+         sudo apt-get purge kubeadm kubectl kubelet -y  --allow-change-held-packages
+         sudo apt-get autoremove -y
+         sudo rm -fr /etc/kubernetes/; sudo rm -fr ~/.kube/

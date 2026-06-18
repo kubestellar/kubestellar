@@ -1,0 +1,38 @@
+# Get joining token for the worker nodes
+- hosts: masters
+  remote_user: ubuntu
+  become: yes
+  gather_facts: yes
+  connection: ssh
+  roles:
+    - kubernetes/commons/join-token
+
+
+# Make joining token available to be applied to worker nodes
+- hosts: masters
+  remote_user: ubuntu
+  gather_facts: yes
+  become: yes
+  vars:
+    remote_path: '/tmp/kubernetes_join_command'
+  tasks:
+    - name: get content of remote file
+      slurp:
+        src: "{{ remote_path }}"
+      register: remote_content_encoded
+
+    - name: decode remote content
+      set_fact:
+        remote_content: "{{remote_content_encoded.content | b64decode}}"
+      register: remote_content_values
+
+
+# Add worker nodes to Kubernetes cluster
+- hosts: add_workers
+  remote_user: ubuntu
+  become: yes
+  vars:
+    join_command: "{{ hostvars[groups['masters'][0]].remote_content_values['ansible_facts']['remote_content'] }}"
+  roles:
+    - kubernetes/commons/install
+    - kubernetes/worker
