@@ -39,7 +39,6 @@ type ObjectIdentifier struct {
 }
 
 // String returns a human-readable representation of the ObjectIdentifier.
-// String returns a human-readable representation of the ObjectIdentifier.
 // For namespaced objects it returns "group/version/resource(namespace/name)",
 // for cluster-scoped objects it returns "group/version/resource(name)".
 // Core resources (empty group) render as "v1/pods(ns/name)" rather than "/v1/pods(ns/name)".
@@ -79,7 +78,9 @@ func EmptyUnstructuredObjectFromIdentifier(objIdentifier ObjectIdentifier) *unst
 	return obj
 }
 
-func ObjIdentifierIsForCRD(objIdentifier ObjectIdentifier) bool { // CRDs might have different versions. therefore, using "any" in CRD version
+// ObjIdentifierIsForCRD returns true if the identifier refers to a CustomResourceDefinition.
+// Version is matched loosely (AnyVersion) because CRDs may exist across multiple API versions.
+func ObjIdentifierIsForCRD(objIdentifier ObjectIdentifier) bool {
 	return gvkMatches(objIdentifier.GVK, apiextensions.GroupName, AnyVersion, CRDKind)
 }
 
