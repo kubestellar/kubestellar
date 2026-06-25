@@ -142,11 +142,15 @@ func TestConcurrentMap_Concurrency(t *testing.T) {
 			for i := 0; i < opsPerGoroutine; i++ {
 				key := id*opsPerGoroutine + i
 				m.Set(key, key*2)
-				if v, ok := m.Get(key); ok && v != key*2 {
+				if v, ok := m.Get(key); !ok {
+					t.Errorf("key %d: expected key to exist after Set", key)
+				} else if v != key*2 {
 					t.Errorf("key %d: expected %d, got %d", key, key*2, v)
 				}
 				m.Len()
-				_ = m.Iterator(func(k, v int) error { return nil })
+				if err := m.Iterator(func(k, v int) error { return nil }); err != nil {
+					t.Errorf("unexpected iterator error: %v", err)
+				}
 				m.Remove(key)
 			}
 		}(g)
