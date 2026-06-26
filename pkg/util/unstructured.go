@@ -99,16 +99,16 @@ func getObjectGVK(o interface{}) (schema.GroupVersionKind, error) {
 
 func GetWorkStatusSourceRef(workStatus runtime.Object) (*SourceRef, error) {
 	obj, ok := workStatus.(*unstructured.Unstructured)
-	if !ok {
+	if !ok || obj == nil {
 		return nil, fmt.Errorf("object cannot be cast to *unstructured.Unstructured")
 	}
 
-	spec := obj.Object["spec"].(map[string]interface{})
-	if spec == nil {
+	spec, ok := obj.Object["spec"].(map[string]interface{})
+	if !ok || spec == nil {
 		return nil, fmt.Errorf("could not find spec in object")
 	}
-	sourceRef := spec["sourceRef"].(map[string]interface{})
-	if sourceRef == nil {
+	sourceRef, ok := spec["sourceRef"].(map[string]interface{})
+	if !ok || sourceRef == nil {
 		return nil, fmt.Errorf("could not find sourceRef in object spec")
 	}
 
@@ -137,9 +137,13 @@ func GetWorkStatusSourceRef(workStatus runtime.Object) (*SourceRef, error) {
 		return nil, fmt.Errorf("could not find name in sourceRef or it's not a string")
 	}
 
-	namespace, ok := sourceRef["namespace"].(string)
-	if !ok {
-		return nil, fmt.Errorf("could not find namespace in sourceRef or it's not a string")
+	namespace := ""
+	if nsObj, found := sourceRef["namespace"]; found && nsObj != nil {
+		ns, ok := nsObj.(string)
+		if !ok {
+			return nil, fmt.Errorf("could not find namespace in sourceRef or it's not a string")
+		}
+		namespace = ns
 	}
 
 	return &SourceRef{
@@ -182,7 +186,7 @@ func ObjectIdentifierFromSourceRef(sourceRef *SourceRef) ObjectIdentifier {
 
 func GetWorkStatusStatus(workStatus runtime.Object) (map[string]interface{}, error) {
 	obj, ok := workStatus.(*unstructured.Unstructured)
-	if !ok {
+	if !ok || obj == nil {
 		return nil, fmt.Errorf("object cannot be cast to *unstructured.Unstructured")
 	}
 
