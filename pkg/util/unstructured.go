@@ -206,9 +206,9 @@ func CheckWorkStatusPresence(config *rest.Config) bool {
 	}
 
 	gvr := schema.GroupVersionResource{
-		Group:    "control.kubestellar.io",
-		Version:  "v1alpha1",
-		Resource: "workstatuses",
+		Group:    WorkStatusGroup,
+		Version:  WorkStatusVersion,
+		Resource: WorkStatusResource,
 	}
 
 	return CheckAPIisPresent(discoveryClient, gvr)
