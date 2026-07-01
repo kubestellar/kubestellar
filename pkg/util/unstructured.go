@@ -104,12 +104,22 @@ func GetWorkStatusSourceRef(workStatus runtime.Object) (*SourceRef, error) {
 	}
 
 	spec, ok := obj.Object["spec"].(map[string]interface{})
+<<<<<<< HEAD
 	if !ok || spec == nil {
 		return nil, fmt.Errorf("could not find spec in object")
 	}
 	sourceRef, ok := spec["sourceRef"].(map[string]interface{})
 	if !ok || sourceRef == nil {
 		return nil, fmt.Errorf("could not find sourceRef in object spec")
+=======
+	if !ok {
+		return nil, fmt.Errorf("could not find spec in object or it's not a map")
+	}
+
+	sourceRef, ok := spec["sourceRef"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("could not find sourceRef in object spec or it's not a map")
+>>>>>>> 785f7a54e (fix(util): update stale error message for namespace type check)
 	}
 
 	group, ok := sourceRef["group"].(string)
@@ -137,11 +147,19 @@ func GetWorkStatusSourceRef(workStatus runtime.Object) (*SourceRef, error) {
 		return nil, fmt.Errorf("could not find name in sourceRef or it's not a string")
 	}
 
+<<<<<<< HEAD
 	namespace := ""
 	if nsObj, found := sourceRef["namespace"]; found && nsObj != nil {
 		ns, ok := nsObj.(string)
 		if !ok {
 			return nil, fmt.Errorf("could not find namespace in sourceRef or it's not a string")
+=======
+	var namespace string
+	if nsObj, found := sourceRef["namespace"]; found && nsObj != nil {
+		ns, ok := nsObj.(string)
+		if !ok {
+			return nil, fmt.Errorf("namespace in sourceRef is not a string")
+>>>>>>> 785f7a54e (fix(util): update stale error message for namespace type check)
 		}
 		namespace = ns
 	}
