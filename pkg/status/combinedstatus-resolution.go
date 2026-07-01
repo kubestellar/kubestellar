@@ -1225,19 +1225,23 @@ func sortedStringSlice(s []string) []string {
 // That means, it must not be surrounded by alphanumeric characters.
 // query is assumed to be non-nil.
 func objectIsQueried(query *string, obj string) bool {
-	idx := 0
+	base := 0
 
 	for {
-		idx = strings.Index((*query)[idx:], obj) // slices share the same storage, therefore efficient
-		if idx == -1 {
+		// strings.Index returns a relative offset within (*query)[base:], so we
+		// must add base to get the absolute position before passing it to
+		// isWholeWord (which operates on the original string).
+		rel := strings.Index((*query)[base:], obj)
+		if rel == -1 {
 			return false
 		}
 
-		if isWholeWord(query, idx, len(obj)) {
+		abs := base + rel
+		if isWholeWord(query, abs, len(obj)) {
 			return true
 		}
 
-		idx += len(obj)
+		base = abs + len(obj)
 	}
 }
 
