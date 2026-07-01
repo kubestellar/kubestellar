@@ -31,12 +31,12 @@ type ConcurrentMap[K comparable, V any] interface {
 	// false. Getting a key does not guarantee that no other goroutine will
 	// also work with it.
 	Get(key K) (V, bool)
-	// Iterator iterates over the map and calls the given function for each
-	// key/value pair sequentially.
+	// Iterator iterates over a point-in-time snapshot of the map and calls
+	// the given function for each key/value pair sequentially.
 	// If the given function returns an error, the iteration is stopped and
 	// the error is returned.
-	// During the iteration, the map must not be mutated by the given function.
-	// If the map is mutated during the iteration, the behavior is undefined.
+	// Mutations by other goroutines after Iterator is called are not reflected.
+	// The given function may safely call Get, Len, Set, or Remove.
 	Iterator(yield func(K, V) error) error
 	// Len returns the number of items in the map.
 	Len() int
@@ -90,10 +90,18 @@ func (mm *rwMutexMap[K, V]) Get(key K) (V, bool) {
 // If the map is mutated during the iteration, the behavior is undefined.
 func (mm *rwMutexMap[K, V]) Iterator(yield func(K, V) error) error {
 	mm.RLock()
-	defer mm.RUnlock()
-
+	type kv struct {
+		k K
+		v V
+	}
+	snapshot := make([]kv, 0, len(mm.m))
 	for k, v := range mm.m {
-		if err := yield(k, v); err != nil {
+		snapshot = append(snapshot, kv{k, v})
+	}
+	mm.RUnlock()
+
+	for _, item := range snapshot {
+		if err := yield(item.k, item.v); err != nil {
 			return err
 		}
 	}
