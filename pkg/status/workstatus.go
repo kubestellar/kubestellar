@@ -156,6 +156,7 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 		logger.V(5).Info("Workload object found to already have intended status", "objectIdentifier", objectIdentifier)
 	} else {
 		// set the status and update the object
+		unstrObj = unstrObj.DeepCopy()
 		unstrObj.Object["status"] = status
 
 		rscIfc := util.DynamicForResource(c.wdsDynClient, gvr, unstrObj.GetNamespace())
