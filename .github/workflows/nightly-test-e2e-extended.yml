@@ -1,0 +1,384 @@
+name: Nightly extended e2e tests
+
+on:
+  # Run nightly at 2:00 AM UTC
+  schedule:
+    - cron: '0 2 * * *'
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      testSuite:
+        description: "Test Suite to run"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - "all"
+          - "host-its-wds"
+          - "shared-its-wds"
+          - "k3d"
+
+permissions:
+  contents: read
+
+jobs:
+  host-its-wds-ginkgo:
+    name: "Ginkgo: host ITS+WDS"
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.testSuite == 'all' || github.event.inputs.testSuite == 'host-its-wds' || github.event_name == 'schedule' }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
+        with:
+          go-version: 1.24
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
+        id: install-kubectl-host
+
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
+
+      - name: Install dependencies
+        run: |
+          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.1_linux_amd64.tar.gz bin/kflex
+          mv bin/kflex /usr/local/bin
+          rm -fr bin kubeflex_0.9.1_linux_amd64.tar.gz
+          go install github.com/onsi/ginkgo/v2/ginkgo
+
+      - name: Run test with host-its-wds config
+        run: |
+          cd test/e2e/ginkgo
+          KFLEX_DISABLE_CHATTY=true ginkgo -vv --trace --no-color --fail-fast -- \
+            -kubestellar-setup-flags="--deployment-config host-its-wds --kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5"
+
+      - name: show kubeconfig contexts
+        if: always()
+        run: kubectl config get-contexts
+
+      - name: show pods in hosting cluster
+        if: always()
+        run: |
+          date
+          kubectl --context kind-kubeflex get pods -A
+          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context kind-kubeflex describe pod -n $ns $name; echo; kubectl --context kind-kubeflex logs -n $ns $name || true; done
+
+      - name: Dump kubeflex-controller-manager logs
+        if: always()
+        run: kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || true
+
+      - name: show previous logs in hosting cluster
+        if: always()
+        run: |
+          date
+          kubectl --context kind-kubeflex get pods -A | grep -v NAME | while read ns name ready status restarts rest; do if [ $restarts != 0 ]; then echo; echo For $ns/$name; kubectl --context kind-kubeflex logs -p -n $ns $name || true; fi; done;
+
+      - name: show Deployment objects in hosting cluster
+        if: always()
+        run: kubectl --context kind-kubeflex get deployments -A
+
+      - name: show kubestellar controller manager log
+        if: always()
+        run: kubectl --context kind-kubeflex logs -n wds1-system $(kubectl --context kind-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}') || true
+
+      - name: show transport controller log
+        if: always()
+        run: kubectl --context kind-kubeflex -n wds1-system logs $(kubectl --context kind-kubeflex -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}') || true
+
+      - name: show bindingpolicies
+        if: always()
+        run: kubectl --context wds1 get bindingpolicies.control.kubestellar.io -o yaml || true
+
+  shared-its-wds-ginkgo:
+    name: "Ginkgo: shared ITS+WDS"
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.testSuite == 'all' || github.event.inputs.testSuite == 'shared-its-wds' || github.event_name == 'schedule' }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
+        with:
+          go-version: 1.24
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
+        id: install-kubectl-shared
+
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
+
+      - name: Install dependencies
+        run: |
+          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.1_linux_amd64.tar.gz bin/kflex
+          mv bin/kflex /usr/local/bin
+          rm -fr bin kubeflex_0.9.1_linux_amd64.tar.gz
+          go install github.com/onsi/ginkgo/v2/ginkgo
+
+      - name: Run test with shared-its-wds config
+        run: |
+          cd test/e2e/ginkgo
+          KFLEX_DISABLE_CHATTY=true ginkgo -vv --trace --no-color --fail-fast -- \
+            -kubestellar-setup-flags="--deployment-config shared-its-wds --kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5"
+
+      - name: show kubeconfig contexts
+        if: always()
+        run: kubectl config get-contexts
+
+      - name: show pods in hosting cluster
+        if: always()
+        run: |
+          date
+          kubectl --context kind-kubeflex get pods -A
+          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context kind-kubeflex describe pod -n $ns $name; echo; kubectl --context kind-kubeflex logs -n $ns $name || true; done
+
+      - name: Dump kubeflex-controller-manager logs
+        if: always()
+        run: kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || true
+
+      - name: show previous logs in hosting cluster
+        if: always()
+        run: |
+          date
+          kubectl --context kind-kubeflex get pods -A | grep -v NAME | while read ns name ready status restarts rest; do if [ $restarts != 0 ]; then echo; echo For $ns/$name; kubectl --context kind-kubeflex logs -p -n $ns $name || true; fi; done;
+
+      - name: show Deployment objects in hosting cluster
+        if: always()
+        run: kubectl --context kind-kubeflex get deployments -A
+
+      - name: show kubestellar controller manager log
+        if: always()
+        run: kubectl --context kind-kubeflex logs -n wds1-system $(kubectl --context kind-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}') || true
+
+      - name: show transport controller log
+        if: always()
+        run: kubectl --context kind-kubeflex -n wds1-system logs $(kubectl --context kind-kubeflex -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}') || true
+
+      - name: show bindingpolicies
+        if: always()
+        run: kubectl --context wds1 get bindingpolicies.control.kubestellar.io -o yaml || true
+
+  host-its-wds-bash:
+    name: "Bash: host ITS+WDS"
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.testSuite == 'all' || github.event.inputs.testSuite == 'host-its-wds' || github.event_name == 'schedule' }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
+        with:
+          go-version: 1.24
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
+        id: install-kubectl-host-bash
+
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
+
+      - name: Install dependencies
+        run: |
+          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.1_linux_amd64.tar.gz bin/kflex
+          mv bin/kflex /usr/local/bin
+          rm -fr bin kubeflex_0.9.1_linux_amd64.tar.gz
+
+      - name: Run test with host-its-wds config
+        run: |
+          cd test/e2e/
+          KFLEX_DISABLE_CHATTY=true ./run-test.sh --deployment-config host-its-wds
+
+      - name: show kubeconfig contexts
+        if: always()
+        run: kubectl config get-contexts
+
+      - name: show pods in hosting cluster
+        if: always()
+        run: |
+          date
+          kubectl --context kind-kubeflex get pods -A
+          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context kind-kubeflex describe pod -n $ns $name; echo; kubectl --context kind-kubeflex logs -n $ns $name || true; done
+
+      - name: Dump kubeflex-controller-manager logs
+        if: always()
+        run: kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || true
+
+      - name: show Deployment objects in hosting cluster
+        if: always()
+        run: kubectl --context kind-kubeflex get deployments -A
+
+  shared-its-wds-bash:
+    name: "Bash: shared ITS+WDS"
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.testSuite == 'all' || github.event.inputs.testSuite == 'shared-its-wds' || github.event_name == 'schedule' }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
+        with:
+          go-version: 1.24
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
+        id: install-kubectl-shared-bash
+
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
+
+      - name: Install dependencies
+        run: |
+          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.1_linux_amd64.tar.gz bin/kflex
+          mv bin/kflex /usr/local/bin
+          rm -fr bin kubeflex_0.9.1_linux_amd64.tar.gz
+
+      - name: Run test with shared-its-wds config
+        run: |
+          cd test/e2e/
+          KFLEX_DISABLE_CHATTY=true ./run-test.sh --deployment-config shared-its-wds
+
+      - name: show kubeconfig contexts
+        if: always()
+        run: kubectl config get-contexts
+
+      - name: show pods in hosting cluster
+        if: always()
+        run: |
+          date
+          kubectl --context kind-kubeflex get pods -A
+          kubectl --context kind-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context kind-kubeflex describe pod -n $ns $name; echo; kubectl --context kind-kubeflex logs -n $ns $name || true; done
+
+      - name: Dump kubeflex-controller-manager logs
+        if: always()
+        run: kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || true
+
+      - name: show Deployment objects in hosting cluster
+        if: always()
+        run: kubectl --context kind-kubeflex get deployments -A
+
+  k3d-standard-ginkgo:
+    name: "Ginkgo: k3d clusters"
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.testSuite == 'all' || github.event.inputs.testSuite == 'k3d' || github.event_name == 'schedule' }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
+        with:
+          go-version: 1.24
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
+        id: install-kubectl-k3d-ginkgo
+
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
+
+      - name: Install k3d
+        run: curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+
+      - name: Install dependencies
+        run: |
+          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.1_linux_amd64.tar.gz bin/kflex
+          mv bin/kflex /usr/local/bin
+          rm -fr bin kubeflex_0.9.1_linux_amd64.tar.gz
+          go install github.com/onsi/ginkgo/v2/ginkgo
+
+      - name: Run test with k3d clusters
+        run: |
+          cd test/e2e/ginkgo
+          KFLEX_DISABLE_CHATTY=true ginkgo -vv --trace --no-color --fail-fast -- \
+            -host-cluster-context=k3d-kubeflex \
+            -kubestellar-setup-flags="--env k3d --kubestellar-controller-manager-verbosity 5 --transport-controller-verbosity 5"
+
+      - name: show kubeconfig contexts
+        if: always()
+        run: kubectl config get-contexts
+
+      - name: show pods in hosting cluster
+        if: always()
+        run: |
+          date
+          kubectl --context k3d-kubeflex get pods -A
+          kubectl --context k3d-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context k3d-kubeflex describe pod -n $ns $name; echo; kubectl --context k3d-kubeflex logs -n $ns $name || true; done
+
+      - name: Dump kubeflex-controller-manager logs
+        if: always()
+        run: kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || true
+
+      - name: show Deployment objects in hosting cluster
+        if: always()
+        run: kubectl --context k3d-kubeflex get deployments -A
+
+      - name: show kubestellar controller manager log
+        if: always()
+        run: kubectl --context k3d-kubeflex logs -n wds1-system $(kubectl --context k3d-kubeflex get pod -n wds1-system --selector=control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}') || true
+
+      - name: show transport controller log
+        if: always()
+        run: kubectl --context k3d-kubeflex -n wds1-system logs $(kubectl --context k3d-kubeflex -n wds1-system get pods -l name=transport-controller -o jsonpath='{.items[0].metadata.name}') || true
+
+      - name: show bindingpolicies
+        if: always()
+        run: kubectl --context wds1 get bindingpolicies.control.kubestellar.io -o yaml || true
+
+  k3d-standard-bash:
+    name: "Bash: k3d clusters"
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.testSuite == 'all' || github.event.inputs.testSuite == 'k3d' || github.event_name == 'schedule' }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
+        with:
+          go-version: 1.24
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
+        id: install-kubectl-k3d-bash
+
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d
+
+      - name: Install k3d
+        run: curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+
+      - name: Install dependencies
+        run: |
+          bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v0.10.1/install.sh) 0.10.1
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.1/kubeflex_0.9.1_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.1_linux_amd64.tar.gz bin/kflex
+          mv bin/kflex /usr/local/bin
+          rm -fr bin kubeflex_0.9.1_linux_amd64.tar.gz
+
+      - name: Run test with k3d clusters
+        run: |
+          cd test/e2e/
+          KFLEX_DISABLE_CHATTY=true ./run-test.sh --env k3d
+
+      - name: show kubeconfig contexts
+        if: always()
+        run: kubectl config get-contexts
+
+      - name: show pods in hosting cluster
+        if: always()
+        run: |
+          date
+          kubectl --context k3d-kubeflex get pods -A
+          kubectl --context k3d-kubeflex get pods -A | grep -vw Running | grep -vw Completed | grep -v NAME | while read ns name rest; do echo; kubectl --context k3d-kubeflex describe pod -n $ns $name; echo; kubectl --context k3d-kubeflex logs -n $ns $name || true; done
+
+      - name: Dump kubeflex-controller-manager logs
+        if: always()
+        run: kubectl logs -n kubeflex-system deploy/kubeflex-controller-manager || true
+
+      - name: show Deployment objects in hosting cluster
+        if: always()
+        run: kubectl --context k3d-kubeflex get deployments -A

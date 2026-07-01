@@ -47,8 +47,8 @@ func main() {
 	var outputFilePath string
 	inCluster := true
 	clientOptions.AddFlagsSansName(pflag.CommandLine)
-	pflag.StringVar(&cpName, "control-plane-name", cpName, "name of ControlPlane to read, or empty string (meaning to pick by label selector); default is empty string")
-	pflag.StringVar(&cpLabelSelectorStr, "control-plane-label-selector", cpLabelSelectorStr, "label selector that identifies exactly one ControlPlane, or empty string (meaning to pick by name); default is empty string")
+	pflag.StringVar(&cpName, "control-plane-name", cpName, "name of ControlPlane to read, or empty string (meaning to pick by label selector); takes precedence if both name and label selector are provided; default is empty string")
+	pflag.StringVar(&cpLabelSelectorStr, "control-plane-label-selector", cpLabelSelectorStr, "label selector that identifies exactly one ControlPlane, or empty string (meaning to pick by name); ignored if name is provided; default is empty string")
 	pflag.StringVar(&outputFilePath, "output-file", outputFilePath, "pathname of file where the kubeconfig will be written; '-' means stdout")
 	pflag.BoolVar(&inCluster, "in-cluster", inCluster, "whether to extract the kubeconfig for use in the kubeflex hosting cluster")
 	klog.InitFlags(nil)
@@ -64,11 +64,7 @@ func main() {
 	})
 
 	if cpName == "" && cpLabelSelectorStr == "" {
-		logger.Error(nil, "You must provide either a non-empty --control-plane-name OR a non-empty --control-plane-label-selector")
-		os.Exit(1)
-	}
-	if cpName != "" && cpLabelSelectorStr != "" {
-		logger.Error(nil, "You may not provide both a non-empty --control-plane-name AND a non-empty --control-plane-label-selector")
+		logger.Error(nil, "You must provide at least a non-empty --control-plane-name or a non-empty --control-plane-label-selector")
 		os.Exit(1)
 	}
 	if outputFilePath == "" {
