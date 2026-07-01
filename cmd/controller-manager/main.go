@@ -20,6 +20,7 @@ package main
 // to ensure that exec-entrypoint and run can make use of them.
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -28,12 +29,17 @@ import (
 
 	"github.com/spf13/pflag"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	coordinationv1 "k8s.io/client-go/kubernetes/typed/coordination/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/leaderelection"
+	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	_ "k8s.io/component-base/metrics/prometheus/version"
@@ -122,8 +128,6 @@ func main() {
 	wdsClientMetrics := spacesClientMetrics.MetricsForSpace("wds")
 	itsClientMetrics := spacesClientMetrics.MetricsForSpace("its")
 
-	// TODO: engage leader election if requested
-
 	// get the config for WDS
 	setupLog.Info("Getting config for WDS", "name", wdsName)
 	wdsRestConfig, wdsName, err := ctrlutil.GetWDSKubeconfig(setupLog, wdsName)
@@ -195,22 +199,73 @@ func main() {
 		setupLog.Info("Not creating status controller")
 	}
 
-	cListers := make(chan interface{}, 1)
+	runControllers := func(runCtx context.Context) {
+		cListers := make(chan interface{}, 1)
 
-	if startBindingController {
-		setupLog.Info("Starting controller", "name", binding.ControllerName)
-		if err := bindingController.Start(ctx, workers, cListers); err != nil {
-			setupLog.Error(err, "error starting the binding controller")
-			os.Exit(1)
+		if startBindingController {
+			setupLog.Info("Starting controller", "name", binding.ControllerName)
+			if err := bindingController.Start(runCtx, workers, cListers); err != nil {
+				setupLog.Error(err, "error starting the binding controller")
+				os.Exit(1)
+			}
+		}
+
+		if startStatusCtlr {
+			setupLog.Info("Starting controller", "name", status.ControllerName)
+			if err := statusController.Start(runCtx, workers, cListers); err != nil {
+				setupLog.Error(err, "error starting the status controller")
+				os.Exit(1)
+			}
 		}
 	}
+	// Engage leader election when requested
+	if enableLeaderElection {
+		setupLog.Info("Leader election enabled")
 
-	if startStatusCtlr {
-		setupLog.Info("Starting controller", "name", status.ControllerName)
-		if err := statusController.Start(ctx, workers, cListers); err != nil {
-			setupLog.Error(err, "error starting the status controller")
+		// Use WDS config for leader election
+		restCfg := rest.CopyConfig(wdsRestConfig)
+
+		id, err := os.Hostname()
+		if err != nil {
+			setupLog.Error(err, "failed to get hostname for leader election identity")
 			os.Exit(1)
 		}
+		leaseClient, err := coordinationv1.NewForConfig(restCfg)
+		if err != nil {
+			setupLog.Error(err, "failed to create lease client for leader election")
+			os.Exit(1)
+		}
+
+		lock := &resourcelock.LeaseLock{
+			LeaseMeta: metav1.ObjectMeta{
+				Name:      "kubestellar-controller-manager",
+				Namespace: "kube-system",
+			},
+			Client: leaseClient,
+			LockConfig: resourcelock.ResourceLockConfig{
+				Identity: id,
+			},
+		}
+
+		leaderelection.RunOrDie(ctx, leaderelection.LeaderElectionConfig{
+			Lock:            lock,
+			LeaseDuration:   15 * time.Second,
+			RenewDeadline:   10 * time.Second,
+			RetryPeriod:     2 * time.Second,
+			ReleaseOnCancel: true,
+			Callbacks: leaderelection.LeaderCallbacks{
+				OnStartedLeading: func(c context.Context) {
+					setupLog.Info("Acquired leadership, starting controllers")
+					runControllers(c)
+				},
+				OnStoppedLeading: func() {
+					setupLog.Info("Lost leadership")
+					os.Exit(0)
+				},
+			},
+		})
+	} else {
+		runControllers(ctx)
 	}
 
 	select {}
