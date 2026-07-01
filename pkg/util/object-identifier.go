@@ -117,9 +117,6 @@ func IdentifierForCombinedStatus(name, ns string) ObjectIdentifier {
 }
 
 func gvkMatches(gvk schema.GroupVersionKind, group, version, kind string) bool {
-	if gvk.Group == group && (version == AnyVersion || gvk.Version == version) &&
-		gvk.Kind == kind {
-		return true
-	}
-	return false
+	return gvk.Group == group && (version == AnyVersion || gvk.Version == version) &&
+		gvk.Kind == kind
 }

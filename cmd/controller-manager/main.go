@@ -80,7 +80,7 @@ func main() {
 	pflag.StringVar(&itsName, "its-name", "", "name of the Inventory and Transport Space to connect to (empty string means to use the only one)")
 	pflag.StringVar(&wdsName, "wds-name", "", "name of the workload description space to connect to")
 	pflag.StringVar(&allowedGroupsString, "api-groups", "", "list of allowed api groups, comma separated. Empty string means all API groups are allowed")
-	pflag.StringSliceVar(&controllers, "controllers", []string{}, "list of controllers to be started by the controller manager, lower case and comma separated, e.g. 'binding,status'. If not specified (or emtpy list specifed), all controllers are started. Currently available controllers are 'binding' and 'status'.")
+	pflag.StringSliceVar(&controllers, "controllers", []string{}, "list of controllers to be started by the controller manager, lower case and comma separated, e.g. 'binding,status'. If not specified (or empty list specified), all controllers are started. Currently available controllers are 'binding' and 'status'.")
 	pflag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -111,7 +111,7 @@ func main() {
 		strings.ToLower(binding.ControllerName),
 		strings.ToLower(status.ControllerName),
 	).IsSuperset(ctlrsToStart) {
-		setupLog.Error(fmt.Errorf("unkown controller specified"), "'controllers' flag has incorrect value")
+		setupLog.Error(fmt.Errorf("unknown controller specified"), "'controllers' flag has incorrect value")
 		os.Exit(1)
 	}
 
