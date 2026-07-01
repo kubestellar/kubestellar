@@ -1,0 +1,166 @@
+name: Auto-unassign stale issues
+
+on:
+  schedule:
+    # Run daily at 9 AM UTC
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+  issue_comment: # Allow manual triggers via comments
+    types: [created]
+
+jobs:
+  check-stale-assignments:
+    if: github.repository_owner == 'kubestellar'
+    name: Check and unassign stale issue assignments
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Check out code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: "false"
+
+      - name: Check stale assignments and send warnings
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          # Function to detect active work indicators
+          has_active_work() {
+            local issue_number=$1
+            local assignee=$2
+
+            # Check for recent comments indicating active work (last 7 days)
+            recent_comments=$(gh issue view "$issue_number" --json comments 2>/dev/null | \
+              jq -r '.comments[] | select(.author.login == "'"$assignee"'") | .createdAt' | \
+              tail -5 2>/dev/null || echo "")
+
+            if echo "$recent_comments" | xargs -I {} sh -c '
+              timestamp=$(date -d "$1" +%s 2>/dev/null || echo "0")
+              current_time=$(date +%s)
+              if [ $((current_time - timestamp)) -lt 604800 ]; then
+                exit 0
+              else
+                exit 1
+              fi
+            ' _ {} 2>/dev/null; then
+              return 0  # Has active work
+            fi
+            return 1  # No active work
+          }
+
+          # Handle manual triggers (contributors can prevent unassignment)
+          if [ "${{ github.event_name }}" = "issue_comment" ]; then
+            comment_body="${{ github.event.comment.body }}"
+            if echo "$comment_body" | grep -qi "still working\|in progress\|work in progress\|actively working"; then
+              echo "Manual trigger: Contributor indicates active work - skipping unassignment check"
+              exit 0
+            fi
+          fi
+
+          # Process issues in batches for better performance
+          gh issue list --state open --assignee "*" --json number,assignees,createdAt --limit 100 | \
+            jq -r '.[] | @base64' | while read -r issue_data; do
+
+            issue=$(echo "$issue_data" | base64 --decode)
+            issue_number=$(echo "$issue" | jq -r '.number')
+            assignee=$(echo "$issue" | jq -r '.assignees[0].login // empty')
+
+            if [ -z "$assignee" ]; then continue; fi
+
+            # Check for active work indicators first
+            if has_active_work "$issue_number" "$assignee"; then
+              echo "Issue #$issue_number: Skipping due to recent active work indicators"
+              continue
+            fi
+
+            # Calculate assignment age
+            created_at=$(echo "$issue" | jq -r '.createdAt')
+            assigned_time=$(date -d "$created_at" +%s 2>/dev/null || echo "0")
+            current_time=$(date +%s)
+            days_since_assignment=$(( (current_time - assigned_time) / 86400 ))
+
+            echo "Processing issue #$issue_number assigned to $assignee ($days_since_assignment days ago)"
+
+            # Single API call for PR data (more efficient)
+            prs_data=$(gh pr list --state all --search "$issue_number" \
+              --json number,state,closedAt,author --limit 50 2>/dev/null || echo "[]")
+
+            # Filter PRs by assignee
+            assignee_prs=$(echo "$prs_data" | jq --arg assignee "$assignee" \
+              '[.[] | select(.author.login == $assignee)]')
+
+            open_pr_count=$(echo "$assignee_prs" | jq '[.[] | select(.state == "OPEN")] | length')
+            closed_prs=$(echo "$assignee_prs" | jq '[.[] | select(.state == "CLOSED" or .state == "MERGED")]')
+
+            should_unassign=false
+            should_warn=false
+            warning_days=0
+
+            if [ "$open_pr_count" -eq 0 ]; then
+              if [ "$(echo "$closed_prs" | jq 'length')" -gt 0 ]; then
+                # Has closed PRs - check if last closed PR was more than 3 days ago
+                latest_closed_at=$(echo "$closed_prs" | jq -r 'sort_by(.closedAt) | last | .closedAt // empty')
+                if [ -n "$latest_closed_at" ]; then
+                  closed_time=$(date -d "$latest_closed_at" +%s 2>/dev/null || echo "0")
+                  hours_since_closed=$(( (current_time - closed_time) / 3600 ))
+
+                  if [ "$hours_since_closed" -gt 72 ]; then
+                    should_unassign=true
+                    echo "  → Will unassign: Last PR closed $hours_since_closed hours ago and no open PRs"
+                  fi
+                fi
+              else
+                # No PRs at all - check assignment age
+                if [ "$days_since_assignment" -ge 7 ]; then
+                  should_unassign=true
+                  echo "  → Will unassign: No PR created in $days_since_assignment days (≥7 days)"
+                elif [ "$days_since_assignment" -ge 4 ]; then
+                  should_warn=true
+                  warning_days=$((7 - days_since_assignment))
+                  echo "  → Will warn: $warning_days days remaining"
+                fi
+              fi
+            else
+              echo "  → Has open PR, keeping assignment"
+            fi
+
+            # Send warning comment
+            if [ "$should_warn" = true ]; then
+              warning_comment=$(printf ':warning: **Assignment Warning** :warning:\n\nHi @%s! This issue has been assigned to you for %s days without a related PR.\n\n**To keep this assignment:**\n- Create a PR within %s days\n- Comment "still working" or "in progress" to indicate active development\n- Ask a maintainer for an extension if you need more time\n\n**Appeals:** If you believe this warning is incorrect, comment explaining your situation for maintainer review.\n\n_Automated message - %s days remaining._' "${assignee}" "${days_since_assignment}" "${warning_days}" "${warning_days}")
+
+              # Check for recent warnings to avoid spam
+              recent_warning=$(gh issue view "$issue_number" --json comments 2>/dev/null | \
+                jq -r '.comments[] | select(.body | contains("Assignment Warning")) | .createdAt' | \
+                tail -1 2>/dev/null || echo "")
+
+              if [ -z "$recent_warning" ] || [ "$recent_warning" = "null" ]; then
+                echo "  → Sending warning comment"
+                gh issue comment "$issue_number" --body "$warning_comment"
+              else
+                warning_time=$(date -d "$recent_warning" +%s 2>/dev/null || echo "0")
+                hours_since_warning=$(( (current_time - warning_time) / 3600 ))
+
+                if [ "$hours_since_warning" -gt 24 ]; then
+                  echo "  → Sending updated warning comment"
+                  gh issue comment "$issue_number" --body "$warning_comment"
+                else
+                  echo "  → Warning already sent recently"
+                fi
+              fi
+            fi
+
+            # Unassign if needed
+            if [ "$should_unassign" = true ]; then
+              unassign_comment=$(printf ':robot: **Issue Unassigned** :robot:\n\nThis issue has been unassigned from @%s due to inactivity.\n\n**Unassignment reason:**\n- No related PR created within 7 days of assignment, OR\n- Last related PR closed and no new PR opened within 3 days\n\n**To reassign yourself:** You can reassign this issue if you\'re still working on it.\n\n**Appeals:** If this unassignment seems incorrect, comment explaining your situation and a maintainer will review.\n\n_Automated action to keep issues available for active contributors._' "${assignee}")
+
+              echo "  → Unassigning issue #$issue_number from $assignee"
+              gh issue edit "$issue_number" --remove-assignee "$assignee"
+              gh issue comment "$issue_number" --body "$unassign_comment"
+            fi
+          done
