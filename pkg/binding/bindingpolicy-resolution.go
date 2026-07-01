@@ -113,11 +113,12 @@ func (resolution *bindingPolicyResolution) GetWorkload() abstract.Map[util.Objec
 func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.ObjectIdentifier,
 	objUID, resourceVersion string, modulation DownsyncModulation) bool {
 	resolution.Lock()
-	defer resolution.Unlock()
 
 	objData := resolution.objectIdentifierToData[objIdentifier]
-	if objData == nil || objData.UID != objUID || objData.ResourceVersion != resourceVersion ||
-		!objData.Modulation.Equal(modulation) {
+	changed := objData == nil || objData.UID != objUID || objData.ResourceVersion != resourceVersion ||
+		!objData.Modulation.Equal(modulation)
+	var needNotify bool
+	if changed {
 		resolution.objectIdentifierToData[objIdentifier] = &ObjectData{
 			UID:             objUID,
 			ResourceVersion: resourceVersion,
@@ -129,14 +130,15 @@ func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.O
 		multiWECChanged := objData == nil && modulation.WantMultiWECReportedState ||
 			objData != nil && objData.Modulation.WantMultiWECReportedState != modulation.WantMultiWECReportedState
 
-		if singletonChanged || multiWECChanged {
-			klog.InfoS("Noting addition/change of object to resolution", "resolution", fmt.Sprintf("%p", resolution), "objId", objIdentifier)
-			resolution.reportedStateRequestChangeConsumer(objIdentifier)
-		}
-		return true
+		needNotify = singletonChanged || multiWECChanged
 	}
+	resolution.Unlock()
 
-	return false
+	if needNotify {
+		klog.InfoS("Noting addition/change of object to resolution", "resolution", fmt.Sprintf("%p", resolution), "objId", objIdentifier)
+		resolution.reportedStateRequestChangeConsumer(objIdentifier)
+	}
+	return changed
 }
 
 // removeObjectIdentifier removes an object identifier from the resolution if it
@@ -144,15 +146,18 @@ func (resolution *bindingPolicyResolution) ensureObjectData(objIdentifier util.O
 // This function is thread-safe.
 func (resolution *bindingPolicyResolution) removeObjectIdentifier(objIdentifier util.ObjectIdentifier) bool {
 	resolution.Lock()
-	defer resolution.Unlock()
 
 	objData, exists := resolution.objectIdentifierToData[objIdentifier]
 	if !exists {
+		resolution.Unlock()
 		return false
 	}
 
 	delete(resolution.objectIdentifierToData, objIdentifier)
-	if objData.Modulation.WantSingletonReportedState || objData.Modulation.WantMultiWECReportedState {
+	needNotify := objData.Modulation.WantSingletonReportedState || objData.Modulation.WantMultiWECReportedState
+	resolution.Unlock()
+
+	if needNotify {
 		klog.InfoS("Noting removal of object from resolution", "resolution", fmt.Sprintf("%p", resolution), "objId", objIdentifier)
 		resolution.reportedStateRequestChangeConsumer(objIdentifier)
 	}
