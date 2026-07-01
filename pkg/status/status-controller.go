@@ -407,12 +407,8 @@ func shouldSkipUpdate(old, new interface{}) bool {
 }
 
 func objNotInThisWDS(obj interface{}, thisWDS string) bool {
-	if objWDS, ok := obj.(metav1.Object).GetLabels()[originWdsLabelKey]; ok {
-		if objWDS != thisWDS {
-			return true
-		}
-	}
-	return false
+	objWDS, ok := obj.(metav1.Object).GetLabels()[originWdsLabelKey]
+	return !ok || objWDS != thisWDS
 }
 
 // Informer event handler: enqueues the workstatus objects to be processed
