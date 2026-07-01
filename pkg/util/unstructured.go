@@ -62,10 +62,6 @@ const (
 	CombinedStatusVersion  = "v1alpha1"
 )
 
-// this type is used in status-addon, which we cannot import due to conflicting versions
-// of packages used in Open Cluster Management AddOn framework (otel - open telemetry)
-// TODO - consider separating APIs in a different git repo to become independent of
-// libs deps in different projects
 type SourceRef struct {
 	Group     string `json:"group,omitempty"`
 	Version   string `json:"version,omitempty"`
@@ -75,7 +71,7 @@ type SourceRef struct {
 	Namespace string `json:"namespace,omitempty"`
 }
 
-func IsCRD(o interface{}) bool { // CRDs might have different versions. therefore, using "any" in CRD version
+func IsCRD(o interface{}) bool {
 	return objectMatchesGVK(o, apiextensions.GroupName, AnyVersion, CRDKind)
 }
 
@@ -84,7 +80,6 @@ func objectMatchesGVK(o interface{}, group, version, kind string) bool {
 	if err != nil {
 		return false
 	}
-
 	return gvkMatches(gvk, group, version, kind)
 }
 
@@ -93,7 +88,6 @@ func getObjectGVK(o interface{}) (schema.GroupVersionKind, error) {
 	case runtime.Object:
 		return obj.GetObjectKind().GroupVersionKind(), nil
 	}
-
 	return schema.GroupVersionKind{}, fmt.Errorf("object is of wrong type: %#v", o)
 }
 
@@ -103,13 +97,14 @@ func GetWorkStatusSourceRef(workStatus runtime.Object) (*SourceRef, error) {
 		return nil, fmt.Errorf("object cannot be cast to *unstructured.Unstructured")
 	}
 
-	spec := obj.Object["spec"].(map[string]interface{})
-	if spec == nil {
-		return nil, fmt.Errorf("could not find spec in object")
+	spec, ok := obj.Object["spec"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("could not find spec in object or it's not a map")
 	}
-	sourceRef := spec["sourceRef"].(map[string]interface{})
-	if sourceRef == nil {
-		return nil, fmt.Errorf("could not find sourceRef in object spec")
+
+	sourceRef, ok := spec["sourceRef"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("could not find sourceRef in object spec or it's not a map")
 	}
 
 	group, ok := sourceRef["group"].(string)
@@ -137,9 +132,13 @@ func GetWorkStatusSourceRef(workStatus runtime.Object) (*SourceRef, error) {
 		return nil, fmt.Errorf("could not find name in sourceRef or it's not a string")
 	}
 
-	namespace, ok := sourceRef["namespace"].(string)
-	if !ok {
-		return nil, fmt.Errorf("could not find namespace in sourceRef or it's not a string")
+	var namespace string
+	if nsObj, found := sourceRef["namespace"]; found && nsObj != nil {
+		ns, ok := nsObj.(string)
+		if !ok {
+			return nil, fmt.Errorf("namespace in sourceRef is not a string")
+		}
+		namespace = ns
 	}
 
 	return &SourceRef{
@@ -206,9 +205,9 @@ func CheckWorkStatusPresence(config *rest.Config) bool {
 	}
 
 	gvr := schema.GroupVersionResource{
-		Group:    "control.kubestellar.io",
-		Version:  "v1alpha1",
-		Resource: "workstatuses",
+		Group:    WorkStatusGroup,
+		Version:  WorkStatusVersion,
+		Resource: WorkStatusResource,
 	}
 
 	return CheckAPIisPresent(discoveryClient, gvr)
@@ -229,7 +228,6 @@ func CheckAPIisPresent(dc *discovery.DiscoveryClient, gvr schema.GroupVersionRes
 	return false
 }
 
-// CreateStatusPatch creates a status patch for unstructured object.
 func CreateStatusPatch(unstrObj *unstructured.Unstructured, status map[string]interface{}) *unstructured.Unstructured {
 	patchedObj := &unstructured.Unstructured{}
 	patchedObj.SetAPIVersion(unstrObj.GetAPIVersion())
@@ -240,7 +238,6 @@ func CreateStatusPatch(unstrObj *unstructured.Unstructured, status map[string]in
 	return patchedObj
 }
 
-// PatchStatus updates the object status with Patch.
 func PatchStatus(ctx context.Context, unstrObj *unstructured.Unstructured, status map[string]interface{},
 	namespace string, gvr schema.GroupVersionResource, dynamicClient dynamic.Interface) error {
 	logger := klog.FromContext(ctx)
