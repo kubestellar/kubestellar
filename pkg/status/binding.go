@@ -69,7 +69,7 @@ func (c *Controller) syncBinding(ctx context.Context, key string) error {
 // missingSCs, a slice of the missing StatusCollector object name(s), must be sorted.
 func (c *Controller) createOrUpdateStatusCollectorAvailableCondition(ctx context.Context, bdg *v1alpha1.Binding, missingSCs []string) error {
 	// compose tentative condition where LastTransitionTime is TBD
-	conditionTentative := v1alpha1.BindingPolicyCondition{}
+	var conditionTentative v1alpha1.BindingPolicyCondition
 	if len(missingSCs) != 0 {
 		conditionTentative = v1alpha1.BindingPolicyCondition{
 			Type:    v1alpha1.TypeStatusCollectorsAvailable,
