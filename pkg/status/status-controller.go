@@ -77,7 +77,7 @@ type Controller struct {
 	workStatusInformer      cache.SharedIndexInformer
 	workStatusLister        cache.GenericLister
 	workStatusIndexer       cache.Indexer
-	workqueue               workqueue.RateLimitingInterface
+	workqueue               workqueue.TypedRateLimitingInterface[any]
 	// all wds listers are used to retrieve objects and update status
 	// without having to re-create new caches for this controller
 	listers util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
@@ -129,9 +129,9 @@ func NewController(logger logr.Logger,
 	wdsRestConfig *rest.Config, itsRestConfig *rest.Config, wdsName string,
 	bindingPolicyResolver binding.BindingPolicyResolver) (*Controller, error) {
 	logger = logger.WithName(ControllerName)
-	ratelimiter := workqueue.NewMaxOfRateLimiter(
-		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
-		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
+	ratelimiter := workqueue.NewTypedMaxOfRateLimiter[any](
+		workqueue.NewTypedItemExponentialFailureRateLimiter[any](5*time.Millisecond, 1000*time.Second),
+		&workqueue.TypedBucketRateLimiter[any]{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
 	)
 
 	wdsDynClientBase, err := dynamic.NewForConfig(wdsRestConfig)
@@ -162,7 +162,7 @@ func NewController(logger logr.Logger,
 		combinedStatusClient: ksmetrics.NewWrappedBasicNamespacedClient(wdsClientMetrics, v1alpha1.GroupVersion.WithResource("combinedstatuses"), func(ns string) ksmetrics.BasicClientModNamespace[*v1alpha1.CombinedStatus, *v1alpha1.CombinedStatusList] {
 			return wdsKsClient.ControlV1alpha1().CombinedStatuses(ns)
 		}),
-		workqueue:             workqueue.NewRateLimitingQueueWithConfig(ratelimiter, workqueue.RateLimitingQueueConfig{Name: ControllerName + "-" + wdsName}),
+		workqueue:             workqueue.NewTypedRateLimitingQueueWithConfig(ratelimiter, workqueue.TypedRateLimitingQueueConfig[any]{Name: ControllerName + "-" + wdsName}),
 		bindingPolicyResolver: bindingPolicyResolver,
 	}
 	controller.workStatusToObject = abstract.NewLockedMapToComparable(&controller.mutex,
