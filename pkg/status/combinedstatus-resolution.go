@@ -1006,7 +1006,7 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 
 // getCombinedFieldSubject returns the subject of the combinedField evaluation.
 // If the subject does not conform to the expected type, the function logs an
-// error and returns nil. TODO: handle errors
+// error using klog and returns nil.
 // The given `row` map has domain = name of a NamedAggregator,
 // domain = evaluated value (before aggregation, of course) for a given WEC.
 func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row map[string]ref.Val) (*float64, string) {
@@ -1066,11 +1066,15 @@ func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row
 	case string:
 		f, err := strconv.ParseFloat(v, 64)
 		if err != nil {
-			return nil, "failed to parse combinedField subject as a float: " + err.Error()
+			errStr := "failed to parse combinedField subject as a float: " + err.Error()
+			klog.ErrorS(err, "Failed to parse combinedField subject as float", "aggregator", combinedFieldNamedAgg.Name)
+			return nil, errStr
 		}
 		return &f, ""
 	default:
-		return nil, fmt.Sprintf("combinedField subject has unexpected type %T", evalValue)
+		errStr := fmt.Sprintf("combinedField subject has unexpected type %T", evalValue)
+		klog.ErrorS(errors.New(errStr), "combinedField subject has unexpected type", "aggregator", combinedFieldNamedAgg.Name, "type", fmt.Sprintf("%T", evalValue))
+		return nil, errStr
 	}
 }
 
