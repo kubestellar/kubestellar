@@ -107,28 +107,6 @@ func (c *Controller) deleteResolutionForBindingPolicy(ctx context.Context, bindi
 	return nil
 }
 
-func (c *Controller) requeueSelectedWorkloadObjects(ctx context.Context, bindingPolicyName string) error {
-	if !c.bindingPolicyResolver.ResolutionExists(bindingPolicyName) {
-		return nil
-	}
-
-	// requeue all objects that are selected by the bindingpolicy (are in its resolution)
-	objectIdentifiers, err := c.bindingPolicyResolver.GetObjectIdentifiers(bindingPolicyName)
-	if err != nil {
-		return fmt.Errorf("failed to get object identifiers from bindingpolicy resolver for "+
-			"bindingpolicy %s: %w", bindingPolicyName, err)
-	}
-
-	logger := klog.FromContext(ctx)
-	for objIdentifier := range objectIdentifiers {
-		logger.V(5).Info("Enqueuing workload object due to change in BindingPolicy",
-			"objectIdentifier", objIdentifier, "bindingPolicyName", bindingPolicyName)
-		c.enqueueObjectIdentifier(objIdentifier)
-	}
-
-	return nil
-}
-
 func (c *Controller) evaluateBindingPoliciesForUpdate(ctx context.Context, clusterId string, oldLabels labels.Set, newLabels labels.Set) {
 	logger := klog.FromContext(ctx)
 

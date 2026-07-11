@@ -239,15 +239,6 @@ func (resolution *bindingPolicyResolution) matchesBindingSpec(bindingSpec *v1alp
 	return true
 }
 
-// getDestinationsList returns a sorted list of v1alpha1.Destination in the
-// resolution.
-func (resolution *bindingPolicyResolution) getDestinationsList() []v1alpha1.Destination {
-	resolution.RLock()
-	defer resolution.RUnlock()
-
-	return destinationsStringSetToSortedDestinations(resolution.destinations)
-}
-
 func (resolution *bindingPolicyResolution) getWorkloadReferences() []util.ObjectIdentifier {
 	resolution.RLock()
 	defer resolution.RUnlock()
