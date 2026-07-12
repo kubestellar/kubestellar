@@ -17,6 +17,7 @@ limitations under the License.
 package status
 
 import (
+	"runtime"
 	"sync"
 	"testing"
 	"time"
@@ -71,6 +72,10 @@ func TestCompareCombinedStatusNoRecursiveReadLock(t *testing.T) {
 			res.Lock()
 			res.StatusCollectorNameToData["sc"] = nil
 			res.Unlock()
+			// Yield so the reader goroutine gets scheduled between our
+			// Lock/Unlock cycles, keeping contention high without pegging a
+			// core in a tight spin loop.
+			runtime.Gosched()
 		}
 	}()
 
@@ -87,6 +92,9 @@ func TestCompareCombinedStatusNoRecursiveReadLock(t *testing.T) {
 		close(stop)
 		wg.Wait()
 	case <-time.After(15 * time.Second):
+		// Signal the writer to stop before failing so it does not keep
+		// spinning and interfere with other tests in the package.
+		close(stop)
 		t.Fatal("compareCombinedStatus deadlocked: recursive read-lock with a waiting writer")
 	}
 }
