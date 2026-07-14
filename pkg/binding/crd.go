@@ -97,10 +97,10 @@ func (c *Controller) syncCRD(ctx context.Context, objIdentifier util.ObjectIdent
 		stopper, ok := c.stoppers.Get(gvr)
 		if !ok {
 			logger.V(5).Info("Informer is already absent.", "gvr", gvr)
-				} else {
+		} else {
 			logger.V(2).Info("API should not be watched, ensuring the informer's absence.", "gvr", gvr)
-			// close channel
-			safeClose(stopper)
+			// close the stopper channel to stop the informer
+			stopper.Stop()
 		}
 		// remove entries for gvr
 		c.informers.Remove(gvr)
@@ -197,13 +197,13 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 		c.listers.Set(gvr, cache.NewGenericLister(informer.GetIndexer(), gvr.GroupResource()))
 
 		// add the stopper since it necessarily does not exist
-		stopper := make(chan struct{})
+		stopper := NewStopper()
 		logger.V(3).Info("Setting stopper", "gvr", gvr)
 		c.stoppers.Set(gvr, stopper)
 
 		// add the informer since it necessarily does not exist
 		logger.V(3).Info("Setting and running informer", "gvr", gvr)
 		c.informers.Set(gvr, informer)
-		go informer.Run(stopper)
+		go informer.Run(stopper.C)
 	}
 }
