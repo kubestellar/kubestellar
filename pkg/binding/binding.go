@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,6 +33,10 @@ import (
 // syncBinding syncs a binding object with what is resolved by the bindingpolicy resolver.
 func (c *Controller) syncBinding(ctx context.Context, bindingName string) error {
 	logger := klog.FromContext(ctx)
+	startTime := time.Now()
+	defer func() {
+		c.bindingResolutionLatency.Observe(time.Since(startTime).Seconds())
+	}()
 
 	if !c.bindingPolicyResolver.ResolutionExists(bindingName) {
 		// if a resolution is not associated to the binding's name
@@ -74,6 +79,9 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 	if generatedBindingSpec == nil { // resolution does not exist, abort syncing
 		return fmt.Errorf("syncing Binding was stopped because it has no counterpart resolution")
 	}
+
+	numObjects := len(generatedBindingSpec.Workload.ClusterScope) + len(generatedBindingSpec.Workload.NamespaceScope)
+	c.workloadObjectsMatched.WithLabelValues(bindingPolicyIdentifier).Set(float64(numObjects))
 
 	// calculate if the resolved decision is different from the current one
 	if c.bindingPolicyResolver.CompareBinding(bindingPolicyIdentifier, &binding.Spec) {
@@ -155,6 +163,7 @@ func (c *Controller) updateOrCreateBinding(ctx context.Context, bdg *v1alpha1.Bi
 				return fmt.Errorf("failed to create binding (name=%s): %w", bdg.Name, err)
 			}
 
+			c.bindingOperations.WithLabelValues("create").Inc()
 			logger.V(2).Info("created binding", "name", bdg.GetName(), "resourceVersion", bdgEcho.ResourceVersion)
 			return nil
 		} else {
@@ -162,6 +171,7 @@ func (c *Controller) updateOrCreateBinding(ctx context.Context, bdg *v1alpha1.Bi
 		}
 	}
 
+	c.bindingOperations.WithLabelValues("update").Inc()
 	logger.V(2).Info("updated binding", "name", bdg.GetName(), "resourceVersion", bdgEcho.ResourceVersion)
 	return nil
 }
