@@ -1005,8 +1005,8 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 }
 
 // getCombinedFieldSubject returns the subject of the combinedField evaluation.
-// If the subject does not conform to the expected type, the function logs an
-// error using klog and returns nil.
+// If the subject does not conform to the expected type or cannot be parsed, the function
+// logs an error using klog and returns nil and an error message.
 // The given `row` map has domain = name of a NamedAggregator,
 // domain = evaluated value (before aggregation, of course) for a given WEC.
 func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row map[string]ref.Val) (*float64, string) {
@@ -1017,9 +1017,10 @@ func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row
 	//
 	// - For the other types, `subject` is required and SHOULD
 	// evaluate to a numeric value; exceptions are handled in the following way.
-	// For a string value: if it parses as an int64 or float64 then that is used.
-	// Otherwise this is an error condition: a value of 0 is used, and the error
-	// is reported in the BindingPolicyStatus.Errors (not necessarily repeated for each WEC).
+	// For a string value: if it parses as a float64 then that is used.
+	// Otherwise this is an error condition: nil is returned with an error message,
+	// and the error is reported in the BindingPolicyStatus.Errors. The aggregation
+	// logic skips nil subjects.
 	eval := row[combinedFieldNamedAgg.Name]
 	if eval == nil {
 		return nil, ""

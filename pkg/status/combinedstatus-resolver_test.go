@@ -122,8 +122,10 @@ func TestGetCombinedFieldSubject_ErrorHandling(t *testing.T) {
 						t.Errorf("expected nil value, got: %v", *val)
 					}
 				} else {
-					if val == nil || *val != *tt.expectedVal {
-						t.Errorf("expected value %v, got: %v", *tt.expectedVal, val)
+					if val == nil {
+						t.Errorf("expected value %v, got: nil", *tt.expectedVal)
+					} else if *val != *tt.expectedVal {
+						t.Errorf("expected value %v, got: %v", *tt.expectedVal, *val)
 					}
 				}
 			} else {
@@ -146,7 +148,8 @@ func TestNoteWorkStatus_ErrorHandling(t *testing.T) {
 	r := resolver.(*combinedStatusResolver)
 
 	objID := util.ObjectIdentifier{
-		GVK: schema.GroupVersionKind{Group: "apps", Version: "v1", Kind: "Deployment"},
+		GVK:      schema.GroupVersionKind{Group: "apps", Version: "v1", Kind: "Deployment"},
+		Resource: "deployments",
 		ObjectName: cache.ObjectName{
 			Namespace: "default",
 			Name:      "my-deploy",
