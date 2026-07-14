@@ -44,10 +44,16 @@ type ocm struct {
 }
 
 var createOnlyStrategy = workv1.UpdateStrategy{Type: workv1.UpdateStrategyTypeCreateOnly}
+// serverSideApplyStrategy uses ServerSideApply (SSA) because it ensures deterministic, declarative
+// updates and avoids conflict errors that can occur with CreateOrUpdate or Patch, particularly
+// for core resources like ServiceAccounts that controllers frequently reconcile.
+// The FieldManager name is set to clearly identify KubeStellar as the manager of these fields
+// for conflict resolution purposes.
 var serverSideApplyStrategy = workv1.UpdateStrategy{
 	Type: workv1.UpdateStrategyTypeServerSideApply,
 	ServerSideApply: &workv1.ServerSideApplyConfig{
-		Force: true,
+		Force:        true,
+		FieldManager: "kubestellar-transport-controller",
 	},
 }
 
