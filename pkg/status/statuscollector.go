@@ -153,10 +153,9 @@ func (c *Controller) updateStatusCollectorErrors(ctx context.Context, statusColl
 			logger.V(4).Info("StatusCollector not found (status updating skipped)",
 				"ns", statusCollector.Namespace, "name", statusCollector.Name)
 			return nil
-		} else {
-			return fmt.Errorf("failed to update StatusCollector status (ns, name = %s, %s): %w",
-				statusCollector.Namespace, statusCollector.Name, err)
 		}
+		return fmt.Errorf("failed to update StatusCollector status (ns, name = %s, %s): %w",
+			statusCollector.Namespace, statusCollector.Name, err)
 	}
 
 	logger.V(2).Info("Updated StatusCollector status", "ns", statusCollector.Namespace,
