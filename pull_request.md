@@ -2,7 +2,7 @@
 This PR adds Prometheus metrics for Binding Controller Operations, improving observability and monitoring. It registers counters for reconciliations and resource operations, a gauge for matched workload objects, and histograms for latency tracking. Additionally, it provides a Grafana dashboard for visualization.
 
 ## Related issue(s)
-Fixes # (Issue 8)
+Fixes #3910
 
 ## Changes
 - **Binding Controller metrics**:
