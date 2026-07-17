@@ -113,8 +113,14 @@ func Start(ctx context.Context, processOpts ksopts.ProcessOptions) error {
 	// Wait for any server error or context cancellation
 	select {
 	case err := <-errChan:
-		logger.Error(err, "HTTP server failed, initiating shutdown")
-		// Cancel context to trigger graceful shutdown
+		logger.Error(err, "HTTP server failed; shutting down")
+		for _, server := range servers {
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			if shutdownErr := server.Shutdown(shutdownCtx); shutdownErr != nil {
+				logger.Error(shutdownErr, "Error shutting down server", "address", server.Addr)
+			}
+			cancel()
+		}
 		return err
 	case <-ctx.Done():
 		logger.Info("Context cancelled, HTTP servers shutting down")
