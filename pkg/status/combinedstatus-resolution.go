@@ -186,11 +186,11 @@ func (c *combinedStatusResolution) setCollectionDestinations(destinationsSet set
 //
 // - removedSome: true if one or more statuscollectors were removed.
 //
-// - addedSome: true if one or more statuscollectors were added.
+// - addedSome: true if one or more statuscollectors were added or updated.
 //
 // - evalNeeded: true if workstatuses should be re-evaluated because an
-// evaluable statuscollector was added or its spec changed. Adding a
-// placeholder for a missing StatusCollector does not set evalNeeded.
+// 	 evaluable statuscollector was added or its spec changed. Adding a
+// 	 placeholder for a missing StatusCollector does not set evalNeeded.
 func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec map[string]*v1alpha1.StatusCollectorSpec) (bool, bool, bool) {
 	c.Lock()
 	defer c.Unlock()
