@@ -115,10 +115,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := ksctlr.Start(ctx, processOpts); err != nil {
-		setupLog.Error(err, "error starting HTTP servers")
-		os.Exit(1)
-	}
+	go func() {
+		if err := ksctlr.Start(ctx, processOpts); err != nil {
+			setupLog.Error(err, "error running HTTP servers")
+			os.Exit(1)
+		}
+	}()
 
 	spacesClientMetrics := ksmetrics.NewMultiSpaceClientMetrics()
 	ksmetrics.MustRegister(legacyregistry.Register, spacesClientMetrics)
