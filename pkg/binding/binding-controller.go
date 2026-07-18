@@ -653,7 +653,6 @@ func (c *Controller) setupBindingInformer(ctx context.Context) error {
 				obj = typed.Obj
 			}
 			bdg := obj.(*v1alpha1.Binding)
-			c.bindingOperations.WithLabelValues("delete").Inc()
 			logger.V(5).Info("Enqueuing reference to Binding because of informer delete event", "name", bdg.Name)
 			c.workqueue.Add(bindingRef(bdg.Name))
 		},

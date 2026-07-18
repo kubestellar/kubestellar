@@ -33,10 +33,6 @@ import (
 // syncBinding syncs a binding object with what is resolved by the bindingpolicy resolver.
 func (c *Controller) syncBinding(ctx context.Context, bindingName string) error {
 	logger := klog.FromContext(ctx)
-	startTime := time.Now()
-	defer func() {
-		c.bindingResolutionLatency.Observe(time.Since(startTime).Seconds())
-	}()
 
 	if !c.bindingPolicyResolver.ResolutionExists(bindingName) {
 		// if a resolution is not associated to the binding's name
@@ -75,6 +71,7 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 	}
 
 	// generate binding spec from resolver
+	resolverStartTime := time.Now()
 	generatedBindingSpec := c.bindingPolicyResolver.GenerateBinding(bindingPolicyIdentifier)
 	if generatedBindingSpec == nil { // resolution does not exist, abort syncing
 		return fmt.Errorf("syncing Binding was stopped because it has no counterpart resolution")
@@ -84,7 +81,10 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 	c.workloadObjectsMatched.WithLabelValues(bindingPolicyIdentifier).Set(float64(numObjects))
 
 	// calculate if the resolved decision is different from the current one
-	if c.bindingPolicyResolver.CompareBinding(bindingPolicyIdentifier, &binding.Spec) {
+	isUpToDate := c.bindingPolicyResolver.CompareBinding(bindingPolicyIdentifier, &binding.Spec)
+	c.bindingResolutionLatency.Observe(time.Since(resolverStartTime).Seconds())
+
+	if isUpToDate {
 		logger.V(4).Info("Binding is up to date", "name", binding.GetName())
 	} else {
 		// update the binding object in the cluster by updating spec
