@@ -2,7 +2,7 @@
 This PR adds a pre-commit hook for documentation spell checking using PySpelling. This runs spellcheck locally to catch typos before code/documentation is committed and pushed.
 
 ## Related issue(s)
-Fixes #11
+Fixes #3926
 
 ## Changes
 - **Pre-commit hook**: Added the `pyspelling` hook to `.pre-commit-config.yaml` pointing to the local configuration in `.github/spellcheck/.spellcheck.yml`.
