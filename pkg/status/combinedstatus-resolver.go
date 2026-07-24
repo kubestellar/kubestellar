@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	machtypes "k8s.io/apimachinery/pkg/types"
-	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
@@ -485,7 +485,7 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(ctx co
 
 			objs, err := workStatusIndexer.ByIndex(workStatusIdentificationIndexKey, indexKey) // one obj expected
 			if err != nil {
-				runtime2.HandleError(fmt.Errorf("failed to get workstatus with indexKey %s: %w", indexKey, err))
+				utilruntime.HandleErrorWithContext(ctx, err, "failed to get workstatus", "indexKey", indexKey)
 				continue
 			}
 			var workStat *workStatus
@@ -508,10 +508,28 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(ctx co
 					logger.V(3).Info("Found more than one WorkStatus object, using the first", "binding", bindingName,
 						"workloadObjIdentifier", workloadObjIdentifier, "destination", destination)
 				}
-				workStat, err = runtimeObjectToWorkStatus(objs[0].(runtime.Object))
-				if err != nil {
-					runtime2.HandleError(fmt.Errorf("failed to convert runtime.Object to workStatus: %w", err))
-					continue
+				runtimeObj, ok := objs[0].(runtime.Object)
+				if !ok {
+					utilruntime.HandleErrorWithContext(ctx, nil, "value does not implement runtime.Object", "type", fmt.Sprintf("%T", objs[0]))
+					workStat = &workStatus{
+						workStatusRef: workStatusRef{
+							Name:                   "",
+							WECName:                destination,
+							SourceObjectIdentifier: workloadObjIdentifier,
+						},
+					}
+				} else {
+					workStat, err = runtimeObjectToWorkStatus(runtimeObj)
+					if err != nil {
+						utilruntime.HandleErrorWithContext(ctx, err, "failed to convert runtime.Object to workStatus")
+						workStat = &workStatus{
+							workStatusRef: workStatusRef{
+								Name:                   "",
+								WECName:                destination,
+								SourceObjectIdentifier: workloadObjIdentifier,
+							},
+						}
+					}
 				}
 			}
 
