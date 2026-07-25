@@ -83,7 +83,6 @@ type GenericLatencyCollectorReconciler struct {
 	BindingPolicyName   string
 	DiscoveredResources []schema.GroupVersionKind
 	gvkToGVR            map[schema.GroupVersionKind]schema.GroupVersionResource
-	bindingCreated      time.Time
 
 	cache    map[string]*PerWorkloadCache
 	cacheMux sync.Mutex
