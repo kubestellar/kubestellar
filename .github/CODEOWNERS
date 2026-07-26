@@ -1,0 +1,20 @@
+# GitHub CODEOWNERS File
+# Automatically assign reviewers based on which files are modified in a PR.
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-codeowners
+
+# Default owners for all files in the repository
+*                   @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
+
+# Component-specific code owners
+/pkg/binding/       @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
+/pkg/status/        @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
+/pkg/transport/     @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
+/monitoring/        @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
+/core-chart/        @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
+
+# Documentation
+/docs/              @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
+/docs/to-be-deleted/ @MikeSpreitzer @ezrasilvera @pdettori @clubanderson @dumb0002 @waltforme
+
+# Scripts and Tooling
+/hack/              @MikeSpreitzer @ezrasilvera @pdettori @clubanderson @dumb0002 @waltforme
