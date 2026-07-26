@@ -8,9 +8,9 @@ This document tracks major feature additions across repository branches in the K
 
 | Feature Name | Commit SHA | Author | Branch | Date | Files Changed | Commit Message |
 |-------------|------------|---------|---------|------|---------------|----------------|
-| Shell Completion Scripts (CLI Bash-to-Go Conversion) | 0e4602431107a39e2b5a29bd9f2188c86c578179 | namasl | i414 | 2023-11-21 | 20 | Preserve REST config for each client |
+| Shell Completion Scripts (CLI Bash-to-Go Conversion) | 0e4602431107a39e2b5a29bd9f2188c86c578179 | namasl | i414 | 2023-11-21 | 19 | Preserve REST config for each client |
 | CHANGELOG/RELEASE Documentation (Version 1.0.65) | f85dd90977b54df02a9b94360667a94b26dd1448 | shivansh-gohem | fix-lfx-release-docs | 2026-01-12 | 1 | docs: add RELEASE.md to resolve LFX Insight OSPS-BR-01.01 |
-| Resource Extraction Improvements (GroupResource Qualification) | f217cb6bac8fa1d2465c46560ccbb4e35b70e72a | xonas1101 | qualify-excluded-resources-by-group | 2026-01-26 | 5 | Minor tweaks, added another apiGroup for events |
+| Resource Extraction Improvements (GroupResource Qualification) | f217cb6bac8fa1d2465c46560ccbb4e35b70e72a | xonas1101 | qualify-excluded-resources-by-group | 2026-01-26 | 2 | Minor tweaks, added another apiGroup for events |
 
 ## Notes
 
