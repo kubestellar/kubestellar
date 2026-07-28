@@ -120,7 +120,7 @@ func TestArgoCDClusterSecretIsCreated(t *testing.T) {
 	// Poll every 2 seconds for up to 60 seconds waiting for the Secret to be created
 	// This gives KubeStellar controllers time to reconcile and create the Argo CD cluster Secret
 	t.Logf("Waiting for Argo CD cluster Secret to be created: %s/%s", argoCDNamespace, secretName)
-	err = wait.PollImmediate(2*time.Second, 60*time.Second, func() (bool, error) {
+	err = wait.PollUntilContextTimeout(ctx, 2*time.Second, 60*time.Second, true, func(ctx context.Context) (bool, error) {
 		// Try to get the Secret from the argocd namespace
 		secret, err := clientset.CoreV1().Secrets(argoCDNamespace).Get(ctx, secretName, metav1.GetOptions{})
 		if err != nil {
