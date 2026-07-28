@@ -18,9 +18,10 @@ package status
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
-	"k8s.io/apimachinery/pkg/api/errors"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
 
@@ -35,7 +36,7 @@ func (c *Controller) syncStatusCollector(ctx context.Context, ref string) error 
 	statusCollector, err := c.statusCollectorLister.Get(ref)
 	if err != nil {
 		// The resource no longer exist, which means it has been deleted.
-		if !errors.IsNotFound(err) {
+		if !apierrors.IsNotFound(err) {
 			return err
 		}
 
@@ -79,11 +80,11 @@ func (c *Controller) validateStatusCollector(statusCollector *v1alpha1.StatusCol
 	// groupBy & CombinedFields empty if select is not
 	if len(statusCollector.Spec.Select) > 0 &&
 		(len(statusCollector.Spec.GroupBy) > 0 || len(statusCollector.Spec.CombinedFields) > 0) {
-		errs = append(errs, fmt.Errorf("groupBy and combinedFields must be empty if select is not"))
+		errs = append(errs, errors.New("groupBy and combinedFields must be empty if select is not"))
 	}
 	// groupBy empty if combinedFields is
 	if len(statusCollector.Spec.CombinedFields) == 0 && len(statusCollector.Spec.GroupBy) > 0 {
-		errs = append(errs, fmt.Errorf("groupBy must be empty if combinedFields is"))
+		errs = append(errs, errors.New("groupBy must be empty if combinedFields is"))
 	}
 
 	// structure must be valid before we get to parsing errors
@@ -149,7 +150,7 @@ func (c *Controller) updateStatusCollectorErrors(ctx context.Context, statusColl
 		statusCollector, metav1.UpdateOptions{FieldManager: ControllerName})
 
 	if err != nil {
-		if errors.IsNotFound(err) {
+		if apierrors.IsNotFound(err) {
 			logger.V(4).Info("StatusCollector not found (status updating skipped)",
 				"ns", statusCollector.Namespace, "name", statusCollector.Name)
 			return nil
