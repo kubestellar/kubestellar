@@ -198,10 +198,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 		},
 		UpdateFunc: func(_, new interface{}) { transportController.handleBinding(new, "update") },
 		DeleteFunc: func(obj any) {
-			if dfsu, is := obj.(*cache.DeletedFinalStateUnknown); is {
-				obj = dfsu.Obj
-			}
-			transportController.handleBinding(obj, "delete")
+			transportController.handleBinding(tombstoneObject(obj), "delete")
 			transportController.bindingSampler.Prod()
 		},
 	})
@@ -213,10 +210,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 		},
 		UpdateFunc: func(_, obj any) { transportController.handleCustomTransform(obj, "update") },
 		DeleteFunc: func(obj any) {
-			if deletedStateUnknown, ok := obj.(cache.DeletedFinalStateUnknown); ok {
-				obj = deletedStateUnknown.Obj
-			}
-			transportController.handleCustomTransform(obj, "delete")
+			transportController.handleCustomTransform(tombstoneObject(obj), "delete")
 			transportController.transformSampler.Prod()
 		},
 	})
@@ -234,10 +228,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 			transportController.handleWrappedObject(new, "update")
 		},
 		DeleteFunc: func(obj any) {
-			if dfsu, is := obj.(*cache.DeletedFinalStateUnknown); is {
-				obj = dfsu.Obj
-			}
-			transportController.handleWrappedObject(obj, "delete")
+			transportController.handleWrappedObject(tombstoneObject(obj), "delete")
 			transportController.wrappedSampler.Prod()
 		},
 	})
@@ -250,10 +241,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 			transportController.handlePropertiesEvent(new, "update")
 		},
 		DeleteFunc: func(obj any) {
-			if dfsu, is := obj.(*cache.DeletedFinalStateUnknown); is {
-				obj = dfsu.Obj
-			}
-			transportController.handlePropertiesEvent(obj, "delete")
+			transportController.handlePropertiesEvent(tombstoneObject(obj), "delete")
 			transportController.wecSampler.Prod()
 		},
 	})
@@ -266,10 +254,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 			transportController.handlePropertiesEvent(new, "update")
 		},
 		DeleteFunc: func(obj any) {
-			if dfsu, is := obj.(*cache.DeletedFinalStateUnknown); is {
-				obj = dfsu.Obj
-			}
-			transportController.handlePropertiesEvent(obj, "delete")
+			transportController.handlePropertiesEvent(tombstoneObject(obj), "delete")
 			transportController.propMapSampler.Prod()
 		},
 	})
@@ -371,6 +356,18 @@ type genericTransportController struct {
 // enqueueBinding takes an Binding resource and
 // converts it into a namespace/name string which is put onto the workqueue.
 // This func *shouldn't* handle any resource other than Binding.
+// tombstoneObject unwraps the object reported by an informer's delete event.
+// On a delete, the informer may deliver the final object directly or, if that
+// object was missed and reconstructed from a re-list, a cache.DeletedFinalStateUnknown
+// holding it. client-go always passes the tombstone by value (see
+// cache.DeltaFIFO), so the assertion must be on the value type, not a pointer.
+func tombstoneObject(obj any) any {
+	if tombstone, ok := obj.(cache.DeletedFinalStateUnknown); ok {
+		return tombstone.Obj
+	}
+	return obj
+}
+
 func (c *genericTransportController) handleBinding(obj interface{}, event string) {
 	binding := obj.(*v1alpha1.Binding)
 	c.logger.V(5).Info("Enqueuing reference to Binding due to informer event about that Binding", "name", binding.Name, "resourceVersion", binding.ResourceVersion, "event", event)
