@@ -59,6 +59,7 @@ import (
 	controllisters "github.com/kubestellar/kubestellar/pkg/generated/listers/control/v1alpha1"
 	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 	"github.com/kubestellar/kubestellar/pkg/util"
+	k8smetrics "k8s.io/component-base/metrics"
 )
 
 const (
@@ -154,6 +155,12 @@ type Controller struct {
 	initializedTs    time.Time
 	wdsName          string
 	allowedGroupsSet sets.Set[string]
+
+	reconciliationDuration       *k8smetrics.HistogramVec
+	bindingResolutionLatency     *k8smetrics.Histogram
+	bindingPolicyReconciliations *k8smetrics.CounterVec
+	bindingOperations            *k8smetrics.CounterVec
+	workloadObjectsMatched       *k8smetrics.GaugeVec
 }
 
 // bindingPolicyRef is a workqueue item that references a BindingPolicy
@@ -324,9 +331,56 @@ func makeController(logger logr.Logger,
 		bindingPolicyResolver:       NewBindingPolicyResolver(),
 		workqueue:                   workqueue.NewRateLimitingQueueWithConfig(ratelimiter, workqueue.RateLimitingQueueConfig{Name: ControllerName + "-" + wdsName}),
 		allowedGroupsSet:            allowedGroupsSet,
+		reconciliationDuration: k8smetrics.NewHistogramVec(&k8smetrics.HistogramOpts{
+			Namespace:      "kubestellar",
+			Subsystem:      "binding_controller",
+			Name:           "reconciliation_duration_seconds",
+			Help:           "Reconciliation duration of binding controller operations in seconds",
+			Buckets:        []float64{0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5, 10, 30},
+			StabilityLevel: k8smetrics.ALPHA,
+		}, []string{"resource"}),
+		bindingResolutionLatency: k8smetrics.NewHistogram(&k8smetrics.HistogramOpts{
+			Namespace:      "kubestellar",
+			Subsystem:      "binding_controller",
+			Name:           "binding_resolution_latency_seconds",
+			Help:           "Latency of binding resolution in seconds",
+			Buckets:        []float64{0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5, 10, 30},
+			StabilityLevel: k8smetrics.ALPHA,
+		}),
+		bindingPolicyReconciliations: k8smetrics.NewCounterVec(&k8smetrics.CounterOpts{
+			Namespace:      "kubestellar",
+			Subsystem:      "binding_controller",
+			Name:           "binding_policy_reconciliations_total",
+			Help:           "Total number of binding policy reconciliations",
+			StabilityLevel: k8smetrics.ALPHA,
+		}, []string{"status"}),
+		bindingOperations: k8smetrics.NewCounterVec(&k8smetrics.CounterOpts{
+			Namespace:      "kubestellar",
+			Subsystem:      "binding_controller",
+			Name:           "binding_operations_total",
+			Help:           "Total number of binding operations",
+			StabilityLevel: k8smetrics.ALPHA,
+		}, []string{"operation"}),
+		workloadObjectsMatched: k8smetrics.NewGaugeVec(&k8smetrics.GaugeOpts{
+			Namespace:      "kubestellar",
+			Subsystem:      "binding_controller",
+			Name:           "workload_objects_matched",
+			Help:           "Number of workload objects matched per binding policy",
+			StabilityLevel: k8smetrics.ALPHA,
+		}, []string{"binding_policy"}),
 	}
 
 	return controller, nil
+}
+
+func (c *Controller) RegisterMetrics(reg ksmetrics.RegisterFn) {
+	ksmetrics.MustRegisterAbles(reg,
+		c.reconciliationDuration,
+		c.bindingResolutionLatency,
+		c.bindingPolicyReconciliations,
+		c.bindingOperations,
+		c.workloadObjectsMatched,
+	)
 }
 
 // EnsureCRDs will ensure that the CRDs are installed.
@@ -735,28 +789,37 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 
 func (c *Controller) reconcile(ctx context.Context, item any) error {
 	logger := klog.FromContext(ctx)
+	startTime := time.Now()
 
 	switch objIdentifier := item.(type) {
 	case bindingRef:
-		return c.syncBinding(ctx, string(objIdentifier)) // this function logs through all its exits
+		err := c.syncBinding(ctx, string(objIdentifier))
+		c.reconciliationDuration.WithLabelValues("binding").Observe(time.Since(startTime).Seconds())
+		return err
 	case bindingPolicyRef:
-		if err := c.syncBindingPolicy(ctx, string(objIdentifier)); err != nil {
-			return fmt.Errorf("failed to handle bindingpolicy: %w", err) // error logging after this call
-			// will add name.
+		err := c.syncBindingPolicy(ctx, string(objIdentifier))
+		c.reconciliationDuration.WithLabelValues("bindingpolicy").Observe(time.Since(startTime).Seconds())
+		if err != nil {
+			c.bindingPolicyReconciliations.WithLabelValues("failure").Inc()
+			return fmt.Errorf("failed to handle bindingpolicy: %w", err)
 		}
-
+		c.bindingPolicyReconciliations.WithLabelValues("success").Inc()
 		logger.V(5).Info("Handled bindingpolicy", "objectIdentifier", objIdentifier)
 		return nil
 	case util.ObjectIdentifier:
+		var err error
 		if util.ObjIdentifierIsForCRD(objIdentifier) {
-			if err := c.syncCRD(ctx, objIdentifier); err != nil {
-				return fmt.Errorf("failed to handle CRD: %w", err) // error logging after this call
-				// will add name.
+			err = c.syncCRD(ctx, objIdentifier)
+			c.reconciliationDuration.WithLabelValues("crd").Observe(time.Since(startTime).Seconds())
+			if err != nil {
+				return fmt.Errorf("failed to handle CRD: %w", err)
 			}
 			logger.V(5).Info("Handled CRD", "objectIdentifier", objIdentifier)
+		} else {
+			err = c.updateResolutions(ctx, objIdentifier)
+			c.reconciliationDuration.WithLabelValues("workload").Observe(time.Since(startTime).Seconds())
 		}
-
-		return c.updateResolutions(ctx, objIdentifier)
+		return err
 	}
 	logger.Error(nil, "Impossible workqueue entry", "type", fmt.Sprintf("%T", item), "value", item)
 	return nil
