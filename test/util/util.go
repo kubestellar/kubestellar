@@ -536,7 +536,7 @@ func ValidateDeploymentDeletion(ctx context.Context, wec *kubernetes.Clientset, 
 		if k8serrors.IsNotFound(err) {
 			return nil
 		}
-		return fmt.Errorf("Deployment %q in namespace %q still exists, or some error other than NotFound occurred", name, ns)
+		return fmt.Errorf("the Deployment %q in namespace %q still exists, or some error other than NotFound occurred", name, ns)
 	}, timeout).Should(gomega.Succeed())
 }
 
@@ -545,10 +545,10 @@ func ValidateDeploymentReplicas(ctx context.Context, wec *kubernetes.Clientset, 
 	gomega.Eventually(func() error {
 		d, err := wec.AppsV1().Deployments(ns).Get(ctx, name, metav1.GetOptions{})
 		if err != nil {
-			return fmt.Errorf("Failed to get Deployment %q in namespace %q: %w", name, ns, err)
+			return fmt.Errorf("failed to get the Deployment %q in namespace %q: %w", name, ns, err)
 		}
 		if int(*d.Spec.Replicas) != numReplicas {
-			return fmt.Errorf("Deployment %q in namespace %q has %d replicas, expected %d", name, ns, *d.Spec.Replicas, numReplicas)
+			return fmt.Errorf("the Deployment %q in namespace %q has %d replicas, expected %d", name, ns, *d.Spec.Replicas, numReplicas)
 		}
 		return nil
 	}, timeout).Should(gomega.Succeed())
