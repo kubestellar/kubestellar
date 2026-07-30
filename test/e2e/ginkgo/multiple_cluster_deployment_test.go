@@ -34,7 +34,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
-	ptr "k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	ksapi "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 	"github.com/kubestellar/kubestellar/test/util"
@@ -791,7 +791,7 @@ var _ = ginkgo.Describe("end to end testing", func() {
 				if n := len(cs.Results[0].Rows); n != 1 {
 					return fmt.Errorf("expected 1 row but got %d", n)
 				}
-				expectedRow := []ksapi.Value{{Type: ksapi.TypeNumber, Number: ptr.String("2")}}
+				expectedRow := []ksapi.Value{{Type: ksapi.TypeNumber, Number: ptr.To("2")}}
 				gotRow := cs.Results[0].Rows[0].Columns
 				if !apiequality.Semantic.DeepEqual(expectedRow, gotRow) {
 					return fmt.Errorf("expected row %#v but got %#v", expectedRow, gotRow)
