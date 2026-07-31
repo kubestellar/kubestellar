@@ -72,6 +72,12 @@ func TestWrapObjects(t *testing.T) {
 	if len(jobConfig.UpdateStrategy.ServerSideApply.IgnoreFields) == 0 || len(jobConfig.UpdateStrategy.ServerSideApply.IgnoreFields[0].JSONPaths) != 3 {
 		t.Errorf("expected 3 IgnoreFields for Job")
 	}
+	if len(jobConfig.ConditionRules) != 1 {
+		t.Fatalf("expected 1 ConditionRule for Job, got %d", len(jobConfig.ConditionRules))
+	}
+	if jobConfig.ConditionRules[0].Condition != "Complete" || jobConfig.ConditionRules[0].Type != workv1.WellKnownConditionsType {
+		t.Errorf("expected WellKnownConditions Complete rule for Job, got %v", jobConfig.ConditionRules[0])
+	}
 
 	// Second config should be for CreateOnly deployment (wrapee3)
 	deployConfig := manifestWork.Spec.ManifestConfigs[1]

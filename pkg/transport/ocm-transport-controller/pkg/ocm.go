@@ -55,12 +55,17 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 		rsc := kindToResource(gvk.GroupKind())
 
 		var ignorePaths []string
+		var conditionRules []workv1.ConditionRule
 		if gvk.Group == "batch" && gvk.Kind == "Job" {
 			ignorePaths = append(ignorePaths,
 				".spec.selector",
 				".spec.template.metadata.labels.controller-uid",
 				".spec.template.metadata.labels[\"batch.kubernetes.io/controller-uid\"]",
 			)
+			conditionRules = append(conditionRules, workv1.ConditionRule{
+				Condition: "Complete",
+				Type:      workv1.WellKnownConditionsType,
+			})
 		}
 
 		if annotationVal := wrapee.Object.GetAnnotations()["kubestellar.io/ignore-fields"]; annotationVal != "" {
@@ -82,15 +87,10 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 				},
 				UpdateStrategy: &createOnlyStrategy,
 			})
-		} else if len(ignorePaths) > 0 {
-			configs = append(configs, workv1.ManifestConfigOption{
-				ResourceIdentifier: workv1.ResourceIdentifier{
-					Group:     gvk.Group,
-					Resource:  rsc,
-					Namespace: wrapee.Object.GetNamespace(),
-					Name:      wrapee.Object.GetName(),
-				},
-				UpdateStrategy: &workv1.UpdateStrategy{
+		} else if len(ignorePaths) > 0 || len(conditionRules) > 0 {
+			var updateStrategy *workv1.UpdateStrategy
+			if len(ignorePaths) > 0 {
+				updateStrategy = &workv1.UpdateStrategy{
 					Type: workv1.UpdateStrategyTypeServerSideApply,
 					ServerSideApply: &workv1.ServerSideApplyConfig{
 						FieldManager: workv1.DefaultFieldManager,
@@ -101,7 +101,18 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 							},
 						},
 					},
+				}
+			}
+
+			configs = append(configs, workv1.ManifestConfigOption{
+				ResourceIdentifier: workv1.ResourceIdentifier{
+					Group:     gvk.Group,
+					Resource:  rsc,
+					Namespace: wrapee.Object.GetNamespace(),
+					Name:      wrapee.Object.GetName(),
 				},
+				UpdateStrategy: updateStrategy,
+				ConditionRules: conditionRules,
 			})
 		}
 	}
