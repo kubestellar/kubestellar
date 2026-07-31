@@ -50,9 +50,10 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 	var configs []workv1.ManifestConfigOption
 	for i, wrapee := range wrapees {
 		manifests[i].RawExtension = runtime.RawExtension{Object: wrapee.Object}
+		gvk := wrapee.Object.GroupVersionKind()
+		rsc := kindToResource(gvk.GroupKind())
+
 		if wrapee.CreateOnly {
-			gvk := wrapee.Object.GroupVersionKind()
-			rsc := kindToResource(gvk.GroupKind())
 			configs = append(configs, workv1.ManifestConfigOption{
 				ResourceIdentifier: workv1.ResourceIdentifier{
 					Group:     gvk.Group,
@@ -61,6 +62,30 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 					Name:      wrapee.Object.GetName(),
 				},
 				UpdateStrategy: &createOnlyStrategy,
+			})
+		} else if gvk.Group == "batch" && gvk.Kind == "Job" {
+			configs = append(configs, workv1.ManifestConfigOption{
+				ResourceIdentifier: workv1.ResourceIdentifier{
+					Group:     gvk.Group,
+					Resource:  rsc,
+					Namespace: wrapee.Object.GetNamespace(),
+					Name:      wrapee.Object.GetName(),
+				},
+				UpdateStrategy: &workv1.UpdateStrategy{
+					Type: workv1.UpdateStrategyTypeServerSideApply,
+					ServerSideApply: &workv1.ServerSideApplyConfig{
+						FieldManager: workv1.DefaultFieldManager,
+						IgnoreFields: []workv1.IgnoreField{
+							{
+								Condition: workv1.IgnoreFieldsConditionOnSpokePresent,
+								JSONPaths: []string{
+									".spec.selector",
+									".spec.template.metadata.labels",
+								},
+							},
+						},
+					},
+				},
 			})
 		}
 	}
