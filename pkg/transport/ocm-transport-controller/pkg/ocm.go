@@ -18,6 +18,7 @@ package ocm
 
 import (
 	"fmt"
+	"strings"
 
 	workv1 "open-cluster-management.io/api/work/v1"
 
@@ -53,6 +54,24 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 		gvk := wrapee.Object.GroupVersionKind()
 		rsc := kindToResource(gvk.GroupKind())
 
+		var ignorePaths []string
+		if gvk.Group == "batch" && gvk.Kind == "Job" {
+			ignorePaths = append(ignorePaths,
+				".spec.selector",
+				".spec.template.metadata.labels.controller-uid",
+				".spec.template.metadata.labels[\"batch.kubernetes.io/controller-uid\"]",
+			)
+		}
+
+		if annotationVal := wrapee.Object.GetAnnotations()["kubestellar.io/ignore-fields"]; annotationVal != "" {
+			parts := strings.Split(annotationVal, ",")
+			for _, p := range parts {
+				if trimmed := strings.TrimSpace(p); trimmed != "" {
+					ignorePaths = append(ignorePaths, trimmed)
+				}
+			}
+		}
+
 		if wrapee.CreateOnly {
 			configs = append(configs, workv1.ManifestConfigOption{
 				ResourceIdentifier: workv1.ResourceIdentifier{
@@ -63,7 +82,7 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 				},
 				UpdateStrategy: &createOnlyStrategy,
 			})
-		} else if gvk.Group == "batch" && gvk.Kind == "Job" {
+		} else if len(ignorePaths) > 0 {
 			configs = append(configs, workv1.ManifestConfigOption{
 				ResourceIdentifier: workv1.ResourceIdentifier{
 					Group:     gvk.Group,
@@ -78,11 +97,7 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 						IgnoreFields: []workv1.IgnoreField{
 							{
 								Condition: workv1.IgnoreFieldsConditionOnSpokePresent,
-								JSONPaths: []string{
-									".spec.selector",
-									".spec.template.metadata.labels.controller-uid",
-									".spec.template.metadata.labels[\"batch.kubernetes.io/controller-uid\"]",
-								},
+								JSONPaths: ignorePaths,
 							},
 						},
 					},

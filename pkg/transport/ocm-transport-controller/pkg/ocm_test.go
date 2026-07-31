@@ -34,7 +34,17 @@ func TestWrapObjects(t *testing.T) {
 	createOnlyObj.SetNamespace("default")
 	wrapee3 := transport.NewWrapee(createOnlyObj, true)
 
-	wrapees := []transport.Wrapee{wrapee1, wrapee2, wrapee3}
+	// 4. Create an object with the ignore-fields annotation
+	annotatedObj := &unstructured.Unstructured{}
+	annotatedObj.SetGroupVersionKind(schema.GroupVersionKind{Group: "apps", Version: "v1", Kind: "Deployment"})
+	annotatedObj.SetName("test-annotated")
+	annotatedObj.SetNamespace("default")
+	annotatedObj.SetAnnotations(map[string]string{
+		"kubestellar.io/ignore-fields": ".spec.replicas, .spec.template.metadata.labels",
+	})
+	wrapee4 := transport.NewWrapee(annotatedObj, false)
+
+	wrapees := []transport.Wrapee{wrapee1, wrapee2, wrapee3, wrapee4}
 
 	kindToResource := func(gk schema.GroupKind) string {
 		return gk.Kind + "s" // Simplistic mock
@@ -47,8 +57,8 @@ func TestWrapObjects(t *testing.T) {
 		t.Fatalf("expected *workv1.ManifestWork, got %T", result)
 	}
 
-	if len(manifestWork.Spec.ManifestConfigs) != 2 {
-		t.Fatalf("expected 2 manifest configs, got %d", len(manifestWork.Spec.ManifestConfigs))
+	if len(manifestWork.Spec.ManifestConfigs) != 3 {
+		t.Fatalf("expected 3 manifest configs, got %d", len(manifestWork.Spec.ManifestConfigs))
 	}
 
 	// First config should be for Job (wrapee2)
@@ -70,5 +80,23 @@ func TestWrapObjects(t *testing.T) {
 	}
 	if deployConfig.UpdateStrategy == nil || deployConfig.UpdateStrategy.Type != workv1.UpdateStrategyTypeCreateOnly {
 		t.Errorf("expected CreateOnly update strategy for Deployment, got %v", deployConfig.UpdateStrategy)
+	}
+
+	// Third config should be for annotated object (wrapee4)
+	annotatedConfig := manifestWork.Spec.ManifestConfigs[2]
+	if annotatedConfig.ResourceIdentifier.Resource != "Deployments" {
+		t.Errorf("expected Deployments resource, got %s", annotatedConfig.ResourceIdentifier.Resource)
+	}
+	if annotatedConfig.UpdateStrategy == nil || annotatedConfig.UpdateStrategy.Type != workv1.UpdateStrategyTypeServerSideApply {
+		t.Errorf("expected ServerSideApply update strategy for Annotated Obj, got %v", annotatedConfig.UpdateStrategy)
+	}
+	if len(annotatedConfig.UpdateStrategy.ServerSideApply.IgnoreFields) == 0 {
+		t.Fatalf("expected IgnoreFields for Annotated Obj")
+	}
+	if len(annotatedConfig.UpdateStrategy.ServerSideApply.IgnoreFields[0].JSONPaths) != 2 {
+		t.Errorf("expected 2 IgnoreFields for Annotated Obj, got %v", annotatedConfig.UpdateStrategy.ServerSideApply.IgnoreFields[0].JSONPaths)
+	}
+	if annotatedConfig.UpdateStrategy.ServerSideApply.IgnoreFields[0].JSONPaths[0] != ".spec.replicas" || annotatedConfig.UpdateStrategy.ServerSideApply.IgnoreFields[0].JSONPaths[1] != ".spec.template.metadata.labels" {
+		t.Errorf("unexpected IgnoreFields parsed: %v", annotatedConfig.UpdateStrategy.ServerSideApply.IgnoreFields[0].JSONPaths)
 	}
 }
