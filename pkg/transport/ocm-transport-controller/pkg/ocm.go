@@ -80,7 +80,8 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 								Condition: workv1.IgnoreFieldsConditionOnSpokePresent,
 								JSONPaths: []string{
 									".spec.selector",
-									".spec.template.metadata.labels",
+									".spec.template.metadata.labels.controller-uid",
+									".spec.template.metadata.labels[\"batch.kubernetes.io/controller-uid\"]",
 								},
 							},
 						},

@@ -59,8 +59,8 @@ func TestWrapObjects(t *testing.T) {
 	if jobConfig.UpdateStrategy == nil || jobConfig.UpdateStrategy.Type != workv1.UpdateStrategyTypeServerSideApply {
 		t.Errorf("expected ServerSideApply update strategy for Job, got %v", jobConfig.UpdateStrategy)
 	}
-	if len(jobConfig.UpdateStrategy.ServerSideApply.IgnoreFields) == 0 {
-		t.Errorf("expected IgnoreFields for Job")
+	if len(jobConfig.UpdateStrategy.ServerSideApply.IgnoreFields) == 0 || len(jobConfig.UpdateStrategy.ServerSideApply.IgnoreFields[0].JSONPaths) != 3 {
+		t.Errorf("expected 3 IgnoreFields for Job")
 	}
 
 	// Second config should be for CreateOnly deployment (wrapee3)
