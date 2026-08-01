@@ -198,7 +198,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 		},
 		UpdateFunc: func(_, new interface{}) { transportController.handleBinding(new, "update") },
 		DeleteFunc: func(obj any) {
-			if dfsu, is := obj.(*cache.DeletedFinalStateUnknown); is {
+			if dfsu, is := obj.(cache.DeletedFinalStateUnknown); is {
 				obj = dfsu.Obj
 			}
 			transportController.handleBinding(obj, "delete")
@@ -234,7 +234,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 			transportController.handleWrappedObject(new, "update")
 		},
 		DeleteFunc: func(obj any) {
-			if dfsu, is := obj.(*cache.DeletedFinalStateUnknown); is {
+			if dfsu, is := obj.(cache.DeletedFinalStateUnknown); is {
 				obj = dfsu.Obj
 			}
 			transportController.handleWrappedObject(obj, "delete")
@@ -250,7 +250,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 			transportController.handlePropertiesEvent(new, "update")
 		},
 		DeleteFunc: func(obj any) {
-			if dfsu, is := obj.(*cache.DeletedFinalStateUnknown); is {
+			if dfsu, is := obj.(cache.DeletedFinalStateUnknown); is {
 				obj = dfsu.Obj
 			}
 			transportController.handlePropertiesEvent(obj, "delete")
@@ -266,7 +266,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 			transportController.handlePropertiesEvent(new, "update")
 		},
 		DeleteFunc: func(obj any) {
-			if dfsu, is := obj.(*cache.DeletedFinalStateUnknown); is {
+			if dfsu, is := obj.(cache.DeletedFinalStateUnknown); is {
 				obj = dfsu.Obj
 			}
 			transportController.handlePropertiesEvent(obj, "delete")
