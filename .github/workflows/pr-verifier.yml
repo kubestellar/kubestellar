@@ -5,13 +5,10 @@ on:
     types: [opened, edited, synchronize, reopened]
 
 permissions:
-  contents: read
+  checks: write
+  pull-requests: read
 
 jobs:
   verify:
-    permissions:
-      checks: write
-      pull-requests: read
-      packages: read
     uses: kubestellar/infra/.github/workflows/reusable-pr-verifier.yml@main
     secrets: inherit
