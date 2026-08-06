@@ -343,7 +343,7 @@ type genericTransportController struct {
 	workqueue workqueue.RateLimitingInterface
 
 	transport        transport.Transport //transport is a specific implementation for the transport interface.
-	transportClient  dynamic.Interface   // dynamic client to transport wrapped object. since object kind is unknown during complilation, we use dynamic
+	transportClient  dynamic.Interface   // dynamic client to transport wrapped object. Since object kind is unknown during compilation, we use dynamic
 	wrappedObjectGVR schema.GroupVersionResource
 
 	wdsDynamicClient dynamic.Interface
@@ -355,7 +355,7 @@ type genericTransportController struct {
 
 	propsMutex sync.Mutex
 
-	// bindingSensitiveDestinations maps Binding name to the set of destinations whose properties the Binding is senstive to.
+	// bindingSensitiveDestinations maps Binding name to the set of destinations whose properties the Binding is sensitive to.
 	// Access to both the map and the Sets it holds is controlled by the RWMutex.
 	// The sets are mutable with the RWMutex held.
 	bindingSensitiveDestinations map[string]sets.Set[v1alpha1.Destination]
