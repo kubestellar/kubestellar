@@ -655,8 +655,11 @@ func verbsSupportInformers(verbs []string) bool {
 // At this time it is very simple, more complex processing might be required
 // here.
 func (c *Controller) handleObject(oldObj, obj any, resource string, eventType WorkloadEventType, wasDeletedFinalStateUnknown bool) {
-	objMR := obj.(mrObject)
-	oldObjMR := oldObj.(mrObject)
+	objMR, ok := obj.(mrObject)
+	if !ok {
+		return
+	}
+	oldObjMR, _ := oldObj.(mrObject)
 	c.logger.V(5).Info("Got object event", "eventType", eventType,
 		"wasDeletedFinalStateUnknown", wasDeletedFinalStateUnknown, "obj", util.RefToRuntimeObj(objMR),
 		"resource", resource)
@@ -779,7 +782,10 @@ func getObject(lister cache.GenericLister, namespace, name string) (runtime.Obje
 }
 
 func isBeingDeleted(obj runtime.Object) bool {
-	mObj := obj.(metav1.Object)
+	mObj, ok := obj.(metav1.Object)
+	if !ok {
+		return false
+	}
 	return mObj.GetDeletionTimestamp() != nil
 }
 
