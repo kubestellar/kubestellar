@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"reflect"
 	"slices"
+	"sync"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -145,7 +146,7 @@ type Controller struct {
 	apiResourceLists []*metav1.APIResourceList
 	listers          util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister]
 	informers        util.ConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer]
-	stoppers         util.ConcurrentMap[schema.GroupVersionResource, chan struct{}]
+	stoppers         util.ConcurrentMap[schema.GroupVersionResource, *Stopper]
 
 	bindingPolicyResolver BindingPolicyResolver
 
@@ -320,7 +321,7 @@ func makeController(logger logr.Logger,
 		apiResourceLists:            apiResourceLists,
 		listers:                     util.NewConcurrentMap[schema.GroupVersionResource, cache.GenericLister](),
 		informers:                   util.NewConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer](),
-		stoppers:                    util.NewConcurrentMap[schema.GroupVersionResource, chan struct{}](),
+		stoppers:                    util.NewConcurrentMap[schema.GroupVersionResource, *Stopper](),
 		bindingPolicyResolver:       NewBindingPolicyResolver(),
 		workqueue:                   workqueue.NewRateLimitingQueueWithConfig(ratelimiter, workqueue.RateLimitingQueueConfig{Name: ControllerName + "-" + wdsName}),
 		allowedGroupsSet:            allowedGroupsSet,
@@ -464,11 +465,15 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 				// run the informer
 				// we need to be able to stop informers for APIs (CRDs) that are removed
 				// after startup, therefore we use a stopper channel for each informer
-				// instead than informerFactory.Start(ctx.Done())
-				stopper := make(chan struct{})
-				defer close(stopper)
+				// instead than informerFactory.Start(ctx.Done()).
+				// Do NOT use defer close(stopper) here: defer runs when run() returns, not
+				// at the end of the loop iteration. If syncCRD already closed a stopper
+				// for a removed CRD, the deferred close would fire again on shutdown and
+				// panic with "close of closed channel". Stoppers are closed either by
+				// syncCRD (for individual CRD removal) or by the shutdown goroutine below.
+				stopper := NewStopper()
 				c.stoppers.Set(gvr, stopper)
-				go informer.Run(stopper)
+				go informer.Run(stopper.C)
 			}
 		}
 	}
@@ -504,10 +509,34 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 	c.logger.Info("Started workers")
 	c.initializedTs = time.Now()
 
+	// Wait for context cancellation, then close all remaining stoppers.
+	// We use Stopper's Stop() to avoid panics due to concurrent close operations.
 	<-ctx.Done()
 	c.logger.Info("Shutting down workers")
+	c.stoppers.Iterator(func(_ schema.GroupVersionResource, stopper *Stopper) error {
+		stopper.Stop()
+		return nil
+	})
 
 	return nil
+}
+
+// Stopper wraps a channel with sync.Once to ensure it is safely closed exactly once.
+type Stopper struct {
+	C    chan struct{}
+	once sync.Once
+}
+
+func (s *Stopper) Stop() {
+	s.once.Do(func() {
+		close(s.C)
+	})
+}
+
+func NewStopper() *Stopper {
+	return &Stopper{
+		C: make(chan struct{}),
+	}
 }
 
 func (c *Controller) setupManagedClustersInformer(ctx context.Context) error {
