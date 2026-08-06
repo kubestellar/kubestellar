@@ -48,7 +48,7 @@ For production use, the console requires:
 1. **KKC Agent**: A local agent that connects to your kubeconfig
 2. **Backend API**: The KKC API server running on port 8080
 
-See the [setup guide](README.md) for detailed installation instructions.
+See the [setup guide](https://github.com/kubestellar/console#local-install-self-host) for detailed installation instructions.
 
 ## Architecture
 
