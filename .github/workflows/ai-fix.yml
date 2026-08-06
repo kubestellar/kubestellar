@@ -13,14 +13,12 @@ on:
     types: [opened]
 
 permissions:
-  contents: read
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
   ai-fix:
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
     uses: kubestellar/infra/.github/workflows/reusable-ai-fix.yml@main
     with:
       issue_number: ${{ github.event.inputs.issue_number || '' }}
