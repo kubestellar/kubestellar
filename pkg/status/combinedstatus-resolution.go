@@ -195,7 +195,7 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 
 	// remove entries for collectors that are not relevant anymore and update the
 	// statuscollector data that are. If one of the latter is updated, mark it as added
-	for statusCollectorName, statusCollectorData := range c.StatusCollectorNameToData {
+	for statusCollectorName, scData := range c.StatusCollectorNameToData {
 		statusCollectorSpec, ok := statusCollectorNameToSpec[statusCollectorName]
 		if !ok {
 			delete(c.StatusCollectorNameToData, statusCollectorName)
@@ -203,8 +203,15 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 			continue
 		}
 
-		if statusCollectorSpec != nil && (statusCollectorData == nil || !statusCollectorSpecsMatch(statusCollectorData.collectorSpec, statusCollectorSpec)) {
-			c.StatusCollectorNameToData[statusCollectorName].collectorSpec = statusCollectorSpec
+		if statusCollectorSpec != nil && (scData == nil || !statusCollectorSpecsMatch(scData.collectorSpec, statusCollectorSpec)) {
+			if c.StatusCollectorNameToData[statusCollectorName] == nil {
+				c.StatusCollectorNameToData[statusCollectorName] = &statusCollectorData{
+					collectorSpec: statusCollectorSpec,
+					WECToData:     make(map[string]*workStatusData),
+				}
+			} else {
+				c.StatusCollectorNameToData[statusCollectorName].collectorSpec = statusCollectorSpec
+			}
 			addedSome = true
 		}
 	}
