@@ -82,17 +82,21 @@ func (mm *rwMutexMap[K, V]) Get(key K) (V, bool) {
 	return value, ok
 }
 
-// Iterator iterates over the map and calls the given function for each
-// key/value pair sequentially.
+// Iterator iterates over a snapshot of the map and calls the given function
+// for each key/value pair sequentially. This prevents deadlocks if the
+// yield function attempts to mutate the map or blocks execution.
 // If the given function returns an error, the iteration is stopped and
 // the error is returned.
-// During the iteration, the map must not be mutated by the given function.
-// If the map is mutated during the iteration, the behavior is undefined.
 func (mm *rwMutexMap[K, V]) Iterator(yield func(K, V) error) error {
 	mm.RLock()
-	defer mm.RUnlock()
-
+	// Take a snapshot of keys and values to release lock early
+	snapshot := make(map[K]V, len(mm.m))
 	for k, v := range mm.m {
+		snapshot[k] = v
+	}
+	mm.RUnlock()
+
+	for k, v := range snapshot {
 		if err := yield(k, v); err != nil {
 			return err
 		}
