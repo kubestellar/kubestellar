@@ -58,7 +58,10 @@ func (c *Controller) syncStatusCollector(ctx context.Context, ref string) error 
 		}
 	}
 
-	combinedStatusSet, bindingNameSet := c.combinedStatusResolver.NoteStatusCollector(ctx, statusCollector, isDeleted, c.workStatusIndexer)
+	combinedStatusSet, bindingNameSet, err := c.combinedStatusResolver.NoteStatusCollector(ctx, statusCollector, isDeleted, c.workStatusIndexer)
+	if err != nil {
+		return fmt.Errorf("failed to note status collector: %w", err)
+	}
 	for combinedStatus := range combinedStatusSet {
 		logger.V(5).Info("Enqueuing reference to CombinedStatus while syncing StatusCollector", "combinedStatusRef", combinedStatus.ObjectName, "statusCollectorName", ref)
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
