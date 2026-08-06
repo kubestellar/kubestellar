@@ -129,7 +129,7 @@ func NewTransportControllerForWrappedObjectGVR(ctx context.Context,
 	customTransformsClient := wdsClientset.ControlV1alpha1().CustomTransforms()
 	measuredCustomTransformClient := ksmetrics.NewWrappedClusterScopedClient[*v1alpha1.CustomTransform, *v1alpha1.CustomTransformList](wdsClientMetrics, v1alpha1.GroupVersion.WithResource("customtransforms"), customTransformsClient)
 	measuredITSNSClient := ksmetrics.NewWrappedClusterScopedClient[*corev1.Namespace, *corev1.NamespaceList](itsClientMetrics, corev1.SchemeGroupVersion.WithResource("namespaces"), itsNSClient)
-	workqueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
+	workqueue := workqueue.NewTypedRateLimitingQueueWithConfig(workqueue.DefaultTypedControllerRateLimiter[any](), workqueue.TypedRateLimitingQueueConfig[any]{Name: ControllerName})
 
 	transportController := &genericTransportController{
 		logger:                        klog.FromContext(ctx),
@@ -340,7 +340,7 @@ type genericTransportController struct {
 	// easy to ensure we are never processing the same item simultaneously in two different workers.
 	// An item can be either of two types: a string holding the name of a Binding, or a
 	// recollectProperties holding the name of a inventory object.
-	workqueue workqueue.RateLimitingInterface
+	workqueue workqueue.TypedRateLimitingInterface[any]
 
 	transport        transport.Transport //transport is a specific implementation for the transport interface.
 	transportClient  dynamic.Interface   // dynamic client to transport wrapped object. since object kind is unknown during complilation, we use dynamic
