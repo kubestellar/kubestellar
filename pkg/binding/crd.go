@@ -152,10 +152,10 @@ func (c *Controller) startInformersForNewAPIResources(ctx context.Context, toSta
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-					return c.dynamicClient.Resource(gvr).List(context.TODO(), metav1.ListOptions{})
+					return c.dynamicClient.Resource(gvr).List(context.TODO(), options)
 				},
 				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-					return c.dynamicClient.Resource(gvr).Watch(context.TODO(), metav1.ListOptions{})
+					return c.dynamicClient.Resource(gvr).Watch(context.TODO(), options)
 				},
 			},
 			nil,
