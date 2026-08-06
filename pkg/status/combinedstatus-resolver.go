@@ -264,7 +264,7 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 		}
 
 		// update statuscollectors
-		removedCollectors, addedCollectors := csResolution.setStatusCollectors(c.statusCollectorNameToSpecFromCache(objectData.Modulation.StatusCollectors))
+		removedCollectors, addedCollectors, collectorsNeedEvaluation := csResolution.setStatusCollectors(c.statusCollectorNameToSpecFromCache(objectData.Modulation.StatusCollectors))
 
 		// update destinations
 		removedDestinations, newDestinationsSet := csResolution.setCollectionDestinations(destinationsSet)
@@ -272,6 +272,7 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 		logger.V(5).Info("Updating CombinedStatus resolution", "binding", bindingName, "objectId", objectIdentifier,
 			"introduced", !exists,
 			"removedCollectors", removedCollectors, "addedCollectors", addedCollectors,
+			"collectorsNeedEvaluation", collectorsNeedEvaluation,
 			"removedDestinations", removedDestinations, "newDestinationsSet", newDestinationsSet)
 
 		// should queue the combinedstatus object for syncing if lost collectors / destinations
@@ -280,9 +281,9 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 				objectIdentifier.ObjectName.Namespace))
 		}
 
-		// should evaluate workstatuses if added/updated collectors or added destinations
-		if addedCollectors || len(newDestinationsSet) > 0 {
-			workloadIdentifiersToEvaluate.Insert(objectIdentifier) // TODO: this can be optimized through tightening
+		// should evaluate workstatuses if evaluable collectors were added/updated or destinations were added
+		if collectorsNeedEvaluation || len(newDestinationsSet) > 0 {
+			workloadIdentifiersToEvaluate.Insert(objectIdentifier)
 		}
 		return nil
 	})

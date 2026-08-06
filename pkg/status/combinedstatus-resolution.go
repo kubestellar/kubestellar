@@ -182,20 +182,24 @@ func (c *combinedStatusResolution) setCollectionDestinations(destinationsSet set
 // and the specs in it are immutable.
 // The given map has an entry for every relevant StatusCollector name,
 // but a `nil` spec pointer if the collector does not exist now.
-// The function returns a tuple (removedSome, addedSome):
+// The function returns a tuple (removedSome, addedSome, evalNeeded):
 //
 // - removedSome: true if one or more statuscollectors were removed.
 //
-// - addedSome: true if one or more statuscollectors were added.
-func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec map[string]*v1alpha1.StatusCollectorSpec) (bool, bool) {
+// - addedSome: true if one or more statuscollectors were added or updated.
+//
+// - evalNeeded: true if workstatuses should be re-evaluated because an
+// 	 evaluable statuscollector was added or its spec changed. Adding a
+// 	 placeholder for a missing StatusCollector does not set evalNeeded.
+func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec map[string]*v1alpha1.StatusCollectorSpec) (bool, bool, bool) {
 	c.Lock()
 	defer c.Unlock()
 
-	removedSome, addedSome := false, false
+	removedSome, addedSome, evalNeeded := false, false, false
 
 	// remove entries for collectors that are not relevant anymore and update the
 	// statuscollector data that are. If one of the latter is updated, mark it as added
-	for statusCollectorName, statusCollectorData := range c.StatusCollectorNameToData {
+	for statusCollectorName, scData := range c.StatusCollectorNameToData {
 		statusCollectorSpec, ok := statusCollectorNameToSpec[statusCollectorName]
 		if !ok {
 			delete(c.StatusCollectorNameToData, statusCollectorName)
@@ -203,9 +207,22 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 			continue
 		}
 
-		if statusCollectorSpec != nil && (statusCollectorData == nil || !statusCollectorSpecsMatch(statusCollectorData.collectorSpec, statusCollectorSpec)) {
-			c.StatusCollectorNameToData[statusCollectorName].collectorSpec = statusCollectorSpec
+		if statusCollectorSpec == nil {
+			continue
+		}
+		if scData == nil {
+			c.StatusCollectorNameToData[statusCollectorName] = &statusCollectorData{
+				collectorSpec: statusCollectorSpec,
+				WECToData:     make(map[string]*workStatusData),
+			}
 			addedSome = true
+			evalNeeded = true
+			continue
+		}
+		if !statusCollectorSpecsMatch(scData.collectorSpec, statusCollectorSpec) {
+			scData.collectorSpec = statusCollectorSpec
+			addedSome = true
+			evalNeeded = true
 		}
 	}
 
@@ -219,13 +236,14 @@ func (c *combinedStatusResolution) setStatusCollectors(statusCollectorNameToSpec
 					collectorSpec: statusCollectorSpec,
 					WECToData:     make(map[string]*workStatusData),
 				}
+				evalNeeded = true
 			}
 
 			addedSome = true
 		}
 	}
 
-	return removedSome, addedSome
+	return removedSome, addedSome, evalNeeded
 }
 
 // updateStatusCollector updates the status collector data in the
