@@ -138,13 +138,13 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 	}
 
 	if wantSingleton && !haveSingleton {
-		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), true, util.BindingPolicyLabelSingletonStatusKey)
+		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), true, util.BindingPolicyLabelSingletonStatusKey, false)
 		if err != nil {
 			return err
 		}
 	}
 	if wantMultiWEC && !haveMultiWEC {
-		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), true, util.BindingPolicyLabelMultiWECStatusKey)
+		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), true, util.BindingPolicyLabelMultiWECStatusKey, false)
 		if err != nil {
 			return err
 		}
@@ -155,6 +155,8 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 	if apiequality.Semantic.DeepEqual(unstrObj.Object["status"], status) {
 		logger.V(5).Info("Workload object found to already have intended status", "objectIdentifier", objectIdentifier)
 	} else {
+		// DeepCopy before mutating to avoid corrupting the informer cache.
+		unstrObj = unstrObj.DeepCopy()
 		// set the status and update the object
 		unstrObj.Object["status"] = status
 
@@ -172,14 +174,14 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 	}
 
 	if haveSingleton && !wantSingleton {
-		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, util.BindingPolicyLabelSingletonStatusKey)
+		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, util.BindingPolicyLabelSingletonStatusKey, true)
 		if err != nil {
 			return err
 		}
 	}
 
 	if haveMultiWEC && !wantMultiWEC {
-		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, util.BindingPolicyLabelMultiWECStatusKey)
+		err = c.handleStatusReturnLabel(ctx, unstrObj, objectIdentifier.GVR(), false, util.BindingPolicyLabelMultiWECStatusKey, true)
 		if err != nil {
 			return err
 		}
@@ -189,7 +191,7 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 }
 
 func (c *Controller) handleStatusReturnLabel(ctx context.Context, unstructuredObj *unstructured.Unstructured,
-	objGVR schema.GroupVersionResource, wantLabel bool, labelKey string) error {
+	objGVR schema.GroupVersionResource, wantLabel bool, labelKey string, alreadyCopied bool) error {
 
 	labels := unstructuredObj.GetLabels() // gets a copy of the labels
 	_, foundLabel := labels[labelKey]
@@ -206,7 +208,9 @@ func (c *Controller) handleStatusReturnLabel(ctx context.Context, unstructuredOb
 		message = fmt.Sprintf("Removed %s label from workload object", labelKey)
 		delete(labels, labelKey)
 	}
-	unstructuredObj = unstructuredObj.DeepCopy() // avoid mutating the original object
+	if !alreadyCopied {
+		unstructuredObj = unstructuredObj.DeepCopy() // avoid mutating the original object
+	}
 	unstructuredObj.SetLabels(labels)
 	namespace := unstructuredObj.GetNamespace()
 	rscIfc := util.DynamicForResource(c.wdsDynClient, objGVR, namespace)
