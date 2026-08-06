@@ -1,6 +1,6 @@
 # KubeStellar Hub Setup
 
-This document is is excerpted from [our example scenarios](examples.md) document to show two ways of deploying the kubestellar hub (core) components to create the "common setup" used by those examples.
+This document is excerpted from [our example scenarios](examples.md) document to show two ways of deploying the kubestellar hub (core) components to create the "common setup" used by those examples.
 
 
 ## Common Setup
