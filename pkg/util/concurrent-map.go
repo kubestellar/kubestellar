@@ -90,14 +90,17 @@ func (mm *rwMutexMap[K, V]) Get(key K) (V, bool) {
 // If the map is mutated during the iteration, the behavior is undefined.
 func (mm *rwMutexMap[K, V]) Iterator(yield func(K, V) error) error {
 	mm.RLock()
-	defer mm.RUnlock()
-
+	snapshot := make(map[K]V, len(mm.m))
 	for k, v := range mm.m {
+		snapshot[k] = v
+	}
+	mm.RUnlock()
+
+	for k, v := range snapshot {
 		if err := yield(k, v); err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
