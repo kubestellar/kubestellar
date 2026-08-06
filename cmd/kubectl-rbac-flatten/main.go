@@ -46,8 +46,6 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
 
-//const noNamespace = "**"
-
 type NamespacedName = apimachtypes.NamespacedName
 
 func main() {
