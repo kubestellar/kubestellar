@@ -41,9 +41,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	k8sschema "k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/apimachinery/pkg/util/sets"
 	dynamicfake "k8s.io/client-go/dynamic/fake"
 	k8sinformers "k8s.io/client-go/informers"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
+	k8smetrics "k8s.io/component-base/metrics"
 	"k8s.io/component-base/metrics/legacyregistry"
 	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/ktesting"
@@ -279,7 +281,6 @@ func (tt *testTransport) WrapObjects(wrapees []transport.Wrapee, kindToResource 
 	tt.extra = []any{}
 	for _, wrapee := range wrapees {
 		obj := wrapee.Object
-		// TODO: test wrapee.CreateOnly
 		key := util.RefToRuntimeObj(obj)
 		delete(tt.missed, key.String())
 		if expectedJMTW, found := tt.expect[key]; found {
@@ -437,4 +438,265 @@ func TestGenericController(t *testing.T) {
 	} else {
 		logger.Info("Success", "objects", len(objs), "numExpected", len(transport.expect))
 	}
+}
+
+func TestCreateOnly(t *testing.T) {
+	scheme := runtime.NewScheme()
+	k8score.AddToScheme(scheme)
+	k8snetv1.AddToScheme(scheme)
+	k8sautoscalingapiv2.AddToScheme(scheme)
+	rbacv1.AddToScheme(scheme)
+	clusterapi.AddToScheme(scheme)
+	workapi.AddToScheme(scheme)
+	ksapi.AddToScheme(scheme)
+
+	logger, ctx := ktesting.NewTestContext(t)
+
+	// Create test objects in WDS
+	configMap1 := &k8score.ConfigMap{
+		TypeMeta: typeMeta("ConfigMap", k8score.SchemeGroupVersion),
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "cm1",
+			Namespace:       "ns1",
+			ResourceVersion: "100",
+		},
+	}
+	configMap2 := &k8score.ConfigMap{
+		TypeMeta: typeMeta("ConfigMap", k8score.SchemeGroupVersion),
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "cm2",
+			Namespace:       "ns1",
+			ResourceVersion: "200",
+		},
+	}
+
+	wdsK8sObjs := []runtime.Object{
+		&k8score.Namespace{
+			TypeMeta:   metav1.TypeMeta{Kind: "Namespace", APIVersion: "v1"},
+			ObjectMeta: metav1.ObjectMeta{Name: "ns1"},
+		},
+		configMap1,
+		configMap2,
+	}
+
+	gvr := metav1.GroupVersionResource{Group: "", Version: "v1", Resource: "configmaps"}
+
+	// Create a binding with createOnly=true for cm1 and createOnly=false for cm2
+	binding := &ksapi.Binding{
+		TypeMeta: typeMeta("Binding", ksapi.GroupVersion),
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "b1",
+		},
+		Spec: ksapi.BindingSpec{
+			Workload: ksapi.DownsyncObjectClauses{
+				NamespaceScope: []ksapi.NamespaceScopeDownsyncClause{
+					{
+						NamespaceScopeDownsyncObject: ksapi.NamespaceScopeDownsyncObject{
+							GroupVersionResource: gvr,
+							Namespace:            "ns1",
+							Name:                 "cm1",
+							ResourceVersion:      "100",
+						},
+						DownsyncModulation: ksapi.DownsyncModulation{
+							CreateOnly: true,
+						},
+					},
+					{
+						NamespaceScopeDownsyncObject: ksapi.NamespaceScopeDownsyncObject{
+							GroupVersionResource: gvr,
+							Namespace:            "ns1",
+							Name:                 "cm2",
+							ResourceVersion:      "200",
+						},
+						DownsyncModulation: ksapi.DownsyncModulation{
+							CreateOnly: false,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	wdsKsObjs := []runtime.Object{binding}
+	wdsKsClientFake := ksclientfake.NewSimpleClientset(wdsKsObjs...)
+	wdsKsInformerFactory := ksinformers.NewSharedInformerFactory(wdsKsClientFake, 0*time.Minute)
+	wdsDynamicClient := dynamicfake.NewSimpleDynamicClient(scheme, wdsK8sObjs...)
+	itsDynamicClient := dynamicfake.NewSimpleDynamicClient(scheme)
+	wdsControlInformers := wdsKsInformerFactory.Control().V1alpha1()
+
+	transport := &createOnlyTestTransport{}
+
+	wrapperGVR := workapi.GroupVersion.WithResource("manifestworks")
+	inventoryClientFake := clusterclientfake.NewSimpleClientset()
+	inventoryInformerFactory := clusterinformers.NewSharedInformerFactory(inventoryClientFake, 0*time.Second)
+	inventoryPreInformer := inventoryInformerFactory.Cluster().V1().ManagedClusters()
+	itsK8sClientFake := k8sfake.NewSimpleClientset()
+	itsK8sInformerFactory := k8sinformers.NewSharedInformerFactory(itsK8sClientFake, 0*time.Minute)
+	parmCfgMapPreInformer := itsK8sInformerFactory.Core().V1().ConfigMaps()
+	spacesClientMetrics := ksmetrics.NewMultiSpaceClientMetrics()
+	// Use local registry to initialize metrics without global duplication
+	localReg := k8smetrics.NewKubeRegistry()
+	ksmetrics.MustRegister(localReg.Register, spacesClientMetrics)
+	wdsClientMetrics := spacesClientMetrics.MetricsForSpace("wds")
+	itsClientMetrics := spacesClientMetrics.MetricsForSpace("its")
+
+	ctlr := NewTransportControllerForWrappedObjectGVR(ctx, wdsClientMetrics, itsClientMetrics,
+		inventoryPreInformer, wdsKsClientFake.ControlV1alpha1().Bindings(),
+		wdsControlInformers.Bindings(), wdsControlInformers.CustomTransforms(),
+		transport,
+		wdsKsClientFake,
+		wdsDynamicClient,
+		itsK8sClientFake.CoreV1().Namespaces(), parmCfgMapPreInformer,
+		itsDynamicClient, 500*1024, 500*1024, "test-wds", wrapperGVR)
+
+	inventoryInformerFactory.Start(ctx.Done())
+	wdsKsInformerFactory.Start(ctx.Done())
+	itsK8sInformerFactory.Start(ctx.Done())
+
+	go ctlr.Run(ctx, 4)
+
+	// Wait for the controller to sync and WrapObjects to be called
+	err := wait.PollUntilContextTimeout(ctx, 100*time.Millisecond, 10*time.Second, false, func(ctx context.Context) (done bool, err error) {
+		transport.Lock()
+		defer transport.Unlock()
+		if len(transport.wrapees) == 2 {
+			return true, nil
+		}
+		return false, nil
+	})
+	if err != nil {
+		t.Fatalf("Never got right call to WrapObjects, got %d wrapees", len(transport.wrapees))
+	}
+
+	// Validate CreateOnly values (Success scenario)
+	foundCM1 := false
+	foundCM2 := false
+	for _, w := range transport.wrapees {
+		logger.Info("Checking wrapee in transport", "name", w.Object.GetName(), "createOnly", w.CreateOnly)
+		if w.Object.GetName() == "cm1" {
+			foundCM1 = true
+			if !w.CreateOnly {
+				t.Errorf("Expected cm1 to have CreateOnly=true, got false")
+			}
+		}
+		if w.Object.GetName() == "cm2" {
+			foundCM2 = true
+			if w.CreateOnly {
+				t.Errorf("Expected cm2 to have CreateOnly=false, got true")
+			}
+		}
+	}
+	if !foundCM1 || !foundCM2 {
+		t.Errorf("Did not find both expected configmaps (cm1: %v, cm2: %v)", foundCM1, foundCM2)
+	}
+}
+
+type createOnlyTestTransport struct {
+	sync.Mutex
+	wrapees []transport.Wrapee
+}
+
+func (c *createOnlyTestTransport) WrapObjects(wrapees []transport.Wrapee, kindToResource func(k8sschema.GroupKind) string) runtime.Object {
+	c.Lock()
+	defer c.Unlock()
+	c.wrapees = wrapees
+	return &workapi.ManifestWork{
+		TypeMeta: typeMeta("ManifestWork", workapi.GroupVersion),
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: "foo",
+			Name:      "bar",
+		},
+	}
+}
+
+func (c *createOnlyTestTransport) UnwrapObjects(wrapped runtime.Object, kindToResource func(k8sschema.GroupKind) (string, bool)) (transport.Gloss, error) {
+	return transport.Gloss{}, nil
+}
+
+type dummyCustomTransformCollection struct{}
+
+func (d *dummyCustomTransformCollection) getCustomTransformChanges(ctx context.Context, groupResource metav1.GroupResource, bindingName string) customTransformChanges {
+	return customTransformChanges{}
+}
+
+func (d *dummyCustomTransformCollection) noteCustomTransform(ctx context.Context, name string, ct *ksapi.CustomTransform) {}
+
+func (d *dummyCustomTransformCollection) setBindingGroupResources(bindingName string, newGroupResources sets.Set[metav1.GroupResource]) {}
+
+func TestTestTransportCreateOnlyValidation(t *testing.T) {
+	dummyCTC := &dummyCustomTransformCollection{}
+
+	// Success Scenario: wrapee.CreateOnly matches expectedJMTW.createOnly
+	t.Run("Success scenario", func(t *testing.T) {
+		mockT := &testing.T{}
+		obj := &unstructured.Unstructured{}
+		obj.SetName("obj1")
+		obj.SetNamespace("ns1")
+		obj.SetKind("ConfigMap")
+		obj.SetAPIVersion("v1")
+		key := util.RefToRuntimeObj(obj)
+
+		tt := &testTransport{
+			t:              mockT,
+			ctx:            context.Background(),
+			bindingName:    "b1",
+			ctc:            dummyCTC,
+			kindToResource: map[metav1.GroupKind]string{{Group: "", Kind: "ConfigMap"}: "configmaps"},
+			expect: map[util.GKObjRef]jsonMapToWrap{
+				key: {
+					jm:         obj.UnstructuredContent(),
+					createOnly: true,
+				},
+			},
+		}
+
+		wrapees := []transport.Wrapee{
+			{
+				Object:     obj,
+				CreateOnly: true,
+			},
+		}
+
+		tt.WrapObjects(wrapees, func(gk k8sschema.GroupKind) string { return "configmaps" })
+		if mockT.Failed() {
+			t.Errorf("Success scenario failed, but it should have succeeded")
+		}
+	})
+
+	// Failure Scenario: wrapee.CreateOnly mismatch
+	t.Run("Failure scenario", func(t *testing.T) {
+		mockT := &testing.T{}
+		obj := &unstructured.Unstructured{}
+		obj.SetName("obj1")
+		obj.SetNamespace("ns1")
+		obj.SetKind("ConfigMap")
+		obj.SetAPIVersion("v1")
+		key := util.RefToRuntimeObj(obj)
+
+		tt := &testTransport{
+			t:              mockT,
+			ctx:            context.Background(),
+			bindingName:    "b1",
+			ctc:            dummyCTC,
+			kindToResource: map[metav1.GroupKind]string{{Group: "", Kind: "ConfigMap"}: "configmaps"},
+			expect: map[util.GKObjRef]jsonMapToWrap{
+				key: {
+					jm:         obj.UnstructuredContent(),
+					createOnly: true, // expect true
+				},
+			},
+		}
+
+		wrapees := []transport.Wrapee{
+			{
+				Object:     obj,
+				CreateOnly: false, // but got false
+			},
+		}
+
+		tt.WrapObjects(wrapees, func(gk k8sschema.GroupKind) string { return "configmaps" })
+		if !mockT.Failed() {
+			t.Errorf("Failure scenario succeeded, but it should have failed due to mismatch")
+		}
+	})
 }
