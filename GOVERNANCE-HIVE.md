@@ -81,6 +81,8 @@ majority vote of the KubeStellar Steering Committee.
 | Name           | GitHub                                            | Role       |
 |----------------|---------------------------------------------------|------------|
 | Andy Anderson  | [@clubanderson](https://github.com/clubanderson)  | Maintainer |
+| James Reilly   | [@hanthor](https://github.com/hanthor)            | Maintainer |
+| Doug Baggett   | [@Danathar](https://github.com/Danathar)          | Maintainer |
 
 ## Contributor Ladder
 
