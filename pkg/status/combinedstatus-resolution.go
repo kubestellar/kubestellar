@@ -1228,16 +1228,17 @@ func objectIsQueried(query *string, obj string) bool {
 	idx := 0
 
 	for {
-		idx = strings.Index((*query)[idx:], obj) // slices share the same storage, therefore efficient
-		if idx == -1 {
+		rel := strings.Index((*query)[idx:], obj) // relative offset within the slice
+		if rel == -1 {
 			return false
 		}
 
-		if isWholeWord(query, idx, len(obj)) {
+		abs := idx + rel // convert to absolute index in the original string
+		if isWholeWord(query, abs, len(obj)) {
 			return true
 		}
 
-		idx += len(obj)
+		idx = abs + len(obj)
 	}
 }
 
