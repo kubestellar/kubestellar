@@ -1,0 +1,71 @@
+{{- if and .Values.argocd.install .Values.InstallPCHs }}
+apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+kind: PostCreateHook
+metadata:
+  name: argocd-wds-registration
+  labels:
+    kflex.kubestellar.io/cptype: wds
+spec:
+  templates:
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: '{{"{{.HookName}}"}}'
+    spec:
+      template:
+        spec:
+          volumes:
+          - name: wds-kubeconfig-volume
+            secret:
+              secretName: '{{"{{.WDSSecretName}}"}}'
+          containers:
+          - name: create-argocd-secret
+            image: quay.io/kubestellar/kubectl:{{$.Values.KUBECTL_VERSION}}
+            command: ["/bin/bash", "-c"]
+            args:
+            - |
+              set -e
+              echo "Starting ArgoCD Registration for WDS: {{"{{.ControlPlaneName}}"}}"
+              KUBECONFIG_FILE=$(find /etc/kube/wds -type f -not -name '..*' | head -n 1)
+              if [ -z "$KUBECONFIG_FILE" ]; then
+                echo "Error: No kubeconfig file found in /etc/kube/wds"
+                exit 1
+              fi
+              SERVER=$(kubectl --kubeconfig "$KUBECONFIG_FILE" config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+              CA_DATA=$(kubectl --kubeconfig "$KUBECONFIG_FILE" config view --minify -o jsonpath='{.clusters[0].cluster.certificate-authority-data}')
+              CERT_DATA=$(kubectl --kubeconfig "$KUBECONFIG_FILE" config view --minify -o jsonpath='{.users[0].user.client-certificate-data}')
+              KEY_DATA=$(kubectl --kubeconfig "$KUBECONFIG_FILE" config view --minify -o jsonpath='{.users[0].user.client-key-data}')
+              CP_UID=$(kubectl get controlplane {{"{{.ControlPlaneName}}"}} -o jsonpath='{.metadata.uid}')
+              echo "Found ControlPlane UID: $CP_UID. Linking Secret for garbage collection."
+              CONFIG_JSON="{\"tlsClientConfig\":{\"insecure\":false,\"caData\":\"$CA_DATA\",\"certData\":\"$CERT_DATA\",\"keyData\":\"$KEY_DATA\"}}"
+              echo "Creating ArgoCD Cluster Secret..."
+              cat <<INNEREOF | kubectl apply -f -
+              apiVersion: v1
+              kind: Secret
+              metadata:
+                name: {{"{{.ControlPlaneName}}"}}-cluster
+                namespace: argocd
+                labels:
+                  argocd.argoproj.io/secret-type: cluster
+                  kflex.kubestellar.io/cptype: wds
+                ownerReferences:
+                - apiVersion: tenancy.kflex.kubestellar.org/v1alpha1
+                  kind: ControlPlane
+                  name: {{"{{.ControlPlaneName}}"}}
+                  uid: $CP_UID
+                  controller: true
+                  blockOwnerDeletion: true
+              type: Opaque
+              stringData:
+                name: {{"{{.ControlPlaneName}}"}}
+                server: $SERVER
+                config: '$CONFIG_JSON'
+              INNEREOF
+              echo "Success! WDS registered with ArgoCD."
+            volumeMounts:
+            - name: wds-kubeconfig-volume
+              mountPath: /etc/kube/wds
+              readOnly: true
+          restartPolicy: Never
+      backoffLimit: 1
+{{- end }}
