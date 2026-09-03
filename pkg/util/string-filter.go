@@ -30,15 +30,18 @@ type StringFilterOptions struct {
 	Literals  []string
 }
 
+// NewStringFilterOptions creates a StringFilterOptions initialized with the provided literals.
 func NewStringFilterOptions(literals ...string) StringFilterOptions {
 	return StringFilterOptions{Literals: literals}
 }
 
+// SeparateBySpacesToo enables space-separation parsing and returns the modified StringFilterOptions.
 func (sfo StringFilterOptions) SeparateBySpacesToo() StringFilterOptions {
 	sfo.SpacesToo = true
 	return sfo
 }
 
+// AddToFlags binds the literals in this StringFilterOptions to a flag in the provided FlagSet.
 func (sfo *StringFilterOptions) AddToFlags(flagSet *pflag.FlagSet, flagName, what string) {
 	sep := "comma"
 	if sfo.SpacesToo {
@@ -53,6 +56,7 @@ type StringFilter struct {
 	Literals sets.Set[string]
 }
 
+// ToFilter converts the options into a StringFilter and returns whether any literals were provided.
 func (sfo StringFilterOptions) ToFilter() (StringFilter, bool) {
 	gotSome := len(sfo.Literals) > 0
 	ansSet := sets.New[string]()
@@ -77,10 +81,14 @@ func (sfo StringFilterOptions) ToFilter() (StringFilter, bool) {
 	return StringFilter{Literals: ansSet}, gotSome
 }
 
+// Passes returns true if the candidate string matches the filter criteria or if the filter allows all.
 func (sf *StringFilter) Passes(candidate string, passStar bool) bool {
 	return sf.AllPass || passStar && candidate == "*" || sf.Literals.Has(candidate)
 }
 
+// FilterSlice filters a slice of candidate strings, returning only those that pass the filter criteria.
+// It iterates through each candidate and applies the StringFilter predicate to determine inclusion.
+// (as evaluated by the Passes predicate).
 func (sf *StringFilter) FilterSlice(candidates []string, passStar bool) []string {
 	ans := make([]string, 0, len(candidates))
 	for _, candidate := range candidates {
