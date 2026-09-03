@@ -75,20 +75,61 @@ func (fn FieldNode) Remove() {
 	delete(fn.Object, fn.Key)
 }
 
+// ArrayItemNode is an element of a JSON array
+type ArrayItemNode struct {
+	Slice []any
+	Index int
+}
+
+var _ Node = ArrayItemNode{}
+
+func (an ArrayItemNode) Get() (JSONValue, bool) {
+	if an.Index < 0 || an.Index >= len(an.Slice) {
+		return nil, false
+	}
+	return an.Slice[an.Index], true
+}
+
+func (an ArrayItemNode) Remove() {
+	if an.Index >= 0 && an.Index < len(an.Slice) {
+		an.Slice[an.Index] = nil
+	}
+}
+
 // QueryValue applies `query` to `node`, invoking `yield` on each
 // of the nodes that the query produces, in a context where the document
 // root is `root`.
 func QueryValue(query Query, node Node, yield func(Node)) {
-	for _, fieldName := range query {
-		objA, ok := node.Get()
-		if !ok {
-			return
-		}
-		objM, ok := objA.(map[string]any)
-		if !ok {
-			return
-		}
-		node = FieldNode{objM, fieldName}
+	queryValueHelper(query, node, yield)
+}
+
+func queryValueHelper(query Query, node Node, yield func(Node)) {
+	if len(query) == 0 {
+		yield(node)
+		return
 	}
-	yield(node)
+
+	segment := query[0]
+	val, ok := node.Get()
+	if !ok {
+		return
+	}
+
+	if segment.Kind == SegmentKindField {
+		objM, ok := val.(map[string]any)
+		if !ok {
+			return
+		}
+		nextNode := FieldNode{Object: objM, Key: segment.Name}
+		queryValueHelper(query[1:], nextNode, yield)
+	} else if segment.Kind == SegmentKindWildcard {
+		sliceVal, ok := val.([]any)
+		if !ok {
+			return
+		}
+		for i := range sliceVal {
+			nextNode := ArrayItemNode{Slice: sliceVal, Index: i}
+			queryValueHelper(query[1:], nextNode, yield)
+		}
+	}
 }
