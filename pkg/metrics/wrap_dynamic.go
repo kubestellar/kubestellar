@@ -48,6 +48,7 @@ type wrappedDynamicModNamespace struct {
 	Inner dynamic.ResourceInterface
 }
 
+// NewWrappedDynamicClient wraps a dynamic client to provide metrics for API calls.
 func NewWrappedDynamicClient(clientMetrics ClientMetrics, inner dynamic.Interface) MeasuredDynamicClient {
 	return &wrappedDynamicClient{
 		Inner:         inner,
