@@ -30,11 +30,11 @@ The following are applied to every workload object.
 
 In a `Service` (core API group) object:
 
-1. remove the following fields from `spec`: `ipFamilies`, `externalTrafficPolicy`, `internalTrafficPolicy`, `ipFamilyPolicy`, `sessionAffinity`. Also remove the `nodePort` field from every port unless the annotation `control.kubestellar.io/preserve=nodeport` is present.
+1. remove the following fields from `spec`: `ipFamilies`, `externalTrafficPolicy`, `internalTrafficPolicy`, `ipFamilyPolicy`, `sessionAffinity`. Also remove the `nodePort` field from every port unless the annotation `control.kubestellar.io/preserve` has a comma-separated value that includes `nodeport`.
 
-1. in the `spec` remove the field `clusterIP` unless it is present with value "None".
+1. in the `spec` remove the field `clusterIP` unless it is present with value "None", or the annotation `control.kubestellar.io/preserve` has a comma-separated value that includes `clusterip`.
 
-1. in the `spec`: if the field `clusterIPs` (which holds an array of strings) is present and those strings include "None" then keep it present holding only "None", otherwise remove that field if it is present.
+1. in the `spec`: if the field `clusterIPs` (which holds an array of strings) is present and those strings include "None" then keep it present holding only "None", otherwise remove that field if it is present; unless the annotation `control.kubestellar.io/preserve` has a comma-separated value that includes `clusterip`, in which case `clusterIPs` is left unchanged.
 
 In a `Job` (API group `batch`) object, remove the following things.
 
