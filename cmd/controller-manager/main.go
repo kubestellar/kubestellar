@@ -20,8 +20,8 @@ package main
 // to ensure that exec-entrypoint and run can make use of them.
 
 import (
+	"errors"
 	"flag"
-	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -111,7 +111,7 @@ func main() {
 		strings.ToLower(binding.ControllerName),
 		strings.ToLower(status.ControllerName),
 	).IsSuperset(ctlrsToStart) {
-		setupLog.Error(fmt.Errorf("unknown controller specified"), "'controllers' flag has incorrect value")
+		setupLog.Error(errors.New("unknown controller specified"), "'controllers' flag has incorrect value")
 		os.Exit(1)
 	}
 
