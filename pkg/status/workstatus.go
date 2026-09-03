@@ -156,6 +156,7 @@ func (c *Controller) updateObjectStatus(ctx context.Context, objectIdentifier ut
 		logger.V(5).Info("Workload object found to already have intended status", "objectIdentifier", objectIdentifier)
 	} else {
 		// set the status and update the object
+		unstrObj = unstrObj.DeepCopy()
 		unstrObj.Object["status"] = status
 
 		rscIfc := util.DynamicForResource(c.wdsDynClient, gvr, unstrObj.GetNamespace())
@@ -231,16 +232,25 @@ func runtimeObjectToWorkStatus(obj runtime.Object) (*workStatus, error) {
 		return nil, err
 	}
 
+	mObj, ok := obj.(metav1.Object)
+	if !ok {
+		return nil, fmt.Errorf("failed to cast object to metav1.Object")
+	}
+
 	return &workStatus{
 		workStatusRef:  *ref,
 		status:         status,
-		lastUpdateTime: getObjectStatusLastUpdateTime(obj.(metav1.Object)),
+		lastUpdateTime: getObjectStatusLastUpdateTime(mObj),
 	}, nil
 }
 
 func runtimeObjectToWorkStatusRef(obj runtime.Object) (*workStatusRef, error) {
-	name := obj.(metav1.Object).GetName()
-	wecName := obj.(metav1.Object).GetNamespace()
+	mObj, ok := obj.(metav1.Object)
+	if !ok {
+		return nil, fmt.Errorf("failed to cast object to metav1.Object")
+	}
+	name := mObj.GetName()
+	wecName := mObj.GetNamespace()
 
 	sourceRef, err := util.GetWorkStatusSourceRef(obj)
 	if err != nil {
