@@ -152,7 +152,7 @@ The Latency Controller exposes the following Prometheus metrics:
 - **kubestellar_downsync_duration_seconds**: End-to-end time from WDS to WEC object creation  
 - **kubestellar_statusPropagation_report_duration_seconds**: Time for status to flow back from WEC to Workstatus status 
 - **kubestellar_statusPropagation_finalization_duration_seconds**: Time for status to flow back from Workstatus to WDS  
-- **kubestellar_statusPropagation_duration_seconds** Total time for status to flow back from WEC to WDS sttus updation
+- **kubestellar_statusPropagation_duration_seconds** Total time for status to flow back from WEC to WDS status update
 - **kubestellar_e2e_latency_duration_seconds**: Complete cycle from workload creation to status update 
 - **kubestellar_workload_count**: Number of workload objects deployed in clusters   
 

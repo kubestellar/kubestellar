@@ -19,7 +19,47 @@ Please read the following guidelines if you're interested in contributing to Kub
 
 Please make sure that your environment has all the necessary versions as spelled out in the prerequisites section of our [user guide](docs/content/direct/pre-reqs.md)
 
+### Pre-commit Hooks
+
+We use `pre-commit` to run checks on changes before they are committed, including secret detection and documentation spell-checking.
+
+#### Prerequisites
+
+To use local pre-commit hooks, you must install the following tools on your local system:
+
+1. **pre-commit**: Install using one of:
+   - Homebrew (macOS): `brew install pre-commit`
+   - Python package manager (pip): `pip install pre-commit`
+   
+2. **aspell** (with English language pack): Required by PySpelling for documentation spellcheck.
+   - macOS: `brew install aspell` (English dictionary is included by default)
+   - Ubuntu/Debian: `sudo apt-get install aspell aspell-en`
+   - Fedora/CentOS/RHEL: `sudo dnf install aspell aspell-en`
+
+#### Setup
+
+After installing the prerequisites, enable the pre-commit hooks by running:
+
+```bash
+pre-commit install
+```
+
+#### Running Hooks Manually
+
+You can run the hooks manually on all files in the repository at any time:
+
+```bash
+pre-commit run --all-files
+```
+
+Or run only the spellcheck hook:
+
+```bash
+pre-commit run pyspelling --all-files
+```
+
 ### Issues
+
 
 **Before reporting a new issue, please search our [issue archive](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue) (including closed issues) to see if it has already been reported or resolved.**
 
