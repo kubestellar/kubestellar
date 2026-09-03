@@ -313,6 +313,18 @@ func getFlat(ctx context.Context, client auth_client.RbacV1Interface, rscMap res
 		complainCS, complainNR := false, false
 		complainedResources := sets.New[metav1.GroupResource]()
 		for ruleIdx, rule := range rules {
+			if len(rule.NonResourceURLs) > 0 {
+				pr := PolicyRule{
+					Verbs:            verbFilter.FilterSlice(rule.Verbs, true),
+					NonResourcePaths: rule.NonResourceURLs,
+				}
+				for _, subj := range subjects {
+					if subjFilter.Passes(subj) {
+						ans = append(ans, Tuple{Binding: source, RoleInCluster: roleInCluster, RoleName: roleName, Subject: subj, Rule: pr})
+					}
+				}
+				continue
+			}
 			ruledResources := composeRuleResources(rscMap, rule.APIGroups, rule.Resources)
 			if len(ruledResources) == 0 {
 				complainNR = true
