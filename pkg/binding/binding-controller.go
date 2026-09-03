@@ -24,12 +24,14 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
+	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/time/rate"
 	clusterclientset "open-cluster-management.io/api/client/cluster/clientset/versioned"
 	clusterpkginformers "open-cluster-management.io/api/client/cluster/informers/externalversions"
 	clusterinformers "open-cluster-management.io/api/client/cluster/informers/externalversions/cluster/v1"
 	clusterlisters "open-cluster-management.io/api/client/cluster/listers/cluster/v1"
 	managedclusterapi "open-cluster-management.io/api/cluster/v1"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
 
 	k8scoreapi "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -60,6 +62,30 @@ import (
 	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 	"github.com/kubestellar/kubestellar/pkg/util"
 )
+
+var (
+	bindingReconcileDuration = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name:    "kubestellar_binding_reconcile_duration_seconds",
+			Help:    "Time taken to reconcile binding controller workqueue items",
+			Buckets: prometheus.DefBuckets,
+		},
+		[]string{"item_type", "outcome"},
+	)
+
+	bindingReconcileTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "kubestellar_binding_reconcile_total",
+			Help: "Total number of reconciliations processed by binding controller",
+		},
+		[]string{"item_type", "outcome"},
+	)
+)
+
+func init() {
+	metrics.Registry.MustRegister(bindingReconcileDuration)
+	metrics.Registry.MustRegister(bindingReconcileTotal)
+}
 
 const (
 	ControllerName      = "Binding"
@@ -693,15 +719,21 @@ func (c *Controller) runWorker(ctx context.Context) {
 }
 
 // processNextWorkItem reads a single work item off the workqueue and
-// attempt to process it by calling the reconcile.
+// attempts to process it by calling reconcile.
 func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 	logger := klog.FromContext(ctx)
+
 	item, shutdown := c.workqueue.Get()
 	if shutdown {
 		logger.V(1).Info("Worker is done")
 		return false
 	}
-	logger.V(4).Info("Dequeued", "item", item, "type", fmt.Sprintf("%T", item))
+
+	itemType := fmt.Sprintf("%T", item)
+
+	logger.V(4).Info("Dequeued", "item", item, "type", itemType)
+
+	start := time.Now()
 
 	// We wrap this block in a func so we can defer c.workqueue.Done.
 	err := func() error {
@@ -712,16 +744,54 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 		// put back on the workqueue and attempted again after a back-off
 		// period.
 		defer c.workqueue.Done(item)
+
 		// Run the reconciler, passing it the full object identifier
 		if err := c.reconcile(ctx, item); err != nil {
 			// Put the item back on the workqueue to handle any transient errors.
 			c.workqueue.AddRateLimited(item)
-			return fmt.Errorf("error reconciling object (identifier: %#v, type: %T): %s, requeuing", item, item, err.Error())
+
+			duration := time.Since(start).Seconds()
+
+			bindingReconcileDuration.
+				WithLabelValues(itemType, "error").
+				Observe(duration)
+
+			bindingReconcileTotal.
+				WithLabelValues(itemType, "error").
+				Inc()
+
+			return fmt.Errorf(
+				"error reconciling object (identifier: %#v, type: %T): %w, requeuing",
+				item,
+				item,
+				err,
+			)
 		}
+
 		// Finally, if no error occurs we Forget this item so it does not
 		// get queued again until another change happens.
 		c.workqueue.Forget(item)
-		logger.V(4).Info("Successfully reconciled", "objectIdentifier", item, "type", fmt.Sprintf("%T", item))
+
+		duration := time.Since(start).Seconds()
+
+		bindingReconcileDuration.
+			WithLabelValues(itemType, "success").
+			Observe(duration)
+
+		bindingReconcileTotal.
+			WithLabelValues(itemType, "success").
+			Inc()
+
+		logger.V(4).Info(
+			"Successfully reconciled",
+			"objectIdentifier",
+			item,
+			"type",
+			itemType,
+			"durationSeconds",
+			duration,
+		)
+
 		return nil
 	}()
 
