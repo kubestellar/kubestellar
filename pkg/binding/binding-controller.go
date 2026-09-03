@@ -150,7 +150,7 @@ type Controller struct {
 	bindingPolicyResolver BindingPolicyResolver
 
 	// Contains bindingPolicyRef, bindingRef, util.ObjectIdentifier
-	workqueue        workqueue.RateLimitingInterface
+	workqueue        workqueue.TypedRateLimitingInterface[any]
 	initializedTs    time.Time
 	wdsName          string
 	allowedGroupsSet sets.Set[string]
@@ -292,9 +292,9 @@ func makeController(logger logr.Logger,
 	wdsName string, allowedGroupsSet sets.Set[string],
 	workloadObserver WorkloadEventHandler) (*Controller, error) {
 
-	ratelimiter := workqueue.NewMaxOfRateLimiter(
-		workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
-		&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
+	ratelimiter := workqueue.NewTypedMaxOfRateLimiter[any](
+		workqueue.NewTypedItemExponentialFailureRateLimiter[any](5*time.Millisecond, 1000*time.Second),
+		&workqueue.TypedBucketRateLimiter[any]{Limiter: rate.NewLimiter(rate.Limit(50), 300)},
 	)
 
 	clusterInformer := clusterPreInformer.Informer()
@@ -322,7 +322,7 @@ func makeController(logger logr.Logger,
 		informers:                   util.NewConcurrentMap[schema.GroupVersionResource, cache.SharedIndexInformer](),
 		stoppers:                    util.NewConcurrentMap[schema.GroupVersionResource, chan struct{}](),
 		bindingPolicyResolver:       NewBindingPolicyResolver(),
-		workqueue:                   workqueue.NewRateLimitingQueueWithConfig(ratelimiter, workqueue.RateLimitingQueueConfig{Name: ControllerName + "-" + wdsName}),
+		workqueue:                   workqueue.NewTypedRateLimitingQueueWithConfig(ratelimiter, workqueue.TypedRateLimitingQueueConfig[any]{Name: ControllerName + "-" + wdsName}),
 		allowedGroupsSet:            allowedGroupsSet,
 	}
 
