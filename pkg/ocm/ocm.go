@@ -28,6 +28,7 @@ import (
 	ksmetrics "github.com/kubestellar/kubestellar/pkg/metrics"
 )
 
+// FindClustersBySelectors retrieves a set of managed cluster names that match any of the provided label selectors.
 func FindClustersBySelectors(ctx context.Context, client ksmetrics.ClientModNamespace[*managedclusterapi.ManagedCluster, *managedclusterapi.ManagedClusterList], selectors []metav1.LabelSelector) (sets.Set[string], error) {
 	// in order to support OR between label selectors in a straightforward manner, we perform List for each selector.
 	// additionally, to support complex selectors (such as set selectors), we avoid conversion to maps.
