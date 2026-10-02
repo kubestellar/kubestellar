@@ -82,6 +82,7 @@ There are several ways to communicate with us:
 
 - Instantly get access to our documents and meeting invites at http://kubestellar.io/joinus
 
+- Join [GitHub Discussions](https://github.com/kubestellar/kubestellar/discussions) for questions, ideas, and show-and-tell
 - The [`#kubestellar-dev` channel](https://cloud-native.slack.com/archives/C097094RZ3M) in the [CNCF Slack workspace](https://communityinviter.com/apps/cloud-native/cncf)
 - Our mailing lists:
     - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
