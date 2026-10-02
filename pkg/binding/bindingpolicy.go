@@ -81,9 +81,9 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 		}
 
 		// set destinations and enqueue binding for syncing
-		// we can skip handling the error since the call to BindingPolicyResolver::NoteBindingPolicy above
-		// guarantees that an error won't be returned here
-		_ = c.bindingPolicyResolver.SetDestinations(bindingPolicy.GetName(), clusterSet)
+		if err := c.bindingPolicyResolver.SetDestinations(bindingPolicy.GetName(), clusterSet); err != nil {
+			return fmt.Errorf("failed to set destinations for %s: %w", bindingPolicy.GetName(), err)
+		}
 		logger.V(5).Info("Enqueued Binding for syncing, while handling BindingPolicy", "name", bindingPolicy.Name)
 		c.enqueueBinding(bindingPolicy.GetName())
 
