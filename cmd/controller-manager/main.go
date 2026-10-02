@@ -152,6 +152,7 @@ func main() {
 		setupLog.Error(err, "unable to create binding controller")
 		os.Exit(1)
 	}
+	bindingController.RegisterMetrics(legacyregistry.Register)
 
 	if err := bindingController.EnsureCRDs(ctx); err != nil {
 		setupLog.Error(err, "error installing the CRDs")
