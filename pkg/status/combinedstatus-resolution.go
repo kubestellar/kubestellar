@@ -1154,8 +1154,12 @@ func valueEqual(a, b *v1alpha1.Value) bool {
 		return *a.Bool == *b.Bool
 	case v1alpha1.TypeObject:
 		var v1, v2 interface{}
-		json.Unmarshal([]byte(a.Object.Raw), &v1)
-		json.Unmarshal([]byte(b.Object.Raw), &v2)
+		if err := json.Unmarshal([]byte(a.Object.Raw), &v1); err != nil {
+			return false
+		}
+		if err := json.Unmarshal([]byte(b.Object.Raw), &v2); err != nil {
+			return false
+		}
 		return reflect.DeepEqual(v1, v2)
 	case v1alpha1.TypeNull:
 		return true
