@@ -363,6 +363,13 @@ func (resolver *bindingPolicyResolver) GetReportedStateRequestForObject(objId ut
 	resolver.RWMutex.RLock()
 	defer resolver.RWMutex.RUnlock()
 
+	return resolver.getReportedStateRequestForObjectLocked(objId)
+}
+
+// getReportedStateRequestForObjectLocked is the unlocked implementation of
+// GetReportedStateRequestForObject. The caller must hold the resolver's
+// read lock.
+func (resolver *bindingPolicyResolver) getReportedStateRequestForObjectLocked(objId util.ObjectIdentifier) (bool, sets.Set[string], bool, sets.Set[string]) {
 	var singletonRequested bool
 	var multiWECRequested bool
 	singletonWECs := sets.New[string]()
@@ -390,14 +397,14 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestsForBindi
 	resolver.RWMutex.RLock()
 	defer resolver.RWMutex.RUnlock()
 
-	resolution := resolver.getResolution(bindingPolicyKey)
+	resolution := resolver.getResolutionLocked(bindingPolicyKey)
 	if resolution == nil {
 		return nil
 	}
 	objIds := resolution.getWorkloadReferences()
 	ans := make([]SingletonReportedStateReturnStatus, len(objIds))
 	for idx, objId := range objIds {
-		want, qualifiedWECsSingleton, _, _ := resolver.GetReportedStateRequestForObject(objId)
+		want, qualifiedWECsSingleton, _, _ := resolver.getReportedStateRequestForObjectLocked(objId)
 		ans[idx] = SingletonReportedStateReturnStatus{objId, want, qualifiedWECsSingleton.Len()}
 	}
 	return ans
@@ -424,6 +431,12 @@ func (resolver *bindingPolicyResolver) getResolution(bindingPolicyKey string) *b
 	resolver.RLock()         // lock for reading map
 	defer resolver.RUnlock() // unlock after accessing map
 
+	return resolver.getResolutionLocked(bindingPolicyKey)
+}
+
+// getResolutionLocked is the unlocked implementation of getResolution.
+// The caller must hold the resolver's read lock.
+func (resolver *bindingPolicyResolver) getResolutionLocked(bindingPolicyKey string) *bindingPolicyResolution {
 	return resolver.bindingPolicyToResolution[bindingPolicyKey]
 }
 
