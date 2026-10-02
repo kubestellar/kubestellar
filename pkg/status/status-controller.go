@@ -398,26 +398,51 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 }
 
 func shouldSkipUpdate(old, new interface{}) bool {
-	oldMObj := old.(metav1.Object)
-	newMObj := new.(metav1.Object)
+	var oldMObj, newMObj metav1.Object
+	var ok bool
+	if oldMObj, ok = old.(metav1.Object); !ok {
+		return false
+	}
+	if newMObj, ok = new.(metav1.Object); !ok {
+		return false
+	}
 	// do not enqueue update events for objects that have not changed
 	return newMObj.GetResourceVersion() == oldMObj.GetResourceVersion()
 }
 
 func objNotInThisWDS(obj interface{}, thisWDS string) bool {
-	if objWDS, ok := obj.(metav1.Object).GetLabels()[originWdsLabelKey]; ok {
-		if objWDS != thisWDS {
-			return true
+	var mObj metav1.Object
+	var ok bool
+	if mObj, ok = obj.(metav1.Object); !ok {
+		if dfsu, isDFSU := obj.(cache.DeletedFinalStateUnknown); isDFSU {
+			if mObj, ok = dfsu.Obj.(metav1.Object); !ok {
+				return false
+			}
+		} else {
+			return false
 		}
 	}
-	return false
+	objWDS, ok := mObj.GetLabels()[originWdsLabelKey]
+	return !ok || objWDS != thisWDS
 }
 
 // Informer event handler: enqueues the workstatus objects to be processed
 // At this time it is very simple, more complex processing might be required here
 func (c *Controller) handleWorkStatus(ctx context.Context, eventType string, obj any) {
 	logger := klog.FromContext(ctx)
-	wsRef, err := runtimeObjectToWorkStatusRef(obj.(runtime.Object))
+	rObj, ok := obj.(runtime.Object)
+	if !ok {
+		if dfsu, isDFSU := obj.(cache.DeletedFinalStateUnknown); isDFSU {
+			if rObj, ok = dfsu.Obj.(runtime.Object); !ok {
+				utilruntime.HandleError(fmt.Errorf("failed to cast deleted object to runtime.Object"))
+				return
+			}
+		} else {
+			utilruntime.HandleError(fmt.Errorf("failed to cast object to runtime.Object"))
+			return
+		}
+	}
+	wsRef, err := runtimeObjectToWorkStatusRef(rObj)
 	if err != nil {
 		utilruntime.HandleError(err)
 		return
