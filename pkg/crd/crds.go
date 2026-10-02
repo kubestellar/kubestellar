@@ -81,13 +81,13 @@ func ApplyCRDs(ctx context.Context, controllerName string,
 		if err != nil {
 			return fmt.Errorf("unable to convert from Unstructured to CRD, name=%s: %w", crdU.GetName(), err)
 		}
-		_, err = clientsetExt.Create(ctx, desiredCRD, metav1.CreateOptions{FieldValidation: metav1.FieldValidationStrict, FieldManager: controllerName})
+		_, err = clientsetExt.Create(ctxLimited, desiredCRD, metav1.CreateOptions{FieldValidation: metav1.FieldValidationStrict, FieldManager: controllerName})
 		if err == nil {
 			logger.Info("Created CRD", "name", desiredCRD.Name)
 		} else if !apierrors.IsAlreadyExists(err) {
 			return fmt.Errorf("unable to create CRD named %s: %w", crdU.GetName(), err)
 		} else {
-			existingCRD, err := clientsetExt.Get(ctx, desiredCRD.Name, metav1.GetOptions{})
+			existingCRD, err := clientsetExt.Get(ctxLimited, desiredCRD.Name, metav1.GetOptions{})
 			if err != nil {
 				return fmt.Errorf("failed to fetch an existing CRD, name=%s: %w", desiredCRD.Name, err)
 			}
@@ -96,7 +96,7 @@ func ApplyCRDs(ctx context.Context, controllerName string,
 				continue
 			}
 			desiredCRD.ResourceVersion = existingCRD.ResourceVersion
-			_, err = clientsetExt.Update(ctx, desiredCRD, metav1.UpdateOptions{FieldManager: controllerName})
+			_, err = clientsetExt.Update(ctxLimited, desiredCRD, metav1.UpdateOptions{FieldManager: controllerName})
 			if err != nil {
 				return fmt.Errorf("unable to update existing CRD named %s: %w", crdU.GetName(), err)
 			}
