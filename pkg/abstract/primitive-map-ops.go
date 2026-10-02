@@ -34,6 +34,7 @@ func PrimitiveMapHas[Key comparable, Val any](rep map[Key]Val) func(Key) bool {
 	}
 }
 
+// DropOK11 wraps a function that returns (value, bool) into one that just returns the value.
 func DropOK11[Domain1, Range1 any](base func(Domain1) (Range1, bool)) func(Domain1) Range1 {
 	return func(dom1 Domain1) Range1 {
 		rng1, _ := base(dom1)
@@ -41,6 +42,7 @@ func DropOK11[Domain1, Range1 any](base func(Domain1) (Range1, bool)) func(Domai
 	}
 }
 
+// PrimitiveMapEqual compares two primitive maps for equality.
 func PrimitiveMapEqual[Key, Val comparable](map1, map2 map[Key]Val) bool {
 	if len(map1) != len(map2) {
 		return false
@@ -75,6 +77,7 @@ func PrimitiveMapSafeValMap[Key comparable, Val, Mapped any](lock *sync.RWMutex,
 	return PrimitiveMapValMap(source, mapper)
 }
 
+// PrimitiveMapKeySlice returns a slice containing all keys from the provided map.
 func PrimitiveMapKeySlice[Key comparable, Val any](rep map[Key]Val) []Key {
 	keys := make([]Key, 0, len(rep))
 	for key := range rep {

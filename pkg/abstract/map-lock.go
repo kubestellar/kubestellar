@@ -31,6 +31,7 @@ type MapToLockedLocker[Key, Val any] struct {
 
 var _ MapToLocked[func() int, func() bool] = &MapToLockedLocker[func() int, func() bool]{}
 
+// NewMapToLockedLocker creates a MapToLockedLocker wrapping an inner MapToLocked with the provided mutex.
 func NewMapToLockedLocker[Key, Val any](mutex *sync.RWMutex, inner MapToLocked[Key, Val]) *MapToLockedLocker[Key, Val] {
 	if mutex == nil {
 		mutex = &sync.RWMutex{}

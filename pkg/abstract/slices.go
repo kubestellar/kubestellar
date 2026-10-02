@@ -44,6 +44,7 @@ func NewSliceByFilter[Elt any](input []Elt, good func(Elt) bool) []Elt {
 	return newSlice
 }
 
+// SliceMap creates a new slice by applying a function to each element of the input slice.
 func SliceMap[Domain, Range any](slice []Domain, fn func(Domain) Range) []Range {
 	if slice == nil {
 		return nil
@@ -55,6 +56,7 @@ func SliceMap[Domain, Range any](slice []Domain, fn func(Domain) Range) []Range 
 	return ans
 }
 
+// SliceToPrimitiveMap creates a map from a slice using the provided key and value functions.
 func SliceToPrimitiveMap[Domain, Range any, Key comparable](slice []Domain, keyFn func(Domain) Key,
 	ValFn func(Domain) Range) map[Key]Range {
 	if slice == nil {
@@ -68,6 +70,7 @@ func SliceToPrimitiveMap[Domain, Range any, Key comparable](slice []Domain, keyF
 	return ans
 }
 
+// SliceMapToK8sSet creates a Kubernetes sets.Set from a slice using a mapping function.
 func SliceMapToK8sSet[Domain any, Range comparable](slice []Domain, fn func(Domain) Range) sets.Set[Range] {
 	if slice == nil {
 		return nil

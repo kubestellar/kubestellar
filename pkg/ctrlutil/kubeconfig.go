@@ -47,10 +47,12 @@ const (
 	ErrMultipleControlPlanes = "more than one control plane of type %s was found and no name was specified"
 )
 
+// GetWDSKubeconfig retrieves the REST config and name for a Workload Description Space (WDS) control plane.
 func GetWDSKubeconfig(logger logr.Logger, wdsName string) (*rest.Config, string, error) {
 	return getRestConfig(logger, wdsName, ControlPlaneTypeWDS)
 }
 
+// GetITSKubeconfig retrieves the REST config and name for an Inventory and Transport Space (ITS) control plane.
 func GetITSKubeconfig(logger logr.Logger, itsName string) (*rest.Config, string, error) {
 	return getRestConfig(logger, itsName, ControlPlaneTypeITS)
 }
