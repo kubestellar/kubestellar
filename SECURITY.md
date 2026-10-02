@@ -44,11 +44,21 @@ You can also email the private [kubestellar-security-announce@googlegroups.com](
 
 ## Security Vulnerability Response
 
-Each report is acknowledged and analyzed by the maintainers of KubeStellar within 3 working days.
+We take security vulnerabilities seriously and are committed to responding promptly to all reports. The KubeStellar security team follows OpenSSF Best Practices guidelines for vulnerability disclosure and response.
 
-Any vulnerability information shared with Security Response Committee stays within KubeStellar project and will not be disseminated to other projects unless it is necessary to get the issue fixed.
+### Response Timeline and OpenSSF Compliance
 
-As the security issue moves from triage, to identified fix, to release planning we will keep the reporter updated.
+- **Initial Acknowledgment**: Each security vulnerability report is acknowledged and analyzed by KubeStellar maintainers within **3 working days** of receipt, which is well within the OpenSSF requirement of an initial response within 14 days
+- **14-Day Guarantee**: We guarantee that all valid vulnerability reports will receive an initial acknowledgment within **14 days** of receipt, meeting the OpenSSF Best Practices requirement for the [vulnerability_report_response] criterion
+- **Continuous Monitoring**: Security reports are reviewed daily by maintainers listed in [OWNERS](OWNERS) to ensure timely responses
+
+### Handling Periods with No Reports
+
+If no vulnerability reports are received during a given 6-month period, this will be noted in the OpenSSF badge application with a justification of "Not Applicable."
+
+### Maintainer Monitoring Process
+
+This monitoring process ensures that any vulnerability report is seen, acknowledged, and acted upon in a timely and consistent manner. Project OWNERS (listed in [OWNERS](OWNERS)) are responsible for vulnerability triage, and any maintainer can respond to security reports to ensure the 14-day SLA is met.
 
 ## Public Disclosure Timing
 
