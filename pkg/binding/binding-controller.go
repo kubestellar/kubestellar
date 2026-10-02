@@ -466,7 +466,11 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 				// after startup, therefore we use a stopper channel for each informer
 				// instead than informerFactory.Start(ctx.Done())
 				stopper := make(chan struct{})
-				defer close(stopper)
+				go func(s chan struct{}) {
+					<-ctx.Done()
+					defer func() { recover() }()
+					close(s)
+				}(stopper)
 				c.stoppers.Set(gvr, stopper)
 				go informer.Run(stopper)
 			}
@@ -688,6 +692,7 @@ func (c *Controller) enqueueBinding(name string) {
 // processNextWorkItem function in order to read and process a message on the
 // workqueue.
 func (c *Controller) runWorker(ctx context.Context) {
+	defer utilruntime.HandleCrash()
 	for c.processNextWorkItem(ctx) {
 	}
 }

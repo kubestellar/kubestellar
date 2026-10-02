@@ -51,7 +51,7 @@ func Start(ctx context.Context, processOpts ksopts.ProcessOptions) {
 			err := http.ListenAndServe(processOpts.HealthProbeBindAddr, http.HandlerFunc(HappyDumbHandler))
 			if err != nil {
 				logger.Error(err, "Failed to serve health probes", "bindAddress", processOpts.HealthProbeBindAddr)
-				panic(err)
+				os.Exit(1)
 			}
 		}()
 
@@ -60,7 +60,7 @@ func Start(ctx context.Context, processOpts ksopts.ProcessOptions) {
 		err := http.ListenAndServe(processOpts.MetricsBindAddr, legacyregistry.Handler())
 		if err != nil {
 			logger.Error(err, "Failed to serve Prometheus metrics", "bindAddress", processOpts.MetricsBindAddr)
-			panic(err)
+			os.Exit(1)
 		}
 	}()
 
@@ -70,7 +70,7 @@ func Start(ctx context.Context, processOpts ksopts.ProcessOptions) {
 		err := http.ListenAndServe(processOpts.PProfBindAddr, mymux)
 		if err != nil {
 			logger.Error(err, "Failure in serving /debug/pprof", "bindAddress", processOpts.PProfBindAddr)
-			panic(err)
+			os.Exit(1)
 		}
 	}()
 }
