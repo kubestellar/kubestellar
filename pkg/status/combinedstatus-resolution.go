@@ -273,12 +273,22 @@ func (c *combinedStatusResolution) noteStatusCollectorAbsence(statusCollectorNam
 }
 
 // generateCombinedStatus calculates the combinedstatus from the statuscollector
-// data in the combinedstatus resolution.
+// data in the combinedstatus resolution. It acquires the read lock and delegates
+// to generateCombinedStatusReadLocked.
 func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
 	workloadObjectIdentifier util.ObjectIdentifier) *v1alpha1.CombinedStatus {
 	c.RLock()
 	defer c.RUnlock()
 
+	return c.generateCombinedStatusReadLocked(bindingName, workloadObjectIdentifier)
+}
+
+// generateCombinedStatusReadLocked calculates the combinedstatus from the
+// statuscollector data in the combinedstatus resolution. The caller must hold
+// at least the read lock, since sync.RWMutex is not reentrant and recursively
+// acquiring the read lock can deadlock if a writer is waiting.
+func (c *combinedStatusResolution) generateCombinedStatusReadLocked(bindingName string,
+	workloadObjectIdentifier util.ObjectIdentifier) *v1alpha1.CombinedStatus {
 	combinedStatus := &v1alpha1.CombinedStatus{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      c.Name,
@@ -318,7 +328,10 @@ func (c *combinedStatusResolution) compareCombinedStatus(status *v1alpha1.Combin
 	c.RLock()
 	defer c.RUnlock()
 
-	localCombinedStatus := c.generateCombinedStatus(bindingName, sourceObjectIdentifier)
+	// Use the read-locked helper: we already hold the read lock, and
+	// sync.RWMutex is not reentrant, so calling generateCombinedStatus (which
+	// re-acquires the read lock) here can deadlock if a writer is waiting.
+	localCombinedStatus := c.generateCombinedStatusReadLocked(bindingName, sourceObjectIdentifier)
 
 	// check labels
 	if !validateCombinedStatusLabels(status, bindingName, sourceObjectIdentifier) {
