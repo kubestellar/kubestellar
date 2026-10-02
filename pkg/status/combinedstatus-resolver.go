@@ -66,7 +66,7 @@ type CombinedStatusResolver interface {
 	// that should be queued for syncing.
 	NoteBindingResolution(ctx context.Context, bindingName string, bindingResolution binding.Resolution, deleted bool,
 		workStatusIndexer cache.Indexer,
-		statusCollectorLister controllisters.StatusCollectorLister) sets.Set[util.ObjectIdentifier]
+		statusCollectorLister controllisters.StatusCollectorLister) (sets.Set[util.ObjectIdentifier], error)
 
 	// NoteStatusCollector notes a statuscollector's spec.
 	// The statuscollector is cached on the resolver's level, and is updated
@@ -82,14 +82,14 @@ type CombinedStatusResolver interface {
 	// that should be queued for syncing, respectively.
 	NoteStatusCollector(ctx context.Context, statusCollector *v1alpha1.StatusCollector, deleted bool,
 		workStatusIndexer cache.Indexer,
-	) (sets.Set[util.ObjectIdentifier], sets.Set[string])
+	) (sets.Set[util.ObjectIdentifier], sets.Set[string], error)
 
 	// NoteWorkStatus notes a workstatus in the combinedstatus resolutions
 	// associated with its source workload object.
 	//
 	// The returned set contains the identifiers of combinedstatus objects
 	// that should be queued for syncing.
-	NoteWorkStatus(ctx context.Context, workStatus *workStatus) sets.Set[util.ObjectIdentifier]
+	NoteWorkStatus(ctx context.Context, workStatus *workStatus) (sets.Set[util.ObjectIdentifier], error)
 
 	// ResolutionExists returns true if a combinedstatus resolution is
 	// associated with the given name. The name is expected to follow the
@@ -192,7 +192,7 @@ func (c *combinedStatusResolver) CompareCombinedStatus(bindingName string,
 // that should be queued for syncing.
 func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bindingName string, bindingResolution binding.Resolution,
 	deleted bool, workStatusIndexer cache.Indexer,
-	statusCollectorLister controllisters.StatusCollectorLister) sets.Set[util.ObjectIdentifier] {
+	statusCollectorLister controllisters.StatusCollectorLister) (sets.Set[util.ObjectIdentifier], error) {
 	logger := klog.FromContext(ctx)
 	c.Lock()
 	defer c.Unlock()
@@ -203,7 +203,7 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 	// (1)
 	if deleted {
 		logger.V(3).Info("Deleting CombinedStatus resolutions for Binding", "name", bindingName)
-		return c.deleteResolutionsForBindingWriteLocked(bindingName)
+		return c.deleteResolutionsForBindingWriteLocked(bindingName), nil
 	} else {
 		logger.V(3).Info("Noting non-deleted resolutions for Binding", "name", bindingName, "bindingResolution", bindingResolution)
 	}
@@ -289,12 +289,15 @@ func (c *combinedStatusResolver) NoteBindingResolution(ctx context.Context, bind
 
 	// evaluate workstatuses associated with members of workloadIdentifiersToEvaluate and return the combinedstatus
 	// identifiers that should be queued for syncing
-	dueToEvaluation := c.evaluateWorkStatusesPerBindingReadLocked(ctx, bindingName,
+	dueToEvaluation, err := c.evaluateWorkStatusesPerBindingReadLocked(ctx, bindingName,
 		workloadIdentifiersToEvaluate, destinationsSet, workStatusIndexer)
+	if err != nil {
+		return nil, err
+	}
 	logger.V(5).Info("After evaluateWorkStatusesPerBindingReadLocked", "binding", bindingName,
 		"workloadIdentifiersToEvaluate", util.K8sSet4Log(workloadIdentifiersToEvaluate),
 		"dueToEvaluation", util.K8sSet4Log(dueToEvaluation))
-	return combinedStatusIdentifiersToQueue.Union(dueToEvaluation)
+	return combinedStatusIdentifiersToQueue.Union(dueToEvaluation), nil
 }
 
 // deleteResolutionsForBindingWriteLocked deletes all combinedstatus resolutions associated with the given binding name.
@@ -327,8 +330,7 @@ func (c *combinedStatusResolver) deleteResolutionsForBindingWriteLocked(bindingN
 //
 // The returned set contains the identifiers of combinedstatus objects
 // that should be queued for syncing.
-// TODO: handle errors
-func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatus *workStatus) sets.Set[util.ObjectIdentifier] {
+func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatus *workStatus) (sets.Set[util.ObjectIdentifier], error) {
 	c.RLock()
 	defer c.RUnlock()
 	logger := klog.FromContext(ctx)
@@ -343,7 +345,10 @@ func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatus 
 			continue
 		}
 
-		content := getCombinedContentMap(c.wdsListers, workStatus, resolution)
+		content, err := getCombinedContentMap(c.wdsListers, workStatus, resolution)
+		if err != nil {
+			return nil, err
+		}
 
 		// this call logs errors, but does not return them for now
 		if resolution.evaluateWorkStatus(ctx, c.celEvaluator, workStatus.SourceObjectIdentifier, bindingName, workStatus.WECName, content) {
@@ -355,7 +360,7 @@ func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatus 
 	}
 	logger.V(5).Info("Done considering bindingResolutions", "workStatusRef", workStatus.workStatusRef, "statusLen", len(workStatus.status), "count", len(c.bindingNameToResolutions))
 
-	return combinedStatusIdentifiersToQueue
+	return combinedStatusIdentifiersToQueue, nil
 }
 
 // NoteStatusCollector notes a statuscollector's spec.
@@ -372,7 +377,7 @@ func (c *combinedStatusResolver) NoteWorkStatus(ctx context.Context, workStatus 
 // that should be queued for syncing, respectively.
 func (c *combinedStatusResolver) NoteStatusCollector(
 	ctx context.Context, statusCollector *v1alpha1.StatusCollector, deleted bool, workStatusIndexer cache.Indexer,
-) (sets.Set[util.ObjectIdentifier], sets.Set[string]) {
+) (sets.Set[util.ObjectIdentifier], sets.Set[string], error) {
 	logger := klog.FromContext(ctx)
 	c.Lock()
 	defer c.Unlock()
@@ -380,7 +385,7 @@ func (c *combinedStatusResolver) NoteStatusCollector(
 	currentSpec := c.statusCollectorNameToSpec[statusCollector.Name]
 	if !deleted && currentSpec != nil && statusCollectorSpecsMatch(currentSpec, &statusCollector.Spec) {
 		logger.V(5).Info("No change in StatusCollector", "name", statusCollector.Name)
-		return nil, nil // already cached and the spec has not changed
+		return nil, nil, nil // already cached and the spec has not changed
 	}
 	logger.V(5).Info("Noting StatusCollector", "name", statusCollector.Name, "numBindings", len(c.bindingNameToResolutions), "deleted", deleted)
 
@@ -403,9 +408,13 @@ func (c *combinedStatusResolver) NoteStatusCollector(
 
 			if resolution.updateStatusCollector(statusCollector.Name, &statusCollector.Spec) { // true if changed
 				// evaluate ALL workstatuses associated with the (binding, workload object) pair
-				combinedStatusIdentifiersToQueue.Insert(c.evaluateWorkStatusesPerBindingReadLocked(ctx, bindingName,
+				dueToEvaluation, err := c.evaluateWorkStatusesPerBindingReadLocked(ctx, bindingName,
 					sets.New(workloadObjectIdentifier), resolution.CollectionDestinations,
-					workStatusIndexer).UnsortedList()...)
+					workStatusIndexer)
+				if err != nil {
+					return nil, nil, err
+				}
+				combinedStatusIdentifiersToQueue.Insert(dueToEvaluation.UnsortedList()...)
 				bindingNamesToQueue.Insert(bindingName)
 			}
 		}
@@ -417,7 +426,7 @@ func (c *combinedStatusResolver) NoteStatusCollector(
 		delete(c.statusCollectorNameToSpec, statusCollector.Name)
 	}
 
-	return combinedStatusIdentifiersToQueue, bindingNamesToQueue
+	return combinedStatusIdentifiersToQueue, bindingNamesToQueue, nil
 }
 
 // ResolutionExists returns true if a combinedstatus resolution is
@@ -473,7 +482,7 @@ func (c *combinedStatusResolver) MissingStatusCollectors(bindingName string) []s
 // The method is expected to be called with the read lock held.
 func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(ctx context.Context, bindingName string,
 	workloadObjIdentifiersToEvaluate sets.Set[util.ObjectIdentifier], destinations sets.Set[string],
-	workStatusIndexer cache.Indexer) sets.Set[util.ObjectIdentifier] {
+	workStatusIndexer cache.Indexer) (sets.Set[util.ObjectIdentifier], error) {
 	combinedStatusesToQueue := sets.Set[util.ObjectIdentifier]{}
 	logger := klog.FromContext(ctx)
 
@@ -534,7 +543,10 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(ctx co
 			}
 
 			csResolution := c.bindingNameToResolutions[bindingName][workStat.SourceObjectIdentifier]
-			content := getCombinedContentMap(c.wdsListers, workStat, csResolution)
+			content, err := getCombinedContentMap(c.wdsListers, workStat, csResolution)
+			if err != nil {
+				return nil, err
+			}
 
 			// evaluate workstatus
 			if csResolution.evaluateWorkStatus(ctx, c.celEvaluator, workloadObjIdentifier, bindingName, workStat.WECName, content) {
@@ -544,7 +556,7 @@ func (c *combinedStatusResolver) evaluateWorkStatusesPerBindingReadLocked(ctx co
 		}
 	}
 
-	return combinedStatusesToQueue
+	return combinedStatusesToQueue, nil
 }
 
 func statusCollectorSpecsMatch(spec1, spec2 *v1alpha1.StatusCollectorSpec) bool {
