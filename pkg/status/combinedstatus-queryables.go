@@ -24,7 +24,6 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	runtime2 "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/kubestellar/kubestellar/pkg/util"
@@ -32,7 +31,7 @@ import (
 
 // getCombinedContentMap returns a map of content for the given workstatus.
 func getCombinedContentMap(listersConcurrentMap util.ConcurrentMap[schema.GroupVersionResource, cache.GenericLister],
-	workStatus *workStatus, resolution *combinedStatusResolution) map[string]interface{} {
+	workStatus *workStatus, resolution *combinedStatusResolution) (map[string]interface{}, error) {
 
 	// betting on `combinedStatusResolution::queryingContentRequirements` being faster
 	// than fetching content that is not required.
@@ -44,8 +43,8 @@ func getCombinedContentMap(listersConcurrentMap util.ConcurrentMap[schema.GroupV
 	if sourceObjectRequired {
 		objMap, err := getObjectMetaAndSpec(listersConcurrentMap, workStatus.SourceObjectIdentifier)
 		if err != nil {
-			runtime2.HandleError(fmt.Errorf("failed to get meta & spec for source object %s: %w",
-				workStatus.SourceObjectIdentifier, err))
+			return nil, fmt.Errorf("failed to get meta & spec for source object %s: %w",
+				workStatus.SourceObjectIdentifier, err)
 		}
 
 		content[sourceObjectKey] = objMap
@@ -63,7 +62,7 @@ func getCombinedContentMap(listersConcurrentMap util.ConcurrentMap[schema.GroupV
 		content[propagationMetaKey] = propagateMetaForWorkStatus(workStatus, resolution)
 	}
 
-	return content
+	return content, nil
 }
 
 // getObjectMetaAndSpec fetches the metadata and spec of the object associated
