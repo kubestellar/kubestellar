@@ -438,3 +438,57 @@ func TestGenericController(t *testing.T) {
 		logger.Info("Success", "objects", len(objs), "numExpected", len(transport.expect))
 	}
 }
+
+func TestRemoveFinalizer(t *testing.T) {
+	newBinding := func(finalizers []string) *ksapi.Binding {
+		return &ksapi.Binding{ObjectMeta: metav1.ObjectMeta{Name: "binding", Finalizers: finalizers}}
+	}
+	original := []string{"keep-1", "remove-me", "keep-2", "keep-3"}
+
+	t.Run("removes finalizer without mutating input", func(t *testing.T) {
+		binding := newBinding(append([]string(nil), original...))
+		wantFinalizers := []string{"keep-1", "keep-2", "keep-3"}
+
+		updated, changed := removeFinalizer(binding, "remove-me")
+		if !changed {
+			t.Fatal("expected changed == true")
+		}
+		if !apiequality.Semantic.DeepEqual(updated.Finalizers, wantFinalizers) {
+			t.Fatalf("expected finalizers %v, got %v", wantFinalizers, updated.Finalizers)
+		}
+		// The original (informer-cache) object must remain untouched.
+		if !apiequality.Semantic.DeepEqual(binding.Finalizers, original) {
+			t.Fatalf("original object was mutated: %v", binding.Finalizers)
+		}
+	})
+
+	t.Run("removing last finalizer", func(t *testing.T) {
+		binding := newBinding([]string{"only"})
+
+		updated, changed := removeFinalizer(binding, "only")
+		if !changed {
+			t.Fatal("expected changed == true")
+		}
+		if len(updated.Finalizers) != 0 {
+			t.Fatalf("expected empty finalizers, got %v", updated.Finalizers)
+		}
+		if len(binding.Finalizers) != 1 {
+			t.Fatalf("original object was mutated: %v", binding.Finalizers)
+		}
+	})
+
+	t.Run("finalizer not present returns unchanged", func(t *testing.T) {
+		binding := newBinding([]string{"keep-1", "keep-2"})
+
+		updated, changed := removeFinalizer(binding, "not-there")
+		if changed {
+			t.Fatal("expected changed == false")
+		}
+		if updated != binding {
+			t.Fatal("expected the same object to be returned")
+		}
+		if !apiequality.Semantic.DeepEqual(binding.Finalizers, []string{"keep-1", "keep-2"}) {
+			t.Fatalf("original object was mutated: %v", binding.Finalizers)
+		}
+	})
+}
