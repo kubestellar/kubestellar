@@ -48,7 +48,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
     ansible-playbook -i .data/${REGION}_${VPC}/hosts_core deploy_ks_core.yaml --ssh-common-args="-o StrictHostKeyChecking=no" -e "region=$REGION vpc_name=$VPC cluster_name=$CLUSTER_NAME ks_release=$KS_RELEASE"
     ```
 
-    You can use the variable `ks_release` to specify the KubeStellar release. Kubestellar is deployed using the [KS helmchart](https://github.com/kubestellar/kubestellar/tree/release-0.26.0/core-chart) configured with a ITS of type host. 
+    You can use the variable `ks_release` to specify the KubeStellar release. Kubestellar is deployed using the [KS helm chart](https://github.com/kubestellar/kubestellar/tree/release-0.26.0/core-chart) configured with an ITS of type host.
 
     Upon completion of the script's execution, a kubeconfig file is generated at `.data/${REGION}_${VPC}/admin.conf` to access the Kubernetes cluster and the control plane components for KubeStellar, for example:
     
@@ -156,7 +156,7 @@ As an alternative to the quick-start deployment bootstrapping instructions, you 
     ansible-playbook -i .data/${REGION}_${VPC}/hosts_wec deploy_ks_wec.yaml --ssh-common-args="-o StrictHostKeyChecking=no" -e "region=$REGION vpc_name=$VPC num_wecs=1"
     ```
 
-    Use the input paramater `num_wecs` to specify the number of kind clusters to be created for each WEC Hosting Instances. The above command creates kind WEC clusters and connects them to the KubeStellar core cluster created in step 1. Furthermore, it attaches a [KWOK](https://github.com/kubernetes-sigs/kwok) fake node to each kind cluster.
+    Use the input parameter `num_wecs` to specify the number of kind clusters to be created for each WEC Hosting Instances. The above command creates kind WEC clusters and connects them to the KubeStellar core cluster created in step 1. Furthermore, it attaches a [KWOK](https://github.com/kubernetes-sigs/kwok) fake node to each kind cluster.
 
 
     c) Access the WEC kind clusters from Ansible control machine:

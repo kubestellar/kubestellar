@@ -184,7 +184,7 @@ a) API Server Monitoring: input into the following text boxes.
 
     <img src="images/apiserver-monitoring.png" width="60%" height="80%" title="apiserver-monitoring"> 
 
-To monitor a WDS space (e.g., wds1) use the following combination of `NS/APIService` parameters: `NS: wds1-system` and `APIService: wds1`. Likewise, to monitor a ITS space (e.g., its1): `NS: its1-system` and `APIService: vcluster`
+To monitor a WDS space (e.g., wds1) use the following combination of `NS/APIService` parameters: `NS: wds1-system` and `APIService: wds1`. Likewise, to monitor an ITS space (e.g., its1): `NS: its1-system` and `APIService: vcluster`
 
 **Note**: 
 - You can also use the following combination of `NS/APIService` values to monitor the apiserver of the hosting cluster or a WEC cluster: `NS: default` and `APIService: apiserver`
@@ -258,7 +258,7 @@ To monitor the KubeStellar controllers in a WDS space (e.g., wds1) or ITS space 
 - `NS: wds1-system` and `KSController: kubestellar-controller-manager-metrics-service`
 - `NS: wds1-system` and `KSController: ks-transport-controller`
 
-Likewise, to monitor the KubeStellar controller in a ITS space and WEC (e.g., its1): `NS: its1-system` and `KSController: status-addon-controller` & `NS: open-cluster-management-agent-addon` and `KSController: status-agent-controller`.
+Likewise, to monitor the KubeStellar controller in an ITS space and WEC (e.g., its1): `NS: its1-system` and `KSController: status-addon-controller` & `NS: open-cluster-management-agent-addon` and `KSController: status-agent-controller`.
 
 Note: 
 - Use the following commands to obtain the IP address of the KubeStellar controllers in the WDS (e.g., `wds1`) and ITS (e.g., `its1-system`) spaces and WEC (e.g.,`cluster1`):
