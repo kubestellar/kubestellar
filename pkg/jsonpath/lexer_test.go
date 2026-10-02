@@ -24,7 +24,7 @@ func TestLexer(t *testing.T) {
 CaseLoop:
 	for _, testCase := range []struct {
 		source  string
-		results []string
+		results []Segment
 		goodEnd func(error) bool
 	}{
 		{"", nil, badEnd},
@@ -32,20 +32,41 @@ CaseLoop:
 			nil,
 			badEnd},
 		{`$.xyz`,
-			[]string{"xyz"},
+			[]Segment{{Kind: SegmentKindField, Name: "xyz"}},
 			cleanEOF},
 		{`$["foo.bar/baz"]`,
-			[]string{"foo.bar/baz"},
+			[]Segment{{Kind: SegmentKindField, Name: "foo.bar/baz"}},
 			cleanEOF},
 		{`$["foo.bar/baz"].zork`,
-			[]string{"foo.bar/baz", "zork"},
+			[]Segment{{Kind: SegmentKindField, Name: "foo.bar/baz"}, {Kind: SegmentKindField, Name: "zork"}},
 			cleanEOF},
 		{`$.zot["foo.bar/baz"]`,
-			[]string{"zot", "foo.bar/baz"},
+			[]Segment{{Kind: SegmentKindField, Name: "zot"}, {Kind: SegmentKindField, Name: "foo.bar/baz"}},
 			cleanEOF},
 		{`$.`, nil, badEnd},
 		{`$[`, nil, badEnd},
 		{`$[]`, nil, badEnd},
+		{`$.spec.resources.GenericItems[*].generictemplate.metadata.resourceVersion`,
+			[]Segment{
+				{Kind: SegmentKindField, Name: "spec"},
+				{Kind: SegmentKindField, Name: "resources"},
+				{Kind: SegmentKindField, Name: "GenericItems"},
+				{Kind: SegmentKindWildcard},
+				{Kind: SegmentKindField, Name: "generictemplate"},
+				{Kind: SegmentKindField, Name: "metadata"},
+				{Kind: SegmentKindField, Name: "resourceVersion"},
+			},
+			cleanEOF},
+		{`$.spec.resources.GenericItems.*.metadata.resourceVersion`,
+			[]Segment{
+				{Kind: SegmentKindField, Name: "spec"},
+				{Kind: SegmentKindField, Name: "resources"},
+				{Kind: SegmentKindField, Name: "GenericItems"},
+				{Kind: SegmentKindWildcard},
+				{Kind: SegmentKindField, Name: "metadata"},
+				{Kind: SegmentKindField, Name: "resourceVersion"},
+			},
+			cleanEOF},
 	} {
 		query, err := ParseQuery(testCase.source)
 		for idx, good := range testCase.results {
@@ -54,7 +75,7 @@ CaseLoop:
 				continue
 			}
 			if query[idx] != good {
-				t.Errorf("For source %q, segment %d is %q but expected token %q", testCase.source, idx, query[idx], good)
+				t.Errorf("For source %q, segment %d is %#v but expected %#v", testCase.source, idx, query[idx], good)
 				continue CaseLoop
 			}
 		}

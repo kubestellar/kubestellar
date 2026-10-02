@@ -162,6 +162,19 @@ func (rg *generator) generateObject() mrObjRsc {
 					APIVersion: "apps/v1",
 				},
 				MaxReplicas: 2,
+				Metrics: []k8sautoscalingapiv2.MetricSpec{
+					{
+						Type: k8sautoscalingapiv2.PodsMetricSourceType,
+						Pods: &k8sautoscalingapiv2.PodsMetricSource{
+							Metric: k8sautoscalingapiv2.MetricIdentifier{
+								Name: "cpu-limit",
+							},
+							Target: k8sautoscalingapiv2.MetricTarget{
+								Type: k8sautoscalingapiv2.AverageValueMetricType,
+							},
+						},
+					},
+				},
 			},
 		}, "horizontalpodautoscalers"}
 	}
@@ -373,7 +386,15 @@ func TestGenericController(t *testing.T) {
 	}
 	bindingCase := gen.generateBindingCase("b1", objs)
 	logger.V(3).Info("Generated bindingCase", "case", bindingCase)
-	wdsKsObjs := []runtime.Object{bindingCase.Binding, ct}
+	ct2 := &ksapi.CustomTransform{
+		TypeMeta:   metav1.TypeMeta{APIVersion: ksapi.GroupVersion.String(), Kind: "CustomTransform"},
+		ObjectMeta: metav1.ObjectMeta{Name: "test-ct2"},
+		Spec: ksapi.CustomTransformSpec{
+			APIGroup: k8sautoscalingapiv2.SchemeGroupVersion.Group,
+			Resource: "horizontalpodautoscalers",
+			Remove:   []string{`$.spec.metrics[*].pods.metric.name`},
+		}}
+	wdsKsObjs := []runtime.Object{bindingCase.Binding, ct, ct2}
 	wdsKsClientFake := ksclientfake.NewSimpleClientset(wdsKsObjs...)
 	wdsKsInformerFactory := ksinformers.NewSharedInformerFactory(wdsKsClientFake, 0*time.Minute)
 	wdsDynamicClient := dynamicfake.NewSimpleDynamicClient(scheme, wdsK8sObjs...)
