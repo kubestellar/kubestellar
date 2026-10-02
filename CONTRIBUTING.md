@@ -151,7 +151,22 @@ _Congratulations! Your pull request has been successfully merged!_ 👏
 
 If you have any questions about contributing, don't hesitate to reach out to us on the KubeStellar-dev [Slack channel](https://cloud-native.slack.com/archives/C097094RZ3M/).
 
+## Testing Policy
 
+To ensure the reliability and stability of KubeStellar, we maintain a rigorous testing policy. Automated testing is a fundamental requirement for contributions that add new functionality, change core logic, or fix bugs, in order to satisfy OpenSSF Best Practices.
+
+- **Requirement**: All new functionality, changes to core logic, and bug fixes **MUST** include automated tests that verify the changed behavior or code path. Bug fixes should include a regression test when practical.
+- **Scope**: Automated tests should be provided for the following areas in this repository:
+    - **Unit Tests**: Located alongside the code (e.g., in `pkg/`). Run them with `make test`.
+    - **Integration Tests**: Located in [test/integration/](test/integration/).
+    - **End-to-end (E2E) Tests**: Located in [test/e2e/](test/e2e/) and can be run using [run-test.sh](test/e2e/run-test.sh).
+- **Enforcement**: Pull requests that do not include the required tests for the changed behavior or code path will be flagged during review and may not be merged until those tests are provided.
+- **Exception Process**: If automated tests are impractical, explain the reason in the pull request description, describe any manual validation performed, and link a follow-up GitHub issue for adding or improving test coverage.
+- **CI/CD Integration**: The repository's automated test workflows are executed via GitHub Actions for pull requests to help prevent regressions. Relevant test workflows include:
+    - [Integration Tests Workflow](.github/workflows/pr-test-integration.yml)
+    - [E2E Tests Workflow](.github/workflows/pr-test-e2e.yml)
+  Additional automated quality checks, such as static analysis, are also run via GitHub Actions:
+    - [Linting Workflow](.github/workflows/golangci-lint.yml)
 
 ## Testing Locally
 
