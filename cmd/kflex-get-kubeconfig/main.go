@@ -23,6 +23,8 @@ import (
 	"context"
 	"flag"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/spf13/pflag"
@@ -54,7 +56,8 @@ func main() {
 	klog.InitFlags(nil)
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()
-	ctx := context.Background()
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer cancel()
 	logger := klog.FromContext(ctx)
 	ctx = klog.NewContext(ctx, logger)
 	setupLog := logger.WithName("setup")
@@ -102,17 +105,17 @@ func main() {
 		if cpName != "" {
 			cpU, err = cpClient.Get(ctx, cpName, metav1.GetOptions{})
 			if err != nil {
-				logger.Info("Failed to fetch ControlPlane", "name", cpName, "err", err)
+				logger.V(2).Info("Failed to fetch ControlPlane", "name", cpName, "err", err)
 				return false, nil
 			}
 		} else {
 			cpsU, err := cpClient.List(ctx, metav1.ListOptions{LabelSelector: cpLabelSelectorStr})
 			if err != nil {
-				logger.Info("Failed to fetch ControlPlanes by label selector", "name", cpLabelSelectorStr, "err", err)
+				logger.V(2).Info("Failed to fetch ControlPlanes by label selector", "name", cpLabelSelectorStr, "err", err)
 				return false, nil
 			}
 			if numGot := len(cpsU.Items); numGot != 1 {
-				logger.Info("Did not get exactly 1 ControlPlane", "numGot", numGot)
+				logger.V(2).Info("Did not get exactly 1 ControlPlane", "numGot", numGot)
 				return false, nil
 			}
 			cpU = &cpsU.Items[0]
@@ -120,17 +123,21 @@ func main() {
 		var cp kfapi.ControlPlane
 		err = runtime.DefaultUnstructuredConverter.FromUnstructuredWithValidation(cpU.UnstructuredContent(), &cp, true)
 		if err != nil {
-			logger.Info("Failed to unmarshal", "err", err)
+			logger.V(2).Info("Failed to unmarshal", "err", err)
 			return false, nil
 		}
 		if !kfapi.HasConditionAvailable(cp.Status.Conditions) {
-			logger.Info("The ControlPlane is not ready")
+			logger.V(2).Info("The ControlPlane is not ready")
+			return false, nil
+		}
+		if cp.Status.SecretRef == nil {
+			logger.V(2).Info("The ControlPlane SecretRef is not yet populated")
 			return false, nil
 		}
 		secretsClient := coreClient.Secrets(cp.Status.SecretRef.Namespace)
 		secret, err := secretsClient.Get(ctx, cp.Status.SecretRef.Name, metav1.GetOptions{})
 		if err != nil {
-			logger.Info("Failed to read Secret", "namespace", cp.Status.SecretRef.Namespace, "name", cp.Status.SecretRef.Name, "err", err)
+			logger.V(2).Info("Failed to read Secret", "namespace", cp.Status.SecretRef.Namespace, "name", cp.Status.SecretRef.Name, "err", err)
 			return false, nil
 		}
 		key := cp.Status.SecretRef.Key
@@ -139,7 +146,7 @@ func main() {
 		}
 		kubeconfigContent = secret.Data[key]
 		if len(kubeconfigContent) == 0 {
-			logger.Info("Secret lacks kubeconfig", "namespace", cp.Status.SecretRef.Namespace, "name", cp.Status.SecretRef.Name, "key", key)
+			logger.V(2).Info("Secret lacks kubeconfig", "namespace", cp.Status.SecretRef.Namespace, "name", cp.Status.SecretRef.Name, "key", key)
 			return false, nil
 		}
 		return true, nil
@@ -150,9 +157,14 @@ func main() {
 	}
 	out := os.Stdout
 	if outputFilePath != "-" {
-		out, err = os.Create(outputFilePath)
+		out, err = os.OpenFile(outputFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if err != nil {
 			logger.Error(err, "Failed to open file for writing", "path", outputFilePath)
+			os.Exit(99)
+		}
+		if err = out.Chmod(0600); err != nil {
+			out.Close()
+			logger.Error(err, "Failed to set file permissions", "path", outputFilePath)
 			os.Exit(99)
 		}
 	}
