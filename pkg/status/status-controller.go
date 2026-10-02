@@ -200,7 +200,11 @@ func (c *Controller) Start(parentCtx context.Context, workers int, cListers chan
 	ctx := klog.NewContext(parentCtx, logger)
 	errChan := make(chan error, 1)
 	go func() {
-		errChan <- c.run(ctx, workers, cListers)
+		err := c.run(ctx, workers, cListers)
+		if err != nil {
+			logger.Error(err, "status-controller failed")
+		}
+		errChan <- err
 	}()
 
 	// check for errors at startup, after all started we let it continue
