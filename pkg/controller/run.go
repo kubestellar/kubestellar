@@ -18,10 +18,12 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"k8s.io/apiserver/pkg/server/mux"
 	"k8s.io/apiserver/pkg/server/routes"
@@ -44,35 +46,87 @@ func InitialContext() (context.Context, func()) {
 	return ctx, cancel
 }
 
-func Start(ctx context.Context, processOpts ksopts.ProcessOptions) {
+func Start(ctx context.Context, processOpts ksopts.ProcessOptions) error {
 	logger := klog.FromContext(ctx)
+	errChan := make(chan error, 3)
+	var servers []*http.Server
+
+	// Start health probe server if address is configured
 	if processOpts.HealthProbeBindAddr != "" {
+		healthServer := &http.Server{
+			Addr:    processOpts.HealthProbeBindAddr,
+			Handler: http.HandlerFunc(HappyDumbHandler),
+		}
+		servers = append(servers, healthServer)
+
 		go func() {
-			err := http.ListenAndServe(processOpts.HealthProbeBindAddr, http.HandlerFunc(HappyDumbHandler))
-			if err != nil {
-				logger.Error(err, "Failed to serve health probes", "bindAddress", processOpts.HealthProbeBindAddr)
-				panic(err)
+			logger.Info("Starting health probe server", "bindAddress", processOpts.HealthProbeBindAddr)
+			if err := healthServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				errChan <- fmt.Errorf("health probe server failed: %w", err)
 			}
 		}()
-
 	}
+
+	// Start Prometheus metrics server
+	metricsServer := &http.Server{
+		Addr:    processOpts.MetricsBindAddr,
+		Handler: legacyregistry.Handler(),
+	}
+	servers = append(servers, metricsServer)
+
 	go func() {
-		err := http.ListenAndServe(processOpts.MetricsBindAddr, legacyregistry.Handler())
-		if err != nil {
-			logger.Error(err, "Failed to serve Prometheus metrics", "bindAddress", processOpts.MetricsBindAddr)
-			panic(err)
+		logger.Info("Starting Prometheus metrics server", "bindAddress", processOpts.MetricsBindAddr)
+		if err := metricsServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			errChan <- fmt.Errorf("Prometheus metrics server failed: %w", err)
 		}
 	}()
 
+	// Start pprof debug server
 	mymux := mux.NewPathRecorderMux("debug")
 	routes.Profiling{}.Install(mymux)
+	pprofServer := &http.Server{
+		Addr:    processOpts.PProfBindAddr,
+		Handler: mymux,
+	}
+	servers = append(servers, pprofServer)
+
 	go func() {
-		err := http.ListenAndServe(processOpts.PProfBindAddr, mymux)
-		if err != nil {
-			logger.Error(err, "Failure in serving /debug/pprof", "bindAddress", processOpts.PProfBindAddr)
-			panic(err)
+		logger.Info("Starting pprof debug server", "bindAddress", processOpts.PProfBindAddr)
+		if err := pprofServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			errChan <- fmt.Errorf("pprof debug server failed: %w", err)
 		}
 	}()
+
+	// Handle graceful shutdown on context cancellation
+	go func() {
+		<-ctx.Done()
+		logger.Info("Shutting down HTTP servers gracefully")
+		for _, server := range servers {
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			if err := server.Shutdown(shutdownCtx); err != nil {
+				logger.Error(err, "Error shutting down server", "address", server.Addr)
+			}
+			cancel()
+		}
+		logger.Error(fmt.Errorf("context cancelled"), "Context cancelled, HTTP servers shutting down")
+	}()
+
+	// Wait for any server error or context cancellation
+	select {
+	case err := <-errChan:
+		logger.Error(err, "HTTP server failed; shutting down")
+		for _, server := range servers {
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			if shutdownErr := server.Shutdown(shutdownCtx); shutdownErr != nil {
+				logger.Error(shutdownErr, "Error shutting down server", "address", server.Addr)
+			}
+			cancel()
+		}
+		return err
+	case <-ctx.Done():
+		logger.Info("Context cancelled, HTTP servers shutting down")
+		return nil
+	}
 }
 
 func HappyDumbHandler(resp http.ResponseWriter, req *http.Request) {
