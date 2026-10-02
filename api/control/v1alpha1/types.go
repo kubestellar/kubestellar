@@ -68,6 +68,7 @@ const PropertyConfigMapNamespace = "customization-properties"
 // +kubebuilder:printcolumn:name="TYPE",type="string",JSONPath=".spec.type"
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:resource:scope=Cluster,shortName={bp}
+// +kubebuilder:validation:XValidation:rule="size(self.metadata.name) <= 63",message="metadata.name must be at most 63 characters, because it is used as a label value on the transport objects"
 type BindingPolicy struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -287,6 +288,7 @@ type BindingPolicyList struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster,shortName={bdg}
+// +kubebuilder:validation:XValidation:rule="size(self.metadata.name) <= 63",message="metadata.name must be at most 63 characters, because it is used as a label value on the transport objects"
 type Binding struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object metadata.

@@ -386,6 +386,10 @@ spec:
             - observedGeneration
             type: object
         type: object
+        x-kubernetes-validations:
+        - message: metadata.name must be at most 63 characters, because it is used
+            as a label value on the transport objects
+          rule: size(self.metadata.name) <= 63
     served: true
     storage: true
     subresources:
