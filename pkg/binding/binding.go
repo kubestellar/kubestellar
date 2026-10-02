@@ -157,9 +157,8 @@ func (c *Controller) updateOrCreateBinding(ctx context.Context, bdg *v1alpha1.Bi
 
 			logger.V(2).Info("created binding", "name", bdg.GetName(), "resourceVersion", bdgEcho.ResourceVersion)
 			return nil
-		} else {
-			return fmt.Errorf("failed to update binding: %w", err)
 		}
+		return fmt.Errorf("failed to update binding: %w", err)
 	}
 
 	logger.V(2).Info("updated binding", "name", bdg.GetName(), "resourceVersion", bdgEcho.ResourceVersion)

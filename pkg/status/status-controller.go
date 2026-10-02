@@ -56,7 +56,7 @@ const (
 	originWdsLabelKey   = "transport.kubestellar.io/originWdsName"
 )
 
-// Controller watches workstatues and checks whether the corresponding
+// Controller watches WorkStatuses and checks whether the corresponding
 // workload object asks for the singleton status returning. If yes,
 // the full status will be copied to the workload object in WDS.
 type Controller struct {
