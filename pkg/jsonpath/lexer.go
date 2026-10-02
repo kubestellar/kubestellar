@@ -72,7 +72,7 @@ func NewLexer(source string, startPos int) (*Lexer, error) {
 	return lxr, err
 }
 
-// GetPosition returns the postion of the character that the Lexer is currently looking at
+// GetPosition returns the position of the character that the Lexer is currently looking at
 // and whether the Lexer is looking at EOF.
 func (lxr *Lexer) GetPosition() (int, bool) { return lxr.chrPos, lxr.eof }
 
