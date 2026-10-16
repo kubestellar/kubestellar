@@ -18,6 +18,7 @@ package ocm
 
 import (
 	"fmt"
+	"strings"
 
 	workv1 "open-cluster-management.io/api/work/v1"
 
@@ -50,9 +51,33 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 	var configs []workv1.ManifestConfigOption
 	for i, wrapee := range wrapees {
 		manifests[i].RawExtension = runtime.RawExtension{Object: wrapee.Object}
+		gvk := wrapee.Object.GroupVersionKind()
+		rsc := kindToResource(gvk.GroupKind())
+
+		var ignorePaths []string
+		var conditionRules []workv1.ConditionRule
+		if gvk.Group == "batch" && gvk.Kind == "Job" {
+			ignorePaths = append(ignorePaths,
+				".spec.selector",
+				".spec.template.metadata.labels.controller-uid",
+				".spec.template.metadata.labels[\"batch.kubernetes.io/controller-uid\"]",
+			)
+			conditionRules = append(conditionRules, workv1.ConditionRule{
+				Condition: "Complete",
+				Type:      workv1.WellKnownConditionsType,
+			})
+		}
+
+		if annotationVal := wrapee.Object.GetAnnotations()["kubestellar.io/ignore-fields"]; annotationVal != "" {
+			parts := strings.Split(annotationVal, ",")
+			for _, p := range parts {
+				if trimmed := strings.TrimSpace(p); trimmed != "" {
+					ignorePaths = append(ignorePaths, trimmed)
+				}
+			}
+		}
+
 		if wrapee.CreateOnly {
-			gvk := wrapee.Object.GroupVersionKind()
-			rsc := kindToResource(gvk.GroupKind())
 			configs = append(configs, workv1.ManifestConfigOption{
 				ResourceIdentifier: workv1.ResourceIdentifier{
 					Group:     gvk.Group,
@@ -61,6 +86,33 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 					Name:      wrapee.Object.GetName(),
 				},
 				UpdateStrategy: &createOnlyStrategy,
+			})
+		} else if len(ignorePaths) > 0 || len(conditionRules) > 0 {
+			var updateStrategy *workv1.UpdateStrategy
+			if len(ignorePaths) > 0 {
+				updateStrategy = &workv1.UpdateStrategy{
+					Type: workv1.UpdateStrategyTypeServerSideApply,
+					ServerSideApply: &workv1.ServerSideApplyConfig{
+						FieldManager: workv1.DefaultFieldManager,
+						IgnoreFields: []workv1.IgnoreField{
+							{
+								Condition: workv1.IgnoreFieldsConditionOnSpokePresent,
+								JSONPaths: ignorePaths,
+							},
+						},
+					},
+				}
+			}
+
+			configs = append(configs, workv1.ManifestConfigOption{
+				ResourceIdentifier: workv1.ResourceIdentifier{
+					Group:     gvk.Group,
+					Resource:  rsc,
+					Namespace: wrapee.Object.GetNamespace(),
+					Name:      wrapee.Object.GetName(),
+				},
+				UpdateStrategy: updateStrategy,
+				ConditionRules: conditionRules,
 			})
 		}
 	}
