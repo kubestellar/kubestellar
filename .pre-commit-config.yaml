@@ -19,3 +19,10 @@ repos:
         # when "--baseline" with "--use-all-plugins", pre-commit scan with all available plugins
         # add "--fail-on-unaudited" to fail pre-commit for unaudited potential secrets
         args: [--baseline, .secrets.baseline, --use-all-plugins]
+
+  - repo: https://github.com/facelessuser/pyspelling
+    rev: "2.12.1"
+    hooks:
+      - id: pyspelling
+        args: ["--config", ".github/spellcheck/.spellcheck.yml"]
+
