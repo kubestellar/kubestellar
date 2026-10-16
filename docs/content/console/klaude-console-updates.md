@@ -147,6 +147,6 @@ npm install && npm run build
 
 For update-related issues:
 
-- Check the [troubleshooting guide](README.md#troubleshooting)
+- Check the [troubleshooting guide](https://github.com/kubestellar/console/blob/main/docs/troubleshooting.md)
 - Search [GitHub Issues](https://github.com/kubestellar/console/issues)
 - Ask in the [KubeStellar Slack](https://kubestellar.io/community)
