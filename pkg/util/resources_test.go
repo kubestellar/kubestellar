@@ -38,12 +38,17 @@ func TestParseAPIGroupsString(t *testing.T) {
 		{
 			name:     "valid input with empty api group",
 			input:    "apps,,policy",
-			expected: sets.New("apps", "", "policy", "control.kubestellar.io", "apiextensions.k8s.io"),
+			expected: sets.New("apps", "policy", "control.kubestellar.io", "apiextensions.k8s.io"),
 		},
 		{
 			name:     "empty input",
 			input:    "",
 			expected: nil,
+		},
+		{
+			name:     "input with spaces after comma",
+			input:    "apps, networking.k8s.io, policy",
+			expected: sets.New("apps", "networking.k8s.io", "policy", "control.kubestellar.io", "apiextensions.k8s.io"),
 		},
 	}
 
