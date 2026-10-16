@@ -19,10 +19,11 @@ package util
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
-	"k8s.io/apimachinery/pkg/api/errors"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -94,49 +95,49 @@ func getObjectGVK(o interface{}) (schema.GroupVersionKind, error) {
 func GetWorkStatusSourceRef(workStatus runtime.Object) (*SourceRef, error) {
 	obj, ok := workStatus.(*unstructured.Unstructured)
 	if !ok {
-		return nil, fmt.Errorf("object cannot be cast to *unstructured.Unstructured")
+		return nil, errors.New("object cannot be cast to *unstructured.Unstructured")
 	}
 
 	spec, ok := obj.Object["spec"].(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("could not find spec in object or it's not a map")
+		return nil, errors.New("could not find spec in object or it's not a map")
 	}
 
 	sourceRef, ok := spec["sourceRef"].(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("could not find sourceRef in object spec or it's not a map")
+		return nil, errors.New("could not find sourceRef in object spec or it's not a map")
 	}
 
 	group, ok := sourceRef["group"].(string)
 	if !ok {
-		return nil, fmt.Errorf("could not find group in sourceRef or it's not a string")
+		return nil, errors.New("could not find group in sourceRef or it's not a string")
 	}
 
 	version, ok := sourceRef["version"].(string)
 	if !ok {
-		return nil, fmt.Errorf("could not find version in sourceRef or it's not a string")
+		return nil, errors.New("could not find version in sourceRef or it's not a string")
 	}
 
 	resource, ok := sourceRef["resource"].(string)
 	if !ok {
-		return nil, fmt.Errorf("could not find resource in sourceRef or it's not a string")
+		return nil, errors.New("could not find resource in sourceRef or it's not a string")
 	}
 
 	kind, ok := sourceRef["kind"].(string)
 	if !ok {
-		return nil, fmt.Errorf("could not find kind in sourceRef or it's not a string")
+		return nil, errors.New("could not find kind in sourceRef or it's not a string")
 	}
 
 	name, ok := sourceRef["name"].(string)
 	if !ok {
-		return nil, fmt.Errorf("could not find name in sourceRef or it's not a string")
+		return nil, errors.New("could not find name in sourceRef or it's not a string")
 	}
 
 	var namespace string
 	if nsObj, found := sourceRef["namespace"]; found && nsObj != nil {
 		ns, ok := nsObj.(string)
 		if !ok {
-			return nil, fmt.Errorf("namespace in sourceRef is not a string")
+			return nil, errors.New("namespace in sourceRef is not a string")
 		}
 		namespace = ns
 	}
@@ -182,7 +183,7 @@ func ObjectIdentifierFromSourceRef(sourceRef *SourceRef) ObjectIdentifier {
 func GetWorkStatusStatus(workStatus runtime.Object) (map[string]interface{}, error) {
 	obj, ok := workStatus.(*unstructured.Unstructured)
 	if !ok {
-		return nil, fmt.Errorf("object cannot be cast to *unstructured.Unstructured")
+		return nil, errors.New("object cannot be cast to *unstructured.Unstructured")
 	}
 
 	statusObj := obj.Object["status"]
@@ -192,7 +193,7 @@ func GetWorkStatusStatus(workStatus runtime.Object) (map[string]interface{}, err
 
 	status, ok := statusObj.(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("object cannot be cast to map[string]interface{}")
+		return nil, errors.New("object cannot be cast to map[string]interface{}")
 	}
 
 	return status, nil
@@ -251,7 +252,7 @@ func PatchStatus(ctx context.Context, unstrObj *unstructured.Unstructured, statu
 	_, err = rscIfc.Patch(ctx, unstrObj.GetName(), types.MergePatchType, patchBytes, metav1.PatchOptions{})
 
 	if err != nil {
-		if errors.IsNotFound(err) {
+		if apierrors.IsNotFound(err) {
 			logger.V(2).Info("could not find object to patch", "object", unstrObj)
 			return nil
 		}
