@@ -109,10 +109,12 @@ type wrappedClientMetrics[Single MRObject, List runtime.Object] struct {
 
 var _ MeasuredClientModNamespace[MRObject, MRObject] = &wrappedClientMetrics[MRObject, MRObject]{}
 
+// NewWrappedBasicClusterScopedClient creates a measured BasicClientModNamespace for a cluster-scoped resource.
 func NewWrappedBasicClusterScopedClient[Single MRObject, List runtime.Object](cm ClientMetrics, gvr schema.GroupVersionResource, inner BasicClientModNamespace[Single, List]) MeasuredBasicClientModNamespace[Single, List] {
 	return &wrappedBasicClientMetrics[Single, List]{cm.ResourceMetrics(gvr), inner}
 }
 
+// NewWrappedClusterScopedClient creates a measured ClientModNamespace for a cluster-scoped resource.
 func NewWrappedClusterScopedClient[Single MRObject, List runtime.Object](cm ClientMetrics, gvr schema.GroupVersionResource, inner ClientModNamespace[Single, List]) MeasuredClientModNamespace[Single, List] {
 	return &wrappedClientMetrics[Single, List]{
 		wrappedBasicClientMetrics: wrappedBasicClientMetrics[Single, List]{cm.ResourceMetrics(gvr), inner},
@@ -120,6 +122,7 @@ func NewWrappedClusterScopedClient[Single MRObject, List runtime.Object](cm Clie
 	}
 }
 
+// NewWrappedBasicNamespacedClient creates a measured BasicNamespacedClient for a namespace-scoped resource.
 func NewWrappedBasicNamespacedClient[Single MRObject, List runtime.Object](cm ClientMetrics, gvr schema.GroupVersionResource, namespaceFn func(string) BasicClientModNamespace[Single, List]) MeasuredBasicNamespacedClient[Single, List] {
 	return &wrappedBasicNamespacingMetrics[Single, List]{
 		namespaceFn:           namespaceFn,
@@ -127,6 +130,7 @@ func NewWrappedBasicNamespacedClient[Single MRObject, List runtime.Object](cm Cl
 	}
 }
 
+// NewWrappedNamespacedClient creates a measured NamespacedClient for a namespace-scoped resource.
 func NewWrappedNamespacedClient[Single MRObject, List runtime.Object](cm ClientMetrics, gvr schema.GroupVersionResource, namespaceFn func(string) ClientModNamespace[Single, List]) MeasuredNamespacedClient[Single, List] {
 	return &wrappedNamespacingMetrics[Single, List]{
 		wrappedBasicNamespacingMetrics: wrappedBasicNamespacingMetrics[Single, List]{cm.ResourceMetrics(gvr), func(ns string) BasicClientModNamespace[Single, List] { return namespaceFn(ns) }},
