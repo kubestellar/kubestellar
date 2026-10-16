@@ -71,6 +71,7 @@ type SourceRef struct {
 	Namespace string `json:"namespace,omitempty"`
 }
 
+// IsCRD returns true if the object is a CustomResourceDefinition.
 func IsCRD(o interface{}) bool {
 	return objectMatchesGVK(o, apiextensions.GroupName, AnyVersion, CRDKind)
 }
@@ -91,6 +92,7 @@ func getObjectGVK(o interface{}) (schema.GroupVersionKind, error) {
 	return schema.GroupVersionKind{}, fmt.Errorf("object is of wrong type: %#v", o)
 }
 
+// GetWorkStatusSourceRef extracts the sourceRef from a WorkStatus unstructured object.
 func GetWorkStatusSourceRef(workStatus runtime.Object) (*SourceRef, error) {
 	obj, ok := workStatus.(*unstructured.Unstructured)
 	if !ok {
@@ -151,11 +153,13 @@ func GetWorkStatusSourceRef(workStatus runtime.Object) (*SourceRef, error) {
 	}, nil
 }
 
+// KeyFromSourceRefAndWecName creates a unique string key from a SourceRef and a WEC name.
 func KeyFromSourceRefAndWecName(sourceRef *SourceRef, wecName string) string {
 	return fmt.Sprintf("%s/%s/%s/%s/%s/%s", sourceRef.Group, sourceRef.Version, sourceRef.Resource,
 		sourceRef.Kind, sourceRef.Name, wecName)
 }
 
+// SourceRefFromObjectIdentifier creates a SourceRef corresponding to an ObjectIdentifier.
 func SourceRefFromObjectIdentifier(objIdentifier ObjectIdentifier) *SourceRef {
 	return &SourceRef{
 		Group:     objIdentifier.GVK.Group,
@@ -167,6 +171,7 @@ func SourceRefFromObjectIdentifier(objIdentifier ObjectIdentifier) *SourceRef {
 	}
 }
 
+// ObjectIdentifierFromSourceRef creates an ObjectIdentifier from a SourceRef.
 func ObjectIdentifierFromSourceRef(sourceRef *SourceRef) ObjectIdentifier {
 	return ObjectIdentifier{
 		GVK: schema.GroupVersionKind{
@@ -179,6 +184,7 @@ func ObjectIdentifierFromSourceRef(sourceRef *SourceRef) ObjectIdentifier {
 	}
 }
 
+// GetWorkStatusStatus extracts the status subresource map from a WorkStatus runtime object.
 func GetWorkStatusStatus(workStatus runtime.Object) (map[string]interface{}, error) {
 	obj, ok := workStatus.(*unstructured.Unstructured)
 	if !ok {
@@ -198,6 +204,7 @@ func GetWorkStatusStatus(workStatus runtime.Object) (map[string]interface{}, err
 	return status, nil
 }
 
+// CheckWorkStatusPresence checks if the WorkStatus API resource is present in the cluster.
 func CheckWorkStatusPresence(config *rest.Config) bool {
 	discoveryClient, err := discovery.NewDiscoveryClientForConfig(config)
 	if err != nil {
@@ -213,6 +220,7 @@ func CheckWorkStatusPresence(config *rest.Config) bool {
 	return CheckAPIisPresent(discoveryClient, gvr)
 }
 
+// CheckAPIisPresent checks if the specified GroupVersionResource is present via discovery.
 func CheckAPIisPresent(dc *discovery.DiscoveryClient, gvr schema.GroupVersionResource) bool {
 	resourceList, err := dc.ServerResourcesForGroupVersion(gvr.GroupVersion().String())
 	if err != nil {
@@ -228,6 +236,7 @@ func CheckAPIisPresent(dc *discovery.DiscoveryClient, gvr schema.GroupVersionRes
 	return false
 }
 
+// CreateStatusPatch creates an unstructured patch containing only the APIVersion, Kind, Name, Namespace, and status.
 func CreateStatusPatch(unstrObj *unstructured.Unstructured, status map[string]interface{}) *unstructured.Unstructured {
 	patchedObj := &unstructured.Unstructured{}
 	patchedObj.SetAPIVersion(unstrObj.GetAPIVersion())
@@ -238,6 +247,7 @@ func CreateStatusPatch(unstrObj *unstructured.Unstructured, status map[string]in
 	return patchedObj
 }
 
+// PatchStatus applies a status patch to an unstructured object using the provided dynamic client.
 func PatchStatus(ctx context.Context, unstrObj *unstructured.Unstructured, status map[string]interface{},
 	namespace string, gvr schema.GroupVersionResource, dynamicClient dynamic.Interface) error {
 	logger := klog.FromContext(ctx)
@@ -260,6 +270,8 @@ func PatchStatus(ctx context.Context, unstrObj *unstructured.Unstructured, statu
 	return err
 }
 
+// DynamicForResource provides a convenient helper to obtain a dynamic.ResourceInterface.
+// It exists to avoid repetitive client setup and namespace handling logic across controllers.
 func DynamicForResource(dynClient dynamic.Interface, gvr schema.GroupVersionResource, namespace string) dynamic.ResourceInterface {
 	nsblIfc := dynClient.Resource(gvr)
 	if namespace == metav1.NamespaceNone {
