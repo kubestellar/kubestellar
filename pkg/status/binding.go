@@ -39,8 +39,11 @@ func (c *Controller) syncBinding(ctx context.Context, key string) error {
 	logger.V(5).Info("In syncBinding", "bindingName", key, "isDeleted", isDeleted, "resolutionIsNil", resolution == nil, "resolution", resolution, "resolutionType", fmt.Sprintf("%T", resolution))
 
 	// NoteBindingResolution does not use the resolution if isDeleted is true
-	changedCombinedStatuses := c.combinedStatusResolver.NoteBindingResolution(ctx, key, resolution, isDeleted,
+	changedCombinedStatuses, err := c.combinedStatusResolver.NoteBindingResolution(ctx, key, resolution, isDeleted,
 		c.workStatusIndexer, c.statusCollectorLister)
+	if err != nil {
+		return fmt.Errorf("failed to note binding resolution: %w", err)
+	}
 	for combinedStatus := range changedCombinedStatuses {
 		logger.V(5).Info("Enqueuing CombinedStatus due to sync of Binding", "combinedStatus", combinedStatus.ObjectName, "bindingName", key)
 		c.workqueue.AddAfter(combinedStatusRef(combinedStatus.ObjectName.AsNamespacedName().String()), queueingDelay)
