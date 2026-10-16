@@ -18,9 +18,11 @@ package transport
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
 	"go/token"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -70,6 +72,7 @@ const (
 	originOwnerReferenceLabel       = "transport.kubestellar.io/originOwnerReferenceBindingKey"
 	originWdsLabel                  = "transport.kubestellar.io/originWdsName"
 	originOwnerGenerationAnnotation = "transport.kubestellar.io/originOwnerReferenceBindingGeneration"
+	customTransformStateAnnotation  = "transport.kubestellar.io/applied-custom-transform-state"
 
 	customTransformDomainIndexName = "custom-transform-domain"
 )
@@ -738,9 +741,12 @@ func (c *genericTransportController) getWrapeesFromWDS(ctx context.Context, bind
 		gr := metav1.GroupResource{Group: gvr.Group, Resource: gvr.Resource}
 		groupResources.Insert(gr)
 		kindToResource[object.GroupVersionKind().GroupKind()] = gvr.Resource
+		transformedObject, customTransformState := transformObject(ctx, c.customTransformCollection, gr, object, binding.Name)
 		wrapees = append(wrapees, WrapeeWithUID{
-			transport.NewWrapee(TransformObject(ctx, c.customTransformCollection, gr, object, binding.Name), createOnly),
-			string(object.GetUID())})
+			Wrapee:               transport.NewWrapee(transformedObject, createOnly),
+			UID:                  string(object.GetUID()),
+			CustomTransformState: customTransformState,
+		})
 	}
 	// add cluster-scoped objects to the 'objectsToPropagate' slice
 	for _, clause := range binding.Spec.Workload.ClusterScope {
@@ -855,7 +861,11 @@ func (c *genericTransportController) computeDestToCustomizedObjects(uncustomized
 			}
 			if destToCustomizedWrapees != nil {
 				customizedObjectsSoFar := destToCustomizedWrapees[dest]
-				customizedObjectsSoFar = append(customizedObjectsSoFar, WrapeeWithUID{transport.NewWrapee(objC, wrapee.CreateOnly), wrapee.UID})
+				customizedObjectsSoFar = append(customizedObjectsSoFar, WrapeeWithUID{
+					Wrapee:               transport.NewWrapee(objC, wrapee.CreateOnly),
+					UID:                  wrapee.UID,
+					CustomTransformState: wrapee.CustomTransformState,
+				})
 				destToCustomizedWrapees[dest] = customizedObjectsSoFar
 			}
 		}
@@ -874,7 +884,7 @@ func (c *genericTransportController) computeDestToCustomizedObjects(uncustomized
 
 // wrapBatch invokes the transport's WrapObjects.
 // uidToPropagate is the UID (in the WDS) of one of the objects in batchToPropagate.
-func (c *genericTransportController) wrapBatch(batchToPropagate []transport.Wrapee, uidToPropagate string, kindToResource func(schema.GroupKind) (string, bool), binding *v1alpha1.Binding, numShard int) (*unstructured.Unstructured, error) {
+func (c *genericTransportController) wrapBatch(batchToPropagate []transport.Wrapee, customTransformStates []string, uidToPropagate string, kindToResource func(schema.GroupKind) (string, bool), binding *v1alpha1.Binding, numShard int) (*unstructured.Unstructured, error) {
 	wrapped := c.transport.WrapObjects(batchToPropagate, abstract.DropOK11(kindToResource))
 	wrappedObject, err := convertObjectToUnstructured(wrapped)
 	if err != nil {
@@ -895,13 +905,32 @@ func (c *genericTransportController) wrapBatch(batchToPropagate []transport.Wrap
 	setLabel(wrappedObject, originOwnerReferenceLabel, binding.GetName())
 	setLabel(wrappedObject, originWdsLabel, c.wdsName)
 	setAnnotation(wrappedObject, originOwnerGenerationAnnotation, binding.GetGeneration())
+	if customTransformState := combinedCustomTransformState(customTransformStates); customTransformState != "" {
+		setAnnotation(wrappedObject, customTransformStateAnnotation, customTransformState)
+	}
 	return wrappedObject, err
+}
+
+func combinedCustomTransformState(states []string) string {
+	needsAnnotation := false
+	for _, state := range states {
+		if state != "" {
+			needsAnnotation = true
+			break
+		}
+	}
+	if !needsAnnotation {
+		return ""
+	}
+	sum := sha256.Sum256([]byte(strings.Join(states, "\x00")))
+	return fmt.Sprintf("sha256:%x", sum[:])
 }
 
 type WrapeeWithUID struct {
 	transport.Wrapee
 	// UID of the object in the WDS
-	UID string
+	UID                  string
+	CustomTransformState string
 }
 
 // transportTask is one wrapped object and a gloss of its contents
@@ -913,6 +942,7 @@ type transportTask struct {
 func (c *genericTransportController) wrap(wrapeesToPropagate []WrapeeWithUID, kindToResource func(schema.GroupKind) (string, bool), binding *v1alpha1.Binding) ([]transportTask, error) {
 	var transportTasks []transportTask
 	var batchToPropagate []transport.Wrapee = nil
+	var customTransformStates []string
 	var uidToPropagate string
 	gloss := transport.Gloss{}
 	maxSize := c.MaxSizeWrapped
@@ -930,25 +960,27 @@ func (c *genericTransportController) wrap(wrapeesToPropagate []WrapeeWithUID, ki
 			return nil, fmt.Errorf("failed to wrap object that is larger than max size")
 		}
 		if (objSize+batchSize >= maxSize) || (batchCount+1 > maxCount) {
-			wrappedObject, err := c.wrapBatch(batchToPropagate, uidToPropagate, kindToResource, binding, numShard)
+			wrappedObject, err := c.wrapBatch(batchToPropagate, customTransformStates, uidToPropagate, kindToResource, binding, numShard)
 			if err != nil {
 				return nil, err
 			}
 			numShard += 1
 			transportTasks = append(transportTasks, transportTask{wrappedObject, gloss})
 			batchToPropagate = nil
+			customTransformStates = nil
 			gloss = transport.Gloss{}
 			batchSize = 0
 			batchCount = 0
 		}
 		batchToPropagate = append(batchToPropagate, wrapee.Wrapee)
+		customTransformStates = append(customTransformStates, wrapee.CustomTransformState)
 		uidToPropagate = wrapee.UID
 		gloss.Insert(wrapee.GetID())
 		batchSize += objSize
 		batchCount += 1
 	}
 	if batchToPropagate != nil {
-		wrappedObject, err := c.wrapBatch(batchToPropagate, uidToPropagate, kindToResource, binding, numShard)
+		wrappedObject, err := c.wrapBatch(batchToPropagate, customTransformStates, uidToPropagate, kindToResource, binding, numShard)
 		if err != nil {
 			return nil, err
 		}
@@ -1087,16 +1119,20 @@ func (c *genericTransportController) propagateWrappedObjectToClusters(ctx contex
 				}
 				desiredGeneration := task.ObjU.GetAnnotations()[originOwnerGenerationAnnotation]
 				actualGeneration := currentWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation]
+				desiredCustomTransformState := task.ObjU.GetAnnotations()[customTransformStateAnnotation]
+				actualCustomTransformState := currentWrappedObject.GetAnnotations()[customTransformStateAnnotation]
 				// This test covers workload object ResourceVersion and the create-only bit.
-				// This test is also an imperfect test for consistency in customization.
-				// It does not take into account the effects of absence of, or changes in, CustomTransform objects.
+				// This test also covers customization and CustomTransform consistency.
 				generationMatch := actualGeneration == desiredGeneration
+				customTransformStateMatch := actualCustomTransformState == desiredCustomTransformState
 				glossEqual := abstract.PrimitiveMapEqual(task.Gloss, gloss)
-				if generationMatch && glossEqual {
+				if generationMatch && customTransformStateMatch && glossEqual {
 					logger.V(5).Info("No need to change wrapped object", "id", wrappedID)
 					continue
 				}
-				if glossEqual {
+				if !customTransformStateMatch {
+					logger.V(5).Info("Need to change wrapped object because of CustomTransform state mismatch", "id", wrappedID, "desiredCustomTransformState", desiredCustomTransformState, "actualCustomTransformState", actualCustomTransformState)
+				} else if glossEqual {
 					logger.V(5).Info("Need to change wrapped object because of Binding generation mismatch", "id", wrappedID, "desiredGeneration", desiredGeneration, "actualGeneration", actualGeneration)
 				} else {
 					logger.V(5).Info("Need to change wrapped object because of (at least) gloss mismatch", "id", wrappedID, "desiredGeneration", desiredGeneration, "actualGeneration", actualGeneration, "desiredGloss", util.K8sSet4Log(task.Gloss), "actualGloss", util.K8sSet4Log(gloss))
@@ -1278,6 +1314,11 @@ func setLabel(object metav1.Object, key string, value any) {
 // 2. Removal that is specific to a Kind of object and fixed in KubeStellar code;
 // 3. Removal that is specific to a Kind of object and configured by API object(s).
 func TransformObject(ctx context.Context, ctc customTransformCollection, groupResource metav1.GroupResource, object *unstructured.Unstructured, bindingName string) *unstructured.Unstructured {
+	objectCopy, _ := transformObject(ctx, ctc, groupResource, object, bindingName)
+	return objectCopy
+}
+
+func transformObject(ctx context.Context, ctc customTransformCollection, groupResource metav1.GroupResource, object *unstructured.Unstructured, bindingName string) (*unstructured.Unstructured, string) {
 	objectCopy := object.DeepCopy() // don't modify object directly. create a copy before zeroing fields
 	objectCopy.SetManagedFields(nil)
 	objectCopy.SetFinalizers(nil)
@@ -1309,7 +1350,7 @@ func TransformObject(ctx context.Context, ctc customTransformCollection, groupRe
 		}
 		objectCopy.SetUnstructuredContent(objectData)
 	}
-	return objectCopy
+	return objectCopy, customChanges.stateDigest
 }
 
 func customTransformToDomain(obj any) ([]string, error) {
