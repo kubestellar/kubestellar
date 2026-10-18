@@ -696,10 +696,9 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	}
 	if binding.Status.ObservedGeneration != binding.Generation || !slices.Equal(binding.Status.Errors, bindingErrors) {
 		bindingCopy := binding.DeepCopy()
-		bindingCopy.Status = v1alpha1.BindingStatus{
-			ObservedGeneration: binding.Generation,
-			Errors:             bindingErrors,
-		}
+		// The Conditions are maintained by another controller; only update the fields owned here.
+		bindingCopy.Status.ObservedGeneration = binding.Generation
+		bindingCopy.Status.Errors = bindingErrors
 		binding2, err := c.bindingClient.UpdateStatus(ctx, bindingCopy, metav1.UpdateOptions{FieldManager: ControllerName})
 		if err != nil {
 			return fmt.Errorf("failed to update status of Binding '%s' - %w", binding.Name, err)
