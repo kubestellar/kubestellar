@@ -44,6 +44,7 @@ import (
 	dynamicfake "k8s.io/client-go/dynamic/fake"
 	k8sinformers "k8s.io/client-go/informers"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
+	k8smetrics "k8s.io/component-base/metrics"
 	"k8s.io/component-base/metrics/legacyregistry"
 	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/ktesting"
@@ -436,5 +437,122 @@ func TestGenericController(t *testing.T) {
 		t.Fatalf("Never got right call to WrapObjects")
 	} else {
 		logger.Info("Success", "objects", len(objs), "numExpected", len(transport.expect))
+	}
+}
+
+// TestBindingStatusConditionsPreserved checks that when the transport controller
+// updates the Binding status fields that it owns, it leaves alone the
+// Conditions that are maintained by another controller.
+func TestBindingStatusConditionsPreserved(t *testing.T) {
+	for _, tc := range []struct {
+		name               string
+		generation         int64
+		observedGeneration int64
+		statusErrors       []string
+	}{
+		{name: "stale-observed-generation", generation: 2, observedGeneration: 1},
+		{name: "stale-errors", generation: 2, observedGeneration: 2, statusErrors: []string{"error from an earlier sync"}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			testBindingStatusConditionsPreserved(t, tc.generation, tc.observedGeneration, tc.statusErrors)
+		})
+	}
+}
+
+func testBindingStatusConditionsPreserved(t *testing.T, generation, observedGeneration int64, statusErrors []string) {
+	scheme := runtime.NewScheme()
+	if err := k8score.AddToScheme(scheme); err != nil {
+		t.Fatalf("Failed to k8score.AddToScheme(scheme): %s", err)
+	}
+	if err := workapi.AddToScheme(scheme); err != nil {
+		t.Fatalf("Failed to workapi.AddToScheme(scheme): %s", err)
+	}
+	if err := ksapi.AddToScheme(scheme); err != nil {
+		t.Fatalf("Failed to ksapi.AddToScheme(scheme): %s", err)
+	}
+	_, ctx := ktesting.NewTestContext(t)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	ns := &k8score.Namespace{
+		TypeMeta:   typeMeta("Namespace", k8score.SchemeGroupVersion),
+		ObjectMeta: metav1.ObjectMeta{Name: "ns1", ResourceVersion: generateResourceVersion()},
+	}
+	cm := &k8score.ConfigMap{
+		TypeMeta:   typeMeta("ConfigMap", k8score.SchemeGroupVersion),
+		ObjectMeta: metav1.ObjectMeta{Namespace: ns.Name, Name: "cm1", ResourceVersion: generateResourceVersion()},
+	}
+	bindingCase := bindingCase{
+		Binding: &ksapi.Binding{
+			TypeMeta:   typeMeta("Binding", ksapi.GroupVersion),
+			ObjectMeta: metav1.ObjectMeta{Name: "b1", Generation: generation},
+			Status: ksapi.BindingStatus{
+				ObservedGeneration: observedGeneration,
+				Errors:             statusErrors,
+				Conditions: []ksapi.BindingPolicyCondition{{
+					Type:    ksapi.TypeStatusCollectorsAvailable,
+					Status:  k8score.ConditionTrue,
+					Reason:  ksapi.ReasonReconcileSuccess,
+					Message: "All StatusCollector(s) are available",
+				}},
+			},
+		},
+		expect: map[util.GKObjRef]jsonMapToWrap{},
+	}
+	bindingCase.Add(mrObjRsc{cm, "configmaps"}, false)
+	wantConditions := bindingCase.Binding.Status.Conditions
+
+	wdsKsClientFake := ksclientfake.NewSimpleClientset(bindingCase.Binding)
+	wdsKsInformerFactory := ksinformers.NewSharedInformerFactory(wdsKsClientFake, 0*time.Minute)
+	wdsControlInformers := wdsKsInformerFactory.Control().V1alpha1()
+	wdsDynamicClient := dynamicfake.NewSimpleDynamicClient(scheme, ns, cm)
+	itsDynamicClient := dynamicfake.NewSimpleDynamicClient(scheme)
+	transport := &testTransport{
+		t:           t,
+		bindingName: bindingCase.Binding.Name,
+		ctx:         ctx,
+		ctc: newCustomTransformCollection(wdsKsClientFake.ControlV1alpha1().CustomTransforms(),
+			wdsControlInformers.CustomTransforms().Informer().GetIndexer().ByIndex,
+			func(any) {}),
+		kindToResource: map[metav1.GroupKind]string{
+			{Group: "", Kind: "ConfigMap"}: "configmaps",
+		},
+		expect: bindingCase.expect}
+	inventoryInformerFactory := clusterinformers.NewSharedInformerFactory(clusterclientfake.NewSimpleClientset(), 0*time.Second)
+	itsK8sClientFake := k8sfake.NewSimpleClientset()
+	itsK8sInformerFactory := k8sinformers.NewSharedInformerFactory(itsK8sClientFake, 0*time.Minute)
+	spacesClientMetrics := ksmetrics.NewMultiSpaceClientMetrics()
+	ksmetrics.MustRegister(k8smetrics.NewKubeRegistry().Register, spacesClientMetrics)
+	ctlr := NewTransportControllerForWrappedObjectGVR(ctx, spacesClientMetrics.MetricsForSpace("wds"), spacesClientMetrics.MetricsForSpace("its"),
+		inventoryInformerFactory.Cluster().V1().ManagedClusters(), wdsKsClientFake.ControlV1alpha1().Bindings(),
+		wdsControlInformers.Bindings(), wdsControlInformers.CustomTransforms(),
+		transport,
+		wdsKsClientFake,
+		wdsDynamicClient,
+		itsK8sClientFake.CoreV1().Namespaces(), itsK8sInformerFactory.Core().V1().ConfigMaps(),
+		itsDynamicClient, 500*1024, 1, "test-wds", workapi.GroupVersion.WithResource("manifestworks"))
+	inventoryInformerFactory.Start(ctx.Done())
+	wdsKsInformerFactory.Start(ctx.Done())
+	itsK8sInformerFactory.Start(ctx.Done())
+	runErrs := make(chan error, 1)
+	go func() { runErrs <- ctlr.Run(ctx, 1) }()
+
+	var binding *ksapi.Binding
+	err := wait.PollUntilContextTimeout(ctx, 100*time.Millisecond, time.Minute, true, func(ctx context.Context) (bool, error) {
+		var err error
+		binding, err = wdsKsClientFake.ControlV1alpha1().Bindings().Get(ctx, bindingCase.Binding.Name, metav1.GetOptions{})
+		if err != nil {
+			return false, err
+		}
+		return binding.Status.ObservedGeneration == binding.Generation && len(binding.Status.Errors) == 0, nil
+	})
+	if err != nil {
+		t.Fatalf("Binding status (observedGeneration, errors) was never updated: %v", err)
+	}
+	if !apiequality.Semantic.DeepEqual(binding.Status.Conditions, wantConditions) {
+		t.Errorf("Binding status conditions changed: got %#v, want %#v", binding.Status.Conditions, wantConditions)
+	}
+	cancel()
+	if err := <-runErrs; err != nil {
+		t.Errorf("Transport controller Run failed: %v", err)
 	}
 }
