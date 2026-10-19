@@ -34,6 +34,9 @@ import (
 const (
 	wrappedObjectKind       = "ManifestWork"
 	wrappedObjectAPIVersion = "work.open-cluster-management.io/v1"
+
+	csiDriverGroup = "storage.k8s.io"
+	csiDriverKind  = "CSIDriver"
 )
 
 func NewOCMTransport() transport.Transport {
@@ -44,15 +47,19 @@ type ocm struct {
 }
 
 var createOnlyStrategy = workv1.UpdateStrategy{Type: workv1.UpdateStrategyTypeCreateOnly}
+var serverSideApplyStrategy = workv1.UpdateStrategy{Type: workv1.UpdateStrategyTypeServerSideApply}
 
 func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(schema.GroupKind) string) runtime.Object {
 	manifests := make([]workv1.Manifest, len(wrapees))
 	var configs []workv1.ManifestConfigOption
 	for i, wrapee := range wrapees {
 		manifests[i].RawExtension = runtime.RawExtension{Object: wrapee.Object}
+		gvk := wrapee.Object.GroupVersionKind()
+		var rsc string
+		if kindToResource != nil {
+			rsc = kindToResource(gvk.GroupKind())
+		}
 		if wrapee.CreateOnly {
-			gvk := wrapee.Object.GroupVersionKind()
-			rsc := kindToResource(gvk.GroupKind())
 			configs = append(configs, workv1.ManifestConfigOption{
 				ResourceIdentifier: workv1.ResourceIdentifier{
 					Group:     gvk.Group,
@@ -61,6 +68,16 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 					Name:      wrapee.Object.GetName(),
 				},
 				UpdateStrategy: &createOnlyStrategy,
+			})
+		} else if gvk.Group == csiDriverGroup && gvk.Kind == csiDriverKind {
+			configs = append(configs, workv1.ManifestConfigOption{
+				ResourceIdentifier: workv1.ResourceIdentifier{
+					Group:     gvk.Group,
+					Resource:  rsc,
+					Namespace: wrapee.Object.GetNamespace(),
+					Name:      wrapee.Object.GetName(),
+				},
+				UpdateStrategy: &serverSideApplyStrategy,
 			})
 		}
 	}
