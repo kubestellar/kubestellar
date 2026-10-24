@@ -709,12 +709,12 @@ func (c *genericTransportController) updateWrappedObjectsAndFinalizer(ctx contex
 	}
 	c.customTransformCollection.setBindingGroupResources(binding.Name, groupResources)
 	// converge actual state to the desired state
-	if len(bindingErrors) == 0 {
-		if err := c.propagateWrappedObjectToClusters(ctx, destToDesiredWrappedObjects, kindToResource, currentWrappedObjectList, binding.Spec.Destinations); err != nil {
-			return fmt.Errorf("failed to propagate wrapped object(s) for binding '%s' to all required WECs - %w", binding.GetName(), err)
-		}
-	} else {
-		klog.FromContext(ctx).Info("Deleting all wrapped objects in ITS because of errors in Binding", "binding", binding.Name)
+	if len(bindingErrors) != 0 {
+		klog.FromContext(ctx).Info("Not changing wrapped objects in ITS because of errors in Binding", "binding", binding.Name)
+		return nil
+	}
+	if err := c.propagateWrappedObjectToClusters(ctx, destToDesiredWrappedObjects, kindToResource, currentWrappedObjectList, binding.Spec.Destinations); err != nil {
+		return fmt.Errorf("failed to propagate wrapped object(s) for binding '%s' to all required WECs - %w", binding.GetName(), err)
 	}
 	// all objects that appear in the desired state were handled. need to remove wrapped objects that are not part of the desired state
 	if len(currentWrappedObjectList.Items) > 0 {

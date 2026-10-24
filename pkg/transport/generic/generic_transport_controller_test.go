@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -36,11 +37,14 @@ import (
 	k8snetv1 "k8s.io/api/networking/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	k8sschema "k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/dynamic"
 	dynamicfake "k8s.io/client-go/dynamic/fake"
 	k8sinformers "k8s.io/client-go/informers"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
@@ -437,4 +441,251 @@ func TestGenericController(t *testing.T) {
 	} else {
 		logger.Info("Success", "objects", len(objs), "numExpected", len(transport.expect))
 	}
+}
+
+type recordingTransport struct{}
+
+func (recordingTransport) WrapObjects([]transport.Wrapee, func(k8sschema.GroupKind) string) runtime.Object {
+	return &workapi.ManifestWork{
+		TypeMeta: typeMeta("ManifestWork", workapi.GroupVersion),
+	}
+}
+
+func (recordingTransport) UnwrapObjects(runtime.Object, func(k8sschema.GroupKind) (string, bool)) (transport.Gloss, error) {
+	return transport.Gloss{}, nil
+}
+
+func TestUpdateWrappedObjectsAndFinalizer(t *testing.T) {
+	const (
+		bindingName = "bind-1"
+		wdsName     = "wds1"
+		shardName   = bindingName + "-" + wdsName + "-0"
+		keptNS      = "c1"
+		staleNS     = "c2"
+	)
+	_, ctx := ktesting.NewTestContext(t)
+	scheme := runtime.NewScheme()
+	if err := k8score.AddToScheme(scheme); err != nil {
+		t.Fatal(err)
+	}
+	if err := workapi.AddToScheme(scheme); err != nil {
+		t.Fatal(err)
+	}
+
+	newWork := func(namespace, name string) *unstructured.Unstructured {
+		obj := &unstructured.Unstructured{}
+		obj.SetAPIVersion(workapi.GroupVersion.String())
+		obj.SetKind("ManifestWork")
+		obj.SetNamespace(namespace)
+		obj.SetName(name)
+		obj.SetLabels(map[string]string{
+			originOwnerReferenceLabel: bindingName,
+			originWdsLabel:            wdsName,
+		})
+		obj.SetAnnotations(map[string]string{"test.kubestellar.io/marker": namespace + "/" + name})
+		return obj
+	}
+
+	type rig struct {
+		ctlr    *genericTransportController
+		its     dynamic.Interface
+		wds     dynamic.Interface
+		binding *ksapi.Binding
+	}
+	setup := func(t *testing.T, data string, expand bool, keptName string) rig {
+		t.Helper()
+		cm := &k8score.ConfigMap{
+			TypeMeta: typeMeta("ConfigMap", k8score.SchemeGroupVersion),
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "app",
+				Name:      "cfg",
+			},
+			Data: map[string]string{"msg": data},
+		}
+		if expand {
+			cm.Annotations = map[string]string{ksapi.TemplateExpansionAnnotationKey: "true"}
+		}
+		wdsDyn := dynamicfake.NewSimpleDynamicClient(scheme, cm)
+		itsDyn := dynamicfake.NewSimpleDynamicClient(scheme)
+		gvr := workapi.GroupVersion.WithResource("manifestworks")
+		for _, obj := range []*unstructured.Unstructured{newWork(keptNS, keptName), newWork(staleNS, "stale")} {
+			if _, err := itsDyn.Resource(gvr).Namespace(obj.GetNamespace()).Create(ctx, obj, metav1.CreateOptions{}); err != nil {
+				t.Fatal(err)
+			}
+		}
+		binding := &ksapi.Binding{
+			TypeMeta: typeMeta("Binding", ksapi.GroupVersion),
+			ObjectMeta: metav1.ObjectMeta{
+				Name:       bindingName,
+				Generation: 3,
+				Finalizers: []string{transportFinalizer},
+			},
+			Spec: ksapi.BindingSpec{
+				Workload: ksapi.DownsyncObjectClauses{
+					NamespaceScope: []ksapi.NamespaceScopeDownsyncClause{
+						newNamespaceScope(metav1.GroupVersionResource{Version: "v1", Resource: "configmaps"}, "app", "cfg", "1", false),
+					},
+				},
+				Destinations: []ksapi.Destination{{ClusterId: keptNS}},
+			},
+		}
+		ksClient := ksclientfake.NewSimpleClientset(binding)
+		created, err := ksClient.ControlV1alpha1().Bindings().Get(ctx, bindingName, metav1.GetOptions{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		inventoryFactory := clusterinformers.NewSharedInformerFactory(clusterclientfake.NewSimpleClientset(), 0)
+		cmFactory := k8sinformers.NewSharedInformerFactory(k8sfake.NewSimpleClientset(), 0)
+		ctlr := &genericTransportController{
+			logger:           klog.FromContext(ctx),
+			bindingClient:    ksClient.ControlV1alpha1().Bindings(),
+			inventoryLister:  inventoryFactory.Cluster().V1().ManagedClusters().Lister(),
+			propCfgMapLister: cmFactory.Core().V1().ConfigMaps().Lister().ConfigMaps(ksapi.PropertyConfigMapNamespace),
+			transport:        recordingTransport{},
+			transportClient:  itsDyn,
+			wrappedObjectGVR: gvr,
+			wdsDynamicClient: wdsDyn,
+			MaxSizeWrapped:   1 << 20,
+			MaxNumWrapped:    20,
+			wdsName:          wdsName,
+			customTransformCollection: newCustomTransformCollection(nil, func(string, string) ([]any, error) {
+				return nil, nil
+			}, func(any) {}),
+			bindingSensitiveDestinations: map[string]sets.Set[ksapi.Destination]{},
+			destinationProperties:        map[ksapi.Destination]clusterProperties{},
+		}
+		return rig{ctlr: ctlr, its: itsDyn, wds: wdsDyn, binding: created}
+	}
+
+	workRV := func(t *testing.T, its dynamic.Interface, namespace, name string) string {
+		t.Helper()
+		obj, err := its.Resource(workapi.GroupVersion.WithResource("manifestworks")).Namespace(namespace).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return obj.GetResourceVersion()
+	}
+	assertGone := func(t *testing.T, its dynamic.Interface, namespace, name string) {
+		t.Helper()
+		_, err := its.Resource(workapi.GroupVersion.WithResource("manifestworks")).Namespace(namespace).Get(ctx, name, metav1.GetOptions{})
+		if !apierrors.IsNotFound(err) {
+			t.Fatalf("Get %s/%s err = %v, want NotFound", namespace, name, err)
+		}
+	}
+
+	t.Run("template error keeps existing wrapped objects", func(t *testing.T) {
+		r := setup(t, "{{ .noSuchProperty }}", true, "kept")
+		keptRV := workRV(t, r.its, keptNS, "kept")
+		staleRV := workRV(t, r.its, staleNS, "stale")
+		if err := r.ctlr.updateWrappedObjectsAndFinalizer(ctx, r.binding); err != nil {
+			t.Fatal(err)
+		}
+		if got := workRV(t, r.its, keptNS, "kept"); got != keptRV {
+			t.Fatalf("kept wrapped object resourceVersion = %s, want %s", got, keptRV)
+		}
+		if got := workRV(t, r.its, staleNS, "stale"); got != staleRV {
+			t.Fatalf("stale wrapped object resourceVersion = %s, want %s", got, staleRV)
+		}
+		assertGone(t, r.its, keptNS, shardName)
+		gotBinding, err := r.ctlr.bindingClient.Get(ctx, bindingName, metav1.GetOptions{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if gotBinding.Status.ObservedGeneration != r.binding.Generation {
+			t.Fatalf("observedGeneration = %d, want %d", gotBinding.Status.ObservedGeneration, r.binding.Generation)
+		}
+		if !errorsMention(gotBinding.Status.Errors, "noSuchProperty") {
+			t.Fatalf("status.errors = %#v, want a noSuchProperty failure", gotBinding.Status.Errors)
+		}
+		if err := r.ctlr.updateWrappedObjectsAndFinalizer(ctx, gotBinding); err != nil {
+			t.Fatal(err)
+		}
+		if got := workRV(t, r.its, keptNS, "kept"); got != keptRV {
+			t.Fatalf("second reconcile changed kept wrapped object resourceVersion to %s", got)
+		}
+		if got := workRV(t, r.its, staleNS, "stale"); got != staleRV {
+			t.Fatalf("second reconcile changed stale wrapped object resourceVersion to %s", got)
+		}
+
+		cmGVR := k8sschema.GroupVersionResource{Version: "v1", Resource: "configmaps"}
+		cm, err := r.wds.Resource(cmGVR).Namespace("app").Get(ctx, "cfg", metav1.GetOptions{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := unstructured.SetNestedField(cm.Object, "{{ .clusterName }}", "data", "msg"); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := r.wds.Resource(cmGVR).Namespace("app").Update(ctx, cm, metav1.UpdateOptions{}); err != nil {
+			t.Fatal(err)
+		}
+		if err := r.ctlr.updateWrappedObjectsAndFinalizer(ctx, gotBinding); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := r.its.Resource(workapi.GroupVersion.WithResource("manifestworks")).Namespace(keptNS).Get(ctx, shardName, metav1.GetOptions{}); err != nil {
+			t.Fatal(err)
+		}
+		assertGone(t, r.its, keptNS, "kept")
+		assertGone(t, r.its, staleNS, "stale")
+		fixed, err := r.ctlr.bindingClient.Get(ctx, bindingName, metav1.GetOptions{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(fixed.Status.Errors) != 0 {
+			t.Fatalf("status.errors after fix = %#v, want none", fixed.Status.Errors)
+		}
+	})
+
+	t.Run("successful expansion deletes only the stale wrapped object", func(t *testing.T) {
+		r := setup(t, "{{ .clusterName }}", true, shardName)
+		if err := r.ctlr.updateWrappedObjectsAndFinalizer(ctx, r.binding); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := r.its.Resource(workapi.GroupVersion.WithResource("manifestworks")).Namespace(keptNS).Get(ctx, shardName, metav1.GetOptions{}); err != nil {
+			t.Fatal(err)
+		}
+		assertGone(t, r.its, staleNS, "stale")
+		list, err := r.its.Resource(workapi.GroupVersion.WithResource("manifestworks")).List(ctx, metav1.ListOptions{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(list.Items) != 1 {
+			t.Fatalf("wrapped objects = %d, want 1", len(list.Items))
+		}
+		gotBinding, err := r.ctlr.bindingClient.Get(ctx, bindingName, metav1.GetOptions{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(gotBinding.Status.Errors) != 0 {
+			t.Fatalf("status.errors = %#v, want none", gotBinding.Status.Errors)
+		}
+		if gotBinding.Status.ObservedGeneration != r.binding.Generation {
+			t.Fatalf("observedGeneration = %d, want %d", gotBinding.Status.ObservedGeneration, r.binding.Generation)
+		}
+	})
+
+	t.Run("empty workload still deletes wrapped objects", func(t *testing.T) {
+		r := setup(t, "plain", false, "kept")
+		r.binding.Spec.Workload = ksapi.DownsyncObjectClauses{}
+		if err := r.ctlr.updateWrappedObjectsAndFinalizer(ctx, r.binding); err != nil {
+			t.Fatal(err)
+		}
+		assertGone(t, r.its, keptNS, "kept")
+		assertGone(t, r.its, staleNS, "stale")
+		list, err := r.its.Resource(workapi.GroupVersion.WithResource("manifestworks")).List(ctx, metav1.ListOptions{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(list.Items) != 0 {
+			t.Fatalf("wrapped objects left: %d", len(list.Items))
+		}
+	})
+}
+
+func errorsMention(errs []string, needle string) bool {
+	for _, err := range errs {
+		if strings.Contains(err, needle) {
+			return true
+		}
+	}
+	return false
 }
