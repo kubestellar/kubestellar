@@ -10,7 +10,7 @@ KUBESTELLAR_VERSION: "0.30.0"
 # TRANSPORT_VERSION: e.g., "0.24.0"; defaults to KUBESTELLAR_VERSION value, if not defined
 # KFLEX_GET_KUBECONFIG: e.g., "0.24.0"; defaults to KUBESTELLAR_VERSION value, if not defined
 CLUSTERADM_VERSION: "1.0.0"
-OCM_STATUS_ADDON_VERSION: "0.2.0-rc17"
+OCM_STATUS_ADDON_VERSION: "0.2.0-rc18"
 
 
 # Control controller log verbosity
