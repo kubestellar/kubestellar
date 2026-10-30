@@ -18,7 +18,10 @@ package transport
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/json"
 	"fmt"
+	"sort"
 	"sync"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -46,7 +49,8 @@ type customTransformCollection interface {
 }
 
 type customTransformChanges struct {
-	removes []jsonpath.Query // immutable
+	removes     []jsonpath.Query // immutable
+	stateDigest string
 }
 
 // customTransformCollectionImpl implements customTransformCollection
@@ -132,6 +136,7 @@ func (ctc *customTransformCollectionImpl) getCustomTransformChanges(ctx context.
 		bindingsThatCare: sets.New(bindingName),
 		ctNames:          abstract.SliceMapToK8sSet(cts, (*v1alpha1.CustomTransform).GetName),
 	}
+	grTransformData.changes.stateDigest = customTransformStateDigest(cts)
 	var commonWarnings []string // warnings common to all the ct
 	if len(cts) > 1 {
 		commonWarnings = []string{fmt.Sprintf("multiple CustomTransform objects specify the same GroupResource; their names are %v", grTransformData.ctNames)}
@@ -144,6 +149,28 @@ func (ctc *customTransformCollectionImpl) getCustomTransformChanges(ctx context.
 	}
 	ctc.grToTransformData[groupResource] = grTransformData
 	return grTransformData.changes
+}
+
+func customTransformStateDigest(cts []*v1alpha1.CustomTransform) string {
+	if len(cts) == 0 {
+		return ""
+	}
+	type customTransformState struct {
+		Name string                       `json:"name"`
+		Spec v1alpha1.CustomTransformSpec `json:"spec"`
+	}
+	states := make([]customTransformState, len(cts))
+	for idx, ct := range cts {
+		states[idx] = customTransformState{Name: ct.Name, Spec: ct.Spec}
+	}
+	sort.Slice(states, func(i, j int) bool { return states[i].Name < states[j].Name })
+	payload, err := json.Marshal(states)
+	if err != nil {
+		// The payload is a local struct of JSON-safe Kubernetes API fields.
+		panic(err)
+	}
+	sum := sha256.Sum256(payload)
+	return fmt.Sprintf("sha256:%x", sum[:])
 }
 
 // digestCustomTransformLocked digests one CustomTransform.
