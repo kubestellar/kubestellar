@@ -118,7 +118,7 @@ is_installed_go() {
         'go version' \
         'go version' \
         'https://go.dev/doc/install' \
-        'go version 1.23'
+        'go version go1.25'
 }
 
 is_installed_ginkgo() {
