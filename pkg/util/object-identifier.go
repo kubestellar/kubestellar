@@ -50,6 +50,7 @@ func (identifier ObjectIdentifier) String() string {
 	return fmt.Sprintf("%s(%s)", gvr, identifier.ObjectName.Name)
 }
 
+// GVR returns the GroupVersionResource associated with the ObjectIdentifier.
 func (identifier *ObjectIdentifier) GVR() schema.GroupVersionResource {
 	return identifier.GVK.GroupVersion().WithResource(identifier.Resource)
 }
@@ -68,6 +69,8 @@ func IdentifierForObject(mrObj MRObject, resource string) ObjectIdentifier {
 	}
 }
 
+// EmptyUnstructuredObjectFromIdentifier creates an empty unstructured.Unstructured object
+// populated with the GroupVersionKind, Name, and Namespace from the given ObjectIdentifier.
 func EmptyUnstructuredObjectFromIdentifier(objIdentifier ObjectIdentifier) *unstructured.Unstructured {
 	obj := &unstructured.Unstructured{}
 
@@ -84,14 +87,19 @@ func ObjIdentifierIsForCRD(objIdentifier ObjectIdentifier) bool {
 	return gvkMatches(objIdentifier.GVK, apiextensions.GroupName, AnyVersion, CRDKind)
 }
 
+// ObjIdentifierIsForBindingPolicy returns true if the identifier refers to a BindingPolicy.
+// Version is matched loosely (AnyVersion) because BindingPolicies may exist across multiple API versions.
 func ObjIdentifierIsForBindingPolicy(objIdentifier ObjectIdentifier) bool {
 	return gvkMatches(objIdentifier.GVK, v1alpha1.GroupVersion.Group, AnyVersion, BindingPolicyKind)
 }
 
+// ObjIdentifierIsForBinding returns true if the identifier refers to a Binding.
+// Version is matched loosely (AnyVersion) because Bindings may exist across multiple API versions.
 func ObjIdentifierIsForBinding(objIdentifier ObjectIdentifier) bool {
 	return gvkMatches(objIdentifier.GVK, v1alpha1.GroupVersion.Group, AnyVersion, BindingKind)
 }
 
+// IdentifierForStatusCollector creates an ObjectIdentifier for a StatusCollector with the given name.
 func IdentifierForStatusCollector(name string) ObjectIdentifier {
 	return ObjectIdentifier{
 		GVK: schema.GroupVersionKind{Group: StatusCollectorGroup, Version: StatusCollectorVersion,
@@ -101,6 +109,8 @@ func IdentifierForStatusCollector(name string) ObjectIdentifier {
 	}
 }
 
+// IdentifierForCombinedStatus creates an ObjectIdentifier for a CombinedStatus with the given name and namespace.
+// If the namespace is empty, it defaults to the ClusterScopedObjectsCombinedStatusNamespace.
 func IdentifierForCombinedStatus(name, ns string) ObjectIdentifier {
 	identifier := ObjectIdentifier{
 		GVK: schema.GroupVersionKind{Group: CombinedStatusGroup, Version: CombinedStatusVersion,
