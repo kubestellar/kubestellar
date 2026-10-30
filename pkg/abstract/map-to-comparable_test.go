@@ -87,6 +87,65 @@ func FuzzTestLockedMapToComparable(f *testing.F) {
 		}
 	})
 }
+func TestIndexedMapToComparableNoStaleReverseEntries(t *testing.T) {
+	for _, testCase := range []struct {
+		name string
+		run  func(imc *IndexedMapToComparable[string, string])
+	}{
+		{
+			name: "delete-removes-reverse-entry",
+			run: func(imc *IndexedMapToComparable[string, string]) {
+				imc.Put("a", "x")
+				imc.Delete("a")
+			},
+		},
+		{
+			name: "reassign-removes-old-reverse-entry",
+			run: func(imc *IndexedMapToComparable[string, string]) {
+				imc.Put("a", "x")
+				imc.Put("b", "x")
+				imc.Put("a", "y")
+				imc.Delete("b")
+				imc.Delete("a")
+			},
+		},
+		{
+			name: "reassign-leaves-shared-reverse-entry",
+			run: func(imc *IndexedMapToComparable[string, string]) {
+				imc.Put("a", "x")
+				imc.Put("b", "x")
+				imc.Put("a", "y")
+			},
+		},
+		{
+			name: "reput-same-value-keeps-reverse-entry",
+			run: func(imc *IndexedMapToComparable[string, string]) {
+				imc.Put("a", "x")
+				imc.Put("a", "x")
+			},
+		},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			imc := NewPrimitiveMapToComparable[string, string]()
+			testCase.run(imc)
+			imc.Iterate2(func(key, val string) error {
+				imc.ReadInverse().ContGet(val, func(reverseKeys sets.Set[string]) {
+					if !reverseKeys.Has(key) {
+						t.Errorf("forward entry %q:%q not in reverse keys %v", key, val, reverseKeys)
+					}
+				})
+				return nil
+			})
+			imc.ReadInverse().Iterate2(func(val string, keys sets.Set[string]) error {
+				if keys.Len() == 0 {
+					t.Errorf("reverse has stale empty key set for value %q", val)
+				}
+				return nil
+			})
+		})
+	}
+}
+
 func mtcCheckConsistency(t *testing.T, mtc MutableMapToComparable[int, int]) {
 	inverse := mtc.ReadInverse()
 	mtc.Iterate2(func(key, val int) error {
