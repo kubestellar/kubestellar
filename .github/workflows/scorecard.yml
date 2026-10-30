@@ -8,13 +8,12 @@ on:
   workflow_dispatch:
 
 permissions:
+  security-events: write
   contents: read
+  actions: read
+  id-token: write
 
 jobs:
   analysis:
-    permissions:
-      security-events: write
-      contents: read
-      actions: read
     uses: kubestellar/infra/.github/workflows/reusable-scorecard.yml@main
     secrets: inherit
