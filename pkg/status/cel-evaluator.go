@@ -52,11 +52,11 @@ func newCELEvaluator() (*celEvaluator, error) {
 	env, err := cel.NewEnv(
 		cel.Variable(sourceObjectKey, cel.MapType(cel.StringType, cel.DynType)),
 		cel.Variable(returnedKey, cel.MapType(cel.StringType, cel.DynType)),
-		cel.Variable(inventoryKey, cel.MapType(cel.StringType, cel.StringType)),
+		cel.Variable(inventoryKey, cel.MapType(cel.StringType, cel.DynType)),
 		cel.Variable(propagationMetaKey, cel.MapType(cel.StringType, cel.DynType)),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create CEL environment: %v", err)
+		return nil, fmt.Errorf("failed to create CEL environment: %w", err)
 	}
 
 	return &celEvaluator{env: env}, nil
