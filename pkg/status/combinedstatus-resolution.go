@@ -826,10 +826,16 @@ func handleAggregationReadLocked(scName string, scData *statusCollectorData) *v1
 		for _, groupByNamedExp := range scData.collectorSpec.GroupBy {
 			groupByValue := wsData.groupByEval[groupByNamedExp.Name]
 
+			val := groupByValue.Value()
+			var mapKey any = val
+			if val != nil && !reflect.TypeOf(val).Comparable() {
+				mapKey = fmt.Sprintf("%#v", val)
+			}
+
 			// ensure unique number mapping for the value
-			uid, exists := ValueToNumber[groupByValue.Value()]
+			uid, exists := ValueToNumber[mapKey]
 			if !exists {
-				ValueToNumber[groupByValue.Value()] = generator
+				ValueToNumber[mapKey] = generator
 				uid = generator
 				generator++
 			}

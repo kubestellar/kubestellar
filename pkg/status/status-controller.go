@@ -432,6 +432,7 @@ func (c *Controller) handleWorkStatus(ctx context.Context, eventType string, obj
 // processNextWorkItem function in order to read and process a message on the
 // workqueue.
 func (c *Controller) runWorker(ctx context.Context) {
+	defer utilruntime.HandleCrash()
 	for c.processNextWorkItem(ctx) {
 	}
 }
