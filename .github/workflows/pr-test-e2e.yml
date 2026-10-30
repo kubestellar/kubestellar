@@ -53,6 +53,12 @@ jobs:
           go-version: 1.26
           cache: true
 
+      - name: Increase inotify limits to support three kind clusters
+        run: |
+          echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.d/99-k8s-kind.conf
+          echo fs.inotify.max_user_instances=512 | sudo tee -a /etc/sysctl.d/99-k8s-kind.conf
+          sudo sysctl --system
+
       - name: Install kubectl
         uses: azure/setup-kubectl@829323503d1be3d00ca8346e5391ca0b07a9ab0d # v5.1.0
         id: install
@@ -62,10 +68,10 @@ jobs:
       - name: Install dependencies
         run: |
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v1.0.0/install.sh) 1.0.0
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.3/kubeflex_0.9.3_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.9.3_linux_amd64.tar.gz bin/kflex
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.6/kubeflex_0.9.6_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.6_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.9.3_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.9.6_linux_amd64.tar.gz
           go install github.com/onsi/ginkgo/v2/ginkgo
 
       - name: Run test
@@ -231,6 +237,12 @@ jobs:
           go-version: 1.26
           cache: true
 
+      - name: Increase inotify limits to support three kind clusters
+        run: |
+          echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.d/99-k8s-kind.conf
+          echo fs.inotify.max_user_instances=512 | sudo tee -a /etc/sysctl.d/99-k8s-kind.conf
+          sudo sysctl --system
+
       - name: Install kubectl
         uses: azure/setup-kubectl@829323503d1be3d00ca8346e5391ca0b07a9ab0d # v5.1.0
         id: install
@@ -240,10 +252,10 @@ jobs:
       - name: Install dependencies
         run: |
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v1.0.0/install.sh) 1.0.0
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.3/kubeflex_0.9.3_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.9.3_linux_amd64.tar.gz bin/kflex
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.6/kubeflex_0.9.6_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.6_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.9.3_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.9.6_linux_amd64.tar.gz
 
       - name: Run test
         env:

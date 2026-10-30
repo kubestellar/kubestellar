@@ -24,8 +24,8 @@
 
     - name: install golang
       shell: |
-             curl -LO https://go.dev/dl/go1.26.2.linux-amd64.tar.gz
-             rm -rf /usr/local/go && tar -C /usr/local -xzf go1.26.2.linux-amd64.tar.gz
+             curl -LO https://go.dev/dl/go1.26.10.linux-amd64.tar.gz
+             rm -rf /usr/local/go && tar -C /usr/local -xzf go1.26.10.linux-amd64.tar.gz
              export PATH=$PATH:/usr/local/go/bin
              go version
                   
@@ -40,7 +40,7 @@
     - name: install the KubeFlex CLI
       shell: |
              sudo su <<EOF
-             bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubeflex/refs/tags/v0.9.3/scripts/install-kubeflex.sh) --ensure-folder /usr/local/bin --strip-bin --version v0.9.3
+             bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubeflex/refs/tags/v0.9.6/scripts/install-kubeflex.sh) --ensure-folder /usr/local/bin --strip-bin --version v0.9.6
              EOF
 
     - name: install Helm
