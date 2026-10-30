@@ -50,7 +50,10 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 		return fmt.Errorf("failed to get runtime.Object from object identifier (%v): %w", objIdentifier, err)
 	}
 
-	objMR := obj.(mrObject)
+	objMR, ok := obj.(mrObject)
+	if !ok {
+		return fmt.Errorf("object is not an mrObject")
+	}
 	objBeingDeleted := isBeingDeleted(obj)
 
 	for _, bindingPolicy := range bindingPolicies {
