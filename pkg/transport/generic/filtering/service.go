@@ -17,6 +17,8 @@ limitations under the License.
 package filtering
 
 import (
+	"strings"
+
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/kubestellar/kubestellar/pkg/abstract"
@@ -25,6 +27,7 @@ import (
 const (
 	preserveFieldAnnotation = "control.kubestellar.io/preserve"
 	preserveNodePortValue   = "nodeport"
+	preserveClusterIPValue  = "clusterip"
 )
 
 func cleanService(object *unstructured.Unstructured) {
@@ -36,21 +39,25 @@ func cleanService(object *unstructured.Unstructured) {
 		unstructured.RemoveNestedField(object.Object, "spec", field)
 	}
 
-	// Keep headless Services headless, remove cluster IPs from others.
-	if val, have, _ := unstructured.NestedString(object.Object, "spec", "clusterIP"); have && val != "None" {
-		unstructured.RemoveNestedField(object.Object, "spec", "clusterIP")
-	}
-	if val, have, _ := unstructured.NestedStringSlice(object.Object, "spec", "clusterIPs"); have {
-		newVal := abstract.NewSliceByFilter(val, func(ip string) bool { return ip == "None" })
-		if len(newVal) == 0 {
-			unstructured.RemoveNestedField(object.Object, "spec", "clusterIPs")
-		} else {
-			unstructured.SetNestedStringSlice(object.Object, newVal, "spec", "clusterIPs")
+	preserveClusterIP := hasPreserveValue(object, preserveClusterIPValue)
+
+	// Keep headless Services headless, remove cluster IPs from others unless explicitly preserved.
+	if !preserveClusterIP {
+		if val, have, _ := unstructured.NestedString(object.Object, "spec", "clusterIP"); have && val != "None" {
+			unstructured.RemoveNestedField(object.Object, "spec", "clusterIP")
+		}
+		if val, have, _ := unstructured.NestedStringSlice(object.Object, "spec", "clusterIPs"); have {
+			newVal := abstract.NewSliceByFilter(val, func(ip string) bool { return ip == "None" })
+			if len(newVal) == 0 {
+				unstructured.RemoveNestedField(object.Object, "spec", "clusterIPs")
+			} else {
+				unstructured.SetNestedStringSlice(object.Object, newVal, "spec", "clusterIPs")
+			}
 		}
 	}
 
-	// Set the nodePort to an empty string unelss the annotation "control.kubestellar.io/preserve=nodeport" is present
-	if !(object.GetAnnotations() != nil && object.GetAnnotations()[preserveFieldAnnotation] == preserveNodePortValue) {
+	// Set the nodePort to an empty string unless the annotation "control.kubestellar.io/preserve=nodeport" is present
+	if !hasPreserveValue(object, preserveNodePortValue) {
 		if ports, found, _ := unstructured.NestedSlice(object.Object, "spec", "ports"); found {
 			for i, port := range ports {
 				if portMap, ok := port.(map[string]interface{}); ok {
@@ -61,4 +68,17 @@ func cleanService(object *unstructured.Unstructured) {
 			unstructured.SetNestedSlice(object.Object, ports, "spec", "ports")
 		}
 	}
+}
+
+func hasPreserveValue(object *unstructured.Unstructured, want string) bool {
+	annotations := object.GetAnnotations()
+	if annotations == nil {
+		return false
+	}
+	for _, value := range strings.FieldsFunc(annotations[preserveFieldAnnotation], func(r rune) bool { return r == ',' || r == ' ' }) {
+		if value == want {
+			return true
+		}
+	}
+	return false
 }
