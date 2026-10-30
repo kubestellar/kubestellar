@@ -231,16 +231,25 @@ func runtimeObjectToWorkStatus(obj runtime.Object) (*workStatus, error) {
 		return nil, err
 	}
 
+	mObj, ok := obj.(metav1.Object)
+	if !ok {
+		return nil, fmt.Errorf("object %T does not implement metav1.Object", obj)
+	}
+
 	return &workStatus{
 		workStatusRef:  *ref,
 		status:         status,
-		lastUpdateTime: getObjectStatusLastUpdateTime(obj.(metav1.Object)),
+		lastUpdateTime: getObjectStatusLastUpdateTime(mObj),
 	}, nil
 }
 
 func runtimeObjectToWorkStatusRef(obj runtime.Object) (*workStatusRef, error) {
-	name := obj.(metav1.Object).GetName()
-	wecName := obj.(metav1.Object).GetNamespace()
+	mObj, ok := obj.(metav1.Object)
+	if !ok {
+		return nil, fmt.Errorf("object %T does not implement metav1.Object", obj)
+	}
+	name := mObj.GetName()
+	wecName := mObj.GetNamespace()
 
 	sourceRef, err := util.GetWorkStatusSourceRef(obj)
 	if err != nil {
