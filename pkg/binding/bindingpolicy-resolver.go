@@ -387,9 +387,6 @@ func (resolver *bindingPolicyResolver) GetReportedStateRequestForObject(objId ut
 }
 
 func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestsForBinding(bindingPolicyKey string) []SingletonReportedStateReturnStatus {
-	resolver.RWMutex.RLock()
-	defer resolver.RWMutex.RUnlock()
-
 	resolution := resolver.getResolution(bindingPolicyKey)
 	if resolution == nil {
 		return nil
@@ -407,9 +404,9 @@ func (resolver *bindingPolicyResolver) GetSingletonReportedStateRequestsForBindi
 // if it exists.
 func (resolver *bindingPolicyResolver) DeleteResolution(bindingPolicyKey string) {
 	resolver.Lock() // lock for modifying map
-	defer resolver.Unlock()
-
 	delete(resolver.bindingPolicyToResolution, bindingPolicyKey)
+	resolver.Unlock()
+
 	resolver.broker.NotifyBindingPolicyCallbacks(bindingPolicyKey)
 }
 
