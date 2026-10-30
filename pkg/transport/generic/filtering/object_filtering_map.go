@@ -31,8 +31,9 @@ type cleanObjectSpecificsFunction func(object *unstructured.Unstructured)
 
 func NewObjectFilteringMap() *ObjectFilteringMap {
 	filteringMap := map[schema.GroupVersionKind]cleanObjectSpecificsFunction{
-		corev1.SchemeGroupVersion.WithKind("Service"): cleanService,
-		batchv1.SchemeGroupVersion.WithKind("Job"):    cleanJob,
+		corev1.SchemeGroupVersion.WithKind("Service"):          cleanService,
+		corev1.SchemeGroupVersion.WithKind("PersistentVolume"): cleanPersistentVolume,
+		batchv1.SchemeGroupVersion.WithKind("Job"):             cleanJob,
 	}
 
 	return &ObjectFilteringMap{
