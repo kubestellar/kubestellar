@@ -29,6 +29,7 @@ import (
 	controlv1alpha1 "github.com/kubestellar/kubestellar/api/control/v1alpha1"
 )
 
+// GetClient creates and returns a new controller-runtime client with the required schemes registered.
 func GetClient() *client.Client {
 	logger := klog.Background().WithName("client")
 

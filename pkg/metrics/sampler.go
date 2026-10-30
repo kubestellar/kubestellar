@@ -31,6 +31,7 @@ type Sampler interface {
 	Register(RegisterFn) error
 }
 
+// NewSampler creates a Sampler that evaluates the read function to produce a gauge value.
 func NewSampler(read func() float64, opts *k8smetrics.KubeOpts) Sampler {
 	return &sampler{
 		Read:  read,
@@ -38,6 +39,7 @@ func NewSampler(read func() float64, opts *k8smetrics.KubeOpts) Sampler {
 	}
 }
 
+// NewListLenSampler creates a Sampler that reports the length of a slice returned by getList.
 func NewListLenSampler[Elt any](getList func() []Elt, opts *k8smetrics.KubeOpts) Sampler {
 	return NewSampler(func() float64 { return float64(len(getList())) }, opts)
 }
