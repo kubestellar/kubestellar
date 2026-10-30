@@ -938,28 +938,33 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 		}
 		numStr = strconv.FormatFloat(sum, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeAvg:
-		var avg float64 = math.NaN()
-		if count := len(rows); count > 0 {
-			sum := 0.0
-			for dest, row := range rows {
-				subject, err1 := getCombinedFieldSubject(combinedFieldNamedAgg, row)
-				if err1 != "" {
-					if errStr == "" {
-						errStr = fmt.Sprintf("for WEC %s, %s", dest.ClusterId, err1)
-					}
+		avg := math.NaN()
+		sum := 0.0
+		count := 0
+		for dest, row := range rows {
+			subject, err1 := getCombinedFieldSubject(combinedFieldNamedAgg, row)
+			if err1 != "" {
+				if errStr == "" {
+					errStr = fmt.Sprintf("for WEC %s, %s", dest.ClusterId, err1)
 				}
-				if subject == nil {
-					continue
-				}
-				sum += *subject
 			}
-			avg = sum / float64(count)
+			if subject == nil {
+				continue
+			}
+			sum += *subject
+			count++
+		}
+		if count == 0 {
+			if errStr == "" {
+				errStr = "no values to average"
+			}
 		} else {
-			errStr = "no values to average"
+			avg = sum / float64(count)
 		}
 		numStr = strconv.FormatFloat(avg, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeMin:
 		min := math.Inf(1)
+		count := 0
 		for dest, row := range rows {
 			subject, err1 := getCombinedFieldSubject(combinedFieldNamedAgg, row)
 			if err1 != "" {
@@ -970,13 +975,18 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 			if subject == nil {
 				continue
 			}
+			count++
 			if *subject < min {
 				min = *subject
 			}
 		}
+		if count == 0 && errStr == "" {
+			errStr = "no values to take minimum of"
+		}
 		numStr = strconv.FormatFloat(min, 'g', -1, 64)
 	case v1alpha1.AggregatorTypeMax:
 		max := math.Inf(-1)
+		count := 0
 		for dest, row := range rows {
 			subject, err1 := getCombinedFieldSubject(combinedFieldNamedAgg, row)
 			if err1 != "" {
@@ -987,9 +997,13 @@ func calculateCombinedFieldAggregation(combinedFieldNamedAgg v1alpha1.NamedAggre
 			if subject == nil {
 				continue
 			}
+			count++
 			if *subject > max {
 				max = *subject
 			}
+		}
+		if count == 0 && errStr == "" {
+			errStr = "no values to take maximum of"
 		}
 		numStr = strconv.FormatFloat(max, 'g', -1, 64)
 	default:
