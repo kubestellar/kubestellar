@@ -630,11 +630,7 @@ func shouldSkipUpdate(old, new interface{}) bool {
 	oldMObj := old.(metav1.Object)
 	newMObj := new.(metav1.Object)
 	// do not enqueue update events for objects that have not changed
-	if newMObj.GetResourceVersion() == oldMObj.GetResourceVersion() {
-		return true
-	}
-
-	return false
+	return newMObj.GetResourceVersion() == oldMObj.GetResourceVersion()
 }
 
 // We only start informers on resources that support both watch and list
