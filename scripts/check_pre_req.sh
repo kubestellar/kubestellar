@@ -224,9 +224,10 @@ is_installed_make() {
 }
 
 # Before 1.3.0, `clusteradm version` reports an empty client version for a
-# `go install` build (open-cluster-management-io/clusteradm#537) and fails when
-# no cluster is reachable (#536). Prefer the module version from the binary's Go
-# build info, which needs neither, and fall back to `clusteradm version`.
+# `go install` build (open-cluster-management-io/clusteradm#537). Prefer the
+# module version from the binary's Go build info, which also skips the server
+# request `clusteradm version` makes (slow when no cluster is reachable), and
+# fall back to `clusteradm version` for builds without one, such as releases.
 clusteradm_version() {
     local ver=""
     if which go > /dev/null; then
