@@ -147,13 +147,37 @@ jobs:
         if: always()
         run: kubectl --context wds1 get bindings.control.kubestellar.io -o yaml
 
-      - name: show deployments in cluster1
+      - name: List objects of category all in cluster1
+        if: always()
+        run: kubectl --context cluster1 get all -A
+
+      - name: List event objects in cluster1
+        if: always()
+        run: kubectl --context cluster1 get events -A --sort-by='.lastTimestamp'
+
+      - name: dump deployments in cluster1
         if: always()
         run: kubectl --context cluster1 get deployments -A -o yaml
 
-      - name: show deployments in cluster2
+      - name: dump Pod objects in cluster1
+        if: always()
+        run: kubectl --context cluster1 get pods -A -o yaml
+
+      - name: List objects of category all in cluster2
+        if: always()
+        run: kubectl --context cluster2 get all -A
+
+      - name: List event objects in cluster2
+        if: always()
+        run: kubectl --context cluster2 get events -A --sort-by='.lastTimestamp'
+
+      - name: dump deployments in cluster2
         if: always()
         run: kubectl --context cluster2 get deployments -A -o yaml
+
+      - name: dump Pod objects in cluster2
+        if: always()
+        run: kubectl --context cluster2 get pods -A -o yaml
 
       - name: show manifestworks
         if: always()
