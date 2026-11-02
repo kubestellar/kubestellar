@@ -223,15 +223,19 @@ is_installed_make() {
         'GNU Make 3.5'
 }
 
-# clusteradm built by `go install` reports an empty client version until 1.3.0
-# (open-cluster-management-io/clusteradm#537); read the Go module version instead.
+# Before 1.3.0, `clusteradm version` reports an empty client version for a
+# `go install` build (open-cluster-management-io/clusteradm#537) and fails when
+# no cluster is reachable (#536). Prefer the module version from the binary's Go
+# build info, which needs neither, and fall back to `clusteradm version`.
 clusteradm_version() {
-    local ver
-    ver=$(clusteradm version 2> /dev/null | grep ^client | awk '{ print $3 }')
-    if [ -z "${ver#:}" ] && which go > /dev/null; then
-        ver=":$(go version -m "$(which clusteradm)" 2> /dev/null | awk '$1 == "mod" { print $3 }')"
+    local ver=""
+    if which go > /dev/null; then
+        ver=$(go version -m "$(which clusteradm)" 2> /dev/null | awk '$1 == "mod" { print $3 }')
     fi
-    echo "$ver"
+    case "$ver" in
+        (v*) echo ":$ver";;
+        (*) clusteradm version 2> /dev/null | grep ^client | awk '{ print $3 }';;
+    esac
 }
 
 is_installed_ocm() {
