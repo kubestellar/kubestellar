@@ -58,7 +58,11 @@ is_installed() {
     else
         echo -e "\033[0;31mX\033[0m $1"
         if [ $# -gt 3 ]; then
-            echov "  how to install: $5; get at least version $wantver"
+            if [ -n "$wantver" ]; then
+                echov "  how to install: $5; get at least version $wantver"
+            else
+                echov "  how to install: $5; get a version at least $addlver and less than $exclver"
+            fi
         fi
         if [ "$assert" == "true" ]; then
             exit 2
