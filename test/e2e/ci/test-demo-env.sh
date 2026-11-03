@@ -35,7 +35,7 @@ echo "Testing demo environment setup with platform: $platform"
 
 # Test the demo environment creation script
 echo "Creating demo environment with $platform..."
-if ! "${scripts_dir}/create-kubestellar-demo-env.sh" --platform $platform; then
+if ! "${scripts_dir}/create-kubestellar-demo-env.sh" -X --platform $platform; then
     echo "ERROR: Demo environment creation script failed for $platform!"
     exit 1
 fi
