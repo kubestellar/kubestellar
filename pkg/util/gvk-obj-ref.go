@@ -35,12 +35,16 @@ func (ref GKObjRef) String() string {
 // RefToRuntimeObj creates a GVKObjRef to a runtime.Object.
 func RefToRuntimeObj(obj runtime.Object) GKObjRef {
 	gvk := obj.GetObjectKind().GroupVersionKind()
-	mObj := obj.(metav1.Object)
+	var namespace, name string
+	if mObj, ok := obj.(metav1.Object); ok {
+		namespace = mObj.GetNamespace()
+		name = mObj.GetName()
+	}
 	ans := GKObjRef{
 		GK: gvk.GroupKind(),
 		OR: klog.ObjectRef{
-			Namespace: mObj.GetNamespace(),
-			Name:      mObj.GetName(),
+			Namespace: namespace,
+			Name:      name,
 		},
 	}
 	return ans
