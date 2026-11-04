@@ -34,7 +34,8 @@ object, role-ism, and binding --- with the exception of wildcards.
 
     A non-resource URL path is just the path part of a URL; the schema
     and authority of the authorized URL are implicitly those of the
-    apiserver.
+    apiserver. Note that rules defining only `NonResourceURLs` (like `system:discovery`)
+    apply exclusively to those paths and will not be expanded against API resources.
 
     An API object is identified by a "resource", "object name"
     (misnamed "ResourceName" in the RBAC API), and possibly
