@@ -68,6 +68,12 @@ func (c *Controller) syncBinding(ctx context.Context, bindingName string) error 
 	} else if policyErr != nil {
 		return fmt.Errorf("failed to get BindingPolicy from informer cache (name=%v): %w", bindingName, policyErr)
 	}
+	// Garbage collection can remove the Binding before the policy reconcile
+	// drops the resolution. Do not create it again while the policy is terminating.
+	if policy.GetDeletionTimestamp() != nil {
+		logger.V(2).Info("Aborting sync of Binding because the corresponding Policy is being deleted", "name", bindingName)
+		return nil
+	}
 
 	// generate binding spec from resolver
 	generatedBindingSpec := c.bindingPolicyResolver.GenerateBinding(bindingPolicyIdentifier)
