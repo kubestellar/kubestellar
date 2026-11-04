@@ -171,6 +171,35 @@ Prior to making a new release, there needs to be testing that the
 current Helm chart works with the executable behavior that will
 appear in the new release.  
 
+### Writing a Playwright Test for the Console
+
+If you want to contribute without implementing the feature yourself, you can start by writing a Playwright test that describes the expected behavior.
+
+Console Playwright tests are located in the `web/e2e/` directory of the KubeStellar Console repository.
+
+To create a test:
+
+1. Choose the Console feature or behavior you want to test.
+2. Add a `.spec.ts` file under `web/e2e/`.
+3. Use Playwright assertions to describe the expected behavior.
+4. Use existing `data-testid` attributes when interacting with UI elements.
+5. Run the test with the Playwright commands documented in the Console `PLAYWRIGHT.md`.
+
+A test that clearly describes the expected behavior can be submitted as a test-only pull request for an AI agent to implement.
+
+### Writing an API Contract Test
+
+You can also contribute by writing an API contract test that describes the expected behavior of an API endpoint.
+
+An API contract test should define:
+
+1. The HTTP method and endpoint.
+2. The expected request parameters or body.
+3. The expected response status.
+4. The expected response structure or fields.
+
+The test should describe the expected behavior clearly and can be submitted as a test-only pull request. The implementation can then be developed to make the test pass.
+
 ## Licensing
 
 KubeStellar is [Apache 2.0 licensed](LICENSE) and we accept contributions via GitHub pull requests.
