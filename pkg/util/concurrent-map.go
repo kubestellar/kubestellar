@@ -31,12 +31,12 @@ type ConcurrentMap[K comparable, V any] interface {
 	// false. Getting a key does not guarantee that no other goroutine will
 	// also work with it.
 	Get(key K) (V, bool)
-	// Iterator iterates over the map and calls the given function for each
+	// Iterator iterates over a snapshot of the map and calls the given function for each
 	// key/value pair sequentially.
-	// If the given function returns an error, the iteration is stopped and
-	// the error is returned.
-	// During the iteration, the map must not be mutated by the given function.
-	// If the map is mutated during the iteration, the behavior is undefined.
+	// Because it iterates over a point-in-time snapshot, operations on the map
+	// (such as Get, Set, or Remove from within yield) are safe and do not deadlock.
+	// Note: creating the snapshot incurs an O(n) memory allocation overhead.
+	// If the given function returns an error, the iteration is stopped and that error is returned.
 	Iterator(yield func(K, V) error) error
 	// Len returns the number of items in the map.
 	Len() int
@@ -82,22 +82,29 @@ func (mm *rwMutexMap[K, V]) Get(key K) (V, bool) {
 	return value, ok
 }
 
-// Iterator iterates over the map and calls the given function for each
+// Iterator iterates over a snapshot of the map and calls the given function for each
 // key/value pair sequentially.
-// If the given function returns an error, the iteration is stopped and
-// the error is returned.
-// During the iteration, the map must not be mutated by the given function.
-// If the map is mutated during the iteration, the behavior is undefined.
+// Because it iterates over a point-in-time snapshot, operations on the map
+// (such as Get, Set, or Remove from within yield) are safe and do not deadlock.
+// Note: creating the snapshot incurs an O(n) memory allocation overhead.
+// If the given function returns an error, the iteration is stopped and that error is returned.
 func (mm *rwMutexMap[K, V]) Iterator(yield func(K, V) error) error {
-	mm.RLock()
-	defer mm.RUnlock()
+	snapshot := func() map[K]V {
+		mm.RLock()
+		defer mm.RUnlock()
 
-	for k, v := range mm.m {
+		snap := make(map[K]V, len(mm.m))
+		for k, v := range mm.m {
+			snap[k] = v
+		}
+		return snap
+	}()
+
+	for k, v := range snapshot {
 		if err := yield(k, v); err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
