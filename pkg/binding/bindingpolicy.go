@@ -103,6 +103,7 @@ func (c *Controller) syncBindingPolicy(ctx context.Context, bindingPolicyName st
 func (c *Controller) deleteResolutionForBindingPolicy(ctx context.Context, bindingPolicyName string) error {
 	logger := klog.FromContext(ctx)
 	c.bindingPolicyResolver.DeleteResolution(bindingPolicyName)
+	c.workloadObjectsMatched.DeleteLabelValues(bindingPolicyName)
 	logger.V(2).Info("Deleted resolution for bindingpolicy", "name", bindingPolicyName)
 	return nil
 }
