@@ -797,7 +797,7 @@ func handleAggregationReadLocked(scName string, scData *statusCollectorData) *v1
 	// 		Where the N-values tuple is the string concatenation of the assigned numbers
 	// 		separated by commas, ordered by the groupBy expressions in scData.GroupBy slice.
 	generator := 0
-	ValueToNumber := map[any]int{}
+	ValueToNumber := map[string]int{}
 	idToAggregationGroup := map[string]*aggregationGroup{}
 
 	if len(scData.collectorSpec.GroupBy) == 0 && len(scData.WECToData) == 0 {
@@ -826,10 +826,13 @@ func handleAggregationReadLocked(scName string, scData *statusCollectorData) *v1
 		for _, groupByNamedExp := range scData.collectorSpec.GroupBy {
 			groupByValue := wsData.groupByEval[groupByNamedExp.Name]
 
-			// ensure unique number mapping for the value
-			uid, exists := ValueToNumber[groupByValue.Value()]
+			// Use string representation as key to handle composite types
+			// (lists, maps) which are not comparable and would panic when
+			// used as map keys.
+			groupByKey := fmt.Sprintf("%v", groupByValue.Value())
+			uid, exists := ValueToNumber[groupByKey]
 			if !exists {
-				ValueToNumber[groupByValue.Value()] = generator
+				ValueToNumber[groupByKey] = generator
 				uid = generator
 				generator++
 			}
