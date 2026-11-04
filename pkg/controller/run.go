@@ -31,6 +31,7 @@ import (
 	ksopts "github.com/kubestellar/kubestellar/options"
 )
 
+// InitialContext creates a new root context and sets up signal handling to cancel it.
 func InitialContext() (context.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	sigChan := make(chan os.Signal, 2)
@@ -44,6 +45,7 @@ func InitialContext() (context.Context, func()) {
 	return ctx, cancel
 }
 
+// Start initializes auxiliary services like health probes, metrics, and profiling for the controller.
 func Start(ctx context.Context, processOpts ksopts.ProcessOptions) {
 	logger := klog.FromContext(ctx)
 	if processOpts.HealthProbeBindAddr != "" {
@@ -75,6 +77,7 @@ func Start(ctx context.Context, processOpts ksopts.ProcessOptions) {
 	}()
 }
 
+// HappyDumbHandler is a simple HTTP handler that always returns an "ok" response.
 func HappyDumbHandler(resp http.ResponseWriter, req *http.Request) {
 	resp.Write([]byte("ok\r\n"))
 }
