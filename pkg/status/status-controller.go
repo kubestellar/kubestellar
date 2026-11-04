@@ -380,6 +380,9 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 			c.handleWorkStatus(ctx, "update", new)
 		},
 		DeleteFunc: func(obj interface{}) {
+			if tombstone, ok := obj.(cache.DeletedFinalStateUnknown); ok {
+				obj = tombstone.Obj
+			}
 			if objNotInThisWDS(obj, c.wdsName) {
 				return
 			}
@@ -398,19 +401,22 @@ func (c *Controller) runWorkStatusInformer(ctx context.Context) {
 }
 
 func shouldSkipUpdate(old, new interface{}) bool {
-	oldMObj := old.(metav1.Object)
-	newMObj := new.(metav1.Object)
+	oldMObj, okOld := old.(metav1.Object)
+	newMObj, okNew := new.(metav1.Object)
+	if !okOld || !okNew {
+		return false
+	}
 	// do not enqueue update events for objects that have not changed
 	return newMObj.GetResourceVersion() == oldMObj.GetResourceVersion()
 }
 
 func objNotInThisWDS(obj interface{}, thisWDS string) bool {
-	if objWDS, ok := obj.(metav1.Object).GetLabels()[originWdsLabelKey]; ok {
-		if objWDS != thisWDS {
-			return true
-		}
+	mObj, ok := obj.(metav1.Object)
+	if !ok {
+		return true
 	}
-	return false
+	objWDS, ok := mObj.GetLabels()[originWdsLabelKey]
+	return !ok || objWDS != thisWDS
 }
 
 // Informer event handler: enqueues the workstatus objects to be processed
