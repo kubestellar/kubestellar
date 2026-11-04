@@ -1224,25 +1224,24 @@ func addFinalizer(binding *v1alpha1.Binding, finalizer string) (*v1alpha1.Bindin
 // removeFinalizer accepts Binding object and removes the provided finalizer if present.
 // It returns the updated (or not) Binding and an indication of whether it updated the object's list of finalizers.
 func removeFinalizer(binding *v1alpha1.Binding, finalizer string) (*v1alpha1.Binding, bool) {
-	finalizersList := binding.GetFinalizers()
-	length := len(finalizersList)
-
-	index := 0
-	for i := 0; i < length; i++ {
-		if finalizersList[i] == finalizer {
-			continue
-		}
-		finalizersList[index] = finalizersList[i]
-		index++
-	}
-	if length == index { // finalizer wasn't found, no need to remove
+	finalizers := binding.GetFinalizers()
+	if !slices.Contains(finalizers, finalizer) { // finalizer wasn't found, no need to remove
 		return binding, false
 	}
 	// otherwise, finalizer was found and has to be removed.
 	// objects returned from a BindingLister must be treated as read-only.
 	// Therefore, create a deep copy before updating the object.
 	updatedBinding := binding.DeepCopy()
-	updatedBinding.SetFinalizers(finalizersList[:index])
+	updatedFinalizers := updatedBinding.GetFinalizers()
+	index := 0
+	for _, item := range updatedFinalizers {
+		if item == finalizer {
+			continue
+		}
+		updatedFinalizers[index] = item
+		index++
+	}
+	updatedBinding.SetFinalizers(updatedFinalizers[:index])
 	return updatedBinding, true
 }
 
