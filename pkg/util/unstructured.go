@@ -167,6 +167,8 @@ func SourceRefFromObjectIdentifier(objIdentifier ObjectIdentifier) *SourceRef {
 	}
 }
 
+// ObjectIdentifierFromSourceRef converts a SourceRef to an ObjectIdentifier.
+// Note: If sourceRef is nil, this function will panic. Callers must ensure sourceRef is non-nil.
 func ObjectIdentifierFromSourceRef(sourceRef *SourceRef) ObjectIdentifier {
 	return ObjectIdentifier{
 		GVK: schema.GroupVersionKind{

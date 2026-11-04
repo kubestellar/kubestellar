@@ -38,19 +38,25 @@ const (
 	WorkStatusSourceRefKey = "managed-by.kubestellar.io/sourceRef"
 )
 
+// GetBindingPolicyGVR returns the GroupVersionResource for BindingPolicy.
 func GetBindingPolicyGVR() schema.GroupVersionResource {
 	return v1alpha1.GroupVersion.WithResource(BindingPolicyResource)
 }
 
+// GetBindingGVR returns the GroupVersionResource for Binding.
 func GetBindingGVR() schema.GroupVersionResource {
 	return v1alpha1.GroupVersion.WithResource(BindingResource)
 }
 
+// Label represents a key-value pair used for labeling resources.
 type Label struct {
 	Key   string
 	Value string
 }
 
+// SplitLabelKeyAndValue splits a "key=value" string into a Label struct.
+// It uses "=" as the delimiter to separate the label key from its value.
+// It returns an error if the string is not in the correct format.
 func SplitLabelKeyAndValue(keyvalue string) (Label, error) {
 	label := Label{}
 	parts := strings.Split(keyvalue, "=")
@@ -62,6 +68,8 @@ func SplitLabelKeyAndValue(keyvalue string) (Label, error) {
 	return label, nil
 }
 
+// SelectorsMatchLabels checks if any of the provided label selectors match the given label set.
+// It returns true if at least one selector matches, otherwise false.
 func SelectorsMatchLabels(selectors []metav1.LabelSelector, labelsSet labels.Set) (bool, error) {
 	for _, selectorApi := range selectors {
 		selector, err := metav1.LabelSelectorAsSelector(&selectorApi)
