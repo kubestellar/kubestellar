@@ -61,6 +61,9 @@ func (imc *IndexedMapToComparable[Key, Val]) Put(key Key, val Val) (Val, bool) {
 	if had {
 		oldKeys, _ := imc.reverse.Get(oldVal)
 		oldKeys.Delete(key)
+		if oldKeys.Len() == 0 {
+			imc.reverse.Delete(oldVal)
+		}
 	}
 	valKeys, hadVal := imc.reverse.Get(val)
 	if hadVal {
@@ -77,6 +80,9 @@ func (imc *IndexedMapToComparable[Key, Val]) Delete(key Key) (Val, bool) {
 	if had {
 		oldKeys, _ := imc.reverse.Get(oldVal)
 		oldKeys.Delete(key)
+		if oldKeys.Len() == 0 {
+			imc.reverse.Delete(oldVal)
+		}
 	}
 	return oldVal, had
 }
