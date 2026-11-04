@@ -30,7 +30,9 @@ const (
 func cleanService(object *unstructured.Unstructured) {
 	// Fields to remove
 	fieldsToDelete := []string{"ipFamilies",
-		"externalTrafficPolicy", "internalTrafficPolicy", "ipFamilyPolicy", "sessionAffinity"}
+		"externalTrafficPolicy", "internalTrafficPolicy", "ipFamilyPolicy", "sessionAffinity",
+		// only valid together with externalTrafficPolicy=Local, which is removed here
+		"healthCheckNodePort"}
 
 	for _, field := range fieldsToDelete {
 		unstructured.RemoveNestedField(object.Object, "spec", field)
