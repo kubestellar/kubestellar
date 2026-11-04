@@ -72,7 +72,12 @@ func GenericMain(transportImplementation transport.Transport) {
 		logger.Info("Command line flag", "name", flg.Name, "value", flg.Value) // log all arguments
 	})
 
-	ksctlr.Start(ctx, options.ProcessOptions)
+	go func() {
+		if err := ksctlr.Start(ctx, options.ProcessOptions); err != nil {
+			logger.Error(err, "error running HTTP servers")
+			klog.FlushAndExit(klog.ExitFlushTimeout, 1)
+		}
+	}()
 
 	// get the config for WDS
 	wdsRestConfig, err := options.WdsClientOptions.ToRESTConfig()
