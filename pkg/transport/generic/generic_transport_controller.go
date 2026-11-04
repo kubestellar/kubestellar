@@ -1083,7 +1083,7 @@ func (c *genericTransportController) propagateWrappedObjectToClusters(ctx contex
 			} else {
 				gloss, err := c.transport.UnwrapObjects(currentWrappedObject, kindToResource)
 				if err != nil {
-					logger.Error(err, fmt.Sprintf("Failed to unwrap %#v", currentWrappedObject))
+					logger.Error(err, "Failed to unwrap", "object", currentWrappedObject)
 				}
 				desiredGeneration := task.ObjU.GetAnnotations()[originOwnerGenerationAnnotation]
 				actualGeneration := currentWrappedObject.GetAnnotations()[originOwnerGenerationAnnotation]
