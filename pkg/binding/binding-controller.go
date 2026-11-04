@@ -466,7 +466,11 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 				// after startup, therefore we use a stopper channel for each informer
 				// instead than informerFactory.Start(ctx.Done())
 				stopper := make(chan struct{})
-				defer close(stopper)
+				go func(s chan struct{}) {
+					<-ctx.Done()
+					defer func() { recover() }()
+					close(s)
+				}(stopper)
 				c.stoppers.Set(gvr, stopper)
 				go informer.Run(stopper)
 			}
