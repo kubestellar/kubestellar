@@ -25,9 +25,22 @@ import (
 	js_ast "github.com/dop251/goja/ast"
 )
 
+type SegmentKind int
+
+const (
+	SegmentKindField SegmentKind = iota
+	SegmentKindWildcard
+)
+
+type Segment struct {
+	Kind SegmentKind
+	Name string
+}
+
 // Query represents a parsed query in a very restricted subset of JSONPath (RFC 9535).
-// The only supported segment functionality is selecting one definite member of a JSON object.
-type Query []string
+// Supported segment functionality is selecting one definite member of a JSON object or
+// traversing all items of an array (wildcard).
+type Query []Segment
 
 // ParseQuery parses a very restricted form of JSONPath expression into a Query.
 // This parser only accepts segments of the form `.name` or `[string]`.
@@ -93,31 +106,50 @@ func (lxr *Lexer) ScanQuery() (Query, error) {
 			if err := lxr.advance(); err != nil {
 				return query, err
 			}
-			if !isNameFirst(lxr.chr) {
-				return query, fmt.Errorf("syntax error at %d: expected member-name-shorthand, got %q", lxr.chrPos, lxr.chr)
-			}
-			if next, err := lxr.nextIdentifier(); err != nil {
-				return query, err
+			if lxr.chr == '*' {
+				if err := lxr.advance(); err != nil {
+					return query, err
+				}
+				query = append(query, Segment{Kind: SegmentKindWildcard})
 			} else {
-				query = append(query, next)
+				if !isNameFirst(lxr.chr) {
+					return query, fmt.Errorf("syntax error at %d: expected member-name-shorthand or wildcard, got %q", lxr.chrPos, lxr.chr)
+				}
+				if next, err := lxr.nextIdentifier(); err != nil {
+					return query, err
+				} else {
+					query = append(query, Segment{Kind: SegmentKindField, Name: next})
+				}
 			}
 		} else if lxr.chr == '[' {
 			if err := lxr.advance(); err != nil {
 				return query, err
 			}
-			if lxr.chr != '"' {
-				return query, fmt.Errorf("syntax error at %d: expected open quote, got %q", lxr.chrPos, lxr.chr)
-			}
-			if next, err := lxr.nextString(); err != nil {
-				return query, err
+			if lxr.chr == '*' {
+				if err := lxr.advance(); err != nil {
+					return query, err
+				}
+				if lxr.chr != ']' {
+					return query, fmt.Errorf("syntax error at %d: missing close bracket, got %q", lxr.chrPos, lxr.chr)
+				}
+				if err := lxr.advance(); err != nil {
+					return query, err
+				}
+				query = append(query, Segment{Kind: SegmentKindWildcard})
+			} else if lxr.chr == '"' {
+				if next, err := lxr.nextString(); err != nil {
+					return query, err
+				} else {
+					query = append(query, Segment{Kind: SegmentKindField, Name: next})
+				}
+				if lxr.chr != ']' {
+					return query, fmt.Errorf("syntax error at %d: missing close bracket, got %q", lxr.chrPos, lxr.chr)
+				}
+				if err := lxr.advance(); err != nil {
+					return query, err
+				}
 			} else {
-				query = append(query, next)
-			}
-			if lxr.chr != ']' {
-				return query, fmt.Errorf("syntax error at %d: missing close bracket, got %q", lxr.chrPos, lxr.chr)
-			}
-			if err := lxr.advance(); err != nil {
-				return query, err
+				return query, fmt.Errorf("syntax error at %d: expected open quote or wildcard, got %q", lxr.chrPos, lxr.chr)
 			}
 		} else {
 			break

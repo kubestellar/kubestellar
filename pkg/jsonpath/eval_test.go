@@ -44,6 +44,63 @@ func TestEval(t *testing.T) {
 	if !jsonEqualities.DeepEqual(expected, actual) {
 		t.Errorf("Expected %#v, got %#v", expected, actual)
 	}
+
+	// Test with arrays and wildcard
+	var root2 RootNode
+	err = json.Unmarshal([]byte(`{
+		"spec": {
+			"resources": {
+				"GenericItems": [
+					{"generictemplate": {"metadata": {"resourceVersion": "123", "name": "item1"}}},
+					{"generictemplate": {"metadata": {"resourceVersion": "456", "name": "item2"}}}
+				]
+			}
+		}
+	}`), &root2.Value)
+	if err != nil {
+		t.Fatalf("Failed to parse doc2, err=%s", err.Error())
+	}
+
+	expected = []JSONValue{"123", "456"}
+	actual = GetQuery(&root2, "$.spec.resources.GenericItems[*].generictemplate.metadata.resourceVersion")
+	if !jsonEqualities.DeepEqual(expected, actual) {
+		t.Errorf("Expected %#v, got %#v", expected, actual)
+	}
+
+	// Test with dot-wildcard as well
+	actual = GetQuery(&root2, "$.spec.resources.GenericItems.*.generictemplate.metadata.resourceVersion")
+	if !jsonEqualities.DeepEqual(expected, actual) {
+		t.Errorf("Expected %#v, got %#v", expected, actual)
+	}
+
+	// Test Remove using wildcard
+	query, err := ParseQuery("$.spec.resources.GenericItems[*].generictemplate.metadata.resourceVersion")
+	if err != nil {
+		t.Fatalf("Failed to parse remove query, err=%s", err.Error())
+	}
+	QueryValue(query, &root2, func(node Node) {
+		node.Remove()
+	})
+
+	// Verify that the fields were removed
+	var expectedDoc any
+	err = json.Unmarshal([]byte(`{
+		"spec": {
+			"resources": {
+				"GenericItems": [
+					{"generictemplate": {"metadata": {"name": "item1"}}},
+					{"generictemplate": {"metadata": {"name": "item2"}}}
+				]
+			}
+		}
+	}`), &expectedDoc)
+	if err != nil {
+		t.Fatalf("Failed to parse expectedDoc, err=%s", err.Error())
+	}
+
+	if !jsonEqualities.DeepEqual(expectedDoc, *root2.Value) {
+		t.Errorf("After Remove, expected %#v, got %#v", expectedDoc, *root2.Value)
+	}
 }
 
 var jsonEqualities = k8sreflect.Equalities{}
