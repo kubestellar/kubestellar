@@ -45,12 +45,22 @@ type ocm struct {
 
 var createOnlyStrategy = workv1.UpdateStrategy{Type: workv1.UpdateStrategyTypeCreateOnly}
 
+// serverSideApplyStrategy is used for Pods. Pods are mostly immutable, but a few
+// fields (container image, activeDeadlineSeconds, toleration additions) can be
+// updated in place and are desired state that must be synced in both directions.
+// Server-side apply gives per-field ownership: the hub declares image etc., so
+// hub updates reach the edge and edge drift is reverted, while cluster-owned
+// fields such as spec.nodeName (stripped in TransformObject) are left to the
+// cluster. createOnly still takes precedence when set.
+var serverSideApplyStrategy = workv1.UpdateStrategy{Type: workv1.UpdateStrategyTypeServerSideApply}
+
 func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(schema.GroupKind) string) runtime.Object {
 	manifests := make([]workv1.Manifest, len(wrapees))
 	var configs []workv1.ManifestConfigOption
 	for i, wrapee := range wrapees {
 		manifests[i].RawExtension = runtime.RawExtension{Object: wrapee.Object}
 		if wrapee.CreateOnly {
+			// createOnly always takes precedence.
 			gvk := wrapee.Object.GroupVersionKind()
 			rsc := kindToResource(gvk.GroupKind())
 			configs = append(configs, workv1.ManifestConfigOption{
@@ -61,6 +71,20 @@ func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(sche
 					Name:      wrapee.Object.GetName(),
 				},
 				UpdateStrategy: &createOnlyStrategy,
+			})
+			continue
+		}
+		if isPod(wrapee.Object) {
+			gvk := wrapee.Object.GroupVersionKind()
+			rsc := kindToResource(gvk.GroupKind())
+			configs = append(configs, workv1.ManifestConfigOption{
+				ResourceIdentifier: workv1.ResourceIdentifier{
+					Group:     gvk.Group,
+					Resource:  rsc,
+					Namespace: wrapee.Object.GetNamespace(),
+					Name:      wrapee.Object.GetName(),
+				},
+				UpdateStrategy: &serverSideApplyStrategy,
 			})
 		}
 	}
@@ -115,4 +139,10 @@ func ManifestConfigOptionResourceIdentifier(mc workv1.ManifestConfigOption) work
 
 func ManifestConfigOptionUpdateStrategy(mc workv1.ManifestConfigOption) *workv1.UpdateStrategy {
 	return mc.UpdateStrategy
+}
+
+// isPod reports whether the object is a core/v1 Pod.
+func isPod(object *unstructured.Unstructured) bool {
+	gvk := object.GroupVersionKind()
+	return gvk.Group == "" && gvk.Kind == "Pod"
 }
