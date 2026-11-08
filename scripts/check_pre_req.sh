@@ -81,11 +81,15 @@ check_sysctl() {
         else
             echo -e "\033[0;31mX\033[0m sysctl ${name} is only $val but must be at least $minval (see https://kind.sigs.k8s.io/docs/user/known-issues#pod-errors-due-to-too-many-open-files)" >&2
              echo -e "\033[0;31mX\033[0m sysctl ${name} is only $val but must be at least $minval (see https://docs-${DOC_VERSION}--kubestellar-docs.netlify.app/docs/user-guide/usage/known-issues/kind-host-configuration)" >&2
-            [ "$assert" == "true" ] && exit 4
+            if [ "$assert" == "true" ]; then
+                exit 4
+            fi
         fi
     else
         echo -e "\033[0;31mX\033[0m Failed to extract sysctl ${name}" >&2
-        [ "$assert" == "true" ] &&  exit 3
+        if [ "$assert" == "true" ]; then
+            exit 3
+        fi
     fi
 }
 
@@ -142,13 +146,18 @@ is_installed_helm() {
         'helm version --template={{.Version}}' \
         'https://helm.sh/docs/intro/install/' \
         'v3'
+    if ! which helm > /dev/null; then
+        return 0
+    fi
     if log=$(helm show chart oci://ghcr.io/kubestellar/kubestellar/core-chart 2>&1)
     then echo -e "\033[0;32m\xE2\x9C\x94\033[0m helm can fetch public charts"
     else
         echo "$log" >&2
         echo >&2
         echo -e "\033[0;31mX\033[0m helm can not fetch public charts!" >&2
-        [ "$assert" == "true" ] && exit 5
+        if [ "$assert" == "true" ]; then
+            exit 5
+        fi
     fi
     
 }
