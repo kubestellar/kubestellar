@@ -28,9 +28,12 @@ const (
 )
 
 func cleanService(object *unstructured.Unstructured) {
-	// Fields to remove
-	fieldsToDelete := []string{"ipFamilies",
-		"externalTrafficPolicy", "internalTrafficPolicy", "ipFamilyPolicy", "sessionAffinity"}
+	// Fields to remove. externalTrafficPolicy, internalTrafficPolicy, and
+	// sessionAffinity are deliberately not here: they are user intent that is
+	// meaningful on every cluster, and removing externalTrafficPolicy would make
+	// a surviving healthCheckNodePort invalid (the API server only accepts
+	// healthCheckNodePort for type=LoadBalancer with externalTrafficPolicy=Local).
+	fieldsToDelete := []string{"ipFamilies", "ipFamilyPolicy"}
 
 	for _, field := range fieldsToDelete {
 		unstructured.RemoveNestedField(object.Object, "spec", field)
@@ -49,8 +52,12 @@ func cleanService(object *unstructured.Unstructured) {
 		}
 	}
 
-	// Set the nodePort to an empty string unelss the annotation "control.kubestellar.io/preserve=nodeport" is present
+	// Clear the nodePort and healthCheckNodePort values unless the annotation
+	// "control.kubestellar.io/preserve=nodeport" is present. Both are node port
+	// numbers that are allocated by the API server of the cluster where the Service
+	// lives, so a value allocated on the hub is not meaningful on a WEC.
 	if !(object.GetAnnotations() != nil && object.GetAnnotations()[preserveFieldAnnotation] == preserveNodePortValue) {
+		unstructured.RemoveNestedField(object.Object, "spec", "healthCheckNodePort")
 		if ports, found, _ := unstructured.NestedSlice(object.Object, "spec", "ports"); found {
 			for i, port := range ports {
 				if portMap, ok := port.(map[string]interface{}); ok {
