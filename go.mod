@@ -1,12 +1,12 @@
 module github.com/kubestellar/kubestellar
 
-go 1.26.10
+go 1.26.11
 
 require (
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
 	github.com/go-logr/logr v1.4.4
 	github.com/google/cel-go v0.22.0
-	github.com/kubestellar/kubeflex v0.9.6
+	github.com/kubestellar/kubeflex v0.9.7
 	github.com/onsi/ginkgo/v2 v2.22.2
 	github.com/onsi/gomega v1.36.2
 	github.com/prometheus/client_golang v1.19.1
