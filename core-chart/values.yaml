@@ -10,7 +10,7 @@ KUBESTELLAR_VERSION: "0.30.1"
 # TRANSPORT_VERSION: e.g., "0.24.0"; defaults to KUBESTELLAR_VERSION value, if not defined
 # KFLEX_GET_KUBECONFIG: e.g., "0.24.0"; defaults to KUBESTELLAR_VERSION value, if not defined
 CLUSTERADM_VERSION: "1.0.0"
-OCM_STATUS_ADDON_VERSION: "0.2.0-rc18"
+OCM_STATUS_ADDON_VERSION: "0.2.0-rc20"
 
 
 # Control controller log verbosity
@@ -113,7 +113,8 @@ ITSes: # all the CPs in this list will execute the its.yaml PCH
   # - name: its2 # name of the control plane
   #   type: external # optional type of control plane: host, vcluster, or external (default to vcluster, if not specified)
   #   install_clusteradm: true|false  # optional flag to enable/disable the installation of OCM in the control plane (default to true, if not specified)
-  #   bootstrapSecret: # this section is ignored unless type is "external"
+  #   this section is ignored unless type is "external"
+  #   bootstrapSecret: # pragma: allowlist secret
   #     name: <secret-name> # default: "<control-plane-name>-bootstrap"
   #     namespace: <secret-namespace> # default: Helm chart installation namespace
   #     key: <key-name> # default: "kubeconfig-incluster"

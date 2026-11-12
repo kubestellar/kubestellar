@@ -50,7 +50,7 @@ jobs:
 
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: 1.26
+          go-version: 1.26.11
           cache: true
 
       - name: Increase inotify limits to support three kind clusters
@@ -68,10 +68,10 @@ jobs:
       - name: Install dependencies
         run: |
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v1.0.0/install.sh) 1.0.0
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.6/kubeflex_0.9.6_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.9.6_linux_amd64.tar.gz bin/kflex
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.7/kubeflex_0.9.7_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.7_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.9.6_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.9.7_linux_amd64.tar.gz
           go install github.com/onsi/ginkgo/v2/ginkgo
 
       - name: Run test
@@ -258,7 +258,7 @@ jobs:
 
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: 1.26
+          go-version: 1.26.11
           cache: true
 
       - name: Increase inotify limits to support three kind clusters
@@ -276,10 +276,10 @@ jobs:
       - name: Install dependencies
         run: |
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v1.0.0/install.sh) 1.0.0
-          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.6/kubeflex_0.9.6_linux_amd64.tar.gz
-          tar -xvf kubeflex_0.9.6_linux_amd64.tar.gz bin/kflex
+          wget https://github.com/kubestellar/kubeflex/releases/download/v0.9.7/kubeflex_0.9.7_linux_amd64.tar.gz
+          tar -xvf kubeflex_0.9.7_linux_amd64.tar.gz bin/kflex
           mv bin/kflex /usr/local/bin
-          rm -fr bin kubeflex_0.9.6_linux_amd64.tar.gz
+          rm -fr bin kubeflex_0.9.7_linux_amd64.tar.gz
 
       - name: Run test
         env:
