@@ -1,0 +1,12 @@
+* @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
+
+/docs/to-be-deleted/ @MikeSpreitzer @ezrasilvera @pdettori @clubanderson @dumb0002 @waltforme
+/hack/ @MikeSpreitzer @ezrasilvera @pdettori @clubanderson @dumb0002 @waltforme
+
+# Explicit coverage for key directories based on root OWNERS
+/pkg/binding/ @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
+/pkg/status/ @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
+/pkg/transport/ @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
+/docs/ @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
+/monitoring/ @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
+/core-chart/ @MikeSpreitzer @KPRoche @pdettori @clubanderson @dumb0002 @waltforme
