@@ -273,12 +273,9 @@ func (c *combinedStatusResolution) noteStatusCollectorAbsence(statusCollectorNam
 }
 
 // generateCombinedStatus calculates the combinedstatus from the statuscollector
-// data in the combinedstatus resolution.
-func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
+// data in the combinedstatus resolution. Caller must hold at least the read lock.
+func (c *combinedStatusResolution) generateCombinedStatusLocked(bindingName string,
 	workloadObjectIdentifier util.ObjectIdentifier) *v1alpha1.CombinedStatus {
-	c.RLock()
-	defer c.RUnlock()
-
 	combinedStatus := &v1alpha1.CombinedStatus{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      c.Name,
@@ -313,12 +310,20 @@ func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
 	return addLabelsToCombinedStatus(combinedStatus, bindingName, workloadObjectIdentifier)
 }
 
+// generateCombinedStatus is the public entry point that acquires the read lock.
+func (c *combinedStatusResolution) generateCombinedStatus(bindingName string,
+	workloadObjectIdentifier util.ObjectIdentifier) *v1alpha1.CombinedStatus {
+	c.RLock()
+	defer c.RUnlock()
+	return c.generateCombinedStatusLocked(bindingName, workloadObjectIdentifier)
+}
+
 func (c *combinedStatusResolution) compareCombinedStatus(status *v1alpha1.CombinedStatus,
 	bindingName string, sourceObjectIdentifier util.ObjectIdentifier) *v1alpha1.CombinedStatus {
 	c.RLock()
 	defer c.RUnlock()
 
-	localCombinedStatus := c.generateCombinedStatus(bindingName, sourceObjectIdentifier)
+	localCombinedStatus := c.generateCombinedStatusLocked(bindingName, sourceObjectIdentifier)
 
 	// check labels
 	if !validateCombinedStatusLabels(status, bindingName, sourceObjectIdentifier) {
