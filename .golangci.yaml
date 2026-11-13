@@ -1,5 +1,6 @@
 version: "2"
 linters:
+  default: none
   enable:
     - asciicheck
     - bidichk
@@ -11,6 +12,10 @@ linters:
     - nilerr
     - nolintlint
     - unconvert
+    - govet
+    - staticcheck
+    - ineffassign
+    - unused
   settings:
     misspell:
       ignore-rules:
@@ -26,6 +31,16 @@ linters:
       - third_party$
       - builtin$
       - examples$
+    rules:
+      - linters:
+          - staticcheck
+        text: "SA1019:"
+      - linters:
+          - staticcheck
+        text: "ST"
+      - linters:
+          - staticcheck
+        text: "QF"
 formatters:
   enable:
     - gofmt
