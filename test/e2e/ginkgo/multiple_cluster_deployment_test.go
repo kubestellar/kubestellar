@@ -88,6 +88,37 @@ var _ = ginkgo.Describe("end to end testing", func() {
 			util.ValidateDeploymentReplicas(ctx, wec2, ns, "nginx", 2)
 		})
 
+		ginkgo.It("removes WDS labels and annotations from the WECs", func(ctx context.Context) {
+			const key = "test.kubestellar.io/removable"
+			checkMetadata := func(wantPresent bool) func(*appsv1.Deployment) string {
+				return func(deployment *appsv1.Deployment) string {
+					label, hasLabel := deployment.Labels[key]
+					annotation, hasAnnotation := deployment.Annotations[key]
+					if wantPresent && (!hasLabel || label != "value" || !hasAnnotation || annotation != "value") {
+						return fmt.Sprintf("expected label and annotation %q to have value %q; got label %q and annotation %q", key, "value", label, annotation)
+					}
+					if !wantPresent && (hasLabel || hasAnnotation) {
+						return fmt.Sprintf("label or annotation %q remains on the WEC", key)
+					}
+					return ""
+				}
+			}
+
+			ginkgo.By("adding a label and annotation on the WDS")
+			patch := []byte(`{"metadata":{"labels":{"test.kubestellar.io/removable":"value"},"annotations":{"test.kubestellar.io/removable":"value"}}}`)
+			_, err := wds.AppsV1().Deployments(ns).Patch(ctx, "nginx", types.MergePatchType, patch, metav1.PatchOptions{})
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 1, checkMetadata(true))
+			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 1, checkMetadata(true))
+
+			ginkgo.By("removing the label and annotation from the WDS")
+			patch = []byte(`{"metadata":{"labels":{"test.kubestellar.io/removable":null},"annotations":{"test.kubestellar.io/removable":null}}}`)
+			_, err = wds.AppsV1().Deployments(ns).Patch(ctx, "nginx", types.MergePatchType, patch, metav1.PatchOptions{})
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			util.ValidateNumDeployments(ctx, "wec1", wec1, ns, 1, checkMetadata(false))
+			util.ValidateNumDeployments(ctx, "wec2", wec2, ns, 1, checkMetadata(false))
+		})
+
 		ginkgo.It("supports create-only mode", func(ctx context.Context) {
 			ginkgo.By("deleting old BindingPolicy and expecting Deployment deletions")
 			util.DeleteBindingPolicy(ctx, ksWds, "nginx")
