@@ -41,7 +41,7 @@ func (c *Controller) updateWorkStatusToObject(ctx context.Context, workStatusON 
 	if wsObj == nil {
 		objId, had := c.workStatusToObject.Delete(workStatusON)
 		if had {
-			logger.V(5).Info("Enqueuing workload object due to absense of WorkStatus", "workStatus", workStatusON, "workloadObject", objId)
+			logger.V(5).Info("Enqueuing workload object due to absence of WorkStatus", "workStatus", workStatusON, "workloadObject", objId)
 			c.workqueue.Add(workloadObjectRef{objId})
 		}
 	} else {
