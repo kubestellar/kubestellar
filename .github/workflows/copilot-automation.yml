@@ -11,7 +11,10 @@ on:
     types: [opened, synchronize, ready_for_review]
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
+  issues: write
+  statuses: write
 
 concurrency:
   group: copilot-automation-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.sha }}
@@ -19,11 +22,6 @@ concurrency:
 
 jobs:
   copilot-automation:
-    permissions:
-      contents: read
-      pull-requests: read
-      issues: write
-      statuses: write
     uses: kubestellar/infra/.github/workflows/reusable-copilot-automation.yml@main
     with:
       pr_number: ${{ github.event.inputs.pr_number || '' }}
