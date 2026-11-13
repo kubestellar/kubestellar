@@ -58,7 +58,12 @@ func (c *Controller) updateResolutions(ctx context.Context, objIdentifier util.O
 			continue // resolution does not exist, skip
 		}
 
-		matchedAny, modFromPolicy := c.testObject(ctx, bindingPolicy.GetName(), objIdentifier, objMR.GetLabels(), bindingPolicy.Spec.Downsync)
+		matchedAny, modFromPolicy, err := c.testObject(ctx, bindingPolicy.GetName(), objIdentifier, objMR.GetLabels(), bindingPolicy.Spec.Downsync)
+		if err != nil {
+			// leave the resolution unchanged; the object will be retried
+			return fmt.Errorf("failed to test object (identifier: %v) against bindingpolicy %s: %w",
+				objIdentifier, bindingPolicy.GetName(), err)
+		}
 		if !matchedAny {
 			// if previously selected, remove
 			if resolutionUpdated := c.bindingPolicyResolver.RemoveObjectIdentifier(bindingPolicy.GetName(),
@@ -137,15 +142,17 @@ func (c *Controller) removeObjectFromBindingPolicies(ctx context.Context, objIde
 //   - bool: whether any test that matches the object also says CreateOnly==true
 //   - sets.Set[string]: the UNION of the statuscollector names that appear within
 //     EACH of the tests that the object matches
+//   - error: non-nil if the object's Namespace could not be read for a reason
+//     other than not existing, in which case the other results are meaningless
 func (c *Controller) testObject(ctx context.Context, bindingName string, objIdentifier util.ObjectIdentifier, objLabels map[string]string,
-	tests []v1alpha1.DownsyncPolicyClause) (bool, DownsyncModulation) {
+	tests []v1alpha1.DownsyncPolicyClause) (bool, DownsyncModulation, error) {
 
 	logger := klog.FromContext(ctx)
 
 	var matched bool
 	mod := ZeroDownsyncModulation()
 
-	var objNS *corev1.Namespace
+	var objNS metav1.Object
 	for _, test := range tests {
 		if test.APIGroup != nil && (*test.APIGroup) != objIdentifier.GVK.Group {
 			continue
@@ -166,17 +173,21 @@ func (c *Controller) testObject(ctx context.Context, bindingName string, objIden
 			continue
 		}
 		if len(test.NamespaceSelectors) > 0 && !ALabelSelectorIsEmpty(test.NamespaceSelectors...) {
+			if objIdentifier.ObjectName.Namespace == "" {
+				continue // cluster-scoped object; only an empty selector matches
+			}
 			if objNS == nil {
 				var err error
-				objNS, err = c.namespaceClient.Get(ctx,
-					objIdentifier.ObjectName.Namespace, metav1.GetOptions{})
-				if err != nil {
+				objNS, err = c.getNamespace(ctx, objIdentifier.ObjectName.Namespace)
+				if errors.IsNotFound(err) {
 					logger.V(3).Info("Object namespace not found, assuming object does not match",
 						"object identifier", objIdentifier, "binding", bindingName)
 					continue
+				} else if err != nil {
+					return false, mod, fmt.Errorf("failed to get namespace %q: %w", objIdentifier.ObjectName.Namespace, err)
 				}
 			}
-			if !labelsMatchAny(logger, objNS.Labels, test.NamespaceSelectors) {
+			if !labelsMatchAny(logger, objNS.GetLabels(), test.NamespaceSelectors) {
 				continue
 			}
 		}
@@ -187,5 +198,25 @@ func (c *Controller) testObject(ctx context.Context, bindingName string, objIden
 		mod.AddExternal(test.DownsyncModulation)
 	}
 
-	return matched, mod
+	return matched, mod, nil
+}
+
+var namespacesGVR = corev1.SchemeGroupVersion.WithResource("namespaces")
+
+// getNamespace returns the Namespace with the given name. It reads from the
+// informer cache when the Namespace informer exists, which is normally the case;
+// otherwise (e.g., when the core API group is not watched) it asks the API server.
+func (c *Controller) getNamespace(ctx context.Context, name string) (metav1.Object, error) {
+	if lister, ok := c.listers.Get(namespacesGVR); ok {
+		obj, err := lister.Get(name)
+		if err != nil {
+			return nil, err
+		}
+		return obj.(metav1.Object), nil
+	}
+	ns, err := c.namespaceClient.Get(ctx, name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return ns, nil
 }
