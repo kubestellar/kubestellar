@@ -53,15 +53,18 @@ func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdent
 
 	// collect status
 	statuses := make([]map[string]any, 0, len(wsObjects))
+	workStatusReadErrors := 0
 	for _, wsON := range wsObjects {
 		wsObj, err := c.workStatusLister.ByNamespace(wsON.Namespace).Get(wsON.Name)
 		if err != nil {
 			logger.V(4).Info("Failed to get WorkStatus", "workStatus", wsON, "error", err)
+			workStatusReadErrors++
 			continue
 		}
 		status, err := util.GetWorkStatusStatus(wsObj)
 		if err != nil {
 			logger.V(4).Info("Failed to extract status from WorkStatus", "workStatus", wsON, "error", err)
+			workStatusReadErrors++
 			continue
 		}
 		if status == nil {
@@ -71,6 +74,11 @@ func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdent
 	}
 
 	if len(statuses) == 0 {
+		if workStatusReadErrors == len(wsObjects) {
+			logger.V(4).Info("No statuses collected due to WorkStatus read/extract errors; preserving existing status",
+				"object", wObjID, "wsObjects", len(wsObjects), "readErrors", workStatusReadErrors)
+			return nil
+		}
 		if err := c.updateObjectStatus(ctx, wObjID, nil, c.listers, true); err != nil {
 			return err
 		}
