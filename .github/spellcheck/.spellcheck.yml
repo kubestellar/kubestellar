@@ -8,6 +8,8 @@ matrix:
     encoding: utf-8
   pipeline:
   - pyspelling.filters.markdown:
+      markdown_extensions:
+        - markdown.extensions.fenced_code
   - pyspelling.filters.html:
       comments: false
       ignores:
@@ -17,10 +19,9 @@ matrix:
         - script
         - head
         - noscript
-      ignore_classes:
-        - hidden
-        - sr-only
-        - copy-button
+        - .hidden
+        - .sr-only
+        - .copy-button
   sources:
-  - '**/*.md'
+  - '**/*.md|!etcd-v*/**/*|!docs/to-be-deleted/**/*|!docs/content/**/*|!oldocs/**/*'
   default_encoding: utf-8
