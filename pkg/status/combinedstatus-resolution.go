@@ -781,6 +781,33 @@ func refValToValue(val ref.Val) v1alpha1.Value {
 	}
 }
 
+// groupByValueKey reduces a groupBy evaluation result to a stable string that
+// can be used as a map key. Scalars are formatted directly; composite values
+// (lists/maps), which are not comparable and cannot be used as map keys, are
+// reduced to their JSON encoding. Two evaluations that produce equal values
+// yield the same key, so grouping semantics are preserved.
+func groupByValueKey(val ref.Val) string {
+	if val == nil {
+		return "null"
+	}
+
+	native := val.Value()
+	switch native.(type) {
+	case string, bool,
+		int, int8, int16, int32, int64,
+		uint, uint8, uint16, uint32, uint64,
+		float32, float64:
+		return fmt.Sprintf("%T:%v", native, native)
+	default:
+		if encoded, err := json.Marshal(native); err == nil {
+			return "json:" + string(encoded)
+		}
+		// Fall back to a Go-syntax representation if the value is not
+		// JSON-encodable, rather than using it directly as a map key.
+		return fmt.Sprintf("gosyntax:%#v", native)
+	}
+}
+
 // handleAggregationReadLocked handles the aggregation of the statuscollector
 // data. This means that the function evaluates the groupBy expressions and the
 // combinedFields expressions against the possibly filtered workstatuses and
@@ -797,7 +824,7 @@ func handleAggregationReadLocked(scName string, scData *statusCollectorData) *v1
 	// 		Where the N-values tuple is the string concatenation of the assigned numbers
 	// 		separated by commas, ordered by the groupBy expressions in scData.GroupBy slice.
 	generator := 0
-	ValueToNumber := map[any]int{}
+	ValueToNumber := map[string]int{}
 	idToAggregationGroup := map[string]*aggregationGroup{}
 
 	if len(scData.collectorSpec.GroupBy) == 0 && len(scData.WECToData) == 0 {
@@ -826,10 +853,14 @@ func handleAggregationReadLocked(scName string, scData *statusCollectorData) *v1
 		for _, groupByNamedExp := range scData.collectorSpec.GroupBy {
 			groupByValue := wsData.groupByEval[groupByNamedExp.Name]
 
-			// ensure unique number mapping for the value
-			uid, exists := ValueToNumber[groupByValue.Value()]
+			// ensure unique number mapping for the value. The value is reduced to
+			// a stable string key first: a groupBy expression may evaluate to a
+			// composite (list/map) value, which is not comparable and would panic
+			// if used directly as a map key.
+			valueKey := groupByValueKey(groupByValue)
+			uid, exists := ValueToNumber[valueKey]
 			if !exists {
-				ValueToNumber[groupByValue.Value()] = generator
+				ValueToNumber[valueKey] = generator
 				uid = generator
 				generator++
 			}
