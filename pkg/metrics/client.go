@@ -64,18 +64,21 @@ func GVRString(gvr schema.GroupVersionResource) string {
 
 type RegisterFn = func(k8smetrics.Registerable) error
 
+// Must panics if the provided error is not nil.
 func Must(err error) {
 	if err != nil {
 		panic(err)
 	}
 }
 
+// MustRegister calls Register on each provided item and panics on error.
 func MustRegister(reg RegisterFn, registerable ...interface{ Register(RegisterFn) error }) {
 	for _, ra := range registerable {
 		Must(ra.Register(reg))
 	}
 }
 
+// MustRegisterAbles registers multiple k8smetrics.Registerable items and panics on error.
 func MustRegisterAbles(reg RegisterFn, registerable ...k8smetrics.Registerable) {
 	for _, ra := range registerable {
 		Must(reg(ra))
@@ -108,6 +111,7 @@ type clientResourceMetrics struct {
 
 var _ MultiSpaceClientMetrics = &multiSpaceClientMetrics{}
 
+// NewMultiSpaceClientMetrics creates a new multiSpaceClientMetrics for tracking API call latency.
 func NewMultiSpaceClientMetrics() *multiSpaceClientMetrics {
 	return &multiSpaceClientMetrics{
 		CallLatency: k8smetrics.NewHistogramVec(&k8smetrics.HistogramOpts{
@@ -151,6 +155,7 @@ func (crm *clientResourceMetrics) ResourceRecord(method string, err error, laten
 	crm.Base.Record(crm.Resource, method, err, latency)
 }
 
+// ErrorShort returns a concise string representation of an error for metrics tagging.
 func ErrorShort(err error) string {
 	if err == nil {
 		return ""
