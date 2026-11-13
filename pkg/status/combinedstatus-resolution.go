@@ -1066,11 +1066,16 @@ func getCombinedFieldSubject(combinedFieldNamedAgg v1alpha1.NamedAggregator, row
 	case string:
 		f, err := strconv.ParseFloat(v, 64)
 		if err != nil {
-			return nil, "failed to parse combinedField subject as a float: " + err.Error()
+			errMessage := "failed to parse combinedField subject as a float"
+			klog.ErrorS(err, errMessage, "subjectValue", v, "aggregatorName", combinedFieldNamedAgg.Name)
+			return nil, errMessage + ": " + err.Error()
 		}
 		return &f, ""
 	default:
-		return nil, fmt.Sprintf("combinedField subject has unexpected type %T", evalValue)
+		err := fmt.Errorf("unexpected type %T", evalValue)
+		errMessage := "combinedField subject has unexpected type"
+		klog.ErrorS(err, errMessage, "type", fmt.Sprintf("%T", evalValue), "aggregatorName", combinedFieldNamedAgg.Name)
+		return nil, fmt.Sprintf("%s %T", errMessage, evalValue)
 	}
 }
 
