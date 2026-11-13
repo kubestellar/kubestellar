@@ -29,14 +29,21 @@ if ! which etcd; then
     platform="$(go env GOOS)-$(go env GOARCH)"
 
     case "$(go env GOOS)" in
-	(darwin|windows) fmt="zip";    extract="unzip"  ;;
+	(darwin|windows) fmt="zip";    extract="unzip -o"  ;;
 	(linux)          fmt="tar.gz"; extract="tar xzf";;
 	(*) echo "Unsupported OS $(go env GOOS)" >& 2
 	    exit 1;;
     esac
 
     etcd_archive_url="https://github.com/etcd-io/etcd/releases/download/v${etcd_version}/etcd-v${etcd_version}-${platform}.${fmt}"
-    wget --no-verbose $etcd_archive_url -O etcd.${fmt}
+    if command -v wget >/dev/null 2>&1; then
+        wget --no-verbose $etcd_archive_url -O etcd.${fmt}
+    elif command -v curl >/dev/null 2>&1; then
+        curl -sSL $etcd_archive_url -o etcd.${fmt}
+    else
+        echo "Neither wget nor curl found" >&2
+        exit 1
+    fi
     case "$platform" in
 	(darwin-amd64)  expected_sha=f9d0c97374655bab27934f7dd19193bc540d692c0a582b3bc686875a0a72754d ;;
 	(darwin-arm64)  expected_sha=912c90ce9f79e822a659462a19049bba9e7f0cb42390ed3a7858781d4a7c2eb9;;
