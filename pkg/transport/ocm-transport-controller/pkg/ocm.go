@@ -45,24 +45,29 @@ type ocm struct {
 
 var createOnlyStrategy = workv1.UpdateStrategy{Type: workv1.UpdateStrategyTypeCreateOnly}
 
+// Server-side apply tracks fields removed from the WDS object, such as labels and annotations.
+var serverSideApplyStrategy = workv1.UpdateStrategy{Type: workv1.UpdateStrategyTypeServerSideApply}
+
 func (ocm *ocm) WrapObjects(wrapees []transport.Wrapee, kindToResource func(schema.GroupKind) string) runtime.Object {
 	manifests := make([]workv1.Manifest, len(wrapees))
 	var configs []workv1.ManifestConfigOption
 	for i, wrapee := range wrapees {
 		manifests[i].RawExtension = runtime.RawExtension{Object: wrapee.Object}
+		strategy := &serverSideApplyStrategy
 		if wrapee.CreateOnly {
-			gvk := wrapee.Object.GroupVersionKind()
-			rsc := kindToResource(gvk.GroupKind())
-			configs = append(configs, workv1.ManifestConfigOption{
-				ResourceIdentifier: workv1.ResourceIdentifier{
-					Group:     gvk.Group,
-					Resource:  rsc,
-					Namespace: wrapee.Object.GetNamespace(),
-					Name:      wrapee.Object.GetName(),
-				},
-				UpdateStrategy: &createOnlyStrategy,
-			})
+			strategy = &createOnlyStrategy
 		}
+		gvk := wrapee.Object.GroupVersionKind()
+		rsc := kindToResource(gvk.GroupKind())
+		configs = append(configs, workv1.ManifestConfigOption{
+			ResourceIdentifier: workv1.ResourceIdentifier{
+				Group:     gvk.Group,
+				Resource:  rsc,
+				Namespace: wrapee.Object.GetNamespace(),
+				Name:      wrapee.Object.GetName(),
+			},
+			UpdateStrategy: strategy,
+		})
 	}
 	return &workv1.ManifestWork{
 		TypeMeta: metav1.TypeMeta{
