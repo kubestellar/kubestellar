@@ -20,6 +20,7 @@ import (
 	"context"
 
 	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
@@ -99,6 +100,13 @@ func (c *Controller) handleMultiWEC(ctx context.Context, wObjID util.ObjectIdent
 			aggregatedStatus, errAggregate = aggregation.AggregateReplicaSetStatus(statuses)
 		case "DaemonSet":
 			aggregatedStatus, errAggregate = aggregation.AggregateDaemonSetStatus(statuses)
+		case "StatefulSet":
+			aggregatedStatus, errAggregate = aggregation.AggregateStatefulSetStatus(statuses)
+		}
+	case batchv1.GroupName:
+		switch wObjID.GVK.Kind {
+		case "Job":
+			aggregatedStatus, errAggregate = aggregation.AggregateJobStatus(statuses)
 		}
 	default:
 		// for generic
