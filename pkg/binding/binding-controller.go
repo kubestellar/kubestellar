@@ -445,6 +445,9 @@ func (c *Controller) run(ctx context.Context, workers int, cListers chan interfa
 							return
 						}
 						c.handleObject(old, new, gvr.Resource, WorkloadUpdate, false)
+						if gvr == namespaceGVR {
+							c.handleNamespaceUpdate(ctx, old, new)
+						}
 					},
 					DeleteFunc: func(obj interface{}) {
 						var oldObj *unstructured.Unstructured
