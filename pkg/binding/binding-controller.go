@@ -557,7 +557,7 @@ func (c *Controller) setupBindingPolicyInformer(ctx context.Context) error {
 		UpdateFunc: func(old, new interface{}) {
 			oldBP := old.(*v1alpha1.BindingPolicy)
 			newBP := new.(*v1alpha1.BindingPolicy)
-			if oldBP.Generation != newBP.Generation {
+			if shouldQueueBindingPolicyOnUpdate(oldBP, newBP) {
 				logger.V(5).Info("Enqueuing reference to BindingPolicy because of informer update event", "name", newBP.Name, "resourceVersion", newBP.ResourceVersion)
 				c.workqueue.Add(bindingPolicyRef(newBP.Name))
 			}
@@ -608,6 +608,14 @@ func (c *Controller) setupBindingInformer(ctx context.Context) error {
 		return err
 	}
 	return nil
+}
+
+func shouldQueueBindingPolicyOnUpdate(old, new *v1alpha1.BindingPolicy) bool {
+	if old.Generation != new.Generation {
+		return true
+	}
+	// deletion does not change generation, and the finalizer blocks removal
+	return old.GetDeletionTimestamp() == nil && new.GetDeletionTimestamp() != nil
 }
 
 func shouldQueueBindingOnUpdate(old, new *v1alpha1.Binding) bool {
