@@ -35,6 +35,7 @@ type IndexedMapToComparable[Key, Val comparable] struct {
 	reverse MutableMap[Val, sets.Set[Key]]
 }
 
+// NewPrimitiveMapToComparable creates an IndexedMapToComparable using built-in maps for underlying storage.
 func NewPrimitiveMapToComparable[Key, Val comparable]() *IndexedMapToComparable[Key, Val] {
 	return &IndexedMapToComparable[Key, Val]{
 		forward: AsPrimitiveMap(map[Key]Val{}),
@@ -95,6 +96,7 @@ type LockedMapToComparable[Key, Val comparable] struct {
 	inverse MapToLocked[Val, sets.Set[Key]]
 }
 
+// NewLockedMapToComparable creates a thread-safe LockedMapToComparable wrapping a MutableMapToComparable.
 func NewLockedMapToComparable[Key, Val comparable](lock *sync.RWMutex, inner MutableMapToComparable[Key, Val]) *LockedMapToComparable[Key, Val] {
 	if lock == nil {
 		lock = new(sync.RWMutex)
