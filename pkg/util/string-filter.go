@@ -54,7 +54,6 @@ type StringFilter struct {
 }
 
 func (sfo StringFilterOptions) ToFilter() (StringFilter, bool) {
-	gotSome := len(sfo.Literals) > 0
 	ansSet := sets.New[string]()
 	for _, piece := range sfo.Literals {
 		if len(piece) == 0 {
@@ -64,13 +63,12 @@ func (sfo StringFilterOptions) ToFilter() (StringFilter, bool) {
 			ansSet.Insert(piece)
 			continue
 		}
-		elts := strings.Split(piece, " ")
+		elts := strings.Fields(piece)
 		for _, elt := range elts {
-			if len(elt) != 0 {
-				ansSet.Insert(elt)
-			}
+			ansSet.Insert(elt)
 		}
 	}
+	gotSome := ansSet.Len() > 0
 	if ansSet.Has("*") {
 		return StringFilter{AllPass: true}, gotSome
 	}
@@ -78,10 +76,16 @@ func (sfo StringFilterOptions) ToFilter() (StringFilter, bool) {
 }
 
 func (sf *StringFilter) Passes(candidate string, passStar bool) bool {
+	if sf == nil {
+		return false
+	}
 	return sf.AllPass || passStar && candidate == "*" || sf.Literals.Has(candidate)
 }
 
 func (sf *StringFilter) FilterSlice(candidates []string, passStar bool) []string {
+	if sf == nil || len(candidates) == 0 {
+		return nil
+	}
 	ans := make([]string, 0, len(candidates))
 	for _, candidate := range candidates {
 		if sf.Passes(candidate, passStar) {
