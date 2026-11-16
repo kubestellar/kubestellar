@@ -6,10 +6,10 @@ If this is your first time, please make sure to review CONTRIBUTING.MD.
 Don't forget to first look for overlapping PRs. Remember, open source
 is a collaborative rather than competitive activity.
 
-If this PR includes changes to the source files for the website
-(docs/content/** or a file included from there) then include a preview
-of the modified website; see
-docs/content/contribution-guidelines/operations/document-management.md.
+For website documentation changes, open a PR in the kubestellar/docs
+repository instead of this one: https://github.com/kubestellar/docs.
+See the documentation contribution guide for details:
+https://github.com/kubestellar/docs/blob/main/CONTRIBUTING.md.
 
 Please put one of the following icons at the start of your PR title,
 to indicate the type of your PR. You could use copy-and-paste from

@@ -70,15 +70,17 @@ if ! dunsel=$(docker ps 2>&1); then
 fi
 echo "Container runtime is running."
 
-kubestellar_version=0.30.0
+kubestellar_version=0.30.2
 echo -e "KubeStellar Version: ${kubestellar_version}"
 
 echo -e "Checking that pre-req softwares are installed..."
+set -x
 if [ "$k8s_platform" == "kind" ]; then
     curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker kind
 else
     curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/v${kubestellar_version}/scripts/check_pre_req.sh | bash -s -- --assert -V kflex ocm helm kubectl docker k3d
 fi
+set +x
 
 ##########################################
 cluster_clean_up() {

@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: 1.26
+          go-version: 1.26.11
           cache: true
 
       - name: Set up Helm
@@ -26,7 +26,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@829323503d1be3d00ca8346e5391ca0b07a9ab0d # v5.1.0
+        uses: azure/setup-kubectl@bda439f5f36b99b262ebdcd3613869bddb064c8e # v5.2.0
         id: install
 
       - name: Install dependencies
@@ -35,7 +35,7 @@ jobs:
           mkdir clusteradm
           export INSTALL_DIR="$PWD/clusteradm"
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v1.0.0/install.sh) 1.0.0
-          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.9.3/kubeflex_0.9.3_linux_amd64.tar.gz --output kubeflex.tar.gz
+          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.9.7/kubeflex_0.9.7_linux_amd64.tar.gz --output kubeflex.tar.gz
           tar -xvf kubeflex.tar.gz bin/kflex
           go install github.com/onsi/ginkgo/v2/ginkgo
           curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.15/openshift-client-linux.tar.gz --output openshift-client-linux.tar.gz
@@ -51,7 +51,7 @@ jobs:
           kubectl get secret kubeconfigfile --output="jsonpath={.data.edgeplatform-cicd-config}" | base64 --decode > kubeconfig.tmp
           export KUBECONFIG=$PWD/kubeconfig.tmp
           export KUBESTELLAR_VERSION=0.22.0
-          export OCM_STATUS_ADDON_VERSION=0.2.0-rc17
+          export OCM_STATUS_ADDON_VERSION=0.2.0-rc18
           export OCM_TRANSPORT_PLUGIN=0.1.8
           export PATH=~/oc:$PATH
           export KFLEX_DISABLE_CHATTY=true
@@ -69,7 +69,7 @@ jobs:
 
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: 1.26
+          go-version: 1.26.11
           cache: true
 
       - name: Set up Helm
@@ -78,7 +78,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@829323503d1be3d00ca8346e5391ca0b07a9ab0d # v5.1.0
+        uses: azure/setup-kubectl@bda439f5f36b99b262ebdcd3613869bddb064c8e # v5.2.0
         id: install
 
       - name: Install dependencies
@@ -87,7 +87,7 @@ jobs:
           export USE_SUDO=false
           export INSTALL_DIR="$PWD/clusteradm"
           bash <(curl -L https://raw.githubusercontent.com/open-cluster-management-io/clusteradm/refs/tags/v1.0.0/install.sh) 1.0.0
-          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.9.3/kubeflex_0.9.3_linux_amd64.tar.gz --output kubeflex.tar.gz
+          curl -L https://github.com/kubestellar/kubeflex/releases/download/v0.9.7/kubeflex_0.9.7_linux_amd64.tar.gz --output kubeflex.tar.gz
           tar -xvf kubeflex.tar.gz bin/kflex
           go install github.com/onsi/ginkgo/v2/ginkgo
           curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.15/openshift-client-linux.tar.gz --output openshift-client-linux.tar.gz
@@ -100,7 +100,7 @@ jobs:
           kubectl get secret kubeconfigfile --output="jsonpath={.data.edgeplatform-cicd-config}" | base64 --decode > kubeconfig.tmp
           export KUBECONFIG=$PWD/kubeconfig.tmp
           export KUBESTELLAR_VERSION=0.22.0
-          export OCM_STATUS_ADDON_VERSION=0.2.0-rc17
+          export OCM_STATUS_ADDON_VERSION=0.2.0-rc18
           export OCM_TRANSPORT_PLUGIN=0.1.8
           export PATH=~/oc:$PATH
           export KFLEX_DISABLE_CHATTY=true
