@@ -18,11 +18,23 @@ package aggregation
 
 import "math"
 
+// fieldValue returns the int64 value of field in status. Kubernetes omits
+// omitempty integer status fields (such as readyReplicas) when they are 0, so
+// a missing field counts as 0 rather than being skipped.
+func fieldValue(status map[string]interface{}, field string) (int64, bool) {
+	raw, present := status[field]
+	if !present || raw == nil {
+		return 0, true
+	}
+	val, ok := raw.(int64)
+	return val, ok
+}
+
 func GetMin(statuses []map[string]interface{}, field string) int64 {
 	min := int64(math.MaxInt64)
 	found := false
 	for _, status := range statuses {
-		if val, ok := status[field].(int64); ok {
+		if val, ok := fieldValue(status, field); ok {
 			if val < min {
 				min = val
 			}
@@ -39,7 +51,7 @@ func GetMax(statuses []map[string]interface{}, field string) int64 {
 	max := int64(math.MinInt64)
 	found := false
 	for _, status := range statuses {
-		if val, ok := status[field].(int64); ok {
+		if val, ok := fieldValue(status, field); ok {
 			if val > max {
 				max = val
 			}
