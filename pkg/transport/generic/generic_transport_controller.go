@@ -632,17 +632,13 @@ func (c *genericTransportController) deleteWrappedObjectsAndFinalizer(ctx contex
 		return fmt.Errorf("failed to get current wrapped objects that are owned by Binding '%s' - %w", binding.GetName(), err)
 	}
 	c.customTransformCollection.setBindingGroupResources(binding.Name, sets.New[metav1.GroupResource]())
-	for _, destination := range binding.Spec.Destinations {
-		for {
-			currentWrappedObject := c.popWrappedObjectByNamespace(currentWrappedObjectList, destination.ClusterId)
-			if currentWrappedObject != nil {
-				if err := c.deleteWrappedObject(ctx, destination.ClusterId, currentWrappedObject.GetName()); err != nil {
-					// wrapped object name is in the format (Binding.GetName()-WdsName). see updateWrappedObject func for explanation.
-					return fmt.Errorf("failed to delete wrapped object from all destinations' - %w", err)
-				}
-			} else {
-				break
-			}
+	// Delete every wrapped object that carries this Binding's origin labels, not only the ones
+	// in the namespaces of the current spec.destinations. A destination may have been dropped
+	// before its wrapped object was cleaned up, and once the finalizer is gone nothing else
+	// would ever delete that wrapped object.
+	for _, wrappedObject := range currentWrappedObjectList.Items {
+		if err := c.deleteWrappedObject(ctx, wrappedObject.GetNamespace(), wrappedObject.GetName()); err != nil {
+			return fmt.Errorf("failed to delete wrapped objects of Binding '%s' - %w", binding.GetName(), err)
 		}
 	}
 
@@ -1105,26 +1101,6 @@ func (c *genericTransportController) propagateWrappedObjectToClusters(ctx contex
 			if err := c.createOrUpdateWrappedObject(ctx, destination.ClusterId, task.ObjU); err != nil {
 				return fmt.Errorf("failed to propagate wrapped object to cluster mailbox namespace '%s' - %w", destination.ClusterId, err)
 			}
-		}
-	}
-
-	return nil
-}
-
-// pops wrapped object by namespace from the list and returns the requested wrapped object.
-// if the object is not found, list remains the same and nil is returned.
-// since the order of items in the list is not important, the implementation is efficient and was done as follows:
-// the functions goes over the list, if the requested object is found, it's replaced with the last object in the list.
-// then the function removes the last object in the list and returns the object.
-// in worst case where object is not found, it will go over all items in the list.
-func (c *genericTransportController) popWrappedObjectByNamespace(list *unstructured.UnstructuredList, namespace string) *unstructured.Unstructured {
-	length := len(list.Items)
-	for i := 0; i < length; i++ {
-		if list.Items[i].GetNamespace() == namespace {
-			requiredObject := list.Items[i]
-			list.Items[i] = list.Items[length-1]
-			list.Items = list.Items[:length-1]
-			return &requiredObject
 		}
 	}
 
